@@ -58,8 +58,11 @@ function Layout(children...; title="Suite.jl")
             children...
         ),
 
+        # Footer separator (dogfooding SuiteSeparator)
+        Main.SuiteSeparator(),
+
         # Footer
-        Footer(:class => "bg-warm-100 dark:bg-warm-900 border-t border-warm-200 dark:border-warm-700 mt-auto transition-colors duration-200",
+        Footer(:class => "bg-warm-100 dark:bg-warm-900 mt-auto transition-colors duration-200",
             Div(:class => "max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8",
                 Div(:class => "text-center",
                     P(:class => "text-warm-600 dark:text-warm-400 text-sm",
