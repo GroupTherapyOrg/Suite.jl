@@ -39,6 +39,9 @@ include("components/Pagination.jl")
 # include("components/Switch.jl")
 # include("components/ToggleGroup.jl")
 
+# --- JS Runtime Components (implemented) ---
+include("components/ThemeToggle.jl")
+
 # --- Phase 3: JS Runtime Components ---
 # include("components/Dialog.jl")
 # include("components/DropdownMenu.jl")

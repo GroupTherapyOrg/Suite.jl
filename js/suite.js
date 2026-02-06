@@ -267,10 +267,32 @@
             }
         },
 
+        // --- Theme Toggle ---------------------------------------------------------
+        ThemeToggle: {
+            /**
+             * Initialize theme toggle buttons.
+             * Discovers elements with data-suite-theme-toggle attribute.
+             * Toggles `dark` class on <html> and persists to localStorage.
+             */
+            init() {
+                const toggles = document.querySelectorAll('[data-suite-theme-toggle]');
+                toggles.forEach(toggle => {
+                    if (toggle._suiteThemeToggle) return; // Already initialized
+                    toggle._suiteThemeToggle = true;
+                    toggle.addEventListener('click', () => {
+                        const isDark = document.documentElement.classList.toggle('dark');
+                        try {
+                            localStorage.setItem('therapy-theme', isDark ? 'dark' : 'light');
+                        } catch (e) {}
+                    });
+                });
+            }
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
-            // Future: scan for data-suite-* attributes and initialize behaviors
-            // This runs on page load and after SPA navigation
+            // Scan for data-suite-* attributes and initialize behaviors
+            this.ThemeToggle.init();
         },
 
         // --- Init -----------------------------------------------------------------

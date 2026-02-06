@@ -965,4 +965,59 @@ using Test
             @test :SuiteInlineCode in meta.exports
         end
     end
+
+    @testset "SuiteThemeToggle" begin
+        @testset "Default" begin
+            html = Therapy.render_to_string(SuiteThemeToggle())
+            @test occursin("<button", html)
+            @test occursin("data-suite-theme-toggle", html)
+            @test occursin("aria-label=\"Toggle dark mode\"", html)
+            @test occursin("type=\"button\"", html)
+        end
+
+        @testset "Sun and moon icons" begin
+            html = Therapy.render_to_string(SuiteThemeToggle())
+            @test occursin("<svg", html)
+            # Sun icon (dark mode visible)
+            @test occursin("hidden dark:block", html)
+            # Moon icon (light mode visible)
+            @test occursin("block dark:hidden", html)
+        end
+
+        @testset "Hover styles" begin
+            html = Therapy.render_to_string(SuiteThemeToggle())
+            @test occursin("hover:bg-warm-200", html)
+            @test occursin("dark:hover:bg-warm-800", html)
+            @test occursin("cursor-pointer", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteThemeToggle(class="ml-4"))
+            @test occursin("ml-4", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :ThemeToggle)
+            meta = Suite.COMPONENT_REGISTRY[:ThemeToggle]
+            @test meta.tier == :js_runtime
+            @test :SuiteThemeToggle in meta.exports
+            @test :ThemeToggle in meta.js_modules
+        end
+    end
+
+    @testset "suite_theme_script" begin
+        html = Therapy.render_to_string(suite_theme_script())
+        @test occursin("<script", html)
+        @test occursin("therapy-theme", html)
+        @test occursin("prefers-color-scheme", html)
+        @test occursin("classList.add", html)
+    end
+
+    @testset "suite_script" begin
+        html = Therapy.render_to_string(suite_script())
+        @test occursin("<script", html)
+        @test occursin("Suite", html)
+        @test occursin("ThemeToggle", html)
+        @test occursin("data-suite-theme-toggle", html)
+    end
 end
