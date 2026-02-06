@@ -62,7 +62,10 @@ function Index()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-# Use components directly — just like shadcn/ui
+# Extract and customize — just like shadcn/ui
+Suite.extract(:Card, "src/components/")
+
+# Then use your own copy:
 SuiteCard(
     SuiteCardHeader(
         SuiteCardTitle("Welcome"),
@@ -72,10 +75,7 @@ SuiteCard(
         SuiteButton(variant="default", "Get Started"),
         SuiteButton(variant="outline", "Learn More")
     )
-)
-
-# Or extract and customize:
-# Suite.extract(:Card, "src/components/")""")
+)""")
                 )
             )
         ),

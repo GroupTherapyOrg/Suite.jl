@@ -26,7 +26,7 @@ function Layout(children...; title="Suite.jl")
                             class = "text-warm-800 dark:text-warm-300 hover:text-warm-800 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors",
                             active_class = "text-accent-600 dark:text-accent-400"
                         ),
-                        NavLink("./docs/", "Docs";
+                        NavLink("./getting-started/", "Getting Started";
                             class = "text-warm-800 dark:text-warm-300 hover:text-warm-800 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors",
                             active_class = "text-accent-600 dark:text-accent-400"
                         ),

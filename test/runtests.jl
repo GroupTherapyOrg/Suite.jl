@@ -656,4 +656,313 @@ using Test
             @test Suite.COMPONENT_REGISTRY[:Progress].tier == :styling
         end
     end
+
+    @testset "SuiteTable" begin
+        @testset "Basic table structure" begin
+            html = Therapy.render_to_string(SuiteTable(
+                SuiteTableHeader(
+                    SuiteTableRow(
+                        SuiteTableHead("Name"),
+                        SuiteTableHead("Email"),
+                    ),
+                ),
+                SuiteTableBody(
+                    SuiteTableRow(
+                        SuiteTableCell("Alice"),
+                        SuiteTableCell("alice@ex.com"),
+                    ),
+                ),
+            ))
+            @test occursin("<table", html)
+            @test occursin("overflow-x-auto", html)
+            @test occursin("Name", html)
+            @test occursin("Alice", html)
+            @test occursin("alice@ex.com", html)
+        end
+
+        @testset "TableHeader" begin
+            html = Therapy.render_to_string(SuiteTableHeader(SuiteTableRow(SuiteTableHead("X"))))
+            @test occursin("<thead", html)
+            @test occursin("border-b", html)
+        end
+
+        @testset "TableHead" begin
+            html = Therapy.render_to_string(SuiteTableHead("Col"))
+            @test occursin("<th", html)
+            @test occursin("h-10", html)
+            @test occursin("font-medium", html)
+            @test occursin("text-warm-600", html)
+        end
+
+        @testset "TableRow" begin
+            html = Therapy.render_to_string(SuiteTableRow(SuiteTableCell("X")))
+            @test occursin("<tr", html)
+            @test occursin("hover:bg-warm-100/50", html)
+            @test occursin("transition-colors", html)
+        end
+
+        @testset "TableCell" begin
+            html = Therapy.render_to_string(SuiteTableCell("Data"))
+            @test occursin("<td", html)
+            @test occursin("p-2", html)
+            @test occursin("Data", html)
+        end
+
+        @testset "TableFooter" begin
+            html = Therapy.render_to_string(SuiteTableFooter(SuiteTableRow(SuiteTableCell("Total"))))
+            @test occursin("<tfoot", html)
+            @test occursin("font-medium", html)
+            @test occursin("border-t", html)
+        end
+
+        @testset "TableCaption" begin
+            html = Therapy.render_to_string(SuiteTableCaption("A list of items"))
+            @test occursin("<caption", html)
+            @test occursin("text-warm-600", html)
+            @test occursin("A list of items", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteTableRow(SuiteTableCell("X")))
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:hover:bg-warm-900/50", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Table)
+            meta = Suite.COMPONENT_REGISTRY[:Table]
+            @test :SuiteTable in meta.exports
+            @test :SuiteTableHead in meta.exports
+            @test :SuiteTableCell in meta.exports
+            @test :SuiteTableCaption in meta.exports
+        end
+    end
+
+    @testset "SuiteScrollArea" begin
+        @testset "Default" begin
+            html = Therapy.render_to_string(SuiteScrollArea(Div("Content")))
+            @test occursin("overflow-auto", html)
+            @test occursin("relative", html)
+            @test occursin("Content", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteScrollArea(class="h-[200px] w-[350px]", Div("X")))
+            @test occursin("h-[200px]", html)
+            @test occursin("w-[350px]", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :ScrollArea)
+        end
+    end
+
+    @testset "SuiteBreadcrumb" begin
+        @testset "Full breadcrumb" begin
+            html = Therapy.render_to_string(SuiteBreadcrumb(
+                SuiteBreadcrumbList(
+                    SuiteBreadcrumbItem(SuiteBreadcrumbLink("Home", href="/")),
+                    SuiteBreadcrumbSeparator(),
+                    SuiteBreadcrumbItem(SuiteBreadcrumbPage("Current")),
+                ),
+            ))
+            @test occursin("<nav", html)
+            @test occursin("aria-label=\"breadcrumb\"", html)
+            @test occursin("Home", html)
+            @test occursin("Current", html)
+        end
+
+        @testset "BreadcrumbList" begin
+            html = Therapy.render_to_string(SuiteBreadcrumbList(SuiteBreadcrumbItem("X")))
+            @test occursin("<ol", html)
+            @test occursin("text-warm-600", html)
+            @test occursin("text-sm", html)
+        end
+
+        @testset "BreadcrumbLink" begin
+            html = Therapy.render_to_string(SuiteBreadcrumbLink("Docs", href="/docs"))
+            @test occursin("<a", html)
+            @test occursin("href=\"/docs\"", html)
+            @test occursin("transition-colors", html)
+        end
+
+        @testset "BreadcrumbPage" begin
+            html = Therapy.render_to_string(SuiteBreadcrumbPage("Current"))
+            @test occursin("aria-current=\"page\"", html)
+            @test occursin("aria-disabled=\"true\"", html)
+            @test occursin("role=\"link\"", html)
+            @test occursin("font-normal", html)
+        end
+
+        @testset "BreadcrumbSeparator" begin
+            html = Therapy.render_to_string(SuiteBreadcrumbSeparator())
+            @test occursin("role=\"presentation\"", html)
+            @test occursin("aria-hidden=\"true\"", html)
+        end
+
+        @testset "BreadcrumbEllipsis" begin
+            html = Therapy.render_to_string(SuiteBreadcrumbEllipsis())
+            @test occursin("aria-hidden=\"true\"", html)
+            @test occursin("...", html)
+            @test occursin("sr-only", html)
+            @test occursin("More", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Breadcrumb)
+            meta = Suite.COMPONENT_REGISTRY[:Breadcrumb]
+            @test :SuiteBreadcrumb in meta.exports
+            @test :SuiteBreadcrumbPage in meta.exports
+        end
+    end
+
+    @testset "SuitePagination" begin
+        @testset "Full pagination" begin
+            html = Therapy.render_to_string(SuitePagination(
+                SuitePaginationContent(
+                    SuitePaginationItem(SuitePaginationPrevious()),
+                    SuitePaginationItem(SuitePaginationLink("1", is_active=true)),
+                    SuitePaginationItem(SuitePaginationLink("2")),
+                    SuitePaginationItem(SuitePaginationEllipsis()),
+                    SuitePaginationItem(SuitePaginationNext()),
+                ),
+            ))
+            @test occursin("<nav", html)
+            @test occursin("role=\"navigation\"", html)
+            @test occursin("aria-label=\"pagination\"", html)
+            @test occursin("Previous", html)
+            @test occursin("Next", html)
+        end
+
+        @testset "Active link" begin
+            html = Therapy.render_to_string(SuitePaginationLink("1", is_active=true))
+            @test occursin("aria-current=\"page\"", html)
+            @test occursin("border", html)
+        end
+
+        @testset "Inactive link" begin
+            html = Therapy.render_to_string(SuitePaginationLink("2"))
+            @test occursin("<a", html)
+            @test occursin("hover:bg-warm-100", html)
+        end
+
+        @testset "Previous" begin
+            html = Therapy.render_to_string(SuitePaginationPrevious(href="/page/1"))
+            @test occursin("aria-label=\"Go to previous page\"", html)
+            @test occursin("href=\"/page/1\"", html)
+        end
+
+        @testset "Next" begin
+            html = Therapy.render_to_string(SuitePaginationNext(href="/page/3"))
+            @test occursin("aria-label=\"Go to next page\"", html)
+            @test occursin("href=\"/page/3\"", html)
+        end
+
+        @testset "Ellipsis" begin
+            html = Therapy.render_to_string(SuitePaginationEllipsis())
+            @test occursin("aria-hidden=\"true\"", html)
+            @test occursin("sr-only", html)
+            @test occursin("More pages", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Pagination)
+            meta = Suite.COMPONENT_REGISTRY[:Pagination]
+            @test :SuitePagination in meta.exports
+            @test :SuitePaginationLink in meta.exports
+        end
+    end
+
+    @testset "SuiteTypography" begin
+        @testset "H1" begin
+            html = Therapy.render_to_string(SuiteH1("Title"))
+            @test occursin("<h1", html)
+            @test occursin("text-4xl", html)
+            @test occursin("font-extrabold", html)
+            @test occursin("Title", html)
+        end
+
+        @testset "H2" begin
+            html = Therapy.render_to_string(SuiteH2("Section"))
+            @test occursin("<h2", html)
+            @test occursin("text-3xl", html)
+            @test occursin("border-b", html)
+            @test occursin("Section", html)
+        end
+
+        @testset "H3" begin
+            html = Therapy.render_to_string(SuiteH3("Sub"))
+            @test occursin("<h3", html)
+            @test occursin("text-2xl", html)
+        end
+
+        @testset "H4" begin
+            html = Therapy.render_to_string(SuiteH4("Minor"))
+            @test occursin("<h4", html)
+            @test occursin("text-xl", html)
+        end
+
+        @testset "P" begin
+            html = Therapy.render_to_string(SuiteP("Paragraph"))
+            @test occursin("<p", html)
+            @test occursin("leading-7", html)
+        end
+
+        @testset "Blockquote" begin
+            html = Therapy.render_to_string(SuiteBlockquote("Quote"))
+            @test occursin("<blockquote", html)
+            @test occursin("border-l-2", html)
+            @test occursin("italic", html)
+        end
+
+        @testset "InlineCode" begin
+            html = Therapy.render_to_string(SuiteInlineCode("npm install"))
+            @test occursin("<code", html)
+            @test occursin("font-mono", html)
+            @test occursin("bg-warm-100", html)
+        end
+
+        @testset "Lead" begin
+            html = Therapy.render_to_string(SuiteLead("Intro text"))
+            @test occursin("text-xl", html)
+            @test occursin("text-warm-600", html)
+        end
+
+        @testset "Large" begin
+            html = Therapy.render_to_string(SuiteLarge("Big"))
+            @test occursin("text-lg", html)
+            @test occursin("font-semibold", html)
+        end
+
+        @testset "Small" begin
+            html = Therapy.render_to_string(SuiteSmall("Tiny"))
+            @test occursin("text-sm", html)
+            @test occursin("font-medium", html)
+        end
+
+        @testset "Muted" begin
+            html = Therapy.render_to_string(SuiteMuted("Secondary"))
+            @test occursin("text-warm-600", html)
+            @test occursin("text-sm", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteBlockquote("X"))
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:text-warm-500", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteH1(class="text-center", "X"))
+            @test occursin("text-center", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Typography)
+            meta = Suite.COMPONENT_REGISTRY[:Typography]
+            @test :SuiteH1 in meta.exports
+            @test :SuiteBlockquote in meta.exports
+            @test :SuiteInlineCode in meta.exports
+        end
+    end
 end
