@@ -1401,4 +1401,243 @@ using Test
             @test :Tabs in meta.js_modules
         end
     end
+
+    # ===== Toggle, ToggleGroup, Switch (SUITE-0401) =====
+
+    @testset "SuiteToggle" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteToggle("Bold"))
+            @test occursin("data-suite-toggle", html)
+            @test occursin("data-state=\"off\"", html)
+            @test occursin("aria-pressed=\"false\"", html)
+            @test occursin("<button", html)
+            @test occursin("Bold", html)
+        end
+
+        @testset "Pressed state" begin
+            html = Therapy.render_to_string(SuiteToggle("B", pressed=true))
+            @test occursin("data-state=\"on\"", html)
+            @test occursin("aria-pressed=\"true\"", html)
+        end
+
+        @testset "Variants" begin
+            default_html = Therapy.render_to_string(SuiteToggle("X"))
+            @test occursin("bg-transparent", default_html)
+
+            outline_html = Therapy.render_to_string(SuiteToggle("X", variant="outline"))
+            @test occursin("border", outline_html)
+            @test occursin("shadow-sm", outline_html)
+        end
+
+        @testset "Sizes" begin
+            sm = Therapy.render_to_string(SuiteToggle("X", size="sm"))
+            @test occursin("h-8", sm)
+            @test occursin("min-w-8", sm)
+
+            lg = Therapy.render_to_string(SuiteToggle("X", size="lg"))
+            @test occursin("h-10", lg)
+            @test occursin("min-w-10", lg)
+        end
+
+        @testset "Disabled" begin
+            html = Therapy.render_to_string(SuiteToggle("X", disabled=true))
+            @test occursin("disabled", html)
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteToggle("X", class="my-toggle"))
+            @test occursin("my-toggle", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteToggle("X"))
+            @test occursin("dark:hover:bg-warm-900", html)
+            @test occursin("dark:data-[state=on]:bg-warm-900", html) || occursin("dark:data-[state=on]", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Toggle)
+            meta = Suite.COMPONENT_REGISTRY[:Toggle]
+            @test meta.tier == :js_runtime
+            @test :SuiteToggle in meta.exports
+            @test :Toggle in meta.js_modules
+        end
+    end
+
+    @testset "SuiteToggleGroup" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteToggleGroup(
+                SuiteToggleGroupItem(value="a", "A"),
+                SuiteToggleGroupItem(value="b", "B"),
+            ))
+            @test occursin("data-suite-toggle-group=\"single\"", html)
+            @test occursin("data-orientation=\"horizontal\"", html)
+            @test occursin("role=\"group\"", html)
+            @test occursin("A", html)
+            @test occursin("B", html)
+        end
+
+        @testset "Multiple type" begin
+            html = Therapy.render_to_string(SuiteToggleGroup(type="multiple",
+                SuiteToggleGroupItem(value="x", "X"),
+            ))
+            @test occursin("data-suite-toggle-group=\"multiple\"", html)
+        end
+
+        @testset "Default value - single" begin
+            html = Therapy.render_to_string(SuiteToggleGroup(default_value="center",
+                SuiteToggleGroupItem(value="left", "L"),
+                SuiteToggleGroupItem(value="center", "C"),
+                SuiteToggleGroupItem(value="right", "R"),
+            ))
+            @test occursin("data-default-value=\"center\"", html)
+        end
+
+        @testset "Default value - multiple" begin
+            html = Therapy.render_to_string(SuiteToggleGroup(type="multiple", default_value=["bold", "italic"],
+                SuiteToggleGroupItem(value="bold", "B"),
+                SuiteToggleGroupItem(value="italic", "I"),
+            ))
+            @test occursin("data-default-value=\"bold,italic\"", html)
+        end
+
+        @testset "Vertical orientation" begin
+            html = Therapy.render_to_string(SuiteToggleGroup(orientation="vertical",
+                SuiteToggleGroupItem(value="a", "A"),
+            ))
+            @test occursin("data-orientation=\"vertical\"", html)
+        end
+
+        @testset "Variants and sizes" begin
+            html = Therapy.render_to_string(SuiteToggleGroup(variant="outline", size="lg",
+                SuiteToggleGroupItem(value="a", "A"),
+            ))
+            @test occursin("data-variant=\"outline\"", html)
+            @test occursin("data-size=\"lg\"", html)
+        end
+
+        @testset "Disabled group" begin
+            html = Therapy.render_to_string(SuiteToggleGroup(disabled=true,
+                SuiteToggleGroupItem(value="x", "X"),
+            ))
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "Item structure" begin
+            html = Therapy.render_to_string(SuiteToggleGroupItem(value="bold", "B"))
+            @test occursin("data-suite-toggle-group-item=\"bold\"", html)
+            @test occursin("data-state=\"off\"", html)
+            @test occursin("<button", html)
+            @test occursin("B", html)
+        end
+
+        @testset "Item variants" begin
+            outline = Therapy.render_to_string(SuiteToggleGroupItem(value="x", "X", variant="outline"))
+            @test occursin("border", outline)
+            @test occursin("shadow-sm", outline)
+        end
+
+        @testset "Item sizes" begin
+            sm = Therapy.render_to_string(SuiteToggleGroupItem(value="x", "X", size="sm"))
+            @test occursin("h-8", sm)
+
+            lg = Therapy.render_to_string(SuiteToggleGroupItem(value="x", "X", size="lg"))
+            @test occursin("h-10", lg)
+        end
+
+        @testset "Item disabled" begin
+            html = Therapy.render_to_string(SuiteToggleGroupItem(value="x", "X", disabled=true))
+            @test occursin("disabled", html)
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteToggleGroup(class="my-group",
+                SuiteToggleGroupItem(value="a", "A", class="my-item"),
+            ))
+            @test occursin("my-group", html)
+            @test occursin("my-item", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :ToggleGroup)
+            meta = Suite.COMPONENT_REGISTRY[:ToggleGroup]
+            @test meta.tier == :js_runtime
+            @test :SuiteToggleGroup in meta.exports
+            @test :SuiteToggleGroupItem in meta.exports
+            @test :ToggleGroup in meta.js_modules
+        end
+    end
+
+    @testset "SuiteSwitch" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteSwitch())
+            @test occursin("role=\"switch\"", html)
+            @test occursin("data-suite-switch", html)
+            @test occursin("data-state=\"unchecked\"", html)
+            @test occursin("aria-checked=\"false\"", html)
+            @test occursin("<button", html)
+            # Thumb span
+            @test occursin("<span", html)
+        end
+
+        @testset "Checked state" begin
+            html = Therapy.render_to_string(SuiteSwitch(checked=true))
+            @test occursin("data-state=\"checked\"", html)
+            @test occursin("aria-checked=\"true\"", html)
+        end
+
+        @testset "Sizes" begin
+            default_html = Therapy.render_to_string(SuiteSwitch())
+            @test occursin("h-5", default_html)
+            @test occursin("w-9", default_html)
+            @test occursin("size-4", default_html)
+
+            sm_html = Therapy.render_to_string(SuiteSwitch(size="sm"))
+            @test occursin("h-3.5", sm_html)
+            @test occursin("w-6", sm_html)
+            @test occursin("size-3", sm_html)
+        end
+
+        @testset "Disabled" begin
+            html = Therapy.render_to_string(SuiteSwitch(disabled=true))
+            @test occursin("disabled", html)
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteSwitch(class="my-switch"))
+            @test occursin("my-switch", html)
+        end
+
+        @testset "Thumb data-state matches" begin
+            unchecked = Therapy.render_to_string(SuiteSwitch())
+            # Both track and thumb should have unchecked state
+            @test count("data-state=\"unchecked\"", unchecked) >= 2
+
+            checked = Therapy.render_to_string(SuiteSwitch(checked=true))
+            @test count("data-state=\"checked\"", checked) >= 2
+        end
+
+        @testset "CSS transition classes" begin
+            html = Therapy.render_to_string(SuiteSwitch())
+            @test occursin("transition-transform", html)
+            @test occursin("translate-x", html) || occursin("translate-x-0", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteSwitch())
+            @test occursin("dark:bg-warm-950", html)
+            @test occursin("dark:data-[state=unchecked]:bg-warm-700", html) || occursin("dark:bg-warm-700", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Switch)
+            meta = Suite.COMPONENT_REGISTRY[:Switch]
+            @test meta.tier == :js_runtime
+            @test :SuiteSwitch in meta.exports
+            @test :Switch in meta.js_modules
+        end
+    end
 end

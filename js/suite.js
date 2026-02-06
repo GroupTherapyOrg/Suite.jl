@@ -495,6 +495,159 @@
             }
         },
 
+        // --- Toggle ---------------------------------------------------------------
+        Toggle: {
+            /**
+             * Initialize standalone toggle buttons.
+             * Discovers [data-suite-toggle] elements and wires click→state toggle.
+             */
+            init() {
+                const toggles = document.querySelectorAll('[data-suite-toggle]');
+                toggles.forEach(btn => {
+                    if (btn._suiteToggle) return;
+                    btn._suiteToggle = true;
+
+                    btn.addEventListener('click', () => {
+                        if (btn.disabled || btn.hasAttribute('data-disabled')) return;
+                        const isOn = btn.getAttribute('data-state') === 'on';
+                        const newState = isOn ? 'off' : 'on';
+                        btn.setAttribute('data-state', newState);
+                        btn.setAttribute('aria-pressed', String(!isOn));
+                    });
+                });
+            }
+        },
+
+        // --- Toggle Group ---------------------------------------------------------
+        ToggleGroup: {
+            /**
+             * Initialize toggle groups.
+             * Discovers [data-suite-toggle-group] roots. Handles single/multiple selection,
+             * ARIA role differences (radio vs pressed), and optional roving focus.
+             */
+            init() {
+                const roots = document.querySelectorAll('[data-suite-toggle-group]');
+                roots.forEach(root => {
+                    if (root._suiteToggleGroup) return;
+                    root._suiteToggleGroup = true;
+
+                    const type = root.getAttribute('data-suite-toggle-group') || 'single';
+                    const orientation = root.getAttribute('data-orientation') || 'horizontal';
+                    const isDisabled = root.hasAttribute('data-disabled');
+
+                    function getItems() {
+                        return Array.from(root.querySelectorAll('[data-suite-toggle-group-item]'))
+                            .filter(i => !i.disabled && !i.hasAttribute('data-disabled'));
+                    }
+
+                    function updateAria(item, isOn) {
+                        item.setAttribute('data-state', isOn ? 'on' : 'off');
+                        if (type === 'single') {
+                            item.setAttribute('role', 'radio');
+                            item.setAttribute('aria-checked', String(isOn));
+                            item.removeAttribute('aria-pressed');
+                        } else {
+                            item.setAttribute('aria-pressed', String(isOn));
+                            item.removeAttribute('role');
+                            item.removeAttribute('aria-checked');
+                        }
+                    }
+
+                    // Apply default values
+                    const defaultVal = root.getAttribute('data-default-value');
+                    if (defaultVal) {
+                        const defaults = defaultVal.split(',');
+                        root.querySelectorAll('[data-suite-toggle-group-item]').forEach(item => {
+                            const val = item.getAttribute('data-suite-toggle-group-item');
+                            const isOn = defaults.includes(val);
+                            updateAria(item, isOn);
+                        });
+                    } else {
+                        // Initialize ARIA for all items
+                        root.querySelectorAll('[data-suite-toggle-group-item]').forEach(item => {
+                            updateAria(item, item.getAttribute('data-state') === 'on');
+                        });
+                    }
+
+                    // Click handler — event delegation
+                    root.addEventListener('click', (e) => {
+                        if (isDisabled) return;
+                        const item = e.target.closest('[data-suite-toggle-group-item]');
+                        if (!item || item.disabled || item.hasAttribute('data-disabled')) return;
+
+                        const isOn = item.getAttribute('data-state') === 'on';
+
+                        if (type === 'single') {
+                            // Deselect all, select this (or deselect if already on)
+                            getItems().forEach(i => updateAria(i, false));
+                            if (!isOn) updateAria(item, true);
+                        } else {
+                            // Multiple — just toggle this item
+                            updateAria(item, !isOn);
+                        }
+                    });
+
+                    // Keyboard — roving focus between items
+                    root.addEventListener('keydown', (e) => {
+                        if (isDisabled) return;
+                        const item = e.target.closest('[data-suite-toggle-group-item]');
+                        if (!item) return;
+
+                        const items = getItems();
+                        const idx = items.indexOf(item);
+                        if (idx === -1) return;
+
+                        const isHoriz = orientation === 'horizontal';
+                        const nextKey = isHoriz ? 'ArrowRight' : 'ArrowDown';
+                        const prevKey = isHoriz ? 'ArrowLeft' : 'ArrowUp';
+                        let target;
+
+                        if (e.key === nextKey) {
+                            target = items[(idx + 1) % items.length];
+                        } else if (e.key === prevKey) {
+                            target = items[(idx - 1 + items.length) % items.length];
+                        } else if (e.key === 'Home') {
+                            target = items[0];
+                        } else if (e.key === 'End') {
+                            target = items[items.length - 1];
+                        }
+
+                        if (target) {
+                            e.preventDefault();
+                            target.focus();
+                        }
+                    });
+                });
+            }
+        },
+
+        // --- Switch ---------------------------------------------------------------
+        Switch: {
+            /**
+             * Initialize switch components.
+             * Discovers [data-suite-switch] buttons and wires click→state toggle.
+             * Thumb animation handled purely via CSS data-[state] selectors.
+             */
+            init() {
+                const switches = document.querySelectorAll('[data-suite-switch]');
+                switches.forEach(btn => {
+                    if (btn._suiteSwitch) return;
+                    btn._suiteSwitch = true;
+
+                    btn.addEventListener('click', () => {
+                        if (btn.disabled || btn.hasAttribute('data-disabled')) return;
+                        const isChecked = btn.getAttribute('data-state') === 'checked';
+                        const newState = isChecked ? 'unchecked' : 'checked';
+                        btn.setAttribute('data-state', newState);
+                        btn.setAttribute('aria-checked', String(!isChecked));
+                        // Update thumb data-state
+                        const thumb = btn.querySelector('span');
+                        if (thumb) thumb.setAttribute('data-state', newState);
+                    });
+                });
+            }
+        },
+
         // --- Theme Toggle ---------------------------------------------------------
         ThemeToggle: {
             /**
@@ -524,6 +677,9 @@
             this.Collapsible.init();
             this.Accordion.init();
             this.Tabs.init();
+            this.Toggle.init();
+            this.ToggleGroup.init();
+            this.Switch.init();
         },
 
         // --- Init -----------------------------------------------------------------
