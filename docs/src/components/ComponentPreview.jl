@@ -8,7 +8,8 @@ Render a live component preview with optional description.
 Used on component docs pages to showcase component variants.
 """
 function ComponentPreview(children...; title="", description="", class="")
-    Div(:class => cn("space-y-4", class),
+    classes = isempty(class) ? "space-y-4" : "space-y-4 $class"
+    Div(:class => classes,
         # Title + description
         if !isempty(title)
             Div(
