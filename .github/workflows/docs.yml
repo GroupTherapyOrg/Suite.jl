@@ -24,7 +24,7 @@ jobs:
       - name: Checkout Therapy.jl
         uses: actions/checkout@v4
         with:
-          repository: TherapeuticJulia/Therapy.jl
+          repository: GroupTherapyOrg/Therapy.jl
           path: Therapy.jl
 
       - name: Checkout WasmTarget.jl
@@ -42,10 +42,9 @@ jobs:
         run: |
           julia --project=. -e '
             using Pkg
-            # Add Therapy.jl from cloned checkout
-            Pkg.develop(path="Therapy.jl")
-            # WasmTarget.jl is a dependency of Therapy.jl
+            # WasmTarget.jl must be developed BEFORE Therapy.jl (not in General registry)
             Pkg.develop(path="WasmTarget.jl")
+            Pkg.develop(path="Therapy.jl")
             Pkg.instantiate()
           '
 
