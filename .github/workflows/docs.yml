@@ -42,9 +42,11 @@ jobs:
         run: |
           julia --project=. -e '
             using Pkg
-            # WasmTarget.jl must be developed BEFORE Therapy.jl (not in General registry)
-            Pkg.develop(path="WasmTarget.jl")
-            Pkg.develop(path="Therapy.jl")
+            # Develop both together — neither is in General registry
+            Pkg.develop([
+              PackageSpec(path="WasmTarget.jl"),
+              PackageSpec(path="Therapy.jl"),
+            ])
             Pkg.instantiate()
           '
 
