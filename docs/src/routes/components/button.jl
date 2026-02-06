@@ -6,7 +6,7 @@
 const SuiteButton = Main.SuiteButton
 
 function ButtonPage()
-    Fragment(
+    ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
             H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
