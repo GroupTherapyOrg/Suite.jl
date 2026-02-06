@@ -165,4 +165,253 @@ using Test
             @test occursin("styling", output2)
         end
     end
+
+    @testset "SuiteBadge" begin
+        @testset "Default variant" begin
+            html = Therapy.render_to_string(SuiteBadge("New"))
+            @test occursin("<span", html)
+            @test occursin("New", html)
+            @test occursin("bg-accent-600", html)
+            @test occursin("text-white", html)
+            @test occursin("rounded-full", html)
+            @test occursin("text-xs", html)
+        end
+
+        @testset "All variants" begin
+            for variant in ["default", "secondary", "destructive", "outline"]
+                html = Therapy.render_to_string(SuiteBadge(variant=variant, "Tag"))
+                @test occursin("<span", html)
+                @test occursin("Tag", html)
+            end
+
+            html_secondary = Therapy.render_to_string(SuiteBadge(variant="secondary", "X"))
+            @test occursin("bg-warm-100", html_secondary)
+
+            html_destructive = Therapy.render_to_string(SuiteBadge(variant="destructive", "X"))
+            @test occursin("text-accent-secondary-600", html_destructive)
+
+            html_outline = Therapy.render_to_string(SuiteBadge(variant="outline", "X"))
+            @test occursin("border-warm-200", html_outline)
+        end
+
+        @testset "Custom class and kwargs" begin
+            html = Therapy.render_to_string(SuiteBadge(class="ml-2", "X"))
+            @test occursin("ml-2", html)
+            @test occursin("bg-accent-600", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(SuiteBadge(variant="secondary", "X"))
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:text-warm-300", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Badge)
+            @test Suite.COMPONENT_REGISTRY[:Badge].tier == :styling
+        end
+    end
+
+    @testset "SuiteAlert" begin
+        @testset "Default variant" begin
+            html = Therapy.render_to_string(SuiteAlert(
+                SuiteAlertTitle("Title"),
+                SuiteAlertDescription("Description"),
+            ))
+            @test occursin("role=\"alert\"", html)
+            @test occursin("Title", html)
+            @test occursin("Description", html)
+            @test occursin("bg-warm-100", html)
+            @test occursin("rounded-lg", html)
+            @test occursin("border", html)
+        end
+
+        @testset "Destructive variant" begin
+            html = Therapy.render_to_string(SuiteAlert(variant="destructive",
+                SuiteAlertTitle("Error"),
+            ))
+            @test occursin("role=\"alert\"", html)
+            @test occursin("text-accent-secondary-600", html)
+            @test occursin("Error", html)
+        end
+
+        @testset "AlertTitle classes" begin
+            html = Therapy.render_to_string(SuiteAlertTitle("Heads up"))
+            @test occursin("font-medium", html)
+            @test occursin("Heads up", html)
+        end
+
+        @testset "AlertDescription classes" begin
+            html = Therapy.render_to_string(SuiteAlertDescription("Details here"))
+            @test occursin("text-warm-600", html)
+            @test occursin("Details here", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteAlert(class="my-alert", SuiteAlertTitle("X")))
+            @test occursin("my-alert", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteAlert(SuiteAlertTitle("X")))
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:border-warm-700", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Alert)
+            @test :SuiteAlert in Suite.COMPONENT_REGISTRY[:Alert].exports
+            @test :SuiteAlertTitle in Suite.COMPONENT_REGISTRY[:Alert].exports
+            @test :SuiteAlertDescription in Suite.COMPONENT_REGISTRY[:Alert].exports
+        end
+    end
+
+    @testset "SuiteCard" begin
+        @testset "Basic card structure" begin
+            html = Therapy.render_to_string(SuiteCard(
+                SuiteCardHeader(
+                    SuiteCardTitle("Title"),
+                    SuiteCardDescription("Desc"),
+                ),
+                SuiteCardContent("Body"),
+                SuiteCardFooter("Footer"),
+            ))
+            @test occursin("rounded-xl", html)
+            @test occursin("shadow-sm", html)
+            @test occursin("bg-warm-100", html)
+            @test occursin("Title", html)
+            @test occursin("Desc", html)
+            @test occursin("Body", html)
+            @test occursin("Footer", html)
+        end
+
+        @testset "CardHeader classes" begin
+            html = Therapy.render_to_string(SuiteCardHeader(SuiteCardTitle("X")))
+            @test occursin("px-6", html)
+            @test occursin("flex", html)
+        end
+
+        @testset "CardTitle classes" begin
+            html = Therapy.render_to_string(SuiteCardTitle("Big Title"))
+            @test occursin("font-semibold", html)
+            @test occursin("Big Title", html)
+        end
+
+        @testset "CardDescription classes" begin
+            html = Therapy.render_to_string(SuiteCardDescription("Some desc"))
+            @test occursin("text-warm-600", html)
+            @test occursin("Some desc", html)
+        end
+
+        @testset "CardContent classes" begin
+            html = Therapy.render_to_string(SuiteCardContent("Content"))
+            @test occursin("px-6", html)
+            @test occursin("Content", html)
+        end
+
+        @testset "CardFooter classes" begin
+            html = Therapy.render_to_string(SuiteCardFooter("Actions"))
+            @test occursin("flex", html)
+            @test occursin("items-center", html)
+            @test occursin("Actions", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteCard(class="w-[350px]", SuiteCardContent("X")))
+            @test occursin("w-[350px]", html)
+            @test occursin("rounded-xl", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteCard(SuiteCardContent("X")))
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:text-warm-300", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Card)
+            meta = Suite.COMPONENT_REGISTRY[:Card]
+            @test :SuiteCard in meta.exports
+            @test :SuiteCardHeader in meta.exports
+            @test :SuiteCardTitle in meta.exports
+            @test :SuiteCardContent in meta.exports
+            @test :SuiteCardFooter in meta.exports
+        end
+    end
+
+    @testset "SuiteSeparator" begin
+        @testset "Horizontal (default)" begin
+            html = Therapy.render_to_string(SuiteSeparator())
+            @test occursin("h-px", html)
+            @test occursin("w-full", html)
+            @test occursin("bg-warm-200", html)
+            @test occursin("role=\"none\"", html)
+        end
+
+        @testset "Vertical" begin
+            html = Therapy.render_to_string(SuiteSeparator(orientation="vertical"))
+            @test occursin("h-full", html)
+            @test occursin("w-px", html)
+        end
+
+        @testset "Non-decorative" begin
+            html = Therapy.render_to_string(SuiteSeparator(decorative=false))
+            @test occursin("role=\"separator\"", html)
+            @test occursin("aria-orientation=\"horizontal\"", html)
+        end
+
+        @testset "Non-decorative vertical" begin
+            html = Therapy.render_to_string(SuiteSeparator(decorative=false, orientation="vertical"))
+            @test occursin("role=\"separator\"", html)
+            @test occursin("aria-orientation=\"vertical\"", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteSeparator(class="my-4"))
+            @test occursin("my-4", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteSeparator())
+            @test occursin("dark:bg-warm-700", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Separator)
+            @test Suite.COMPONENT_REGISTRY[:Separator].tier == :styling
+        end
+    end
+
+    @testset "SuiteSkeleton" begin
+        @testset "Default" begin
+            html = Therapy.render_to_string(SuiteSkeleton())
+            @test occursin("animate-pulse", html)
+            @test occursin("rounded-md", html)
+            @test occursin("bg-warm-200", html)
+        end
+
+        @testset "Custom dimensions" begin
+            html = Therapy.render_to_string(SuiteSkeleton(class="h-4 w-[250px]"))
+            @test occursin("h-4", html)
+            @test occursin("w-[250px]", html)
+            @test occursin("animate-pulse", html)
+        end
+
+        @testset "Circle skeleton" begin
+            html = Therapy.render_to_string(SuiteSkeleton(class="h-12 w-12 rounded-full"))
+            @test occursin("rounded-full", html)
+            @test occursin("animate-pulse", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteSkeleton())
+            @test occursin("dark:bg-warm-800", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Skeleton)
+            @test Suite.COMPONENT_REGISTRY[:Skeleton].tier == :styling
+        end
+    end
 end
