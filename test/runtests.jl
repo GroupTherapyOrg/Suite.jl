@@ -414,4 +414,246 @@ using Test
             @test Suite.COMPONENT_REGISTRY[:Skeleton].tier == :styling
         end
     end
+
+    @testset "SuiteInput" begin
+        @testset "Default" begin
+            html = Therapy.render_to_string(SuiteInput(placeholder="Email"))
+            @test occursin("<input", html)
+            @test occursin("type=\"text\"", html)
+            @test occursin("placeholder=\"Email\"", html)
+            @test occursin("rounded-md", html)
+            @test occursin("border-warm-200", html)
+            @test occursin("h-9", html)
+        end
+
+        @testset "Type prop" begin
+            html = Therapy.render_to_string(SuiteInput(type="password"))
+            @test occursin("type=\"password\"", html)
+        end
+
+        @testset "Focus styles" begin
+            html = Therapy.render_to_string(SuiteInput())
+            @test occursin("focus-visible:border-accent-600", html)
+            @test occursin("focus-visible:ring-2", html)
+        end
+
+        @testset "Disabled styles" begin
+            html = Therapy.render_to_string(SuiteInput())
+            @test occursin("disabled:opacity-50", html)
+            @test occursin("disabled:cursor-not-allowed", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteInput())
+            @test occursin("dark:border-warm-700", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteInput(class="w-[300px]"))
+            @test occursin("w-[300px]", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Input)
+            @test Suite.COMPONENT_REGISTRY[:Input].tier == :styling
+        end
+    end
+
+    @testset "SuiteLabel" begin
+        @testset "Default" begin
+            html = Therapy.render_to_string(SuiteLabel("Email"))
+            @test occursin("<label", html)
+            @test occursin("Email", html)
+            @test occursin("text-sm", html)
+            @test occursin("font-medium", html)
+            @test occursin("select-none", html)
+        end
+
+        @testset "For attribute" begin
+            html = Therapy.render_to_string(SuiteLabel("Name", :for => "name-input"))
+            @test occursin("for=\"name-input\"", html)
+        end
+
+        @testset "Peer disabled" begin
+            html = Therapy.render_to_string(SuiteLabel("X"))
+            @test occursin("peer-disabled:cursor-not-allowed", html)
+            @test occursin("peer-disabled:opacity-50", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteLabel(class="mb-2", "X"))
+            @test occursin("mb-2", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Label)
+            @test Suite.COMPONENT_REGISTRY[:Label].tier == :styling
+        end
+    end
+
+    @testset "SuiteTextarea" begin
+        @testset "Default" begin
+            html = Therapy.render_to_string(SuiteTextarea(placeholder="Message"))
+            @test occursin("<textarea", html)
+            @test occursin("placeholder=\"Message\"", html)
+            @test occursin("rounded-md", html)
+            @test occursin("border-warm-200", html)
+            @test occursin("min-h-16", html)
+        end
+
+        @testset "Focus styles" begin
+            html = Therapy.render_to_string(SuiteTextarea())
+            @test occursin("focus-visible:border-accent-600", html)
+            @test occursin("focus-visible:ring-2", html)
+        end
+
+        @testset "Disabled styles" begin
+            html = Therapy.render_to_string(SuiteTextarea())
+            @test occursin("disabled:opacity-50", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteTextarea())
+            @test occursin("dark:border-warm-700", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteTextarea(class="h-32"))
+            @test occursin("h-32", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Textarea)
+            @test Suite.COMPONENT_REGISTRY[:Textarea].tier == :styling
+        end
+    end
+
+    @testset "SuiteAvatar" begin
+        @testset "Default size" begin
+            html = Therapy.render_to_string(SuiteAvatar(
+                SuiteAvatarFallback("JD"),
+            ))
+            @test occursin("<span", html)
+            @test occursin("rounded-full", html)
+            @test occursin("size-8", html)
+            @test occursin("JD", html)
+        end
+
+        @testset "All sizes" begin
+            html_sm = Therapy.render_to_string(SuiteAvatar(size="sm", SuiteAvatarFallback("X")))
+            @test occursin("size-6", html_sm)
+
+            html_lg = Therapy.render_to_string(SuiteAvatar(size="lg", SuiteAvatarFallback("X")))
+            @test occursin("size-10", html_lg)
+        end
+
+        @testset "AvatarImage" begin
+            html = Therapy.render_to_string(SuiteAvatarImage(src="/avatar.jpg", alt="User"))
+            @test occursin("<img", html)
+            @test occursin("src=\"/avatar.jpg\"", html)
+            @test occursin("alt=\"User\"", html)
+            @test occursin("aspect-square", html)
+        end
+
+        @testset "AvatarFallback" begin
+            html = Therapy.render_to_string(SuiteAvatarFallback("AB"))
+            @test occursin("AB", html)
+            @test occursin("bg-warm-100", html)
+            @test occursin("items-center", html)
+            @test occursin("justify-center", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteAvatarFallback("X"))
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:text-warm-500", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteAvatar(class="border-2", SuiteAvatarFallback("X")))
+            @test occursin("border-2", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Avatar)
+            meta = Suite.COMPONENT_REGISTRY[:Avatar]
+            @test :SuiteAvatar in meta.exports
+            @test :SuiteAvatarImage in meta.exports
+            @test :SuiteAvatarFallback in meta.exports
+        end
+    end
+
+    @testset "SuiteAspectRatio" begin
+        @testset "Default 16/9" begin
+            html = Therapy.render_to_string(SuiteAspectRatio(Div("Content")))
+            @test occursin("aspect-ratio:", html)
+            @test occursin("relative", html)
+            @test occursin("overflow-hidden", html)
+            @test occursin("Content", html)
+        end
+
+        @testset "Custom ratio" begin
+            html = Therapy.render_to_string(SuiteAspectRatio(ratio=1, Div("Square")))
+            @test occursin("aspect-ratio: 1", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteAspectRatio(class="rounded-lg", Div("X")))
+            @test occursin("rounded-lg", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :AspectRatio)
+            @test Suite.COMPONENT_REGISTRY[:AspectRatio].tier == :styling
+        end
+    end
+
+    @testset "SuiteProgress" begin
+        @testset "Default (0%)" begin
+            html = Therapy.render_to_string(SuiteProgress())
+            @test occursin("role=\"progressbar\"", html)
+            @test occursin("aria-valuenow=\"0\"", html)
+            @test occursin("aria-valuemin=\"0\"", html)
+            @test occursin("aria-valuemax=\"100\"", html)
+            @test occursin("rounded-full", html)
+            @test occursin("h-2", html)
+            @test occursin("translateX(-100%)", html)
+        end
+
+        @testset "Partial progress" begin
+            html = Therapy.render_to_string(SuiteProgress(value=60))
+            @test occursin("aria-valuenow=\"60\"", html)
+            @test occursin("translateX(-40%)", html)
+        end
+
+        @testset "Full progress" begin
+            html = Therapy.render_to_string(SuiteProgress(value=100))
+            @test occursin("aria-valuenow=\"100\"", html)
+            @test occursin("translateX(-0%)", html)
+        end
+
+        @testset "Clamped values" begin
+            html_neg = Therapy.render_to_string(SuiteProgress(value=-10))
+            @test occursin("aria-valuenow=\"0\"", html_neg)
+
+            html_over = Therapy.render_to_string(SuiteProgress(value=150))
+            @test occursin("aria-valuenow=\"100\"", html_over)
+        end
+
+        @testset "Indicator colors" begin
+            html = Therapy.render_to_string(SuiteProgress(value=50))
+            @test occursin("bg-accent-600", html)
+            @test occursin("transition-all", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteProgress(value=50, class="w-[60%]"))
+            @test occursin("w-[60%]", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Progress)
+            @test Suite.COMPONENT_REGISTRY[:Progress].tier == :styling
+        end
+    end
 end
