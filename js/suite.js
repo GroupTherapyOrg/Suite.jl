@@ -267,6 +267,234 @@
             }
         },
 
+        // --- Collapsible ----------------------------------------------------------
+        Collapsible: {
+            /**
+             * Initialize collapsible components.
+             * Discovers [data-suite-collapsible] roots and wires trigger→content toggle.
+             */
+            init() {
+                const roots = document.querySelectorAll('[data-suite-collapsible]');
+                roots.forEach(root => {
+                    if (root._suiteCollapsible) return;
+                    root._suiteCollapsible = true;
+
+                    const trigger = root.querySelector('[data-suite-collapsible-trigger]');
+                    const content = root.querySelector('[data-suite-collapsible-content]');
+                    if (!trigger || !content) return;
+
+                    trigger.addEventListener('click', () => {
+                        if (root.hasAttribute('data-disabled')) return;
+                        const isOpen = root.getAttribute('data-state') === 'open';
+                        const newState = isOpen ? 'closed' : 'open';
+                        root.setAttribute('data-state', newState);
+                        trigger.setAttribute('data-state', newState);
+                        trigger.setAttribute('aria-expanded', String(!isOpen));
+                        content.setAttribute('data-state', newState);
+                        content.hidden = isOpen;
+                    });
+                });
+            }
+        },
+
+        // --- Accordion ------------------------------------------------------------
+        Accordion: {
+            /**
+             * Initialize accordion components.
+             * Discovers [data-suite-accordion] roots. Handles single/multiple mode,
+             * collapsible flag, and keyboard navigation between triggers.
+             */
+            init() {
+                const roots = document.querySelectorAll('[data-suite-accordion]');
+                roots.forEach(root => {
+                    if (root._suiteAccordion) return;
+                    root._suiteAccordion = true;
+
+                    const type = root.getAttribute('data-suite-accordion') || 'single';
+                    const collapsible = root.hasAttribute('data-collapsible');
+                    const orientation = root.getAttribute('data-orientation') || 'vertical';
+
+                    function getItems() {
+                        return Array.from(root.querySelectorAll('[data-suite-accordion-item]'));
+                    }
+
+                    function getTriggers() {
+                        return Array.from(root.querySelectorAll('[data-suite-accordion-trigger]'))
+                            .filter(t => !t.disabled && !t.closest('[data-suite-accordion-item]').hasAttribute('data-disabled'));
+                    }
+
+                    function toggleItem(item, open) {
+                        const state = open ? 'open' : 'closed';
+                        item.setAttribute('data-state', state);
+                        const trigger = item.querySelector('[data-suite-accordion-trigger]');
+                        const content = item.querySelector('[data-suite-accordion-content]');
+                        if (trigger) {
+                            trigger.setAttribute('data-state', state);
+                            trigger.setAttribute('aria-expanded', String(open));
+                            if (type === 'single' && open && !collapsible) {
+                                trigger.setAttribute('aria-disabled', 'true');
+                            } else {
+                                trigger.removeAttribute('aria-disabled');
+                            }
+                        }
+                        if (content) {
+                            content.setAttribute('data-state', state);
+                            content.hidden = !open;
+                        }
+                    }
+
+                    // Trigger click handlers
+                    root.addEventListener('click', (e) => {
+                        const trigger = e.target.closest('[data-suite-accordion-trigger]');
+                        if (!trigger || trigger.disabled) return;
+                        const item = trigger.closest('[data-suite-accordion-item]');
+                        if (!item || item.hasAttribute('data-disabled')) return;
+
+                        const isOpen = item.getAttribute('data-state') === 'open';
+
+                        if (type === 'single') {
+                            if (isOpen) {
+                                if (collapsible) toggleItem(item, false);
+                                // If not collapsible, do nothing (can't close last open)
+                            } else {
+                                // Close all others, open this one
+                                getItems().forEach(i => toggleItem(i, false));
+                                toggleItem(item, true);
+                            }
+                        } else {
+                            // Multiple mode — always toggle
+                            toggleItem(item, !isOpen);
+                        }
+                    });
+
+                    // Keyboard navigation between triggers
+                    root.addEventListener('keydown', (e) => {
+                        const trigger = e.target.closest('[data-suite-accordion-trigger]');
+                        if (!trigger) return;
+
+                        const triggers = getTriggers();
+                        const idx = triggers.indexOf(trigger);
+                        if (idx === -1) return;
+
+                        const isVert = orientation === 'vertical';
+                        const nextKey = isVert ? 'ArrowDown' : 'ArrowRight';
+                        const prevKey = isVert ? 'ArrowUp' : 'ArrowLeft';
+                        let target;
+
+                        if (e.key === nextKey) {
+                            target = triggers[(idx + 1) % triggers.length];
+                        } else if (e.key === prevKey) {
+                            target = triggers[(idx - 1 + triggers.length) % triggers.length];
+                        } else if (e.key === 'Home') {
+                            target = triggers[0];
+                        } else if (e.key === 'End') {
+                            target = triggers[triggers.length - 1];
+                        }
+
+                        if (target) {
+                            e.preventDefault();
+                            target.focus();
+                        }
+                    });
+                });
+            }
+        },
+
+        // --- Tabs -----------------------------------------------------------------
+        Tabs: {
+            /**
+             * Initialize tabs components.
+             * Discovers [data-suite-tabs] roots. Handles tab selection,
+             * roving tabindex on TabsList, and keyboard navigation.
+             */
+            init() {
+                const roots = document.querySelectorAll('[data-suite-tabs]');
+                roots.forEach(root => {
+                    if (root._suiteTabs) return;
+                    root._suiteTabs = true;
+
+                    const orientation = root.getAttribute('data-orientation') || 'horizontal';
+                    const activation = root.getAttribute('data-activation') || 'automatic';
+                    const list = root.querySelector('[data-suite-tabslist]');
+                    if (!list) return;
+
+                    const loop = !list.hasAttribute('data-no-loop');
+
+                    function getTriggers() {
+                        return Array.from(list.querySelectorAll('[data-suite-tabs-trigger]'))
+                            .filter(t => !t.disabled && !t.hasAttribute('data-disabled'));
+                    }
+
+                    function selectTab(value) {
+                        // Update triggers
+                        const triggers = Array.from(list.querySelectorAll('[data-suite-tabs-trigger]'));
+                        triggers.forEach(t => {
+                            const isActive = t.getAttribute('data-suite-tabs-trigger') === value;
+                            t.setAttribute('data-state', isActive ? 'active' : 'inactive');
+                            t.setAttribute('aria-selected', String(isActive));
+                            t.setAttribute('tabindex', isActive ? '0' : '-1');
+                        });
+                        // Update content panels
+                        const panels = Array.from(root.querySelectorAll('[data-suite-tabs-content]'));
+                        panels.forEach(p => {
+                            const isActive = p.getAttribute('data-suite-tabs-content') === value;
+                            p.setAttribute('data-state', isActive ? 'active' : 'inactive');
+                            p.hidden = !isActive;
+                        });
+                    }
+
+                    // Click handler
+                    list.addEventListener('click', (e) => {
+                        const trigger = e.target.closest('[data-suite-tabs-trigger]');
+                        if (!trigger || trigger.disabled || trigger.hasAttribute('data-disabled')) return;
+                        selectTab(trigger.getAttribute('data-suite-tabs-trigger'));
+                    });
+
+                    // Keyboard handler — roving focus
+                    list.addEventListener('keydown', (e) => {
+                        // Suppress arrow nav when modifier keys are pressed
+                        if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+
+                        const trigger = e.target.closest('[data-suite-tabs-trigger]');
+                        if (!trigger) return;
+
+                        const triggers = getTriggers();
+                        const idx = triggers.indexOf(trigger);
+                        if (idx === -1) return;
+
+                        const isHoriz = orientation === 'horizontal';
+                        const nextKey = isHoriz ? 'ArrowRight' : 'ArrowDown';
+                        const prevKey = isHoriz ? 'ArrowLeft' : 'ArrowUp';
+                        let target;
+
+                        if (e.key === nextKey) {
+                            const next = idx + 1;
+                            target = next < triggers.length ? triggers[next] : (loop ? triggers[0] : null);
+                        } else if (e.key === prevKey) {
+                            const prev = idx - 1;
+                            target = prev >= 0 ? triggers[prev] : (loop ? triggers[triggers.length - 1] : null);
+                        } else if (e.key === 'Home') {
+                            target = triggers[0];
+                        } else if (e.key === 'End') {
+                            target = triggers[triggers.length - 1];
+                        } else if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            selectTab(trigger.getAttribute('data-suite-tabs-trigger'));
+                            return;
+                        }
+
+                        if (target) {
+                            e.preventDefault();
+                            target.focus();
+                            if (activation === 'automatic') {
+                                selectTab(target.getAttribute('data-suite-tabs-trigger'));
+                            }
+                        }
+                    });
+                });
+            }
+        },
+
         // --- Theme Toggle ---------------------------------------------------------
         ThemeToggle: {
             /**
@@ -293,6 +521,9 @@
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
             this.ThemeToggle.init();
+            this.Collapsible.init();
+            this.Accordion.init();
+            this.Tabs.init();
         },
 
         // --- Init -----------------------------------------------------------------

@@ -13,7 +13,7 @@ const SUITE_COMPONENTS = [
     ]),
     # --- Components (alphabetical) ---
     (section = "Components", items = [
-        (slug = "accordion",        title = "Accordion",        implemented = false),
+        (slug = "accordion",        title = "Accordion",        implemented = true),
         (slug = "alert",            title = "Alert",            implemented = true),
         (slug = "alert-dialog",     title = "Alert Dialog",     implemented = false),
         (slug = "aspect-ratio",     title = "Aspect Ratio",     implemented = true),
@@ -25,7 +25,7 @@ const SUITE_COMPONENTS = [
         (slug = "card",             title = "Card",             implemented = true),
         (slug = "carousel",         title = "Carousel",         implemented = false),
         (slug = "checkbox",         title = "Checkbox",         implemented = false),
-        (slug = "collapsible",      title = "Collapsible",      implemented = false),
+        (slug = "collapsible",      title = "Collapsible",      implemented = true),
         (slug = "command",          title = "Command",          implemented = false),
         (slug = "context-menu",     title = "Context Menu",     implemented = false),
         (slug = "data-table",       title = "Data Table",       implemented = false),
@@ -52,7 +52,7 @@ const SUITE_COMPONENTS = [
         (slug = "slider",           title = "Slider",           implemented = false),
         (slug = "switch",           title = "Switch",           implemented = false),
         (slug = "table",            title = "Table",            implemented = true),
-        (slug = "tabs",             title = "Tabs",             implemented = false),
+        (slug = "tabs",             title = "Tabs",             implemented = true),
         (slug = "textarea",         title = "Textarea",         implemented = true),
         (slug = "toast",            title = "Toast",            implemented = false),
         (slug = "toggle",           title = "Toggle",           implemented = false),

@@ -1019,5 +1019,386 @@ using Test
         @test occursin("Suite", html)
         @test occursin("ThemeToggle", html)
         @test occursin("data-suite-theme-toggle", html)
+        # Verify new modules are in suite.js
+        @test occursin("Collapsible", html)
+        @test occursin("Accordion", html)
+        @test occursin("Tabs", html)
+    end
+
+    # ==========================================================================
+    # Phase 2: Interactive Components
+    # ==========================================================================
+
+    @testset "SuiteCollapsible" begin
+        @testset "Default (closed)" begin
+            html = Therapy.render_to_string(SuiteCollapsible(
+                SuiteCollapsibleTrigger("Toggle"),
+                SuiteCollapsibleContent(Div("Content")),
+            ))
+            @test occursin("data-suite-collapsible", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("Toggle", html)
+            @test occursin("Content", html)
+        end
+
+        @testset "Open by default" begin
+            html = Therapy.render_to_string(SuiteCollapsible(open=true,
+                SuiteCollapsibleTrigger("Close"),
+                SuiteCollapsibleContent(Div("Visible")),
+            ))
+            @test occursin("data-state=\"open\"", html)
+        end
+
+        @testset "Disabled" begin
+            html = Therapy.render_to_string(SuiteCollapsible(disabled=true,
+                SuiteCollapsibleTrigger("Disabled"),
+                SuiteCollapsibleContent(Div("Hidden")),
+            ))
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "Trigger structure" begin
+            html = Therapy.render_to_string(SuiteCollapsibleTrigger("Click me"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+            @test occursin("data-suite-collapsible-trigger", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("Click me", html)
+        end
+
+        @testset "Trigger accessibility" begin
+            html = Therapy.render_to_string(SuiteCollapsibleTrigger("X"))
+            @test occursin("focus-visible:ring-2", html)
+            @test occursin("disabled:opacity-50", html)
+        end
+
+        @testset "Content structure" begin
+            html = Therapy.render_to_string(SuiteCollapsibleContent(Div("Inner")))
+            @test occursin("data-suite-collapsible-content", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("hidden", html)
+            @test occursin("overflow-hidden", html)
+            @test occursin("Inner", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteCollapsible(class="w-[350px]",
+                SuiteCollapsibleTrigger("X"),
+                SuiteCollapsibleContent(Div("X")),
+            ))
+            @test occursin("w-[350px]", html)
+
+            html2 = Therapy.render_to_string(SuiteCollapsibleTrigger(class="font-bold", "X"))
+            @test occursin("font-bold", html2)
+
+            html3 = Therapy.render_to_string(SuiteCollapsibleContent(class="p-4", Div("X")))
+            @test occursin("p-4", html3)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Collapsible)
+            meta = Suite.COMPONENT_REGISTRY[:Collapsible]
+            @test meta.tier == :js_runtime
+            @test :SuiteCollapsible in meta.exports
+            @test :SuiteCollapsibleTrigger in meta.exports
+            @test :SuiteCollapsibleContent in meta.exports
+            @test :Collapsible in meta.js_modules
+        end
+    end
+
+    @testset "SuiteAccordion" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteAccordion(
+                SuiteAccordionItem(value="item-1",
+                    SuiteAccordionTrigger("Section 1"),
+                    SuiteAccordionContent(Div("Content 1")),
+                ),
+                SuiteAccordionItem(value="item-2",
+                    SuiteAccordionTrigger("Section 2"),
+                    SuiteAccordionContent(Div("Content 2")),
+                ),
+            ))
+            @test occursin("data-suite-accordion=\"single\"", html)
+            @test occursin("data-orientation=\"vertical\"", html)
+            @test occursin("Section 1", html)
+            @test occursin("Section 2", html)
+            @test occursin("Content 1", html)
+            @test occursin("Content 2", html)
+        end
+
+        @testset "Multiple type" begin
+            html = Therapy.render_to_string(SuiteAccordion(type="multiple",
+                SuiteAccordionItem(value="a",
+                    SuiteAccordionTrigger("A"),
+                    SuiteAccordionContent(Div("AA")),
+                ),
+            ))
+            @test occursin("data-suite-accordion=\"multiple\"", html)
+        end
+
+        @testset "Collapsible flag" begin
+            html = Therapy.render_to_string(SuiteAccordion(collapsible=true,
+                SuiteAccordionItem(value="x",
+                    SuiteAccordionTrigger("X"),
+                    SuiteAccordionContent(Div("XX")),
+                ),
+            ))
+            @test occursin("data-collapsible", html)
+        end
+
+        @testset "Default value" begin
+            html = Therapy.render_to_string(SuiteAccordion(default_value="item-1",
+                SuiteAccordionItem(value="item-1",
+                    SuiteAccordionTrigger("Open"),
+                    SuiteAccordionContent(Div("Visible")),
+                ),
+            ))
+            @test occursin("data-default-value=\"item-1\"", html)
+        end
+
+        @testset "Disabled accordion" begin
+            html = Therapy.render_to_string(SuiteAccordion(disabled=true,
+                SuiteAccordionItem(value="x",
+                    SuiteAccordionTrigger("X"),
+                    SuiteAccordionContent(Div("X")),
+                ),
+            ))
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "Disabled item" begin
+            html = Therapy.render_to_string(SuiteAccordionItem(value="x", disabled=true,
+                SuiteAccordionTrigger("Disabled"),
+                SuiteAccordionContent(Div("Hidden")),
+            ))
+            @test occursin("data-disabled", html)
+            @test occursin("data-suite-accordion-item=\"x\"", html)
+        end
+
+        @testset "AccordionItem structure" begin
+            html = Therapy.render_to_string(SuiteAccordionItem(value="test",
+                SuiteAccordionTrigger("Title"),
+                SuiteAccordionContent(Div("Body")),
+            ))
+            @test occursin("data-suite-accordion-item=\"test\"", html)
+            @test occursin("data-state=\"closed\"", html)
+        end
+
+        @testset "AccordionTrigger structure" begin
+            html = Therapy.render_to_string(SuiteAccordionTrigger("Click"))
+            @test occursin("<h3", html)
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+            @test occursin("data-suite-accordion-trigger", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("Click", html)
+            # Chevron icon
+            @test occursin("<svg", html)
+            @test occursin("rotate-180", html)
+        end
+
+        @testset "AccordionContent structure" begin
+            html = Therapy.render_to_string(SuiteAccordionContent(Div("Inner")))
+            @test occursin("data-suite-accordion-content", html)
+            @test occursin("role=\"region\"", html)
+            @test occursin("hidden", html)
+            @test occursin("overflow-hidden", html)
+            @test occursin("Inner", html)
+        end
+
+        @testset "Styling" begin
+            html = Therapy.render_to_string(SuiteAccordion(
+                SuiteAccordionItem(value="x",
+                    SuiteAccordionTrigger("X"),
+                    SuiteAccordionContent(Div("X")),
+                ),
+            ))
+            @test occursin("divide-y", html)
+            @test occursin("divide-warm-200", html)
+            @test occursin("dark:divide-warm-700", html)
+        end
+
+        @testset "Trigger hover" begin
+            html = Therapy.render_to_string(SuiteAccordionTrigger("X"))
+            @test occursin("hover:underline", html)
+            @test occursin("font-medium", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteAccordion(class="w-full",
+                SuiteAccordionItem(value="x",
+                    SuiteAccordionTrigger("X"),
+                    SuiteAccordionContent(Div("X")),
+                ),
+            ))
+            @test occursin("w-full", html)
+        end
+
+        @testset "Horizontal orientation" begin
+            html = Therapy.render_to_string(SuiteAccordion(orientation="horizontal",
+                SuiteAccordionItem(value="x",
+                    SuiteAccordionTrigger("X"),
+                    SuiteAccordionContent(Div("X")),
+                ),
+            ))
+            @test occursin("data-orientation=\"horizontal\"", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteAccordionTrigger("X"))
+            @test occursin("dark:text-warm-500", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Accordion)
+            meta = Suite.COMPONENT_REGISTRY[:Accordion]
+            @test meta.tier == :js_runtime
+            @test :SuiteAccordion in meta.exports
+            @test :SuiteAccordionItem in meta.exports
+            @test :SuiteAccordionTrigger in meta.exports
+            @test :SuiteAccordionContent in meta.exports
+            @test :Accordion in meta.js_modules
+        end
+    end
+
+    @testset "SuiteTabs" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteTabs(default_value="tab1",
+                SuiteTabsList(
+                    SuiteTabsTrigger("Account", value="tab1"),
+                    SuiteTabsTrigger("Password", value="tab2"),
+                ),
+                SuiteTabsContent(value="tab1", Div("Account settings")),
+                SuiteTabsContent(value="tab2", Div("Password settings")),
+            ))
+            @test occursin("data-suite-tabs", html)
+            @test occursin("data-default-value=\"tab1\"", html)
+            @test occursin("Account", html)
+            @test occursin("Password", html)
+            @test occursin("Account settings", html)
+            @test occursin("Password settings", html)
+        end
+
+        @testset "TabsList structure" begin
+            html = Therapy.render_to_string(SuiteTabsList(
+                SuiteTabsTrigger("Tab 1", value="t1"),
+            ))
+            @test occursin("role=\"tablist\"", html)
+            @test occursin("data-suite-tabslist", html)
+            @test occursin("aria-orientation=\"horizontal\"", html)
+        end
+
+        @testset "TabsList styling" begin
+            html = Therapy.render_to_string(SuiteTabsList(
+                SuiteTabsTrigger("X", value="x"),
+            ))
+            @test occursin("rounded-lg", html)
+            @test occursin("bg-warm-100", html)
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("inline-flex", html)
+        end
+
+        @testset "TabsTrigger structure" begin
+            html = Therapy.render_to_string(SuiteTabsTrigger("My Tab", value="my-tab"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+            @test occursin("role=\"tab\"", html)
+            @test occursin("data-suite-tabs-trigger=\"my-tab\"", html)
+            @test occursin("aria-selected=\"false\"", html)
+            @test occursin("tabindex=\"-1\"", html)
+            @test occursin("My Tab", html)
+        end
+
+        @testset "TabsTrigger styling" begin
+            html = Therapy.render_to_string(SuiteTabsTrigger("X", value="x"))
+            @test occursin("rounded-md", html)
+            @test occursin("text-sm", html)
+            @test occursin("font-medium", html)
+            @test occursin("focus-visible:ring-2", html)
+            # Active state classes
+            @test occursin("data-[state=active]:bg-warm-50", html)
+            @test occursin("data-[state=active]:shadow", html)
+        end
+
+        @testset "Disabled trigger" begin
+            html = Therapy.render_to_string(SuiteTabsTrigger("X", value="x", disabled=true))
+            @test occursin("disabled", html)
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "TabsContent structure" begin
+            html = Therapy.render_to_string(SuiteTabsContent(value="panel1", Div("Content")))
+            @test occursin("role=\"tabpanel\"", html)
+            @test occursin("data-suite-tabs-content=\"panel1\"", html)
+            @test occursin("tabindex=\"0\"", html)
+            @test occursin("hidden", html)
+            @test occursin("Content", html)
+        end
+
+        @testset "TabsContent styling" begin
+            html = Therapy.render_to_string(SuiteTabsContent(value="x", Div("X")))
+            @test occursin("mt-2", html)
+            @test occursin("focus-visible:ring-2", html)
+            @test occursin("focus-visible:ring-accent-600", html)
+        end
+
+        @testset "Orientation" begin
+            html = Therapy.render_to_string(SuiteTabs(default_value="x", orientation="vertical",
+                SuiteTabsList(SuiteTabsTrigger("X", value="x")),
+                SuiteTabsContent(value="x", Div("X")),
+            ))
+            @test occursin("data-orientation=\"vertical\"", html)
+        end
+
+        @testset "Activation mode" begin
+            html = Therapy.render_to_string(SuiteTabs(default_value="x", activation="manual",
+                SuiteTabsList(SuiteTabsTrigger("X", value="x")),
+                SuiteTabsContent(value="x", Div("X")),
+            ))
+            @test occursin("data-activation=\"manual\"", html)
+        end
+
+        @testset "No loop" begin
+            html = Therapy.render_to_string(SuiteTabsList(loop=false,
+                SuiteTabsTrigger("X", value="x"),
+            ))
+            @test occursin("data-no-loop", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteTabs(default_value="x", class="w-[400px]",
+                SuiteTabsList(class="grid-cols-2",
+                    SuiteTabsTrigger("X", value="x", class="data-[state=active]:font-bold"),
+                ),
+                SuiteTabsContent(value="x", class="p-4", Div("X")),
+            ))
+            @test occursin("w-[400px]", html)
+            @test occursin("grid-cols-2", html)
+            @test occursin("data-[state=active]:font-bold", html)
+            @test occursin("p-4", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(SuiteTabsList(
+                SuiteTabsTrigger("X", value="x"),
+            ))
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:text-warm-500", html)
+
+            html2 = Therapy.render_to_string(SuiteTabsTrigger("X", value="x"))
+            @test occursin("dark:data-[state=active]:bg-warm-950", html2)
+            @test occursin("dark:data-[state=active]:text-warm-300", html2)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Tabs)
+            meta = Suite.COMPONENT_REGISTRY[:Tabs]
+            @test meta.tier == :js_runtime
+            @test :SuiteTabs in meta.exports
+            @test :SuiteTabsList in meta.exports
+            @test :SuiteTabsTrigger in meta.exports
+            @test :SuiteTabsContent in meta.exports
+            @test :Tabs in meta.js_modules
+        end
     end
 end

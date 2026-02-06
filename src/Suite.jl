@@ -28,14 +28,14 @@ include("components/ScrollArea.jl")
 include("components/Breadcrumb.jl")
 include("components/Pagination.jl")
 
-# --- Phase 2: Simple Islands (Wasm) ---
+# --- Phase 2: Interactive Components ---
+include("components/Collapsible.jl")
+include("components/Accordion.jl")
+include("components/Tabs.jl")
 # include("components/Toggle.jl")
 # include("components/Checkbox.jl")
 # include("components/RadioGroup.jl")
 # include("components/Slider.jl")
-# include("components/Accordion.jl")
-# include("components/Collapsible.jl")
-# include("components/Tabs.jl")
 # include("components/Switch.jl")
 # include("components/ToggleGroup.jl")
 
