@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/* Configure content sources for v4 */
+@source "./src/**/*.jl";
+@source "../src/**/*.jl";
+
+/* Enable class-based dark mode (toggle via .dark class on <html>) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Theme customizations */
+@theme {
+  --font-sans: 'Optima', 'Palatino Linotype', 'Book Antiqua', 'EB Garamond', serif;
+  --font-serif: 'EB Garamond', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --font-mono: 'JuliaMono', 'Fira Code', 'JetBrains Mono', monospace;
+
+  /* Warm neutral palette (shared across GroupTherapyOrg ecosystem) */
+  --color-warm-50: #f8f7f4;
+  --color-warm-100: #f0ece4;
+  --color-warm-200: #e8e3d9;
+  --color-warm-300: #d4d0c8;
+  --color-warm-400: #9a9590;
+  --color-warm-500: #8a8680;
+  --color-warm-600: #6b6560;
+  --color-warm-700: #5a5855;
+  --color-warm-800: #2a2520;
+  --color-warm-900: #1a1918;
+  --color-warm-950: #111110;
+
+  /* Accent palette — Julia Purple #9558b2 (Suite.jl primary accent) */
+  --color-accent-50: #f6f0fa;
+  --color-accent-100: #e9d9f2;
+  --color-accent-200: #d4b3e5;
+  --color-accent-300: #bf8dd8;
+  --color-accent-400: #a96ecb;
+  --color-accent-500: #9558b2;
+  --color-accent-600: #7a4892;
+  --color-accent-700: #5f3871;
+  --color-accent-800: #452851;
+  --color-accent-900: #2b1933;
+  --color-accent-950: #180e1e;
+
+  /* Accent-secondary palette — Julia Red #cb3c33 (Suite.jl secondary accent) */
+  --color-accent-secondary-50: #fdf2f1;
+  --color-accent-secondary-100: #f9dbd9;
+  --color-accent-secondary-200: #f0aba6;
+  --color-accent-secondary-300: #e47b74;
+  --color-accent-secondary-400: #d85a51;
+  --color-accent-secondary-500: #cb3c33;
+  --color-accent-secondary-600: #a8312a;
+  --color-accent-secondary-700: #832620;
+  --color-accent-secondary-800: #5f1b17;
+  --color-accent-secondary-900: #3d110f;
+  --color-accent-secondary-950: #240a09;
+
+  /* Border radius tokens (shadcn compatibility) */
+  --radius: 0.5rem;
+}
+
+/* Design System CSS custom properties */
+@layer base {
+  :root {
+    /* Shared neutrals */
+    --bg-primary: #f8f7f4;
+    --bg-secondary: #f0ece4;
+    --bg-tertiary: #e8e3d9;
+    --text-primary: #2a2520;
+    --text-secondary: #6b6560;
+    --text-tertiary: #9a9590;
+
+    /* Julia palette */
+    --julia-red: #cb3c33;
+    --julia-purple: #9558b2;
+    --julia-blue: #4063d8;
+    --julia-green: #389826;
+
+    /* Suite.jl accent overrides */
+    --accent: var(--julia-purple);
+    --accent-secondary: var(--julia-red);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  pre code {
+    font-family: 'JuliaMono', 'Fira Code', 'JetBrains Mono', monospace;
+  }
+}
+
+/* Dark mode custom properties */
+@layer base {
+  .dark {
+    --bg-primary: #111110;
+    --bg-secondary: #1a1918;
+    --bg-tertiary: #252422;
+    --text-primary: #d4d0c8;
+    --text-secondary: #8a8680;
+    --text-tertiary: #5a5855;
+  }
+}
