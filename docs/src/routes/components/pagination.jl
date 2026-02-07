@@ -12,12 +12,12 @@ function PaginationPage()
         ComponentPreview(title="Default", description="A pagination bar with previous, next, and page links.",
             Main.Pagination(
                 Main.PaginationContent(
-                    Main.PaginationItem(Main.PaginationPrevious(href="#")),
-                    Main.PaginationItem(Main.PaginationLink("1", href="#", is_active=true)),
-                    Main.PaginationItem(Main.PaginationLink("2", href="#")),
-                    Main.PaginationItem(Main.PaginationLink("3", href="#")),
+                    Main.PaginationItem(Main.PaginationPrevious()),
+                    Main.PaginationItem(Main.PaginationLink("1", is_active=true)),
+                    Main.PaginationItem(Main.PaginationLink("2")),
+                    Main.PaginationItem(Main.PaginationLink("3")),
                     Main.PaginationItem(Main.PaginationEllipsis()),
-                    Main.PaginationItem(Main.PaginationNext(href="#"))
+                    Main.PaginationItem(Main.PaginationNext())
                 )
             )
         ),
@@ -47,7 +47,7 @@ Pagination(
                     Main.TableBody(
                         ApiRow("is_active", "Bool", "false", "Whether this is the current page"),
                         ApiRow("size", "String", "\"icon\"", "icon | default"),
-                        ApiRow("href", "String", "\"#\"", "Link URL"),
+                        ApiRow("href", "String", "\"javascript:void(0)\"", "Link URL"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                         ApiRow("children...", "Any", "-", "Page number text"),
                         ApiRow("kwargs...", "Pair", "-", "Any HTML attribute")
@@ -60,7 +60,7 @@ Pagination(
                 Main.Table(
                     Main.TableHeader(ApiHead()),
                     Main.TableBody(
-                        ApiRow("href", "String", "\"#\"", "Link URL"),
+                        ApiRow("href", "String", "\"javascript:void(0)\"", "Link URL"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                         ApiRow("kwargs...", "Pair", "-", "Any HTML attribute")
                     )

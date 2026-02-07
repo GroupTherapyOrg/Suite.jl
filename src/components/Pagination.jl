@@ -75,7 +75,7 @@ end
 A pagination page number link.
 """
 function PaginationLink(children...; is_active::Bool=false, size::String="icon",
-                              href::String="#", class::String="", theme::Symbol=:default, kwargs...)
+                              href::String="javascript:void(0)", class::String="", theme::Symbol=:default, kwargs...)
     size_classes = Dict(
         "default" => "h-10 px-4 py-2",
         "icon"    => "h-10 w-10",
@@ -97,7 +97,7 @@ end
 
 Previous page navigation link.
 """
-function PaginationPrevious(; href::String="#", class::String="", kwargs...)
+function PaginationPrevious(; href::String="javascript:void(0)", class::String="", kwargs...)
     classes = cn(_PAGINATION_BTN_BASE, _PAGINATION_GHOST, "h-10 px-4 py-2 gap-1", class)
     A(:href => href, :aria_label => "Go to previous page",
       :class => classes, kwargs...,
@@ -110,7 +110,7 @@ end
 
 Next page navigation link.
 """
-function PaginationNext(; href::String="#", class::String="", kwargs...)
+function PaginationNext(; href::String="javascript:void(0)", class::String="", kwargs...)
     classes = cn(_PAGINATION_BTN_BASE, _PAGINATION_GHOST, "h-10 px-4 py-2 gap-1", class)
     A(:href => href, :aria_label => "Go to next page",
       :class => classes, kwargs...,
