@@ -7,14 +7,14 @@ function WidgetsExample()
     Div(:class => "max-w-4xl mx-auto py-8",
         # Header
         Div(:class => "mb-10",
-            H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-2", "Widget Showcase"),
+            H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "Widget Showcase"),
             P(:class => "text-warm-600 dark:text-warm-400", "Interactive components that double as Pluto @bind widgets.")
         ),
 
         Div(:class => "grid gap-8",
 
             # Available widgets
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50", "Available Now"),
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300", "Available Now"),
 
             # Switch widget
             Main.Card(
@@ -26,7 +26,7 @@ function WidgetsExample()
                     Div(:class => "grid md:grid-cols-2 gap-6",
                         # Live demo
                         Div(:class => "space-y-4",
-                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-200 mb-3", "Live Demo"),
+                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Live Demo"),
                             Div(:class => "space-y-3",
                                 Div(:class => "flex items-center justify-between",
                                     Main.Label("Dark mode"),
@@ -44,7 +44,7 @@ function WidgetsExample()
                         ),
                         # Code
                         Div(
-                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-200 mb-3", "Usage"),
+                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Usage"),
                             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
                                 Pre(:class => "text-xs text-warm-100",
                                     Code("""# Therapy.jl mode
@@ -68,7 +68,7 @@ Switch(checked=true)
                 Main.CardContent(
                     Div(:class => "grid md:grid-cols-2 gap-6",
                         Div(:class => "space-y-4",
-                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-200 mb-3", "Live Demo"),
+                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Live Demo"),
                             Div(:class => "flex flex-wrap gap-3",
                                 Main.Toggle("Bold"),
                                 Main.Toggle(variant="outline", "Italic"),
@@ -77,7 +77,7 @@ Switch(checked=true)
                             )
                         ),
                         Div(
-                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-200 mb-3", "Usage"),
+                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Usage"),
                             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
                                 Pre(:class => "text-xs text-warm-100",
                                     Code("""# Therapy.jl mode
@@ -99,7 +99,7 @@ Toggle(variant="outline", "Italic")""")
                 Main.CardContent(
                     Div(:class => "grid md:grid-cols-2 gap-6",
                         Div(:class => "space-y-4",
-                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-200 mb-3", "Live Demo"),
+                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Live Demo"),
                             Div(:class => "space-y-4",
                                 Div(
                                     P(:class => "text-xs text-warm-500 dark:text-warm-500 mb-2", "Single select"),
@@ -120,7 +120,7 @@ Toggle(variant="outline", "Italic")""")
                             )
                         ),
                         Div(
-                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-200 mb-3", "Usage"),
+                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Usage"),
                             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
                                 Pre(:class => "text-xs text-warm-100",
                                     Code("""# Single selection
@@ -145,7 +145,7 @@ ToggleGroup(type="single",
                 Main.CardContent(
                     Div(:class => "grid md:grid-cols-2 gap-6",
                         Div(:class => "space-y-4",
-                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-200 mb-3", "Live Demo"),
+                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Live Demo"),
                             Div(:class => "grid gap-3",
                                 Div(:class => "grid gap-1.5",
                                     Main.Label("Name"),
@@ -162,7 +162,7 @@ ToggleGroup(type="single",
                             )
                         ),
                         Div(
-                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-200 mb-3", "Usage"),
+                            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Usage"),
                             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
                                 Pre(:class => "text-xs text-warm-100",
                                     Code("""# Therapy.jl mode
@@ -182,7 +182,7 @@ Textarea(placeholder="...")
             Main.Separator(),
 
             # Planned widgets
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50", "Coming Soon"),
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300", "Coming Soon"),
             P(:class => "text-warm-600 dark:text-warm-400 mb-6",
                 "These widgets are designed and will implement the full @bind protocol with index-mapping."
             ),
@@ -219,7 +219,7 @@ end
 function _PlannedWidget(title, description, code)
     Div(:class => "border border-warm-200 dark:border-warm-700 rounded-lg p-4 bg-warm-50/50 dark:bg-warm-900/50",
         Div(:class => "flex items-start justify-between mb-2",
-            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", title),
+            H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300", title),
             Main.Badge(variant="outline", class="text-[10px]", "Planned")
         ),
         P(:class => "text-xs text-warm-600 dark:text-warm-400 mb-3", description),

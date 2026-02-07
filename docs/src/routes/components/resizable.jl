@@ -3,7 +3,7 @@
 function ResizablePage()
     ComponentsLayout(
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3", "Resizable"),
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3", "Resizable"),
             P(:class => "text-lg text-warm-600 dark:text-warm-300",
                 "Draggable panel groups for creating resizable layouts with min/max constraints."
             )
@@ -74,7 +74,7 @@ function ResizablePage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4", "Usage"),
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", "Usage"),
             Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
@@ -94,9 +94,9 @@ ResizablePanelGroup(direction="horizontal",
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4", "API Reference"),
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", "API Reference"),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-50 mt-6 mb-3", "ResizablePanelGroup"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "ResizablePanelGroup"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(Tr(:class => "border-b border-warm-200 dark:border-warm-700",
@@ -113,7 +113,7 @@ ResizablePanelGroup(direction="horizontal",
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-50 mt-6 mb-3", "ResizablePanel"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "ResizablePanel"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(Tr(:class => "border-b border-warm-200 dark:border-warm-700",
@@ -132,7 +132,7 @@ ResizablePanelGroup(direction="horizontal",
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-50 mt-6 mb-3", "ResizableHandle"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "ResizableHandle"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(Tr(:class => "border-b border-warm-200 dark:border-warm-700",

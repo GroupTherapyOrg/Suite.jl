@@ -7,7 +7,7 @@ function CardsExample()
     Div(:class => "max-w-4xl mx-auto py-8",
         # Header
         Div(:class => "mb-10",
-            H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-2", "Cards"),
+            H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "Cards"),
             P(:class => "text-warm-600 dark:text-warm-400", "Card compositions for common UI patterns.")
         ),
 
@@ -31,13 +31,13 @@ function CardsExample()
                         "Building modern web applications with Therapy.jl and Suite.jl. Passionate about reactive programming and the Julia ecosystem."
                     ),
                     Div(:class => "flex gap-4 text-sm",
-                        Span(:class => "text-warm-800 dark:text-warm-200",
+                        Span(:class => "text-warm-800 dark:text-warm-300",
                             Strong("142"), " ", Span(:class => "text-warm-500 dark:text-warm-500", "Packages")
                         ),
-                        Span(:class => "text-warm-800 dark:text-warm-200",
+                        Span(:class => "text-warm-800 dark:text-warm-300",
                             Strong("2.8k"), " ", Span(:class => "text-warm-500 dark:text-warm-500", "Stars")
                         ),
-                        Span(:class => "text-warm-800 dark:text-warm-200",
+                        Span(:class => "text-warm-800 dark:text-warm-300",
                             Strong("1.2k"), " ", Span(:class => "text-warm-500 dark:text-warm-500", "Followers")
                         )
                     )
@@ -137,7 +137,7 @@ function _NotificationItem(title, description, time, unread)
     Div(:class => "flex items-start gap-3",
         Div(:class => "w-2 h-2 rounded-full $(dot_class) mt-1.5 shrink-0"),
         Div(:class => "flex-1 min-w-0",
-            P(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", title),
+            P(:class => "text-sm font-medium text-warm-800 dark:text-warm-300", title),
             P(:class => "text-xs text-warm-500 dark:text-warm-500 mt-0.5", description),
             P(:class => "text-xs text-warm-400 dark:text-warm-600 mt-1", time)
         )
@@ -157,7 +157,7 @@ end
 function _SettingsRow(title, description, enabled)
     Div(:class => "flex items-center justify-between",
         Div(
-            P(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", title),
+            P(:class => "text-sm font-medium text-warm-800 dark:text-warm-300", title),
             P(:class => "text-xs text-warm-500 dark:text-warm-500", description)
         ),
         Main.Switch(checked=enabled)

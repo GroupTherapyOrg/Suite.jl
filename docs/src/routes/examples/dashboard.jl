@@ -7,7 +7,7 @@ function DashboardExample()
         # Header
         Div(:class => "flex items-center justify-between mb-8",
             Div(
-                H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-50", "Dashboard"),
+                H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-300", "Dashboard"),
                 P(:class => "text-warm-600 dark:text-warm-400 mt-1", "Your application overview")
             ),
             Main.Button("Download Report")
@@ -82,7 +82,7 @@ function _StatCard(title, value, change, positive)
                 P(:class => "text-sm font-medium text-warm-600 dark:text-warm-400", title),
                 Span(:class => "text-xs $(change_color)", "$(change_icon) $(change)")
             ),
-            P(:class => "text-2xl font-bold text-warm-800 dark:text-warm-50 mt-2", value)
+            P(:class => "text-2xl font-bold text-warm-800 dark:text-warm-300 mt-2", value)
         )
     )
 end
@@ -108,7 +108,7 @@ function _ActivityItem(title, description, time)
     Div(:class => "flex items-start gap-3",
         Div(:class => "w-2 h-2 rounded-full bg-accent-600 dark:bg-accent-400 mt-2 shrink-0"),
         Div(
-            P(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", title),
+            P(:class => "text-sm font-medium text-warm-800 dark:text-warm-300", title),
             P(:class => "text-xs text-warm-500 dark:text-warm-500", description),
             P(:class => "text-xs text-warm-400 dark:text-warm-600 mt-1", time)
         )

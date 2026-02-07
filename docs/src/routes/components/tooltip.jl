@@ -7,7 +7,7 @@ function TooltipPage()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "Tooltip"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-300",
@@ -37,7 +37,7 @@ function TooltipPage()
                 Main.TooltipProvider(
                     Main.Tooltip(
                         Main.TooltipTrigger(
-                            Button(:class => "inline-flex items-center justify-center rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-800 px-4 py-2 text-sm font-medium text-warm-800 dark:text-warm-200 hover:bg-warm-100 dark:hover:bg-warm-700", "Bold")
+                            Button(:class => "inline-flex items-center justify-center rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-800 px-4 py-2 text-sm font-medium text-warm-800 dark:text-warm-300 hover:bg-warm-100 dark:hover:bg-warm-700", "Bold")
                         ),
                         Main.TooltipContent(side="bottom",
                             P(:class => "text-sm", "Toggle bold")
@@ -45,7 +45,7 @@ function TooltipPage()
                     ),
                     Main.Tooltip(
                         Main.TooltipTrigger(
-                            Button(:class => "inline-flex items-center justify-center rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-800 px-4 py-2 text-sm font-medium text-warm-800 dark:text-warm-200 hover:bg-warm-100 dark:hover:bg-warm-700", "Italic")
+                            Button(:class => "inline-flex items-center justify-center rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-800 px-4 py-2 text-sm font-medium text-warm-800 dark:text-warm-300 hover:bg-warm-100 dark:hover:bg-warm-700", "Italic")
                         ),
                         Main.TooltipContent(side="bottom",
                             P(:class => "text-sm", "Toggle italic")
@@ -53,7 +53,7 @@ function TooltipPage()
                     ),
                     Main.Tooltip(
                         Main.TooltipTrigger(
-                            Button(:class => "inline-flex items-center justify-center rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-800 px-4 py-2 text-sm font-medium text-warm-800 dark:text-warm-200 hover:bg-warm-100 dark:hover:bg-warm-700", "Underline")
+                            Button(:class => "inline-flex items-center justify-center rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-800 px-4 py-2 text-sm font-medium text-warm-800 dark:text-warm-300 hover:bg-warm-100 dark:hover:bg-warm-700", "Underline")
                         ),
                         Main.TooltipContent(side="bottom",
                             P(:class => "text-sm", "Toggle underline")
@@ -65,7 +65,7 @@ function TooltipPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Usage"
             ),
             Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
@@ -88,7 +88,7 @@ TooltipProvider(
 
         # Keyboard shortcuts
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Keyboard Interactions"
             ),
             Div(:class => "overflow-x-auto",
@@ -109,7 +109,7 @@ TooltipProvider(
 
         # Accessibility Notes
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Accessibility"
             ),
             Div(:class => "space-y-2 text-sm text-warm-600 dark:text-warm-400",
@@ -121,7 +121,7 @@ TooltipProvider(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "API Reference"
             ),
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "TooltipProvider"),
@@ -187,7 +187,7 @@ end
 
 function KeyRow(key, action)
     Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-200", key),
+        Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", key),
         Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", action)
     )
 end

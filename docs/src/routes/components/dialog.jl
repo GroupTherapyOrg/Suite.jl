@@ -7,7 +7,7 @@ function DialogPage()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "Dialog"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-300",
@@ -52,12 +52,12 @@ function DialogPage()
                         ),
                         Div(:class => "grid gap-4 py-4",
                             Div(:class => "grid grid-cols-4 items-center gap-4",
-                                Label(:class => "text-right text-sm font-medium text-warm-800 dark:text-warm-200", :for => "name", "Name"),
-                                Input(:id => "name", :type => "text", :value => "Dale Black", :class => "col-span-3 flex h-10 w-full rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900 px-3 py-2 text-sm text-warm-800 dark:text-warm-200 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2")
+                                Label(:class => "text-right text-sm font-medium text-warm-800 dark:text-warm-300", :for => "name", "Name"),
+                                Input(:id => "name", :type => "text", :value => "Dale Black", :class => "col-span-3 flex h-10 w-full rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900 px-3 py-2 text-sm text-warm-800 dark:text-warm-300 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2")
                             ),
                             Div(:class => "grid grid-cols-4 items-center gap-4",
-                                Label(:class => "text-right text-sm font-medium text-warm-800 dark:text-warm-200", :for => "username", "Username"),
-                                Input(:id => "username", :type => "text", :value => "@daleblack", :class => "col-span-3 flex h-10 w-full rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900 px-3 py-2 text-sm text-warm-800 dark:text-warm-200 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2")
+                                Label(:class => "text-right text-sm font-medium text-warm-800 dark:text-warm-300", :for => "username", "Username"),
+                                Input(:id => "username", :type => "text", :value => "@daleblack", :class => "col-span-3 flex h-10 w-full rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900 px-3 py-2 text-sm text-warm-800 dark:text-warm-300 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2")
                             )
                         ),
                         Main.DialogFooter(
@@ -73,7 +73,7 @@ function DialogPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Usage"
             ),
             Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
@@ -102,7 +102,7 @@ Dialog(
 
         # Keyboard shortcuts
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Keyboard Interactions"
             ),
             Div(:class => "overflow-x-auto",
@@ -124,7 +124,7 @@ Dialog(
 
         # Accessibility
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Accessibility"
             ),
             Div(:class => "overflow-x-auto",
@@ -138,17 +138,17 @@ Dialog(
                     ),
                     Tbody(
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-200", "role=\"dialog\""),
+                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "role=\"dialog\""),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "DialogContent"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Identifies the element as a dialog")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-200", "aria-modal=\"true\""),
+                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "aria-modal=\"true\""),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "DialogContent"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Indicates that the dialog is modal and blocks interaction with the rest of the page")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-200", "aria-describedby"),
+                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "aria-describedby"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "DialogContent"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Points to the DialogDescription for screen readers")
                         ),
@@ -159,7 +159,7 @@ Dialog(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "API Reference"
             ),
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Dialog"),
@@ -264,7 +264,7 @@ end
 
 function KeyRow(key, action)
     Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-200", key),
+        Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", key),
         Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", action)
     )
 end

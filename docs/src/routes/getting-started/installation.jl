@@ -7,7 +7,7 @@ function InstallationPage()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "Installation"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-400",
@@ -18,7 +18,7 @@ function InstallationPage()
         Div(:class => "prose max-w-none",
 
             # Prerequisites
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Prerequisites"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -34,7 +34,7 @@ function InstallationPage()
             ),
 
             # Installation
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Add Suite.jl"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -65,7 +65,7 @@ Therapy.run(app)""")
             ),
 
             # Tailwind CSS setup
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Tailwind CSS Setup"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -90,7 +90,7 @@ Therapy.run(app)""")
             ),
 
             # Using components
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Using Components"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -122,7 +122,7 @@ HomePage""")
             ),
 
             # Extraction
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Extracting Components"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -155,7 +155,7 @@ Suite.info(:Dialog)""")
             ),
 
             # JS Runtime
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "JS Runtime"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -181,7 +181,7 @@ end""")
             ),
 
             # Next steps
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Next Steps"
             ),
             Ul(:class => "list-disc list-inside space-y-2 text-warm-600 dark:text-warm-400 mb-6",

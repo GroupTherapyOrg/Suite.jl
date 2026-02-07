@@ -7,7 +7,7 @@ function BindPage()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "The @bind Pattern"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-400",
@@ -18,7 +18,7 @@ function BindPage()
         Div(:class => "prose max-w-none",
 
             # Overview
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "How @bind Works"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -48,7 +48,7 @@ function BindPage()
             ),
 
             # Four protocol methods
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "The Four Protocol Methods"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -57,7 +57,7 @@ function BindPage()
             ),
 
             # initial_value
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "initial_value(widget)"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -70,7 +70,7 @@ function BindPage()
             ),
 
             # transform_value
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "transform_value(widget, value_from_js)"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -87,7 +87,7 @@ Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
             ),
 
             # possible_values
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "possible_values(widget)"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -100,7 +100,7 @@ Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
             ),
 
             # validate_value
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "validate_value(widget, value_from_js)"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -115,7 +115,7 @@ Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
             Main.Separator(),
 
             # The index-mapping pattern
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "The Index-Mapping Pattern"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -151,7 +151,7 @@ plot(transform, 0:0.1:2\u03c0)""")
             Main.Separator(),
 
             # The HTML contract
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "The HTML Contract"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -171,7 +171,7 @@ plot(transform, 0:0.1:2\u03c0)""")
             Main.Separator(),
 
             # Full example
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Full Example: SuiteSlider"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -216,7 +216,7 @@ Bonds.validate_value(s::SuiteSliderWidget, val) =
             ),
 
             # Therapy.jl reactivity comparison
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Pluto vs Therapy.jl Reactivity"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -255,7 +255,7 @@ Bonds.validate_value(s::SuiteSliderWidget, val) =
             ),
 
             # Next steps
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Next Steps"
             ),
             Ul(:class => "list-disc list-inside space-y-2 text-warm-600 dark:text-warm-400 mb-6",

@@ -13,7 +13,7 @@ function Index()
                     Span(:class => "text-warm-300 dark:text-warm-600", "/"),
                     Span(:class => "text-xs font-medium text-accent-600 dark:text-accent-400", "50+ Components")
                 ),
-                H1(:class => "text-4xl sm:text-6xl lg:text-7xl font-serif font-semibold text-warm-800 dark:text-warm-50 tracking-tight leading-[1.1]",
+                H1(:class => "text-4xl sm:text-6xl lg:text-7xl font-serif font-semibold text-warm-800 dark:text-warm-300 tracking-tight leading-[1.1]",
                     "Build your Julia",
                     Br(),
                     "web app with ",
@@ -40,7 +40,7 @@ function Index()
 
         # Component Showcase — live rendered Suite.jl components
         Div(:class => "py-16",
-            H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-300 mb-4",
                 "Components that just work"
             ),
             P(:class => "text-center text-warm-600 dark:text-warm-400 mb-12 max-w-lg mx-auto",
@@ -171,7 +171,7 @@ function Index()
                                 Main.AvatarFallback("JL")
                             ),
                             Div(
-                                P(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", "Julia Developer"),
+                                P(:class => "text-sm font-medium text-warm-800 dark:text-warm-300", "Julia Developer"),
                                 P(:class => "text-xs text-warm-500 dark:text-warm-500", "using Suite")
                             )
                         )
@@ -182,7 +182,7 @@ function Index()
 
         # Extraction-First Code Example
         Div(:class => "py-20",
-            H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-300 mb-4",
                 "Own your components"
             ),
             P(:class => "text-center text-warm-600 dark:text-warm-400 mb-10 max-w-lg mx-auto",
@@ -217,7 +217,7 @@ Card(
 
         # Feature Grid
         Div(:class => "py-16",
-            H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-50 mb-12",
+            H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-300 mb-12",
                 "Why Suite.jl?"
             ),
             Div(:class => "grid md:grid-cols-3 gap-10 max-w-5xl mx-auto px-4",
@@ -266,7 +266,7 @@ Card(
 
         # Component Categories — kept but updated counts
         Div(:class => "py-16",
-            H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-50 mb-12",
+            H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-300 mb-12",
                 "Three Implementation Tiers"
             ),
             Div(:class => "grid md:grid-cols-3 gap-6 max-w-4xl mx-auto",
@@ -298,14 +298,14 @@ function _FeatureCard(title, description, icon_path)
                 Path(:stroke_linecap => "round", :stroke_linejoin => "round", :d => icon_path)
             )
         ),
-        H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3", title),
+        H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3", title),
         P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed text-sm", description)
     )
 end
 
 function _CategoryCard(title, count, components)
     Div(:class => "border border-warm-200 dark:border-warm-700 rounded-xl p-6 bg-warm-100/50 dark:bg-warm-900/50",
-        H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-50 mb-1", title),
+        H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-300 mb-1", title),
         P(:class => "text-sm font-medium text-accent-600 dark:text-accent-400 mb-3", count),
         P(:class => "text-sm text-warm-600 dark:text-warm-400", components)
     )

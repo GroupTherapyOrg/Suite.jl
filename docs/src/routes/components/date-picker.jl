@@ -8,7 +8,7 @@ function DatePickerPage()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "Date Picker"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-300",
@@ -39,7 +39,7 @@ function DatePickerPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Usage"
             ),
             Pre(:class => "bg-warm-100 dark:bg-warm-900 rounded-lg p-4 text-sm overflow-x-auto",
@@ -66,7 +66,7 @@ DatePicker(disabled_dates="2026-02-14,2026-02-15")"""
 
         # Composition Notes
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Composition"
             ),
             P(:class => "text-warm-600 dark:text-warm-300 mb-4",
@@ -87,7 +87,7 @@ Popover(
 
         # Keyboard Interactions
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Keyboard Interactions"
             ),
             Div(:class => "overflow-x-auto",
@@ -111,12 +111,12 @@ Popover(
 
         # API Reference
         Div(:class => "mt-12 space-y-8",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "API Reference"
             ),
 
             # DatePicker
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-50", "DatePicker"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300", "DatePicker"),
             Div(:class => "overflow-x-auto",
                 Main.Table(
                     Main.TableHeader(

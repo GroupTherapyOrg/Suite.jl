@@ -6,7 +6,7 @@ function GettingStartedIndex()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "Introduction"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-400",
@@ -16,7 +16,7 @@ function GettingStartedIndex()
 
         # What is Suite.jl?
         Div(:class => "prose max-w-none",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "What is Suite.jl?"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -31,12 +31,12 @@ function GettingStartedIndex()
             ),
 
             # Key concepts
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Key Concepts"
             ),
 
             # Extraction model
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "Own the code"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -55,7 +55,7 @@ Suite.extract(:Button, "src/components/")
             ),
 
             # Three tiers
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "Three implementation tiers"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -89,7 +89,7 @@ Suite.extract(:Button, "src/components/")
             ),
 
             # Themes
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "Built-in themes"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -106,7 +106,7 @@ Suite.extract(:Button, "components/", theme=:nature)""")
             ),
 
             # Quick start
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Quick Start"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",

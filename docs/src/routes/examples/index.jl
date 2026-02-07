@@ -4,7 +4,7 @@ function ExamplesIndex()
     Div(:class => "max-w-4xl mx-auto py-12",
         # Header
         Div(:class => "mb-12",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "Examples"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-400",

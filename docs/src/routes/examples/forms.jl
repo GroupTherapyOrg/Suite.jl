@@ -6,7 +6,7 @@ function FormsExample()
     Div(:class => "max-w-4xl mx-auto py-8",
         # Header
         Div(:class => "mb-10",
-            H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-2", "Forms"),
+            H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "Forms"),
             P(:class => "text-warm-600 dark:text-warm-400", "Login, signup, and settings form compositions.")
         ),
 
@@ -94,7 +94,7 @@ function FormsExample()
                         Div(:class => "grid gap-6",
                             # Personal info section
                             Div(:class => "grid gap-4",
-                                H3(:class => "text-lg font-medium text-warm-800 dark:text-warm-200", "Personal Information"),
+                                H3(:class => "text-lg font-medium text-warm-800 dark:text-warm-300", "Personal Information"),
                                 Div(:class => "grid sm:grid-cols-2 gap-4",
                                     Div(:class => "grid gap-2",
                                         Main.Label("Display name"),
@@ -125,7 +125,7 @@ function FormsExample()
 
                             # Notification preferences
                             Div(:class => "grid gap-4",
-                                H3(:class => "text-lg font-medium text-warm-800 dark:text-warm-200", "Notifications"),
+                                H3(:class => "text-lg font-medium text-warm-800 dark:text-warm-300", "Notifications"),
                                 Div(:class => "space-y-4",
                                     _FormSettingsRow("Email digest", "Receive a weekly summary of activity.", true),
                                     _FormSettingsRow("Push notifications", "Get notified about important updates.", true),
@@ -158,7 +158,7 @@ end
 function _FormSettingsRow(title, description, enabled)
     Div(:class => "flex items-center justify-between",
         Div(
-            P(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", title),
+            P(:class => "text-sm font-medium text-warm-800 dark:text-warm-300", title),
             P(:class => "text-xs text-warm-500 dark:text-warm-500", description)
         ),
         Main.Switch(checked=enabled)

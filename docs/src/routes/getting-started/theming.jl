@@ -7,7 +7,7 @@ function ThemingPage()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "Theming"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-400",
@@ -18,7 +18,7 @@ function ThemingPage()
         Div(:class => "prose max-w-none",
 
             # Overview
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "How Themes Work"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -30,7 +30,7 @@ function ThemingPage()
             ),
 
             # Pre-built themes
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Pre-built Themes"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -79,12 +79,12 @@ function ThemingPage()
             ),
 
             # Usage
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Applying Themes"
             ),
 
             # Runtime
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "At render time"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -115,7 +115,7 @@ Card(theme=:nature,
             ),
 
             # Extraction
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "At extraction time"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -134,7 +134,7 @@ Suite.extract(:Card, "src/components/", theme=:nature)
             ),
 
             # Design tokens
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Design Tokens"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -196,7 +196,7 @@ Suite.extract(:Card, "src/components/", theme=:nature)
             ),
 
             # Color mapping
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Color Token Mapping"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -242,7 +242,7 @@ Suite.extract(:Card, "src/components/", theme=:nature)
             ),
 
             # Dark mode
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Dark Mode"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -267,7 +267,7 @@ ThemeToggle()  # Sun/moon toggle button
             ),
 
             # Warm neutral palette
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Warm Neutral Palette"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -288,7 +288,7 @@ ThemeToggle()  # Sun/moon toggle button
             ),
 
             # Accent palette
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-8 mb-3",
+            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
                 "Accent (Purple)"
             ),
             Div(:class => "grid grid-cols-5 sm:grid-cols-11 gap-1 mb-6",

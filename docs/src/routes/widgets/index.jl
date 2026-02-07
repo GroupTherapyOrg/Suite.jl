@@ -7,7 +7,7 @@ function WidgetsIndex()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "Widgets"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-400",
@@ -18,7 +18,7 @@ function WidgetsIndex()
         Div(:class => "prose max-w-none",
 
             # The idea
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "The Big Idea"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -26,7 +26,7 @@ function WidgetsIndex()
             ),
             Div(:class => "grid md:grid-cols-2 gap-4 mb-6",
                 Div(:class => "border border-warm-200 dark:border-warm-700 rounded-lg p-5 bg-warm-50/50 dark:bg-warm-900/50",
-                    H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-50 mb-2", "UI Component"),
+                    H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "UI Component"),
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-3",
                         "In a Therapy.jl app, call the component as a function. It returns a VNode that renders styled HTML."
                     ),
@@ -37,7 +37,7 @@ function WidgetsIndex()
                     )
                 ),
                 Div(:class => "border border-warm-200 dark:border-warm-700 rounded-lg p-5 bg-warm-50/50 dark:bg-warm-900/50",
-                    H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-50 mb-2", "Data Widget"),
+                    H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "Data Widget"),
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-3",
                         "In a Pluto notebook, pass a positional argument to get a bindable struct. Use with ", Code(:class => "text-xs bg-warm-200 dark:bg-warm-800 px-1 py-0.5 rounded", "@bind"), "."
                     ),
@@ -55,7 +55,7 @@ function WidgetsIndex()
             ),
 
             # How disambiguation works
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Positional vs Keyword"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -88,7 +88,7 @@ function WidgetsIndex()
             ),
 
             # Widget mapping table
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Widget Mapping"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -156,7 +156,7 @@ function WidgetsIndex()
             ),
 
             # Three tiers in widget context
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Three Tiers, Two Modes"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -190,7 +190,7 @@ function WidgetsIndex()
             ),
 
             # Package extension
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Zero-Cost Dependency"
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
@@ -221,7 +221,7 @@ end""")
             ),
 
             # Next steps
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mt-10 mb-4",
+            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
                 "Next Steps"
             ),
             Ul(:class => "list-disc list-inside space-y-2 text-warm-600 dark:text-warm-400 mb-6",

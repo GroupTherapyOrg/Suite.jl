@@ -8,7 +8,7 @@ function ComponentsIndex()
         if item.implemented
             A(:href => "./components/$(item.slug)/",
               :class => "block p-4 rounded-lg border border-warm-200 dark:border-warm-700 hover:border-accent-600 dark:hover:border-accent-400 transition-colors",
-                H3(:class => "text-sm font-semibold text-warm-800 dark:text-warm-50", item.title),
+                H3(:class => "text-sm font-semibold text-warm-800 dark:text-warm-300", item.title),
                 P(:class => "text-xs text-warm-500 dark:text-warm-400 mt-1", "Available")
             )
         else
@@ -22,7 +22,7 @@ function ComponentsIndex()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-3",
+            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
                 "Components"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-300",
