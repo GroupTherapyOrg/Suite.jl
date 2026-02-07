@@ -61,9 +61,7 @@ function TabsPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Tabs(default_value="account",
     TabsList(
@@ -76,31 +74,17 @@ Tabs(default_value="account",
     TabsContent(value="password",
         P("Password settings content"),
     ),
-)""")
-        ),
+)"""),
 
         # Keyboard shortcuts
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
-                        )
-                    ),
-                    Main.TableBody(
-                        KeyRow("Tab", "Enter/exit the tab list"),
-                        KeyRow("Arrow Right", "Focus next tab (horizontal)"),
-                        KeyRow("Arrow Left", "Focus previous tab (horizontal)"),
-                        KeyRow("Arrow Down", "Focus next tab (vertical)"),
-                        KeyRow("Arrow Up", "Focus previous tab (vertical)"),
-                        KeyRow("Home", "Focus first tab"),
-                        KeyRow("End", "Focus last tab"),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("Tab", "Enter/exit the tab list"),
+            KeyRow("Arrow Right", "Focus next tab (horizontal)"),
+            KeyRow("Arrow Left", "Focus previous tab (horizontal)"),
+            KeyRow("Arrow Down", "Focus next tab (vertical)"),
+            KeyRow("Arrow Up", "Focus previous tab (vertical)"),
+            KeyRow("Home", "Focus first tab"),
+            KeyRow("End", "Focus last tab"),
         ),
 
         # API Reference

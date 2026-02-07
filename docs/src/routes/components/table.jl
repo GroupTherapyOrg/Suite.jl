@@ -56,9 +56,7 @@ function TablePage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Main.Table(
     TableHeader(
@@ -73,8 +71,7 @@ Main.Table(
             TableCell("alice@example.com"),
         ),
     ),
-)""")
-        ),
+)"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",

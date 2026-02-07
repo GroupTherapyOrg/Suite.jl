@@ -28,9 +28,7 @@ function ToastPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 # Place Toaster once in your layout (e.g. at the root)
 Toaster(position="bottom-right")
@@ -44,8 +42,7 @@ Toaster(position="bottom-right")
 
 # Programmatic dismissal:
 #   Suite.toast.dismiss(id)
-#   Suite.toast.dismissAll()""")
-        ),
+#   Suite.toast.dismissAll()"""),
 
         # Notes
         Div(:class => "mt-12 space-y-6",

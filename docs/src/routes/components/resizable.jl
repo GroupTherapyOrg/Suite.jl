@@ -68,9 +68,7 @@ function ResizablePage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 ResizablePanelGroup(direction="horizontal",
     ResizablePanel(default_size=30,
@@ -80,8 +78,7 @@ ResizablePanelGroup(direction="horizontal",
     ResizablePanel(default_size=70,
         Div("Main content")
     ),
-)""")
-        ),
+)"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
@@ -89,13 +86,8 @@ ResizablePanelGroup(direction="horizontal",
 
             SectionH3("ResizablePanelGroup"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("direction", "String", "\"horizontal\"", "Layout direction: \"horizontal\" or \"vertical\""),
                         ApiRow("children", "Any", "-", "ResizablePanel and ResizableHandle elements"),
@@ -106,13 +98,8 @@ ResizablePanelGroup(direction="horizontal",
 
             SectionH3("ResizablePanel"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("default_size", "Int", "0", "Initial size as percentage (0 = auto-distribute)"),
                         ApiRow("min_size", "Int", "10", "Minimum size percentage"),
@@ -125,13 +112,8 @@ ResizablePanelGroup(direction="horizontal",
 
             SectionH3("ResizableHandle"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("with_handle", "Bool", "false", "Whether to show a visible grip icon"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),

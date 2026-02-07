@@ -35,36 +35,18 @@ function InputPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Input(placeholder="Email")
 Input(type="password", placeholder="Password")
 Input(type="file")
-Input(:disabled => true, placeholder="Disabled")""")
-        ),
+Input(:disabled => true, placeholder="Disabled")"""),
 
         # API Reference
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("API Reference"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
-                    Main.TableBody(
-                        ApiRow("type", "String", "\"text\"", "text | email | password | file | number | etc."),
-                        ApiRow("class", "String", "\"\"", "Additional CSS classes"),
-                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute (placeholder, disabled, id, etc.)")
-                    )
-                )
-            )
+        ApiTable(
+            ApiRow("type", "String", "\"text\"", "text | email | password | file | number | etc."),
+            ApiRow("class", "String", "\"\"", "Additional CSS classes"),
+            ApiRow("kwargs...", "Pair", "-", "Any HTML attribute (placeholder, disabled, id, etc.)"),
         )
     )
 end

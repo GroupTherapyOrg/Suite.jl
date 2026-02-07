@@ -57,9 +57,7 @@ function TypographyPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 H1("Page Title")
 H2("Section Heading")
@@ -69,8 +67,7 @@ Blockquote("A notable quote.")
 InlineCode("code_snippet()")
 Large("Large text")
 Small("Small label")
-Muted("Muted hint text")""")
-        ),
+Muted("Muted hint text")"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
@@ -80,18 +77,11 @@ Muted("Muted hint text")""")
             ),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                         ApiRow("children...", "Any", "-", "Text content"),
-                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute")
+                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute"),
                     )
                 )
             ),
@@ -99,13 +89,11 @@ Muted("Muted hint text")""")
             SectionH3("Available Components"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Component"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "HTML Element"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                    Main.TableHeader(Main.TableRow(
+                        Main.TableHead("Component"),
+                        Main.TableHead("HTML Element"),
+                        Main.TableHead("Description"),
+                    )),
                     Main.TableBody(
                         Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
                             Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "H1"),

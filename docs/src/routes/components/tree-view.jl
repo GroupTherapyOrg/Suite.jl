@@ -41,44 +41,16 @@ function TreeViewPage()
         ),
 
         # Keyboard
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
-                    )),
-                    Main.TableBody(
-                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs", "↓ / ↑"),
-                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Move between visible items"),
-                        ),
-                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs", "→"),
-                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Expand folder / move to first child"),
-                        ),
-                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs", "←"),
-                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Collapse folder / move to parent"),
-                        ),
-                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs", "Enter / Space"),
-                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Select item / toggle folder"),
-                        ),
-                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs", "Home / End"),
-                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Jump to first / last visible item"),
-                        ),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("↓ / ↑", "Move between visible items"),
+            KeyRow("→", "Expand folder / move to first child"),
+            KeyRow("←", "Collapse folder / move to parent"),
+            KeyRow("Enter / Space", "Select item / toggle folder"),
+            KeyRow("Home / End", "Jump to first / last visible item"),
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 TreeView(
     TreeViewItem(label="src", is_folder=true, expanded=true,
@@ -86,8 +58,7 @@ TreeView(
         TreeViewItem(label="utils.jl"),
     ),
     TreeViewItem(label="Project.toml"),
-)""")
-        ),
+)"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
@@ -95,13 +66,8 @@ TreeView(
 
             SectionH3("TreeView"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("children", "Any", "-", "TreeViewItem elements"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
@@ -111,13 +77,8 @@ TreeView(
 
             SectionH3("TreeViewItem"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("label", "String", "\"\"", "Display text"),
                         ApiRow("is_folder", "Bool", "auto", "Whether this is a folder (auto-detected from children)"),

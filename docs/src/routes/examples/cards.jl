@@ -6,10 +6,7 @@
 function CardsExample()
     Div(:class => "max-w-4xl mx-auto py-8",
         # Header
-        Div(:class => "mb-10",
-            H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "Cards"),
-            P(:class => "text-warm-600 dark:text-warm-400", "Card compositions for common UI patterns.")
-        ),
+        PageHeader("Cards", "Card compositions for common UI patterns."),
 
         Div(:class => "grid md:grid-cols-2 gap-6",
 

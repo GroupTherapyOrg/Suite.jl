@@ -62,9 +62,7 @@ function ToggleGroupPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 # Single selection
 ToggleGroup(type="single", default_value="center",
@@ -78,29 +76,15 @@ ToggleGroup(type="multiple",
     ToggleGroupItem(value="bold", "B"),
     ToggleGroupItem(value="italic", "I"),
     ToggleGroupItem(value="underline", "U"),
-)""")
-        ),
+)"""),
 
         # Keyboard shortcuts
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
-                        )
-                    ),
-                    Main.TableBody(
-                        KeyRow("Enter / Space", "Toggle the focused item"),
-                        KeyRow("Arrow Right", "Focus next item (horizontal)"),
-                        KeyRow("Arrow Left", "Focus previous item (horizontal)"),
-                        KeyRow("Arrow Down", "Focus next item (vertical)"),
-                        KeyRow("Arrow Up", "Focus previous item (vertical)"),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("Enter / Space", "Toggle the focused item"),
+            KeyRow("Arrow Right", "Focus next item (horizontal)"),
+            KeyRow("Arrow Left", "Focus previous item (horizontal)"),
+            KeyRow("Arrow Down", "Focus next item (vertical)"),
+            KeyRow("Arrow Up", "Focus previous item (vertical)"),
         ),
 
         # API Reference

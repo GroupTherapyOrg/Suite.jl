@@ -3,15 +3,6 @@
 # Showcases Form with validation, error messages, and accessibility.
 
 
-function FormApiRow(name, type, default, description)
-    Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", name),
-        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
-
 function FormPage()
     ComponentsLayout(
         # Header
@@ -115,9 +106,7 @@ function FormPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Form(action="/api/submit",
     FormField(name="email",
@@ -134,8 +123,7 @@ Form(action="/api/submit",
         pattern_message="Please enter a valid email address",
     ),
     Button(type="submit", "Submit"),
-)""")
-        ),
+)"""),
 
         # Component Structure
         Div(:class => "mt-12 space-y-6",
@@ -185,55 +173,41 @@ Form(action="/api/submit",
             )
         ),
 
-        # API Reference — Form
+        # API Reference
         Div(:class => "mt-12 space-y-6",
             SectionH2("API Reference"),
 
             SectionH3("Form"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
-                        FormApiRow("action", "String", "\"\"", "Form action URL"),
-                        FormApiRow("method", "String", "\"post\"", "Form method"),
-                        FormApiRow("validate_on", "String", "\"submit\"", "Validation mode: submit, change, or blur"),
-                        FormApiRow("class", "String", "\"\"", "Additional CSS classes"),
-                        FormApiRow("theme", "Symbol", ":default", "Theme name"),
+                        ApiRow("action", "String", "\"\"", "Form action URL"),
+                        ApiRow("method", "String", "\"post\"", "Form method"),
+                        ApiRow("validate_on", "String", "\"submit\"", "Validation mode: submit, change, or blur"),
+                        ApiRow("class", "String", "\"\"", "Additional CSS classes"),
+                        ApiRow("theme", "Symbol", ":default", "Theme name"),
                     )
                 )
             ),
 
             SectionH3("FormField"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
-                        FormApiRow("name", "String", "required", "Field name"),
-                        FormApiRow("required", "Bool", "false", "Whether the field is required"),
-                        FormApiRow("required_message", "String", "\"This field is required\"", "Custom required error message"),
-                        FormApiRow("min_length", "Int", "0", "Minimum length (0 = no minimum)"),
-                        FormApiRow("min_length_message", "String", "\"\"", "Custom min length error message"),
-                        FormApiRow("max_length", "Int", "0", "Maximum length (0 = no maximum)"),
-                        FormApiRow("max_length_message", "String", "\"\"", "Custom max length error message"),
-                        FormApiRow("pattern", "String", "\"\"", "Regex pattern for validation"),
-                        FormApiRow("pattern_message", "String", "\"\"", "Custom pattern error message"),
-                        FormApiRow("min", "String", "\"\"", "Minimum value (for number inputs)"),
-                        FormApiRow("max", "String", "\"\"", "Maximum value (for number inputs)"),
-                        FormApiRow("custom_message", "String", "\"\"", "Default error message"),
+                        ApiRow("name", "String", "required", "Field name"),
+                        ApiRow("required", "Bool", "false", "Whether the field is required"),
+                        ApiRow("required_message", "String", "\"This field is required\"", "Custom required error message"),
+                        ApiRow("min_length", "Int", "0", "Minimum length (0 = no minimum)"),
+                        ApiRow("min_length_message", "String", "\"\"", "Custom min length error message"),
+                        ApiRow("max_length", "Int", "0", "Maximum length (0 = no maximum)"),
+                        ApiRow("max_length_message", "String", "\"\"", "Custom max length error message"),
+                        ApiRow("pattern", "String", "\"\"", "Regex pattern for validation"),
+                        ApiRow("pattern_message", "String", "\"\"", "Custom pattern error message"),
+                        ApiRow("min", "String", "\"\"", "Minimum value (for number inputs)"),
+                        ApiRow("max", "String", "\"\"", "Maximum value (for number inputs)"),
+                        ApiRow("custom_message", "String", "\"\"", "Default error message"),
                     )
                 )
             ),

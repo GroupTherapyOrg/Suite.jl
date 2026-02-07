@@ -25,9 +25,7 @@ function AlertPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Alert(
     AlertTitle("Heads up!"),
@@ -37,8 +35,7 @@ Alert(
 Alert(variant="destructive",
     AlertTitle("Error"),
     AlertDescription("Something went wrong."),
-)""")
-        ),
+)"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
@@ -48,19 +45,12 @@ Alert(variant="destructive",
             SectionH3("Alert"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("variant", "String", "\"default\"", "default | destructive"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes to merge"),
                         ApiRow("children...", "Any", "-", "Alert content (AlertTitle, AlertDescription)"),
-                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute")
+                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute"),
                     )
                 )
             ),
@@ -69,18 +59,11 @@ Alert(variant="destructive",
             SectionH3("AlertTitle"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                         ApiRow("children...", "Any", "-", "Title text"),
-                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute")
+                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute"),
                     )
                 )
             ),
@@ -89,18 +72,11 @@ Alert(variant="destructive",
             SectionH3("AlertDescription"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                         ApiRow("children...", "Any", "-", "Description text"),
-                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute")
+                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute"),
                     )
                 )
             )

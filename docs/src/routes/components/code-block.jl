@@ -25,9 +25,7 @@ function CodeBlockPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 # With language badge
 CodeBlock("println(\\"Hello\\")", language="julia")
@@ -36,30 +34,16 @@ CodeBlock("println(\\"Hello\\")", language="julia")
 CodeBlock(code, language="julia", show_line_numbers=true)
 
 # Without copy button
-CodeBlock("simple", show_copy=false)""")
-        ),
+CodeBlock("simple", show_copy=false)"""),
 
         # API Reference
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("API Reference"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )),
-                    Main.TableBody(
-                        ApiRow("code", "String", "\"\"", "The code text to display"),
-                        ApiRow("language", "String", "\"\"", "Language name shown as badge (e.g., \"julia\", \"bash\")"),
-                        ApiRow("show_line_numbers", "Bool", "false", "Whether to display line numbers"),
-                        ApiRow("show_copy", "Bool", "true", "Whether to show copy-to-clipboard button"),
-                        ApiRow("class", "String", "\"\"", "Additional CSS classes"),
-                        ApiRow("theme", "Symbol", ":default", "Theme preset"),
-                    )
-                )
-            )
+        ApiTable(
+            ApiRow("code", "String", "\"\"", "The code text to display"),
+            ApiRow("language", "String", "\"\"", "Language name shown as badge (e.g., \"julia\", \"bash\")"),
+            ApiRow("show_line_numbers", "Bool", "false", "Whether to display line numbers"),
+            ApiRow("show_copy", "Bool", "true", "Whether to show copy-to-clipboard button"),
+            ApiRow("class", "String", "\"\"", "Additional CSS classes"),
+            ApiRow("theme", "Symbol", ":default", "Theme preset"),
         )
     )
 end

@@ -45,32 +45,21 @@ function TogglePage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Toggle("B")
 Toggle(variant="outline", "I")
 Toggle(pressed=true, "Bold")
-Toggle(size="sm", disabled=true, "X")""")
-        ),
+Toggle(size="sm", disabled=true, "X")"""),
 
         # API Reference
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("API Reference"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(ApiHead()),
-                    Main.TableBody(
-                        ApiRow("variant", "String", "\"default\"", "\"default\" or \"outline\""),
-                        ApiRow("size", "String", "\"default\"", "\"default\", \"sm\", or \"lg\""),
-                        ApiRow("pressed", "Bool", "false", "Initial pressed state"),
-                        ApiRow("disabled", "Bool", "false", "Disable the toggle"),
-                        ApiRow("class", "String", "\"\"", "Additional CSS classes"),
-                        ApiRow("children...", "Any", "-", "Toggle content (text, icons)"),
-                    )
-                )
-            )
+        ApiTable(
+            ApiRow("variant", "String", "\"default\"", "\"default\" or \"outline\""),
+            ApiRow("size", "String", "\"default\"", "\"default\", \"sm\", or \"lg\""),
+            ApiRow("pressed", "Bool", "false", "Initial pressed state"),
+            ApiRow("disabled", "Bool", "false", "Disable the toggle"),
+            ApiRow("class", "String", "\"\"", "Additional CSS classes"),
+            ApiRow("children...", "Any", "-", "Toggle content (text, icons)"),
         )
     )
 end

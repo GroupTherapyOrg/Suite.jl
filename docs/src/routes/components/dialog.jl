@@ -65,9 +65,7 @@ function DialogPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Dialog(
     DialogTrigger(
@@ -84,27 +82,13 @@ Dialog(
             Button("Confirm"),
         ),
     ),
-)""")
-        ),
+)"""),
 
         # Keyboard shortcuts
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
-                        )
-                    ),
-                    Main.TableBody(
-                        KeyRow("Escape", "Close the dialog"),
-                        KeyRow("Tab", "Cycle focus through focusable elements inside the dialog"),
-                        KeyRow("Shift + Tab", "Cycle focus backward through focusable elements"),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("Escape", "Close the dialog"),
+            KeyRow("Tab", "Cycle focus through focusable elements inside the dialog"),
+            KeyRow("Shift + Tab", "Cycle focus backward through focusable elements"),
         ),
 
         # Accessibility

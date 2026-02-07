@@ -302,10 +302,16 @@ function _FeatureCard(title, description, icon_path)
 end
 
 function _CategoryCard(title, count, components)
-    Div(:class => "border border-warm-200 dark:border-warm-700 rounded-xl p-6 bg-warm-100/50 dark:bg-warm-900/50",
-        H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-300 mb-1", title),
-        P(:class => "text-sm font-medium text-accent-600 dark:text-accent-400 mb-3", count),
-        P(:class => "text-sm text-warm-600 dark:text-warm-400", components)
+    Main.Card(class="bg-warm-100/50 dark:bg-warm-900/50",
+        Main.CardHeader(
+            Main.CardTitle(title),
+            Main.CardDescription(
+                Span(:class => "text-sm font-medium text-accent-600 dark:text-accent-400", count)
+            )
+        ),
+        Main.CardContent(
+            P(:class => "text-sm text-warm-600 dark:text-warm-400", components)
+        )
     )
 end
 

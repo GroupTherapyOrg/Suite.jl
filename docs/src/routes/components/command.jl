@@ -55,9 +55,7 @@ function CommandPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Command(
     CommandInput(placeholder="Type a command or search..."),
@@ -75,33 +73,16 @@ Command(
                 CommandShortcut("⌘,")),
         ),
     ),
-)""")
-        ),
+)"""),
 
         # Keyboard shortcuts
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-4",
-                "Fuzzy search is built in with a recursive scoring algorithm. Vim-style bindings are supported."
-            ),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
-                        )
-                    ),
-                    Main.TableBody(
-                        KeyRow("Arrow Down", "Move focus to the next item"),
-                        KeyRow("Arrow Up", "Move focus to the previous item"),
-                        KeyRow("Enter", "Select the focused item"),
-                        KeyRow("Escape", "Close the dialog"),
-                        KeyRow("Ctrl+N / Ctrl+J", "Move focus to the next item (vim binding)"),
-                        KeyRow("Ctrl+P / Ctrl+K", "Move focus to the previous item (vim binding)"),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("Arrow Down", "Move focus to the next item"),
+            KeyRow("Arrow Up", "Move focus to the previous item"),
+            KeyRow("Enter", "Select the focused item"),
+            KeyRow("Escape", "Close the dialog"),
+            KeyRow("Ctrl+N / Ctrl+J", "Move focus to the next item (vim binding)"),
+            KeyRow("Ctrl+P / Ctrl+K", "Move focus to the previous item (vim binding)"),
         ),
 
         # API Reference

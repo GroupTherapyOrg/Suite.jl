@@ -26,15 +26,6 @@ const _DT_DEMO_COLUMNS = [
     Main.DataTableColumn("amount", "Amount", align="right"),
 ]
 
-function ApiRow(name, type, default, description)
-    Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", name),
-        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
-
 function DataTablePage()
     ComponentsLayout(
         # Header
@@ -65,9 +56,7 @@ function DataTablePage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 # Define your data
 data = [
@@ -90,8 +79,7 @@ DataTable(data, columns,
     selectable=true,
     column_visibility=true,
     filter_placeholder="Search users...",
-)""")
-        ),
+)"""),
 
         # Column Definition
         Div(:class => "mt-12 space-y-6",
@@ -158,15 +146,8 @@ DataTableColumn("status", "Status",
 
             SectionH3("DataTable"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("data", "Vector", "required", "Data rows (Vector of NamedTuples or Dicts)"),
                         ApiRow("columns", "Vector{DataTableColumn}", "required", "Column definitions"),
@@ -187,15 +168,8 @@ DataTableColumn("status", "Status",
 
             SectionH3("DataTableColumn"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("key", "String", "required", "Data field key (accessor)"),
                         ApiRow("header", "String", "required", "Display header text"),

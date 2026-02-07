@@ -7,7 +7,7 @@ function DashboardExample()
         # Header
         Div(:class => "flex items-center justify-between mb-8",
             Div(
-                H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-300", "Dashboard"),
+                Main.H1("Dashboard"),
                 P(:class => "text-warm-600 dark:text-warm-400 mt-1", "Your application overview")
             ),
             Main.Button("Download Report")

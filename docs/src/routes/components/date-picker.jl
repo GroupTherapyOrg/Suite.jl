@@ -31,9 +31,7 @@ function DatePickerPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 # Simple date picker
 DatePicker()
@@ -48,8 +46,7 @@ DatePicker(selected="2026-02-14")
 DatePicker(placeholder="Choose a birthday")
 
 # Disabled dates
-DatePicker(disabled_dates="2026-02-14,2026-02-15")""")
-        ),
+DatePicker(disabled_dates="2026-02-14,2026-02-15")"""),
 
         # Composition Notes
         Div(:class => "mt-12 space-y-6",
@@ -67,57 +64,26 @@ Popover(
         ),
 
         # Keyboard Interactions
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(
-                    Main.TableHeader(
-                        Main.TableRow(
-                            Main.TableHead("Key"),
-                            Main.TableHead("Action"),
-                        )
-                    ),
-                    Main.TableBody(
-                        KeyRow("Space / Enter", "Open calendar (on trigger button)"),
-                        KeyRow("Escape", "Close calendar and return focus to trigger"),
-                        KeyRow("Arrow keys", "Navigate days in the calendar grid"),
-                        KeyRow("PageUp / PageDown", "Navigate months"),
-                        KeyRow("Space / Enter", "Select focused date (in calendar)"),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("Space / Enter", "Open calendar (on trigger button)"),
+            KeyRow("Escape", "Close calendar and return focus to trigger"),
+            KeyRow("Arrow keys", "Navigate days in the calendar grid"),
+            KeyRow("PageUp / PageDown", "Navigate months"),
+            KeyRow("Space / Enter", "Select focused date (in calendar)"),
         ),
 
         # API Reference
-        Div(:class => "mt-12 space-y-8",
-            SectionH2("API Reference"),
-
-            # DatePicker
-            SectionH3("DatePicker"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(
-                    Main.TableHeader(
-                        Main.TableRow(
-                            Main.TableHead("Prop"),
-                            Main.TableHead("Type"),
-                            Main.TableHead("Default"),
-                            Main.TableHead("Description"),
-                        )
-                    ),
-                    Main.TableBody(
-                        ApiRow("mode", "String", "\"single\"", "Selection mode: single, multiple, or range"),
-                        ApiRow("month", "Int", "current month", "Initial displayed month (1-12)"),
-                        ApiRow("year", "Int", "current year", "Initial displayed year"),
-                        ApiRow("selected", "String", "\"\"", "Pre-selected date(s), comma-separated ISO strings"),
-                        ApiRow("placeholder", "String", "\"Pick a date\"", "Trigger button text when no date selected"),
-                        ApiRow("disabled_dates", "String", "\"\"", "Disabled dates, comma-separated ISO strings"),
-                        ApiRow("show_outside_days", "Bool", "true", "Show days from adjacent months"),
-                        ApiRow("number_of_months", "Int", "1", "Number of months to display"),
-                        ApiRow("class", "String", "\"\"", "Additional CSS classes for the trigger button"),
-                        ApiRow("theme", "Symbol", ":default", "Theme preset"),
-                    )
-                )
-            ),
+        ApiTable(
+            ApiRow("mode", "String", "\"single\"", "Selection mode: single, multiple, or range"),
+            ApiRow("month", "Int", "current month", "Initial displayed month (1-12)"),
+            ApiRow("year", "Int", "current year", "Initial displayed year"),
+            ApiRow("selected", "String", "\"\"", "Pre-selected date(s), comma-separated ISO strings"),
+            ApiRow("placeholder", "String", "\"Pick a date\"", "Trigger button text when no date selected"),
+            ApiRow("disabled_dates", "String", "\"\"", "Disabled dates, comma-separated ISO strings"),
+            ApiRow("show_outside_days", "Bool", "true", "Show days from adjacent months"),
+            ApiRow("number_of_months", "Int", "1", "Number of months to display"),
+            ApiRow("class", "String", "\"\"", "Additional CSS classes for the trigger button"),
+            ApiRow("theme", "Symbol", ":default", "Theme preset"),
         ),
     )
 end

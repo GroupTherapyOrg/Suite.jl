@@ -104,9 +104,7 @@ function CarouselPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Carousel(
     CarouselContent(
@@ -116,8 +114,7 @@ Carousel(
     ),
     CarouselPrevious(),
     CarouselNext(),
-)""")
-        ),
+)"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
@@ -125,13 +122,8 @@ Carousel(
 
             SectionH3("Carousel"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("orientation", "String", "\"horizontal\"", "Scroll direction: \"horizontal\" or \"vertical\""),
                         ApiRow("loop", "Bool", "false", "Whether to loop back to start"),
@@ -145,27 +137,27 @@ Carousel(
 
             SectionH3("Sub-components"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Component"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description"),
+                Main.Table(
+                    Main.TableHeader(Main.TableRow(
+                        Main.TableHead("Component"),
+                        Main.TableHead("Description"),
                     )),
                     Main.TableBody(
-                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "CarouselContent"),
-                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Scrollable container for carousel slides"),
+                        Main.TableRow(
+                            Main.TableCell(:class => "text-accent-600 dark:text-accent-400 font-mono text-xs", "CarouselContent"),
+                            Main.TableCell("Scrollable container for carousel slides"),
                         ),
-                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "CarouselItem"),
-                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "A single slide within the carousel"),
+                        Main.TableRow(
+                            Main.TableCell(:class => "text-accent-600 dark:text-accent-400 font-mono text-xs", "CarouselItem"),
+                            Main.TableCell("A single slide within the carousel"),
                         ),
-                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "CarouselPrevious"),
-                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Previous slide navigation button"),
+                        Main.TableRow(
+                            Main.TableCell(:class => "text-accent-600 dark:text-accent-400 font-mono text-xs", "CarouselPrevious"),
+                            Main.TableCell("Previous slide navigation button"),
                         ),
-                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "CarouselNext"),
-                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Next slide navigation button"),
+                        Main.TableRow(
+                            Main.TableCell(:class => "text-accent-600 dark:text-accent-400 font-mono text-xs", "CarouselNext"),
+                            Main.TableCell("Next slide navigation button"),
                         ),
                     )
                 )

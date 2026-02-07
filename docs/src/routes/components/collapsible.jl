@@ -63,9 +63,7 @@ function CollapsiblePage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Collapsible(
     CollapsibleTrigger(
@@ -74,8 +72,7 @@ Collapsible(
     CollapsibleContent(
         Div("Hidden content revealed on click"),
     ),
-)""")
-        ),
+)"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",

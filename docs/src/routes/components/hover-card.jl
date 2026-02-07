@@ -37,9 +37,7 @@ function HoverCardPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 HoverCard(
     HoverCardTrigger(
@@ -51,8 +49,7 @@ HoverCard(
             P("The Julia Programming Language."),
         )
     ),
-)""")
-        ),
+)"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",

@@ -32,34 +32,18 @@ function SpinnerPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Spinner()
 Spinner(size="sm")
 Spinner(size="lg")
-Spinner(class="text-red-500")""")
-        ),
+Spinner(class="text-red-500")"""),
 
         # API Reference
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("API Reference"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )),
-                    Main.TableBody(
-                        ApiRow("size", "String", "\"default\"", "Spinner size: \"sm\", \"default\", or \"lg\""),
-                        ApiRow("class", "String", "\"\"", "Additional CSS classes"),
-                        ApiRow("theme", "Symbol", ":default", "Theme preset"),
-                    )
-                )
-            )
+        ApiTable(
+            ApiRow("size", "String", "\"default\"", "Spinner size: \"sm\", \"default\", or \"lg\""),
+            ApiRow("class", "String", "\"\"", "Additional CSS classes"),
+            ApiRow("theme", "Symbol", ":default", "Theme preset"),
         )
     )
 end

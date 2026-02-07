@@ -6,10 +6,7 @@
 function WidgetsExample()
     Div(:class => "max-w-4xl mx-auto py-8",
         # Header
-        Div(:class => "mb-10",
-            H1(:class => "text-3xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "Widget Showcase"),
-            P(:class => "text-warm-600 dark:text-warm-400", "Interactive components that double as Pluto @bind widgets.")
-        ),
+        PageHeader("Widget Showcase", "Interactive components that double as Pluto @bind widgets."),
 
         Div(:class => "grid gap-8",
 

@@ -27,9 +27,7 @@ function AvatarPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Avatar(
     AvatarImage(src="/avatar.jpg", alt="User"),
@@ -38,8 +36,7 @@ Avatar(
 
 Avatar(size="lg",
     AvatarFallback("AB"),
-)""")
-        ),
+)"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
@@ -48,19 +45,12 @@ Avatar(size="lg",
             SectionH3("Avatar"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("size", "String", "\"default\"", "default | sm | lg"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                         ApiRow("children...", "Any", "-", "AvatarImage and/or AvatarFallback"),
-                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute")
+                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute"),
                     )
                 )
             ),
@@ -68,19 +58,12 @@ Avatar(size="lg",
             SectionH3("AvatarImage"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("src", "String", "\"\"", "Image URL"),
                         ApiRow("alt", "String", "\"\"", "Alt text for accessibility"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
-                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute")
+                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute"),
                     )
                 )
             ),
@@ -88,18 +71,11 @@ Avatar(size="lg",
             SectionH3("AvatarFallback"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                        )
-                    ),
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                         ApiRow("children...", "Any", "-", "Fallback content (initials, icon)"),
-                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute")
+                        ApiRow("kwargs...", "Pair", "-", "Any HTML attribute"),
                     )
                 )
             )

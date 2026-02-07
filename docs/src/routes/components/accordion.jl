@@ -61,9 +61,7 @@ function AccordionPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Accordion(default_value="item-1",
     AccordionItem(value="item-1",
@@ -74,29 +72,15 @@ Accordion(default_value="item-1",
         AccordionTrigger("Section 2"),
         AccordionContent(P("Content 2")),
     ),
-)""")
-        ),
+)"""),
 
         # Keyboard shortcuts
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
-                        )
-                    ),
-                    Main.TableBody(
-                        KeyRow("Enter / Space", "Toggle the focused accordion item"),
-                        KeyRow("Arrow Down", "Move focus to the next trigger"),
-                        KeyRow("Arrow Up", "Move focus to the previous trigger"),
-                        KeyRow("Home", "Move focus to the first trigger"),
-                        KeyRow("End", "Move focus to the last trigger"),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("Enter / Space", "Toggle the focused accordion item"),
+            KeyRow("Arrow Down", "Move focus to the next trigger"),
+            KeyRow("Arrow Up", "Move focus to the previous trigger"),
+            KeyRow("Home", "Move focus to the first trigger"),
+            KeyRow("End", "Move focus to the last trigger"),
         ),
 
         # API Reference

@@ -37,17 +37,14 @@ function EmptyPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 Empty(
     EmptyIcon(my_icon),
     EmptyTitle("No results found"),
     EmptyDescription("Try a different search query."),
     EmptyAction(Button("Try Again"))
-)""")
-        ),
+)"""),
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
@@ -55,13 +52,8 @@ Empty(
 
             SectionH3("Empty"),
             Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )),
+                Main.Table(
+                    Main.TableHeader(ApiHead()),
                     Main.TableBody(
                         ApiRow("children", "Any", "-", "Sub-components (EmptyIcon, EmptyTitle, EmptyDescription, EmptyAction)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),

@@ -58,9 +58,7 @@ function NavigationMenuPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 NavigationMenu(
     NavigationMenuList(
@@ -79,30 +77,16 @@ NavigationMenu(
         ),
     ),
     NavigationMenuViewport(),
-)""")
-        ),
+)"""),
 
         # Keyboard shortcuts
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
-                        )
-                    ),
-                    Main.TableBody(
-                        KeyRow("Arrow Right", "Move focus to the next trigger"),
-                        KeyRow("Arrow Left", "Move focus to the previous trigger"),
-                        KeyRow("Arrow Down", "Open content panel / move into content"),
-                        KeyRow("Tab", "Cycle through links within an open content panel"),
-                        KeyRow("Enter / Space", "Activate the focused link or trigger"),
-                        KeyRow("Escape", "Close the open content panel"),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("Arrow Right", "Move focus to the next trigger"),
+            KeyRow("Arrow Left", "Move focus to the previous trigger"),
+            KeyRow("Arrow Down", "Open content panel / move into content"),
+            KeyRow("Tab", "Cycle through links within an open content panel"),
+            KeyRow("Enter / Space", "Activate the focused link or trigger"),
+            KeyRow("Escape", "Close the open content panel"),
         ),
 
         # API Reference

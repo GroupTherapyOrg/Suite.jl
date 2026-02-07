@@ -71,9 +71,7 @@ function SliderPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 # Basic slider
 Slider()
@@ -91,31 +89,17 @@ Slider(default_value=40, disabled=true)
 Div(
     Label("Volume"),
     Slider(min=0, max=100, step=1, default_value=75),
-)""")
-        ),
+)"""),
 
         # Keyboard Interactions
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(:class => "w-full text-sm",
-                    Main.TableHeader(
-                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
-                        )
-                    ),
-                    Main.TableBody(
-                        KeyRow("ArrowRight / ArrowUp", "Increase value by one step"),
-                        KeyRow("ArrowLeft / ArrowDown", "Decrease value by one step"),
-                        KeyRow("Shift + Arrow", "Increase/decrease by 10x step"),
-                        KeyRow("PageUp", "Increase value by 10x step"),
-                        KeyRow("PageDown", "Decrease value by 10x step"),
-                        KeyRow("Home", "Set to minimum value"),
-                        KeyRow("End", "Set to maximum value"),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("ArrowRight / ArrowUp", "Increase value by one step"),
+            KeyRow("ArrowLeft / ArrowDown", "Decrease value by one step"),
+            KeyRow("Shift + Arrow", "Increase/decrease by 10x step"),
+            KeyRow("PageUp", "Increase value by 10x step"),
+            KeyRow("PageDown", "Decrease value by 10x step"),
+            KeyRow("Home", "Set to minimum value"),
+            KeyRow("End", "Set to maximum value"),
         ),
 
         # API Reference

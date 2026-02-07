@@ -38,9 +38,7 @@ function CalendarPage()
         ),
 
         # Usage
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Usage"),
-            Main.CodeBlock(language="julia", """using Suite
+        UsageBlock("""using Suite
 
 # Single date selection (default)
 Calendar()
@@ -61,100 +59,35 @@ Calendar(disabled_dates="2026-02-14,2026-02-15")
 Calendar(show_outside_days=false)
 
 # Fixed 6-week grid
-Calendar(fixed_weeks=true)""")
-        ),
+Calendar(fixed_weeks=true)"""),
 
         # Keyboard Interactions
-        Div(:class => "mt-12 space-y-6",
-            SectionH2("Keyboard Interactions"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(
-                    Main.TableHeader(
-                        Main.TableRow(
-                            Main.TableHead("Key"),
-                            Main.TableHead("Action"),
-                        )
-                    ),
-                    Main.TableBody(
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("ArrowLeft")),
-                            Main.TableCell("Move focus to previous day"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("ArrowRight")),
-                            Main.TableCell("Move focus to next day"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("ArrowUp")),
-                            Main.TableCell("Move focus to same day in previous week"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("ArrowDown")),
-                            Main.TableCell("Move focus to same day in next week"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("PageUp")),
-                            Main.TableCell("Move focus to same day in previous month"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("PageDown")),
-                            Main.TableCell("Move focus to same day in next month"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("Shift+PageUp")),
-                            Main.TableCell("Move focus to same day in previous year"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("Shift+PageDown")),
-                            Main.TableCell("Move focus to same day in next year"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("Home")),
-                            Main.TableCell("Move focus to start of week (Monday)"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("End")),
-                            Main.TableCell("Move focus to end of week (Sunday)"),
-                        ),
-                        Main.TableRow(
-                            Main.TableCell(Main.InlineCode("Space / Enter")),
-                            Main.TableCell("Select focused date"),
-                        ),
-                    )
-                )
-            )
+        KeyboardTable(
+            KeyRow("ArrowLeft", "Move focus to previous day"),
+            KeyRow("ArrowRight", "Move focus to next day"),
+            KeyRow("ArrowUp", "Move focus to same day in previous week"),
+            KeyRow("ArrowDown", "Move focus to same day in next week"),
+            KeyRow("PageUp", "Move focus to same day in previous month"),
+            KeyRow("PageDown", "Move focus to same day in next month"),
+            KeyRow("Shift+PageUp", "Move focus to same day in previous year"),
+            KeyRow("Shift+PageDown", "Move focus to same day in next year"),
+            KeyRow("Home", "Move focus to start of week (Monday)"),
+            KeyRow("End", "Move focus to end of week (Sunday)"),
+            KeyRow("Space / Enter", "Select focused date"),
         ),
 
         # API Reference
-        Div(:class => "mt-12 space-y-8",
-            SectionH2("API Reference"),
-
-            # Calendar
-            SectionH3("Calendar"),
-            Div(:class => "overflow-x-auto",
-                Main.Table(
-                    Main.TableHeader(
-                        Main.TableRow(
-                            Main.TableHead("Prop"),
-                            Main.TableHead("Type"),
-                            Main.TableHead("Default"),
-                            Main.TableHead("Description"),
-                        )
-                    ),
-                    Main.TableBody(
-                        ApiRow("mode", "String", "\"single\"", "Selection mode: single, multiple, or range"),
-                        ApiRow("month", "Int", "current month", "Displayed month (1-12)"),
-                        ApiRow("year", "Int", "current year", "Displayed year"),
-                        ApiRow("selected", "String", "\"\"", "Pre-selected date(s), comma-separated ISO strings"),
-                        ApiRow("disabled_dates", "String", "\"\"", "Disabled dates, comma-separated ISO strings"),
-                        ApiRow("show_outside_days", "Bool", "true", "Show days from adjacent months"),
-                        ApiRow("fixed_weeks", "Bool", "false", "Always show 6 weeks"),
-                        ApiRow("number_of_months", "Int", "1", "Number of months to display side by side"),
-                        ApiRow("class", "String", "\"\"", "Additional CSS classes"),
-                        ApiRow("theme", "Symbol", ":default", "Theme preset"),
-                    )
-                )
-            ),
+        ApiTable(
+            ApiRow("mode", "String", "\"single\"", "Selection mode: single, multiple, or range"),
+            ApiRow("month", "Int", "current month", "Displayed month (1-12)"),
+            ApiRow("year", "Int", "current year", "Displayed year"),
+            ApiRow("selected", "String", "\"\"", "Pre-selected date(s), comma-separated ISO strings"),
+            ApiRow("disabled_dates", "String", "\"\"", "Disabled dates, comma-separated ISO strings"),
+            ApiRow("show_outside_days", "Bool", "true", "Show days from adjacent months"),
+            ApiRow("fixed_weeks", "Bool", "false", "Always show 6 weeks"),
+            ApiRow("number_of_months", "Int", "1", "Number of months to display side by side"),
+            ApiRow("class", "String", "\"\"", "Additional CSS classes"),
+            ApiRow("theme", "Symbol", ":default", "Theme preset"),
         ),
     )
 end
