@@ -6,24 +6,17 @@
 function ThemingPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Theming"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-400",
-                "Customize Suite.jl's visual appearance with built-in themes and fine-grained overrides."
-            )
-        ),
+        PageHeader("Theming", "Customize Suite.jl's visual appearance with built-in themes and fine-grained overrides."),
 
         Div(:class => "prose max-w-none",
 
             # Overview
             SectionH2("How Themes Work"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "A theme is a named bundle of design tokens — accent color, border radius, font weight, shadow style, and more. Every Suite.jl component accepts a ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "theme"), " keyword argument."
+                "A theme is a named bundle of design tokens — accent color, border radius, font weight, shadow style, and more. Every Suite.jl component accepts a ", Main.InlineCode("theme"), " keyword argument."
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "When ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "theme=:default"),
+                "When ", Main.InlineCode("theme=:default"),
                 " (the default), there is zero overhead — the component renders its standard classes unchanged."
             ),
 
@@ -80,7 +73,7 @@ function ThemingPage()
             # Runtime
             SectionH3("At render time"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Pass the ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "theme"), " kwarg to any component:"
+                "Pass the ", Main.InlineCode("theme"), " kwarg to any component:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
                 Main.CodeBlock(language="julia", """# Default theme (purple accent, warm neutrals, rounded-md)
@@ -226,10 +219,10 @@ Suite.extract(:Card, "src/components/", theme=:nature)
             # Dark mode
             SectionH2("Dark Mode"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Every Suite.jl component includes dark mode classes out of the box. Dark mode is toggled by adding the ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "dark"), " class to the ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "<html>"), " element."
+                "Every Suite.jl component includes dark mode classes out of the box. Dark mode is toggled by adding the ", Main.InlineCode("dark"), " class to the ", Main.InlineCode("<html>"), " element."
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Use the ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "ThemeToggle"),
+                "Use the ", Main.InlineCode("ThemeToggle"),
                 " component to add a dark mode toggle to your app:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
@@ -240,7 +233,7 @@ ThemeToggle()  # Sun/moon toggle button
 # Respects system prefers-color-scheme as default""")
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Therapy.jl's App framework includes a FOUC-prevention script in ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "<head>"),
+                "Therapy.jl's App framework includes a FOUC-prevention script in ", Main.InlineCode("<head>"),
                 " that applies the saved theme before first paint."
             ),
 

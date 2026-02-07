@@ -6,14 +6,7 @@
 function InstallationPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Installation"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-400",
-                "How to add Suite.jl to your Therapy.jl project."
-            )
-        ),
+        PageHeader("Installation", "How to add Suite.jl to your Therapy.jl project."),
 
         Div(:class => "prose max-w-none",
 
@@ -59,7 +52,7 @@ Therapy.run(app)""")
             # Tailwind CSS setup
             SectionH2("Tailwind CSS Setup"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Suite.jl components use Tailwind CSS classes. Your app's ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "input.css"),
+                "Suite.jl components use Tailwind CSS classes. Your app's ", Main.InlineCode("input.css"),
                 " needs to include Suite.jl's source directories for Tailwind to scan:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
@@ -130,8 +123,8 @@ Suite.list()
 Suite.info(:Dialog)""")
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Extracted components are self-contained Julia files. They use an ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "@isdefined"),
-                " guard pattern so they work both via ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "using Suite"), " and via ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "include()"), " in your own project."
+                "Extracted components are self-contained Julia files. They use an ", Main.InlineCode("@isdefined"),
+                " guard pattern so they work both via ", Main.InlineCode("using Suite"), " and via ", Main.InlineCode("include()"), " in your own project."
             ),
 
             # JS Runtime
@@ -152,8 +145,8 @@ function Layout(children...)
 end""")
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "The ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "suite_script()"),
-                " function injects the bundled JavaScript that powers focus traps, dismiss layers, floating positioning, keyboard navigation, and all other interactive behaviors. It loads once and auto-discovers components via ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "data-suite-*"), " attributes."
+                "The ", Main.InlineCode("suite_script()"),
+                " function injects the bundled JavaScript that powers focus traps, dismiss layers, floating positioning, keyboard navigation, and all other interactive behaviors. It loads once and auto-discovers components via ", Main.InlineCode("data-suite-*"), " attributes."
             ),
 
             # Next steps

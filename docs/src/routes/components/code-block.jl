@@ -2,12 +2,7 @@
 
 function CodeBlockPage()
     ComponentsLayout(
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3", "Code Block"),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A styled code display container with copy-to-clipboard, language badge, and line numbers."
-            )
-        ),
+        PageHeader("Code Block", "A styled code display container with copy-to-clipboard, language badge, and line numbers."),
 
         # Default
         ComponentPreview(title="Default", description="Code block with language badge and copy button.",

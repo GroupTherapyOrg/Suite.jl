@@ -93,7 +93,7 @@ Popover(
             SectionH2("API Reference"),
 
             # DatePicker
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300", "DatePicker"),
+            SectionH3("DatePicker"),
             Div(:class => "overflow-x-auto",
                 Main.Table(
                     Main.TableHeader(

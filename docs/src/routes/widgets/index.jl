@@ -6,14 +6,7 @@
 function WidgetsIndex()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Widgets"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-400",
-                "Suite.jl components as reactive data widgets — for Pluto notebooks and Therapy.jl apps."
-            )
-        ),
+        PageHeader("Widgets", "Suite.jl components as reactive data widgets — for Pluto notebooks and Therapy.jl apps."),
 
         Div(:class => "prose max-w-none",
 
@@ -71,7 +64,7 @@ function WidgetsIndex()
                 )
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4 mt-4",
-                "Positional argument = struct for ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "@bind"),
+                "Positional argument = struct for ", Main.InlineCode("@bind"),
                 ". Keyword-only = VNode for Therapy.jl. This keeps one function name for both contexts."
             ),
 

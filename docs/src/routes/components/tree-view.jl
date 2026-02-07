@@ -2,12 +2,7 @@
 
 function TreeViewPage()
     ComponentsLayout(
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3", "Tree View"),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A hierarchical tree component for displaying nested data like file browsers."
-            )
-        ),
+        PageHeader("Tree View", "A hierarchical tree component for displaying nested data like file browsers."),
 
         # Default
         ComponentPreview(title="File Browser", description="Tree view with folders and files.",
@@ -98,7 +93,7 @@ TreeView(
         Div(:class => "mt-12 space-y-6",
             SectionH2("API Reference"),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "TreeView"),
+            SectionH3("TreeView"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
@@ -114,7 +109,7 @@ TreeView(
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "TreeViewItem"),
+            SectionH3("TreeViewItem"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",

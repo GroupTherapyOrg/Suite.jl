@@ -5,14 +5,7 @@
 function GettingStartedIndex()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Introduction"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-400",
-                "Suite.jl is a component library for Therapy.jl — beautifully designed, accessible, and copy-paste friendly."
-            )
-        ),
+        PageHeader("Introduction", "Suite.jl is a component library for Therapy.jl — beautifully designed, accessible, and copy-paste friendly."),
 
         # What is Suite.jl?
         Div(:class => "prose max-w-none",

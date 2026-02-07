@@ -45,7 +45,7 @@ Alert(variant="destructive",
             SectionH2("API Reference"),
 
             # Alert
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Alert"),
+            SectionH3("Alert"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(
@@ -66,7 +66,7 @@ Alert(variant="destructive",
             ),
 
             # AlertTitle
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "AlertTitle"),
+            SectionH3("AlertTitle"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(
@@ -86,7 +86,7 @@ Alert(variant="destructive",
             ),
 
             # AlertDescription
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "AlertDescription"),
+            SectionH3("AlertDescription"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(

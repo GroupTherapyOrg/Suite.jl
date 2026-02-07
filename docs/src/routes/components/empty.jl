@@ -2,12 +2,7 @@
 
 function EmptyPage()
     ComponentsLayout(
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3", "Empty"),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "An empty state placeholder for when there is no content to display."
-            )
-        ),
+        PageHeader("Empty", "An empty state placeholder for when there is no content to display."),
 
         # Default
         ComponentPreview(title="Default", description="Empty state with title and description.",
@@ -58,7 +53,7 @@ Empty(
         Div(:class => "mt-12 space-y-6",
             SectionH2("API Reference"),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Empty"),
+            SectionH3("Empty"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
@@ -75,7 +70,7 @@ Empty(
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Sub-components"),
+            SectionH3("Sub-components"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",

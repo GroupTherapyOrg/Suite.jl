@@ -56,7 +56,7 @@ Breadcrumb(
         Div(:class => "mt-12 space-y-6",
             SectionH2("API Reference"),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "BreadcrumbLink"),
+            SectionH3("BreadcrumbLink"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(
@@ -76,7 +76,7 @@ Breadcrumb(
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Sub-components"),
+            SectionH3("Sub-components"),
             P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-4",
                 "Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage, BreadcrumbSeparator, and BreadcrumbEllipsis all accept ",
                 Main.InlineCode("class"),
@@ -86,7 +86,7 @@ Breadcrumb(
             ),
 
             # Accessibility
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Accessibility"),
+            SectionH3("Accessibility"),
             P(:class => "text-sm text-warm-600 dark:text-warm-400",
                 "Uses semantic ",
                 Main.InlineCode("nav"),

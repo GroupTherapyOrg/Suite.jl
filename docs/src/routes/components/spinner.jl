@@ -2,10 +2,7 @@
 
 function SpinnerPage()
     ComponentsLayout(
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3", "Spinner"),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300", "An animated loading spinner indicator.")
-        ),
+        PageHeader("Spinner", "An animated loading spinner indicator."),
 
         # Sizes
         ComponentPreview(title="Sizes", description="Three sizes: sm, default, and lg.",

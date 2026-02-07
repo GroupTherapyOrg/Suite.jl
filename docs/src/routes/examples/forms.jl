@@ -94,7 +94,7 @@ function FormsExample()
                         Div(:class => "grid gap-6",
                             # Personal info section
                             Div(:class => "grid gap-4",
-                                H3(:class => "text-lg font-medium text-warm-800 dark:text-warm-300", "Personal Information"),
+                                SectionH3("Personal Information"),
                                 Div(:class => "grid sm:grid-cols-2 gap-4",
                                     Div(:class => "grid gap-2",
                                         Main.Label("Display name"),
@@ -125,7 +125,7 @@ function FormsExample()
 
                             # Notification preferences
                             Div(:class => "grid gap-4",
-                                H3(:class => "text-lg font-medium text-warm-800 dark:text-warm-300", "Notifications"),
+                                SectionH3("Notifications"),
                                 Div(:class => "space-y-4",
                                     _FormSettingsRow("Email digest", "Receive a weekly summary of activity.", true),
                                     _FormSettingsRow("Push notifications", "Get notified about important updates.", true),

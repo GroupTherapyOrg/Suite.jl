@@ -96,7 +96,7 @@ TooltipProvider(
         Div(:class => "mt-12 space-y-6",
             SectionH2("Accessibility"),
             Div(:class => "space-y-2 text-sm text-warm-600 dark:text-warm-400",
-                P("Uses ", Code(:class => "font-mono text-xs text-accent-600 dark:text-accent-400", "role=\"tooltip\""), " and ", Code(:class => "font-mono text-xs text-accent-600 dark:text-accent-400", "aria-describedby"), " to associate the tooltip content with its trigger."),
+                P("Uses ", Main.InlineCode("role=\"tooltip\""), " and ", Main.InlineCode("aria-describedby"), " to associate the tooltip content with its trigger."),
                 P("Opens on hover or focus after a 700ms delay. Consecutive tooltips within a shared provider open instantly during the 300ms skip window."),
                 P("Touch devices are excluded — tooltips are not shown on tap."),
             )

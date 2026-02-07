@@ -96,7 +96,7 @@ Muted("Muted hint text")""")
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Available Components"),
+            SectionH3("Available Components"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(

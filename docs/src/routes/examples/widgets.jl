@@ -14,7 +14,7 @@ function WidgetsExample()
         Div(:class => "grid gap-8",
 
             # Available widgets
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300", "Available Now"),
+            SectionH2( "Available Now"),
 
             # Switch widget
             Main.Card(
@@ -174,7 +174,7 @@ Textarea(placeholder="...")
             Main.Separator(),
 
             # Planned widgets
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300", "Coming Soon"),
+            SectionH2( "Coming Soon"),
             P(:class => "text-warm-600 dark:text-warm-400 mb-6",
                 "These widgets are designed and will implement the full @bind protocol with index-mapping."
             ),
@@ -216,7 +216,7 @@ function _PlannedWidget(title, description, code)
         ),
         P(:class => "text-xs text-warm-600 dark:text-warm-400 mb-3", description),
         Div(:class => "bg-warm-900 dark:bg-warm-950 rounded px-3 py-2",
-            Code(:class => "text-[10px] text-warm-300", code)
+            Main.InlineCode(code)
         )
     )
 end

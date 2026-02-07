@@ -77,47 +77,47 @@ Calendar(fixed_weeks=true)""")
                     ),
                     Main.TableBody(
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "ArrowLeft")),
+                            Main.TableCell(Main.InlineCode("ArrowLeft")),
                             Main.TableCell("Move focus to previous day"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "ArrowRight")),
+                            Main.TableCell(Main.InlineCode("ArrowRight")),
                             Main.TableCell("Move focus to next day"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "ArrowUp")),
+                            Main.TableCell(Main.InlineCode("ArrowUp")),
                             Main.TableCell("Move focus to same day in previous week"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "ArrowDown")),
+                            Main.TableCell(Main.InlineCode("ArrowDown")),
                             Main.TableCell("Move focus to same day in next week"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "PageUp")),
+                            Main.TableCell(Main.InlineCode("PageUp")),
                             Main.TableCell("Move focus to same day in previous month"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "PageDown")),
+                            Main.TableCell(Main.InlineCode("PageDown")),
                             Main.TableCell("Move focus to same day in next month"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "Shift+PageUp")),
+                            Main.TableCell(Main.InlineCode("Shift+PageUp")),
                             Main.TableCell("Move focus to same day in previous year"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "Shift+PageDown")),
+                            Main.TableCell(Main.InlineCode("Shift+PageDown")),
                             Main.TableCell("Move focus to same day in next year"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "Home")),
+                            Main.TableCell(Main.InlineCode("Home")),
                             Main.TableCell("Move focus to start of week (Monday)"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "End")),
+                            Main.TableCell(Main.InlineCode("End")),
                             Main.TableCell("Move focus to end of week (Sunday)"),
                         ),
                         Main.TableRow(
-                            Main.TableCell(Code(:class => "text-sm", "Space / Enter")),
+                            Main.TableCell(Main.InlineCode("Space / Enter")),
                             Main.TableCell("Select focused date"),
                         ),
                     )
@@ -130,7 +130,7 @@ Calendar(fixed_weeks=true)""")
             SectionH2("API Reference"),
 
             # Calendar
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300", "Calendar"),
+            SectionH3("Calendar"),
             Div(:class => "overflow-x-auto",
                 Main.Table(
                     Main.TableHeader(

@@ -6,21 +6,14 @@
 function BindPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "The @bind Pattern"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-400",
-                "How PlutoUI's reactive binding protocol works, and how Suite.jl implements it."
-            )
-        ),
+        PageHeader("The @bind Pattern", "How PlutoUI's reactive binding protocol works, and how Suite.jl implements it."),
 
         Div(:class => "prose max-w-none",
 
             # Overview
             SectionH2("How @bind Works"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "In Pluto notebooks, ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "@bind"),
+                "In Pluto notebooks, ", Main.InlineCode("@bind"),
                 " creates a two-way connection between a Julia variable and an HTML widget:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
@@ -46,7 +39,7 @@ function BindPage()
             # Four protocol methods
             SectionH2("The Four Protocol Methods"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Suite.jl implements these methods from ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "AbstractPlutoDingetjes.Bonds"),
+                "Suite.jl implements these methods from ", Main.InlineCode("AbstractPlutoDingetjes.Bonds"),
                 " for each widget type:"
             ),
 
@@ -130,8 +123,8 @@ plot(transform, 0:0.1:2\u03c0)""")
                 Li("Native inputs (", Main.InlineCode("<input>"), ", ", Main.InlineCode("<select>"), ") satisfy this automatically")
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "For custom widgets (like Suite.jl's styled Switch), use ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "Object.defineProperty"),
-                " to define a custom ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", ".value"), " getter on the outer element."
+                "For custom widgets (like Suite.jl's styled Switch), use ", Main.InlineCode("Object.defineProperty"),
+                " to define a custom ", Main.InlineCode(".value"), " getter on the outer element."
             ),
 
             Main.Separator(),

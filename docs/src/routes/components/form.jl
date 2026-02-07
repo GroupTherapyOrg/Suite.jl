@@ -189,7 +189,7 @@ Form(action="/api/submit",
         Div(:class => "mt-12 space-y-6",
             SectionH2("API Reference"),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Form"),
+            SectionH3("Form"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(
@@ -210,7 +210,7 @@ Form(action="/api/submit",
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "FormField"),
+            SectionH3("FormField"),
             Div(:class => "overflow-x-auto",
                 Main.Table(:class => "w-full text-sm",
                     Main.TableHeader(

@@ -70,7 +70,7 @@ Progress(value=75, class="w-[60%]")""")
             ),
 
             # Accessibility
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Accessibility"),
+            SectionH3("Accessibility"),
             P(:class => "text-sm text-warm-600 dark:text-warm-400",
                 "Renders with ",
                 Main.InlineCode("role=\"progressbar\""),
