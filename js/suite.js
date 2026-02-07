@@ -12,7 +12,7 @@
  * Architecture:
  *   - Auto-discovers components via data-suite-* attributes
  *   - Each behavior is a standalone module (no cross-dependencies)
- *   - Re-scans on SPA navigation (listens for therapy:navigate)
+ *   - Re-scans on SPA navigation (listens for therapy:router:loaded)
  *   - Zero external dependencies (no Floating UI, no Radix)
  *
  * Verified against:
@@ -3077,7 +3077,8 @@
             this.discover();
 
             // Re-discover on SPA navigation
-            window.addEventListener('therapy:navigate', () => {
+            // Therapy.jl's client router fires 'therapy:router:loaded' after each navigation
+            window.addEventListener('therapy:router:loaded', () => {
                 requestAnimationFrame(() => this.discover());
             });
         }
