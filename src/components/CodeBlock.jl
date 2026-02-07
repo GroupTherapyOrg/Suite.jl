@@ -85,7 +85,8 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
         )
     end
 
-    Div(:class => wrapper_classes, :data_suite_codeblock => "true", kwargs...,
+    lang_attr = isempty(language) ? Pair{Symbol,String}[] : [Symbol("data-suite-codeblock-lang") => language]
+    Div(:class => wrapper_classes, :data_suite_codeblock => "true", lang_attr..., kwargs...,
         has_header ? Div(:class => "flex items-center gap-2 border-b border-warm-800 px-4 py-2",
             header_items...
         ) : nothing,

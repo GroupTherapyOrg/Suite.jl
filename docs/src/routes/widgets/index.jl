@@ -30,22 +30,14 @@ function WidgetsIndex()
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-3",
                         "In a Therapy.jl app, call the component as a function. It returns a VNode that renders styled HTML."
                     ),
-                    Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
-                        Pre(:class => "text-xs text-warm-100",
-                            Code("Switch(checked=true)\nInput(type=\"email\", placeholder=\"you@example.com\")")
-                        )
-                    )
+                    Main.CodeBlock(language="julia", "Switch(checked=true)\nInput(type=\"email\", placeholder=\"you@example.com\")")
                 ),
                 Div(:class => "border border-warm-200 dark:border-warm-700 rounded-lg p-5 bg-warm-50/50 dark:bg-warm-900/50",
                     H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "Data Widget"),
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-3",
                         "In a Pluto notebook, pass a positional argument to get a bindable struct. Use with ", Code(:class => "text-xs bg-warm-200 dark:bg-warm-800 px-1 py-0.5 rounded", "@bind"), "."
                     ),
-                    Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
-                        Pre(:class => "text-xs text-warm-100",
-                            Code("@bind value SuiteSlider(1:100)\n@bind lang SuiteSelect([\"julia\" => \"Julia\"])")
-                        )
-                    )
+                    Main.CodeBlock(language="julia", "@bind value SuiteSlider(1:100)\n@bind lang SuiteSelect([\"julia\" => \"Julia\"])")
                 )
             ),
 
@@ -197,8 +189,7 @@ function WidgetsIndex()
                 "The Pluto integration uses Julia's package extension system. If you only use Therapy.jl, AbstractPlutoDingetjes is never loaded:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# Project.toml
+                Main.CodeBlock(language="julia", """# Project.toml
 [weakdeps]
 AbstractPlutoDingetjes = "6e696c72-..."
 
@@ -213,7 +204,6 @@ import AbstractPlutoDingetjes.Bonds
 Bonds.initial_value(s::Suite.SuiteSliderWidget) = s.default
 Bonds.transform_value(s::Suite.SuiteSliderWidget, val) = s.values[val]
 end""")
-                )
             ),
             Main.Alert(
                 Main.AlertTitle("No overhead"),

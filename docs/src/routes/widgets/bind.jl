@@ -26,12 +26,10 @@ function BindPage()
                 " creates a two-way connection between a Julia variable and an HTML widget:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""@bind temperature SuiteSlider(0:100; default=20)
+                Main.CodeBlock(language="julia", """@bind temperature SuiteSlider(0:100; default=20)
 
 # `temperature` is now a reactive Julia variable.
 # Moving the slider updates it, re-executing dependent cells.""")
-                )
             ),
 
             # The flow
@@ -63,11 +61,7 @@ function BindPage()
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Returns the Julia value before the browser renders. Used for initial cell execution and running notebooks as scripts."
             ),
-            Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-4 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("Bonds.initial_value(s::SuiteSliderWidget) = s.default  # e.g., 50")
-                )
-            ),
+            Main.CodeBlock(language="julia", "Bonds.initial_value(s::SuiteSliderWidget) = s.default  # e.g., 50"),
 
             # transform_value
             H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
@@ -77,13 +71,11 @@ function BindPage()
                 "Converts the raw JavaScript value into a Julia value. This is the key innovation — it enables binding arbitrary Julia objects via index mapping."
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-4 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# Slider: JS sends integer index → map to Julia value
+                Main.CodeBlock(language="julia", """# Slider: JS sends integer index → map to Julia value
 Bonds.transform_value(s::SuiteSliderWidget, val) = s.values[val]
 
 # Checkbox: JS sends boolean directly
 Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
-                )
             ),
 
             # possible_values
@@ -93,11 +85,7 @@ Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Returns all possible values (before transformation). Used by PlutoSliderServer.jl for precomputing notebook states."
             ),
-            Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-4 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("Bonds.possible_values(s::SuiteSliderWidget) = 1:length(s.values)  # indices")
-                )
-            ),
+            Main.CodeBlock(language="julia", "Bonds.possible_values(s::SuiteSliderWidget) = 1:length(s.values)  # indices"),
 
             # validate_value
             H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
@@ -106,11 +94,7 @@ Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Security validation for untrusted input on public PlutoSliderServer deployments. Values are validated before transformation."
             ),
-            Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-4 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("Bonds.validate_value(s::SuiteSliderWidget, val) = val isa Integer && 1 <= val <= length(s.values)")
-                )
-            ),
+            Main.CodeBlock(language="julia", "Bonds.validate_value(s::SuiteSliderWidget, val) = val isa Integer && 1 <= val <= length(s.values)"),
 
             Main.Separator(),
 
@@ -131,8 +115,7 @@ Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
                 "This enables binding to arbitrary Julia objects — even functions or structs:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# Bind to Julia functions!
+                Main.CodeBlock(language="julia", """# Bind to Julia functions!
 @bind transform SuiteSelect([
     sin => "Sine",
     cos => "Cosine",
@@ -141,7 +124,6 @@ Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
 
 # `transform` is now a Julia function (sin, cos, or tan)
 plot(transform, 0:0.1:2\u03c0)""")
-                )
             ),
             Main.Alert(
                 Main.AlertTitle("Why indices?"),
@@ -178,8 +160,7 @@ plot(transform, 0:0.1:2\u03c0)""")
                 "Here's how a complete dual-mode widget is implemented:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# --- Widget struct (for Pluto @bind) ---
+                Main.CodeBlock(language="julia", """# --- Widget struct (for Pluto @bind) ---
 struct SuiteSliderWidget{T}
     values::AbstractVector{T}
     default::T
@@ -212,7 +193,6 @@ Bonds.possible_values(s::SuiteSliderWidget) = 1:length(s.values)
 Bonds.transform_value(s::SuiteSliderWidget, val) = s.values[val]
 Bonds.validate_value(s::SuiteSliderWidget, val) =
     val isa Integer && 1 <= val <= length(s.values)""")
-                )
             ),
 
             # Therapy.jl reactivity comparison

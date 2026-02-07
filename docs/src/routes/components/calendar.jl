@@ -49,9 +49,7 @@ function CalendarPage()
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Usage"
             ),
-            Pre(:class => "bg-warm-100 dark:bg-warm-900 rounded-lg p-4 text-sm overflow-x-auto",
-                Code(:class => "text-warm-800 dark:text-warm-300",
-                    """using Suite
+            Main.CodeBlock(language="julia", """using Suite
 
 # Single date selection (default)
 Calendar()
@@ -72,9 +70,7 @@ Calendar(disabled_dates="2026-02-14,2026-02-15")
 Calendar(show_outside_days=false)
 
 # Fixed 6-week grid
-Calendar(fixed_weeks=true)"""
-                )
-            )
+Calendar(fixed_weeks=true)""")
         ),
 
         # Keyboard Interactions

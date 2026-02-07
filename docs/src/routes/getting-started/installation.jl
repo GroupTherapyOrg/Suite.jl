@@ -41,17 +41,14 @@ function InstallationPage()
                 "Add Suite.jl as a dependency to your project:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""using Pkg
+                Main.CodeBlock(language="julia", """using Pkg
 Pkg.add(url="https://github.com/GroupTherapyOrg/Suite.jl")""")
-                )
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Then add it to your app file:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""using Therapy
+                Main.CodeBlock(language="julia", """using Therapy
 using Suite
 
 app = App(
@@ -61,7 +58,6 @@ app = App(
 )
 
 Therapy.run(app)""")
-                )
             ),
 
             # Tailwind CSS setup
@@ -73,15 +69,13 @@ Therapy.run(app)""")
                 " needs to include Suite.jl's source directories for Tailwind to scan:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""/* input.css */
+                Main.CodeBlock(language="julia", """/* input.css */
 @import "tailwindcss";
 
 /* Scan Suite.jl component files for Tailwind classes */
 @source "../../Suite.jl/src";
 
 /* Your app's routes and components are already scanned by Therapy.jl */""")
-                )
             ),
 
             Main.Alert(
@@ -97,8 +91,7 @@ Therapy.run(app)""")
                 "Once installed, use any Suite.jl component in your routes:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# src/routes/index.jl
+                Main.CodeBlock(language="julia", """# src/routes/index.jl
 function HomePage()
     Div(:class => "max-w-md mx-auto py-12",
         Card(
@@ -118,7 +111,6 @@ function HomePage()
 end
 
 HomePage""")
-                )
             ),
 
             # Extraction
@@ -129,8 +121,7 @@ HomePage""")
                 "The extraction model is Suite.jl's core feature — just like shadcn/ui, you can copy any component into your project and customize it freely:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""using Suite
+                Main.CodeBlock(language="julia", """using Suite
 
 # Extract a single component
 Suite.extract(:Button, "src/components/")
@@ -147,7 +138,6 @@ Suite.list()
 
 # Get info about a specific component
 Suite.info(:Dialog)""")
-                )
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Extracted components are self-contained Julia files. They use an ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "@isdefined"),
@@ -162,8 +152,7 @@ Suite.info(:Dialog)""")
                 "Interactive components (Dialog, Menu, Tooltip, etc.) require the Suite.jl JavaScript runtime. Add it to your layout:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# src/components/Layout.jl
+                Main.CodeBlock(language="julia", """# src/components/Layout.jl
 function Layout(children...)
     Div(:class => "min-h-screen",
         # Your navbar, content, footer...
@@ -173,7 +162,6 @@ function Layout(children...)
         suite_script()
     )
 end""")
-                )
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "The ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "suite_script()"),

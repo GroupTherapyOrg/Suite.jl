@@ -76,9 +76,7 @@ function DataTablePage()
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Usage"
             ),
-            Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-50",
-                    Code(:class => "language-julia", """using Suite
+            Main.CodeBlock(language="julia", """using Suite
 
 # Define your data
 data = [
@@ -102,8 +100,6 @@ DataTable(data, columns,
     column_visibility=true,
     filter_placeholder="Search users...",
 )""")
-                )
-            )
         ),
 
         # Column Definition
@@ -116,9 +112,7 @@ DataTable(data, columns,
                 Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "DataTableColumn"),
                 ". Each column specifies a data key, header text, and optional configuration."
             ),
-            Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-50",
-                    Code(:class => "language-julia", """# Basic column
+            Main.CodeBlock(language="julia", """# Basic column
 DataTableColumn("name", "Name")
 
 # Right-aligned column
@@ -130,8 +124,6 @@ DataTableColumn("actions", "Actions", sortable=false, hideable=false)
 # Custom cell renderer
 DataTableColumn("status", "Status",
     cell=(val, row) -> Badge(val, variant=val == "Active" ? "default" : "secondary"))""")
-                )
-            )
         ),
 
         # Keyboard Interactions

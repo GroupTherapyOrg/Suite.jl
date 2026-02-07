@@ -4530,7 +4530,150 @@
             },
         },
 
-        // --- CodeBlock (copy-to-clipboard) ----------------------------------------
+        // --- SyntaxHighlight (Julia code highlighting) ----------------------------
+        SyntaxHighlight: {
+            _highlighted: new Set(),
+
+            // Julia keyword list
+            _keywords: new Set([
+                'function', 'end', 'if', 'else', 'elseif', 'for', 'while', 'return',
+                'begin', 'let', 'do', 'try', 'catch', 'finally', 'struct', 'mutable',
+                'abstract', 'primitive', 'type', 'module', 'baremodule', 'using',
+                'import', 'export', 'const', 'local', 'global', 'macro', 'quote',
+                'where', 'in', 'isa', 'break', 'continue', 'new',
+            ]),
+
+            // Special values
+            _specials: new Set(['true', 'false', 'nothing', 'missing', 'Inf', 'NaN', 'pi']),
+
+            highlight(codeEl) {
+                if (this._highlighted.has(codeEl)) return;
+                this._highlighted.add(codeEl);
+
+                const text = codeEl.textContent || '';
+                if (!text.trim()) return;
+
+                const tokens = this._tokenize(text);
+                codeEl.innerHTML = tokens.map(t => this._render(t)).join('');
+            },
+
+            _tokenize(text) {
+                const tokens = [];
+                let i = 0;
+                while (i < text.length) {
+                    // Triple-quoted string
+                    if (text.startsWith('"""', i)) {
+                        const end = text.indexOf('"""', i + 3);
+                        const j = end === -1 ? text.length : end + 3;
+                        tokens.push({ type: 'string', value: text.slice(i, j) });
+                        i = j;
+                    }
+                    // Single-line comment
+                    else if (text[i] === '#') {
+                        const nl = text.indexOf('\n', i);
+                        const j = nl === -1 ? text.length : nl;
+                        tokens.push({ type: 'comment', value: text.slice(i, j) });
+                        i = j;
+                    }
+                    // Double-quoted string (with escape handling)
+                    else if (text[i] === '"') {
+                        let j = i + 1;
+                        while (j < text.length && text[j] !== '"') {
+                            if (text[j] === '\\') j++; // skip escaped char
+                            j++;
+                        }
+                        j = Math.min(j + 1, text.length);
+                        tokens.push({ type: 'string', value: text.slice(i, j) });
+                        i = j;
+                    }
+                    // Single-quoted char
+                    else if (text[i] === "'" && (i === 0 || /[\s(,=\[{;]/.test(text[i-1]))) {
+                        let j = i + 1;
+                        while (j < text.length && text[j] !== "'") {
+                            if (text[j] === '\\') j++;
+                            j++;
+                        }
+                        j = Math.min(j + 1, text.length);
+                        tokens.push({ type: 'string', value: text.slice(i, j) });
+                        i = j;
+                    }
+                    // Symbol :word
+                    else if (text[i] === ':' && i + 1 < text.length && /[a-zA-Z_]/.test(text[i+1]) && (i === 0 || /[\s(,=\[{;]/.test(text[i-1]))) {
+                        let j = i + 1;
+                        while (j < text.length && /[a-zA-Z0-9_!]/.test(text[j])) j++;
+                        tokens.push({ type: 'symbol', value: text.slice(i, j) });
+                        i = j;
+                    }
+                    // Number
+                    else if (/[0-9]/.test(text[i]) && (i === 0 || /[\s(,=\[{;+\-*\/<>!^%&|~]/.test(text[i-1]))) {
+                        let j = i;
+                        if (text[j] === '0' && j + 1 < text.length && (text[j+1] === 'x' || text[j+1] === 'o' || text[j+1] === 'b')) {
+                            j += 2;
+                            while (j < text.length && /[0-9a-fA-F_]/.test(text[j])) j++;
+                        } else {
+                            while (j < text.length && /[0-9._eE+\-]/.test(text[j])) j++;
+                        }
+                        tokens.push({ type: 'number', value: text.slice(i, j) });
+                        i = j;
+                    }
+                    // Word (keyword, identifier, type, function call)
+                    else if (/[a-zA-Z_@]/.test(text[i])) {
+                        let j = i;
+                        if (text[i] === '@') j++; // macro
+                        while (j < text.length && /[a-zA-Z0-9_!]/.test(text[j])) j++;
+
+                        const word = text.slice(i, j);
+
+                        // Look ahead for function call: word(
+                        if (j < text.length && text[j] === '(') {
+                            tokens.push({ type: 'funcall', value: word });
+                        } else if (text[i] === '@') {
+                            tokens.push({ type: 'macro', value: word });
+                        } else if (this._keywords.has(word)) {
+                            tokens.push({ type: 'keyword', value: word });
+                        } else if (this._specials.has(word)) {
+                            tokens.push({ type: 'special', value: word });
+                        } else if (/^[A-Z]/.test(word) && word.length > 1) {
+                            tokens.push({ type: 'type', value: word });
+                        } else {
+                            tokens.push({ type: 'plain', value: word });
+                        }
+                        i = j;
+                    }
+                    // Operators
+                    else if (/[=!<>+\-*\/\\%^&|~]/.test(text[i])) {
+                        let j = i + 1;
+                        // Multi-char operators: ==, !=, <=, >=, |>, ->, =>, ::, ...
+                        while (j < text.length && /[=!<>|>&:]/.test(text[j]) && j - i < 3) j++;
+                        tokens.push({ type: 'operator', value: text.slice(i, j) });
+                        i = j;
+                    }
+                    // :: type annotation
+                    else if (text[i] === ':' && i + 1 < text.length && text[i+1] === ':') {
+                        tokens.push({ type: 'operator', value: '::' });
+                        i += 2;
+                    }
+                    // Everything else (whitespace, punctuation)
+                    else {
+                        tokens.push({ type: 'plain', value: text[i] });
+                        i++;
+                    }
+                }
+                return tokens;
+            },
+
+            _render(token) {
+                const esc = token.value
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+
+                if (token.type === 'plain') return esc;
+                return `<span class="suite-hl-${token.type}">${esc}</span>`;
+            },
+        },
+
+        // --- CodeBlock (copy-to-clipboard + syntax highlighting) -----------------
         CodeBlock: {
             _initialized: new Set(),
 
@@ -4539,21 +4682,28 @@
                     if (this._initialized.has(block)) return;
                     this._initialized.add(block);
 
+                    // Copy button
                     const copyBtn = block.querySelector('[data-suite-codeblock-copy]');
-                    if (!copyBtn) return;
+                    if (copyBtn) {
+                        copyBtn.addEventListener('click', () => {
+                            const code = block.querySelector('code');
+                            if (!code) return;
 
-                    copyBtn.addEventListener('click', () => {
-                        const code = block.querySelector('code');
-                        if (!code) return;
-
-                        const text = code.textContent || '';
-                        navigator.clipboard.writeText(text).then(() => {
-                            // Show check icon briefly
-                            const original = copyBtn.innerHTML;
-                            copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-                            setTimeout(() => { copyBtn.innerHTML = original; }, 2000);
+                            const text = code.textContent || '';
+                            navigator.clipboard.writeText(text).then(() => {
+                                const original = copyBtn.innerHTML;
+                                copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+                                setTimeout(() => { copyBtn.innerHTML = original; }, 2000);
+                            });
                         });
-                    });
+                    }
+
+                    // Syntax highlighting
+                    const lang = block.getAttribute('data-suite-codeblock-lang');
+                    if (lang === 'julia' || lang === 'jl') {
+                        const code = block.querySelector('code');
+                        if (code) Suite.SyntaxHighlight.highlight(code);
+                    }
                 });
             },
         },

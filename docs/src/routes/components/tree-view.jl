@@ -83,9 +83,7 @@ function TreeViewPage()
         # Usage
         Div(:class => "mt-12 space-y-6",
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", "Usage"),
-            Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-50",
-                    Code(:class => "language-julia", """using Suite
+            Main.CodeBlock(language="julia", """using Suite
 
 TreeView(
     TreeViewItem(label="src", is_folder=true, expanded=true,
@@ -94,8 +92,6 @@ TreeView(
     ),
     TreeViewItem(label="Project.toml"),
 )""")
-                )
-            )
         ),
 
         # API Reference

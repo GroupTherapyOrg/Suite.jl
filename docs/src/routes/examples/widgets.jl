@@ -46,13 +46,11 @@ function WidgetsExample()
                         Div(
                             H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Usage"),
                             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
-                                Pre(:class => "text-xs text-warm-100",
-                                    Code("""# Therapy.jl mode
+                                Main.CodeBlock(language="julia", """# Therapy.jl mode
 Switch(checked=true)
 
 # Pluto @bind mode
 @bind dark SuiteSwitch(; default=false)""")
-                                )
                             )
                         )
                     )
@@ -79,11 +77,9 @@ Switch(checked=true)
                         Div(
                             H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Usage"),
                             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
-                                Pre(:class => "text-xs text-warm-100",
-                                    Code("""# Therapy.jl mode
+                                Main.CodeBlock(language="julia", """# Therapy.jl mode
 Toggle(pressed=true, "Bold")
 Toggle(variant="outline", "Italic")""")
-                                )
                             )
                         )
                     )
@@ -122,14 +118,12 @@ Toggle(variant="outline", "Italic")""")
                         Div(
                             H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Usage"),
                             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
-                                Pre(:class => "text-xs text-warm-100",
-                                    Code("""# Single selection
+                                Main.CodeBlock(language="julia", """# Single selection
 ToggleGroup(type="single",
     ToggleGroupItem(value="left", "L"),
     ToggleGroupItem(value="center", "C"),
     ToggleGroupItem(value="right", "R")
 )""")
-                                )
                             )
                         )
                     )
@@ -164,15 +158,13 @@ ToggleGroup(type="single",
                         Div(
                             H4(:class => "text-sm font-medium text-warm-800 dark:text-warm-300 mb-3", "Usage"),
                             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-md p-4 overflow-x-auto",
-                                Pre(:class => "text-xs text-warm-100",
-                                    Code("""# Therapy.jl mode
+                                Main.CodeBlock(language="julia", """# Therapy.jl mode
 Input(type="email", placeholder="...")
 Textarea(placeholder="...")
 
 # Pluto @bind mode
 @bind name SuiteInput(; default="")
 @bind bio SuiteTextarea(; default="")""")
-                                )
                             )
                         )
                     )

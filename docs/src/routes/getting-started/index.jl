@@ -43,15 +43,13 @@ function GettingStartedIndex()
                 "Suite.jl works in two modes. You can use it as a package dependency, or you can extract components into your own project and customize them freely:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# Mode 1: Use as a package
+                Main.CodeBlock(language="julia", """# Mode 1: Use as a package
 using Suite
 Button(variant="outline", "Click me")
 
 # Mode 2: Extract and customize
 Suite.extract(:Button, "src/components/")
 # Now edit src/components/Button.jl however you want""")
-                )
             ),
 
             # Three tiers
@@ -96,13 +94,11 @@ Suite.extract(:Button, "src/components/")
                 "Suite.jl ships with 4 pre-built themes. Apply a theme with a single keyword argument, or extract components with a theme baked in:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# Apply at render time
+                Main.CodeBlock(language="julia", """# Apply at render time
 Button(theme=:ocean, variant="outline", "Ocean Style")
 
 # Or extract with a theme baked in
 Suite.extract(:Button, "components/", theme=:nature)""")
-                )
             ),
 
             # Quick start
@@ -113,17 +109,14 @@ Suite.extract(:Button, "components/", theme=:nature)""")
                 "Add Suite.jl to your Therapy.jl project:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""using Pkg
+                Main.CodeBlock(language="julia", """using Pkg
 Pkg.add(url="https://github.com/GroupTherapyOrg/Suite.jl")""")
-                )
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Then use components in your app:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""using Therapy
+                Main.CodeBlock(language="julia", """using Therapy
 using Suite
 
 function MyPage()
@@ -137,7 +130,6 @@ function MyPage()
         )
     )
 end""")
-                )
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "See the ",

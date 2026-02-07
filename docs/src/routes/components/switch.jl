@@ -72,9 +72,7 @@ function SwitchPage()
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Usage"
             ),
-            Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-50",
-                    Code(:class => "language-julia", """using Suite
+            Main.CodeBlock(language="julia", """using Suite
 
 Switch()
 Switch(checked=true)
@@ -85,8 +83,6 @@ Div(
     Switch(:id => "notifications"),
     Label(:htmlFor => "notifications", "Enable notifications"),
 )""")
-                )
-            )
         ),
 
         # API Reference

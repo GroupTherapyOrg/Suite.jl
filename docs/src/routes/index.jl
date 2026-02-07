@@ -194,8 +194,7 @@ function Index()
                     Span(:class => "w-3 h-3 rounded-full bg-yellow-500/60"),
                     Span(:class => "w-3 h-3 rounded-full bg-green-500/60")
                 ),
-                Pre(:class => "text-sm text-warm-100 leading-relaxed",
-                    Code(:class => "language-julia", """using Suite
+                Main.CodeBlock(language="julia", """using Suite
 
 # Extract and customize — just like shadcn/ui
 Suite.extract(:Card, "src/components/")
@@ -211,7 +210,6 @@ Card(
         Button(variant="outline", "Learn More")
     )
 )""")
-                )
             )
         ),
 

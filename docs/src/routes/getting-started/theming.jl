@@ -91,8 +91,7 @@ function ThemingPage()
                 "Pass the ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "theme"), " kwarg to any component:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# Default theme (purple accent, warm neutrals, rounded-md)
+                Main.CodeBlock(language="julia", """# Default theme (purple accent, warm neutrals, rounded-md)
 Button("Default Theme")
 
 # Ocean theme (blue accent, rounded-lg)
@@ -106,7 +105,6 @@ Card(theme=:nature,
     CardHeader(CardTitle("Nature Theme")),
     CardContent("Emerald accents with stone neutrals")
 )""")
-                )
             ),
 
             Main.Alert(
@@ -122,15 +120,13 @@ Card(theme=:nature,
                 "When extracting components, the theme is baked into the generated source code. The output file contains concrete Tailwind classes — no runtime theme lookup needed:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# Extract with ocean theme
+                Main.CodeBlock(language="julia", """# Extract with ocean theme
 Suite.extract(:Button, "src/components/", theme=:ocean)
 # → Button.jl uses bg-blue-600 instead of bg-accent-600
 
 # Extract with nature theme
 Suite.extract(:Card, "src/components/", theme=:nature)
 # → Card.jl uses rounded-xl, stone-* neutrals, emerald-* accents""")
-                )
             ),
 
             # Design tokens
@@ -253,13 +249,11 @@ Suite.extract(:Card, "src/components/", theme=:nature)
                 " component to add a dark mode toggle to your app:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Pre(:class => "text-sm text-warm-100",
-                    Code("""# In your Layout.jl navbar
+                Main.CodeBlock(language="julia", """# In your Layout.jl navbar
 ThemeToggle()  # Sun/moon toggle button
 
 # Persists preference to localStorage
 # Respects system prefers-color-scheme as default""")
-                )
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Therapy.jl's App framework includes a FOUC-prevention script in ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "<head>"),

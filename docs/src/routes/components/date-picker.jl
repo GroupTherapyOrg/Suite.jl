@@ -42,9 +42,7 @@ function DatePickerPage()
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
                 "Usage"
             ),
-            Pre(:class => "bg-warm-100 dark:bg-warm-900 rounded-lg p-4 text-sm overflow-x-auto",
-                Code(:class => "text-warm-800 dark:text-warm-300",
-                    """using Suite
+            Main.CodeBlock(language="julia", """using Suite
 
 # Simple date picker
 DatePicker()
@@ -59,9 +57,7 @@ DatePicker(selected="2026-02-14")
 DatePicker(placeholder="Choose a birthday")
 
 # Disabled dates
-DatePicker(disabled_dates="2026-02-14,2026-02-15")"""
-                )
-            )
+DatePicker(disabled_dates="2026-02-14,2026-02-15")""")
         ),
 
         # Composition Notes
@@ -72,17 +68,13 @@ DatePicker(disabled_dates="2026-02-14,2026-02-15")"""
             P(:class => "text-warm-600 dark:text-warm-300 mb-4",
                 "DatePicker is a composition of a trigger button with a Calendar inside a floating dropdown. For more control, you can compose these yourself using Popover + Calendar."
             ),
-            Pre(:class => "bg-warm-100 dark:bg-warm-900 rounded-lg p-4 text-sm overflow-x-auto",
-                Code(:class => "text-warm-800 dark:text-warm-300",
-                    """# Manual composition with Popover + Calendar
+            Main.CodeBlock(language="julia", """# Manual composition with Popover + Calendar
 Popover(
     PopoverTrigger(Button(variant="outline", "Pick a date")),
     PopoverContent(class="w-auto p-0",
         Calendar(mode="single")
     )
-)"""
-                )
-            )
+)""")
         ),
 
         # Keyboard Interactions
