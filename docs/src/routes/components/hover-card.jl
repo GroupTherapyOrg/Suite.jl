@@ -7,14 +7,7 @@
 function HoverCardPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Hover Card"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A popup that displays a content preview when hovering over a trigger element. Opens after 700ms, closes after 300ms. Touch devices excluded."
-            )
-        ),
+        PageHeader("Hover Card", "A popup that displays a content preview when hovering over a trigger element. Opens after 700ms, closes after 300ms. Touch devices excluded."),
 
         # Basic Preview
         ComponentPreview(title="Basic", description="Hover over the link to see a user profile card preview.",
@@ -45,9 +38,7 @@ function HoverCardPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 HoverCard(
@@ -65,32 +56,30 @@ HoverCard(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "HoverCard"),
+            SectionH2("API Reference"),
+            SectionH3("HoverCard"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Trigger and content sub-components (container only, no props)"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "HoverCardTrigger"),
+            SectionH3("HoverCardTrigger"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Trigger content (typically a link or text)"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "HoverCardContent"),
+            SectionH3("HoverCardContent"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("side", "String", "\"bottom\"", "Preferred side of the trigger to render against"),
                         ApiRow("align", "String", "\"center\"", "Preferred alignment against the trigger"),
                         ApiRow("side_offset", "Int", "4", "Distance in px from the trigger"),
@@ -102,22 +91,6 @@ HoverCard(
     )
 end
 
-function ApiHead()
-    Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-    )
-end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
 HoverCardPage

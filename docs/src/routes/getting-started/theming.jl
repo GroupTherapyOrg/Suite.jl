@@ -18,9 +18,7 @@ function ThemingPage()
         Div(:class => "prose max-w-none",
 
             # Overview
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "How Themes Work"
-            ),
+            SectionH2("How Themes Work"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "A theme is a named bundle of design tokens — accent color, border radius, font weight, shadow style, and more. Every Suite.jl component accepts a ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "theme"), " keyword argument."
             ),
@@ -30,9 +28,7 @@ function ThemingPage()
             ),
 
             # Pre-built themes
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Pre-built Themes"
-            ),
+            SectionH2("Pre-built Themes"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl ships with 4 pre-built themes:"
             ),
@@ -79,14 +75,10 @@ function ThemingPage()
             ),
 
             # Usage
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Applying Themes"
-            ),
+            SectionH2("Applying Themes"),
 
             # Runtime
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
-                "At render time"
-            ),
+            SectionH3("At render time"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Pass the ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "theme"), " kwarg to any component:"
             ),
@@ -113,9 +105,7 @@ Card(theme=:nature,
             ),
 
             # Extraction
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
-                "At extraction time"
-            ),
+            SectionH3("At extraction time"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "When extracting components, the theme is baked into the generated source code. The output file contains concrete Tailwind classes — no runtime theme lookup needed:"
             ),
@@ -130,9 +120,7 @@ Suite.extract(:Card, "src/components/", theme=:nature)
             ),
 
             # Design tokens
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Design Tokens"
-            ),
+            SectionH2("Design Tokens"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Each theme defines these tokens, which are substituted into component class strings:"
             ),
@@ -192,9 +180,7 @@ Suite.extract(:Card, "src/components/", theme=:nature)
             ),
 
             # Color mapping
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Color Token Mapping"
-            ),
+            SectionH2("Color Token Mapping"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl maps shadcn/ui's CSS variables to Tailwind utility classes:"
             ),
@@ -238,9 +224,7 @@ Suite.extract(:Card, "src/components/", theme=:nature)
             ),
 
             # Dark mode
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Dark Mode"
-            ),
+            SectionH2("Dark Mode"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Every Suite.jl component includes dark mode classes out of the box. Dark mode is toggled by adding the ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "dark"), " class to the ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "<html>"), " element."
             ),
@@ -261,9 +245,7 @@ ThemeToggle()  # Sun/moon toggle button
             ),
 
             # Warm neutral palette
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Warm Neutral Palette"
-            ),
+            SectionH2("Warm Neutral Palette"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "The default theme uses a warm neutral palette shared across all GroupTherapyOrg packages:"
             ),
@@ -282,9 +264,7 @@ ThemeToggle()  # Sun/moon toggle button
             ),
 
             # Accent palette
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
-                "Accent (Purple)"
-            ),
+            SectionH3("Accent (Purple)"),
             Div(:class => "grid grid-cols-5 sm:grid-cols-11 gap-1 mb-6",
                 _ColorSwatch("50", "bg-accent-50"),
                 _ColorSwatch("100", "bg-accent-100"),

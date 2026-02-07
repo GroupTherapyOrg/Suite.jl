@@ -7,14 +7,7 @@
 function AlertDialogPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Alert Dialog"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A modal dialog that interrupts the user with important content and expects a response. Uses role=alertdialog and cannot be dismissed by Escape or clicking outside."
-            )
-        ),
+        PageHeader("Alert Dialog", "A modal dialog that interrupts the user with important content and expects a response. Uses role=alertdialog and cannot be dismissed by Escape or clicking outside."),
 
         # Basic Preview
         ComponentPreview(title="Basic", description="A simple confirmation dialog with Cancel and Continue actions.",
@@ -60,9 +53,7 @@ function AlertDialogPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 AlertDialog(
@@ -84,18 +75,16 @@ AlertDialog(
 
         # Keyboard shortcuts
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Keyboard Interactions"
-            ),
+            SectionH2("Keyboard Interactions"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
                         )
                     ),
-                    Tbody(
+                    Main.TableBody(
                         KeyRow("Tab", "Move focus between Cancel and Action buttons"),
                         KeyRow("Enter / Space", "Activate the focused button"),
                     )
@@ -105,94 +94,92 @@ AlertDialog(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialog"),
+            SectionH2("API Reference"),
+            SectionH3("AlertDialog"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "AlertDialog sub-components"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogTrigger"),
+            SectionH3("AlertDialogTrigger"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Element that opens the dialog"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogContent"),
+            SectionH3("AlertDialogContent"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Dialog content (header, footer, etc.)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogHeader"),
+            SectionH3("AlertDialogHeader"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Header content (title, description)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogFooter"),
+            SectionH3("AlertDialogFooter"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Footer content (action buttons)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogTitle"),
+            SectionH3("AlertDialogTitle"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Dialog title text"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogDescription"),
+            SectionH3("AlertDialogDescription"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Dialog description text"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogAction"),
+            SectionH3("AlertDialogAction"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Action button text (e.g. \"Continue\", \"Delete\")"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogCancel"),
+            SectionH3("AlertDialogCancel"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Cancel button text (e.g. \"Cancel\")"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
@@ -202,29 +189,7 @@ AlertDialog(
     )
 end
 
-function ApiHead()
-    Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-    )
-end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
-function KeyRow(key, action)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", key),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", action)
-    )
-end
 
 AlertDialogPage

@@ -6,14 +6,7 @@
 function CollapsiblePage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Collapsible"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "An interactive component which expands/collapses a panel."
-            )
-        ),
+        PageHeader("Collapsible", "An interactive component which expands/collapses a panel."),
 
         # Default Preview
         ComponentPreview(title="Default", description="Click the trigger to toggle content visibility.",
@@ -71,9 +64,7 @@ function CollapsiblePage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 Collapsible(
@@ -88,35 +79,33 @@ Collapsible(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Collapsible"),
+            SectionH2("API Reference"),
+            SectionH3("Collapsible"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("open", "Bool", "false", "Start with content visible"),
                         ApiRow("disabled", "Bool", "false", "Prevent toggling"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CollapsibleTrigger"),
+            SectionH3("CollapsibleTrigger"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Trigger content (typically a button)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CollapsibleContent"),
+            SectionH3("CollapsibleContent"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Content to show/hide"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
@@ -126,22 +115,6 @@ Collapsible(
     )
 end
 
-function ApiHead()
-    Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-    )
-end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
 CollapsiblePage

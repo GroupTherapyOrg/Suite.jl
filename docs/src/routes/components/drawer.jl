@@ -6,14 +6,7 @@
 function DrawerPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Drawer"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A drag-to-dismiss overlay panel with velocity and distance thresholds. Slides in from any edge of the screen."
-            )
-        ),
+        PageHeader("Drawer", "A drag-to-dismiss overlay panel with velocity and distance thresholds. Slides in from any edge of the screen."),
 
         # Default bottom drawer with handle
         ComponentPreview(title="Default", description="Bottom drawer with a visible grab handle.",
@@ -83,9 +76,7 @@ function DrawerPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 Drawer(
@@ -111,18 +102,16 @@ Drawer(
 
         # Keyboard shortcuts
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Keyboard Interactions"
-            ),
+            SectionH2("Keyboard Interactions"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
                         )
                     ),
-                    Tbody(
+                    Main.TableBody(
                         KeyRow("Escape", "Close the drawer"),
                     )
                 )
@@ -131,95 +120,93 @@ Drawer(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Drawer"),
+            SectionH2("API Reference"),
+            SectionH3("Drawer"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Drawer trigger and content"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerTrigger"),
+            SectionH3("DrawerTrigger"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Element that opens the drawer on click"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerContent"),
+            SectionH3("DrawerContent"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Content rendered inside the drawer panel"),
                         ApiRow("direction", "String", "\"bottom\"", "Slide direction: \"bottom\", \"top\", \"left\", or \"right\""),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerHeader"),
+            SectionH3("DrawerHeader"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Header content (title and description)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerFooter"),
+            SectionH3("DrawerFooter"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Footer content (action buttons)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerTitle"),
+            SectionH3("DrawerTitle"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Title text"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerDescription"),
+            SectionH3("DrawerDescription"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Description text"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerClose"),
+            SectionH3("DrawerClose"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Element that closes the drawer on click"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerHandle"),
+            SectionH3("DrawerHandle"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("class", "String", "\"\"", "Additional CSS classes for the visual grab indicator"),
                     )
                 )
@@ -228,29 +215,7 @@ Drawer(
     )
 end
 
-function ApiHead()
-    Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-    )
-end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
-function KeyRow(key, action)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", key),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", action)
-    )
-end
 
 DrawerPage

@@ -6,14 +6,7 @@
 function SliderPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Slider"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "An input where the user selects a value from within a given range."
-            )
-        ),
+        PageHeader("Slider", "An input where the user selects a value from within a given range."),
 
         # Default Preview
         ComponentPreview(title="Default", description="A basic slider from 0 to 100.",
@@ -79,9 +72,7 @@ function SliderPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 # Basic slider
@@ -105,18 +96,16 @@ Div(
 
         # Keyboard Interactions
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Keyboard Interactions"
-            ),
+            SectionH2("Keyboard Interactions"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
                         )
                     ),
-                    Tbody(
+                    Main.TableBody(
                         KeyRow("ArrowRight / ArrowUp", "Increase value by one step"),
                         KeyRow("ArrowLeft / ArrowDown", "Decrease value by one step"),
                         KeyRow("Shift + Arrow", "Increase/decrease by 10x step"),
@@ -130,14 +119,7 @@ Div(
         ),
 
         # API Reference
-        Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
-            Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+        ApiTable(
                         ApiRow("min", "Real", "0", "Minimum value"),
                         ApiRow("max", "Real", "100", "Maximum value"),
                         ApiRow("step", "Real", "1", "Step increment"),
@@ -145,21 +127,16 @@ Div(
                         ApiRow("orientation", "String", "\"horizontal\"", "\"horizontal\" or \"vertical\""),
                         ApiRow("disabled", "Bool", "false", "Disable the slider"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
-                    )
-                )
-            )
         ),
 
         # Accessibility
         Div(:class => "mt-12 space-y-4",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Accessibility"
-            ),
+            SectionH2("Accessibility"),
             P(:class => "text-warm-600 dark:text-warm-400",
                 "The Slider follows the ", A(:href => "https://www.w3.org/WAI/ARIA/apg/patterns/slider/", :target => "_blank", :class => "text-accent-600 dark:text-accent-400 hover:underline", "WAI-ARIA Slider pattern"), "."
             ),
             Ul(:class => "list-disc list-inside text-warm-600 dark:text-warm-400 space-y-1",
-                Li("The thumb has ", Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "role=\"slider\""), " with proper aria-valuenow/min/max"),
+                Li("The thumb has ", Main.InlineCode("role=\"slider\""), " with proper aria-valuenow/min/max"),
                 Li("Keyboard navigation for arrow keys, Home, End, PageUp, PageDown"),
                 Li("Pointer capture API for smooth drag interaction"),
                 Li("Disabled state sets tabindex=\"-1\" and aria-disabled=\"true\""),
@@ -168,31 +145,7 @@ Div(
     )
 end
 
-function ApiHead()
-    Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-    )
-end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
-function KeyRow(key, action)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4",
-            Main.Kbd(key)
-        ),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", action)
-    )
-end
 
 SliderPage

@@ -43,7 +43,7 @@ function EmptyPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", "Usage"),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 Empty(
@@ -56,18 +56,18 @@ Empty(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", "API Reference"),
+            SectionH2("API Reference"),
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Empty"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                     )),
-                    Tbody(
+                    Main.TableBody(
                         ApiRow("children", "Any", "-", "Sub-components (EmptyIcon, EmptyTitle, EmptyDescription, EmptyAction)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                         ApiRow("theme", "Symbol", ":default", "Theme preset"),
@@ -77,27 +77,27 @@ Empty(
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Sub-components"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Component"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description"),
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Component"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description"),
                     )),
-                    Tbody(
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "EmptyIcon"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Icon or illustration wrapper (rounded circle bg)"),
+                    Main.TableBody(
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "EmptyIcon"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Icon or illustration wrapper (rounded circle bg)"),
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "EmptyTitle"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Title text (h3)"),
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "EmptyTitle"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Title text (h3)"),
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "EmptyDescription"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Descriptive text (p)"),
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "EmptyDescription"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Descriptive text (p)"),
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "EmptyAction"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Action slot (typically wraps a Button)"),
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-accent-600 dark:text-accent-400", "EmptyAction"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Action slot (typically wraps a Button)"),
                         ),
                     )
                 )
@@ -106,13 +106,5 @@ Empty(
     )
 end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
 EmptyPage

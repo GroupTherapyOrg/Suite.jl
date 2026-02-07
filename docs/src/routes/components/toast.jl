@@ -7,14 +7,7 @@
 function ToastPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Toast"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A succinct message that is displayed temporarily. Toasts are triggered from client-side JavaScript and managed by a single Toaster placed in your layout."
-            )
-        ),
+        PageHeader("Toast", "A succinct message that is displayed temporarily. Toasts are triggered from client-side JavaScript and managed by a single Toaster placed in your layout."),
 
         # Default Preview — trigger buttons
         ComponentPreview(title="Default", description="Click each button to trigger a different toast type.",
@@ -36,9 +29,7 @@ function ToastPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 # Place Toaster once in your layout (e.g. at the root)
@@ -58,9 +49,7 @@ Toaster(position="bottom-right")
 
         # Notes
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Notes"
-            ),
+            SectionH2("Notes"),
             Div(:class => "space-y-3 text-warm-600 dark:text-warm-300",
                 P("Toasts are entirely client-side. The ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "Toaster"), " component renders the container element; individual toasts are created and managed by the ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "Suite.toast"), " JavaScript API."),
                 P("Place ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "Toaster"), " once in your root layout. Multiple toasters on the same page will result in duplicate notifications."),
@@ -70,14 +59,12 @@ Toaster(position="bottom-right")
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Toaster"),
+            SectionH2("API Reference"),
+            SectionH3("Toaster"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("position", "String", "\"bottom-right\"", "Toast placement — \"top-left\", \"top-right\", \"top-center\", \"bottom-left\", \"bottom-right\", \"bottom-center\""),
                         ApiRow("duration", "Int", "4000", "Auto-dismiss duration in milliseconds"),
                         ApiRow("visible_toasts", "Int", "3", "Maximum number of toasts visible at once"),
@@ -85,43 +72,43 @@ Toaster(position="bottom-right")
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Suite.toast (JS API)"),
+            SectionH3("Suite.toast (JS API)"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Method"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Method"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                         )
                     ),
-                    Tbody(
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast(message)"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show a default toast")
+                    Main.TableBody(
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast(message)"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show a default toast")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.success(message)"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show a success toast")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.success(message)"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show a success toast")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.error(message)"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show an error toast")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.error(message)"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show an error toast")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.warning(message)"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show a warning toast")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.warning(message)"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show a warning toast")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.info(message)"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show an info toast")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.info(message)"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Show an info toast")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.dismiss(id)"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Dismiss a specific toast by its ID")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.dismiss(id)"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Dismiss a specific toast by its ID")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.dismissAll()"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Dismiss all visible toasts")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Suite.toast.dismissAll()"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Dismiss all visible toasts")
                         ),
                     )
                 )
@@ -130,22 +117,6 @@ Toaster(position="bottom-right")
     )
 end
 
-function ApiHead()
-    Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-    )
-end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
 ToastPage

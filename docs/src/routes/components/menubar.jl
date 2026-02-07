@@ -6,14 +6,7 @@
 function MenubarPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Menubar"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A visually persistent menu common in desktop applications that provides quick access to a consistent set of commands."
-            )
-        ),
+        PageHeader("Menubar", "A visually persistent menu common in desktop applications that provides quick access to a consistent set of commands."),
 
         # Default Preview — File / Edit / View
         ComponentPreview(title="Default", description="Classic desktop-style menubar with File, Edit, and View menus.",
@@ -65,9 +58,7 @@ function MenubarPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 Menubar(
@@ -99,18 +90,16 @@ Menubar(
 
         # Keyboard shortcuts
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Keyboard Interactions"
-            ),
+            SectionH2("Keyboard Interactions"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
                         )
                     ),
-                    Tbody(
+                    Main.TableBody(
                         KeyRow("Arrow Right", "Move focus to the next menu trigger"),
                         KeyRow("Arrow Left", "Move focus to the previous menu trigger"),
                         KeyRow("Arrow Down", "Open the focused menu / move to next item"),
@@ -124,44 +113,42 @@ Menubar(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Menubar"),
+            SectionH2("API Reference"),
+            SectionH3("Menubar"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "MenubarMenu items"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarMenu"),
+            SectionH3("MenubarMenu"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Trigger + Content pair"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarTrigger"),
+            SectionH3("MenubarTrigger"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Trigger label text"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarContent"),
+            SectionH3("MenubarContent"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Menu items, separators, labels, submenus"),
                         ApiRow("align", "String", "\"start\"", "Alignment relative to trigger"),
                         ApiRow("side_offset", "Int", "5", "Distance from trigger in pixels"),
@@ -169,22 +156,22 @@ Menubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarItem"),
+            SectionH3("MenubarItem"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Item label and optional shortcut"),
                         ApiRow("disabled", "Bool", "false", "Disable this item"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarCheckboxItem"),
+            SectionH3("MenubarCheckboxItem"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Checkbox label text"),
                         ApiRow("checked", "Bool", "false", "Whether the item is checked"),
                         ApiRow("disabled", "Bool", "false", "Disable this item"),
@@ -192,93 +179,93 @@ Menubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarRadioGroup"),
+            SectionH3("MenubarRadioGroup"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "MenubarRadioItem children"),
                         ApiRow("value", "String", "\"\"", "Currently selected value"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarRadioItem"),
+            SectionH3("MenubarRadioItem"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Radio item label"),
                         ApiRow("value", "String", "\"\"", "Value for this radio option"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarSeparator"),
+            SectionH3("MenubarSeparator"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarShortcut"),
+            SectionH3("MenubarShortcut"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Shortcut text (e.g. \"Ctrl+T\")"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarSub"),
+            SectionH3("MenubarSub"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "SubTrigger + SubContent pair"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarSubTrigger"),
+            SectionH3("MenubarSubTrigger"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Sub-menu trigger label"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarSubContent"),
+            SectionH3("MenubarSubContent"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Sub-menu items"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarLabel"),
+            SectionH3("MenubarLabel"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Label text"),
                         ApiRow("inset", "Bool", "false", "Add left padding to align with items"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarItemIndicator"),
+            SectionH3("MenubarItemIndicator"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Indicator content (icon or check)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
@@ -288,29 +275,7 @@ Menubar(
     )
 end
 
-function ApiHead()
-    Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-    )
-end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
-function KeyRow(key, action)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", key),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", action)
-    )
-end
 
 MenubarPage

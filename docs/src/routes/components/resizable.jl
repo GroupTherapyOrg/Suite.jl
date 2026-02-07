@@ -74,7 +74,7 @@ function ResizablePage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", "Usage"),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 ResizablePanelGroup(direction="horizontal",
@@ -90,18 +90,18 @@ ResizablePanelGroup(direction="horizontal",
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", "API Reference"),
+            SectionH2("API Reference"),
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "ResizablePanelGroup"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                     )),
-                    Tbody(
+                    Main.TableBody(
                         ApiRow("direction", "String", "\"horizontal\"", "Layout direction: \"horizontal\" or \"vertical\""),
                         ApiRow("children", "Any", "-", "ResizablePanel and ResizableHandle elements"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
@@ -111,14 +111,14 @@ ResizablePanelGroup(direction="horizontal",
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "ResizablePanel"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                     )),
-                    Tbody(
+                    Main.TableBody(
                         ApiRow("default_size", "Int", "0", "Initial size as percentage (0 = auto-distribute)"),
                         ApiRow("min_size", "Int", "10", "Minimum size percentage"),
                         ApiRow("max_size", "Int", "100", "Maximum size percentage"),
@@ -130,14 +130,14 @@ ResizablePanelGroup(direction="horizontal",
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "ResizableHandle"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                     )),
-                    Tbody(
+                    Main.TableBody(
                         ApiRow("with_handle", "Bool", "false", "Whether to show a visible grip icon"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
@@ -147,13 +147,5 @@ ResizablePanelGroup(direction="horizontal",
     )
 end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
 ResizablePage

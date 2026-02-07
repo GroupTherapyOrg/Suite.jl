@@ -5,22 +5,30 @@ Render an API reference table with prop/type/default/description columns.
 """
 function ApiTable(rows...)
     Div(:class => "mt-12 space-y-6",
-        H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-            "API Reference"
-        ),
+        SectionH2("API Reference"),
         Div(:class => "overflow-x-auto",
-            Table(:class => "w-full text-sm",
-                Thead(
-                    Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-                    )
-                ),
-                Tbody(rows...)
+            Main.Table(
+                Main.TableHeader(Main.TableRow(
+                    Main.TableHead("Prop"),
+                    Main.TableHead("Type"),
+                    Main.TableHead("Default"),
+                    Main.TableHead("Description"),
+                )),
+                Main.TableBody(rows...)
             )
         )
+    )
+end
+
+"""
+Render the API table header row (for use with raw Table wrapping).
+"""
+function ApiHead()
+    Main.TableRow(
+        Main.TableHead("Prop"),
+        Main.TableHead("Type"),
+        Main.TableHead("Default"),
+        Main.TableHead("Description"),
     )
 end
 
@@ -28,11 +36,39 @@ end
 Render a single row in the API reference table.
 """
 function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
+    Main.TableRow(
+        Main.TableCell(:class => "text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
+        Main.TableCell(:class => "font-mono text-xs", type),
+        Main.TableCell(:class => "font-mono text-xs", default),
+        Main.TableCell(description),
+    )
+end
+
+"""
+Render a keyboard interactions table.
+"""
+function KeyboardTable(rows...)
+    Div(:class => "mt-12 space-y-6",
+        SectionH2("Keyboard Interactions"),
+        Div(:class => "overflow-x-auto",
+            Main.Table(
+                Main.TableHeader(Main.TableRow(
+                    Main.TableHead("Key"),
+                    Main.TableHead("Action"),
+                )),
+                Main.TableBody(rows...)
+            )
+        )
+    )
+end
+
+"""
+Render a keyboard shortcut row with Kbd component.
+"""
+function KeyRow(key, action)
+    Main.TableRow(
+        Main.TableCell(Main.Kbd(key)),
+        Main.TableCell(action),
     )
 end
 
@@ -41,14 +77,8 @@ Render a code usage example block.
 """
 function UsageBlock(code::String)
     Div(:class => "mt-12 space-y-6",
-        H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-            "Usage"
-        ),
-        Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
-            Pre(:class => "text-sm text-warm-50",
-                Code(:class => "language-julia", code)
-            )
-        )
+        SectionH2("Usage"),
+        Main.CodeBlock(code, language="julia"),
     )
 end
 
@@ -60,4 +90,18 @@ function PageHeader(title::String, description::String)
         H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3", title),
         P(:class => "text-lg text-warm-600 dark:text-warm-300", description)
     )
+end
+
+"""
+Render a section H2 heading (shared styling for all docs pages).
+"""
+function SectionH2(text::String)
+    H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", text)
+end
+
+"""
+Render a section H3 heading (shared styling for all docs pages).
+"""
+function SectionH3(text::String)
+    H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3", text)
 end

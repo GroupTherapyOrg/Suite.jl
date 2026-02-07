@@ -16,9 +16,7 @@ function GettingStartedIndex()
 
         # What is Suite.jl?
         Div(:class => "prose max-w-none",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "What is Suite.jl?"
-            ),
+            SectionH2("What is Suite.jl?"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl is a collection of 50+ UI components built on ",
                 A(:href => "https://github.com/GroupTherapyOrg/Therapy.jl", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Therapy.jl"),
@@ -31,14 +29,10 @@ function GettingStartedIndex()
             ),
 
             # Key concepts
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Key Concepts"
-            ),
+            SectionH2("Key Concepts"),
 
             # Extraction model
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
-                "Own the code"
-            ),
+            SectionH3("Own the code"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl works in two modes. You can use it as a package dependency, or you can extract components into your own project and customize them freely:"
             ),
@@ -53,9 +47,7 @@ Suite.extract(:Button, "src/components/")
             ),
 
             # Three tiers
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
-                "Three implementation tiers"
-            ),
+            SectionH3("Three implementation tiers"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Components are implemented in three tiers based on their interactivity needs:"
             ),
@@ -87,9 +79,7 @@ Suite.extract(:Button, "src/components/")
             ),
 
             # Themes
-            H3(:class => "text-xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-8 mb-3",
-                "Built-in themes"
-            ),
+            SectionH3("Built-in themes"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl ships with 4 pre-built themes. Apply a theme with a single keyword argument, or extract components with a theme baked in:"
             ),
@@ -102,9 +92,7 @@ Suite.extract(:Button, "components/", theme=:nature)""")
             ),
 
             # Quick start
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Quick Start"
-            ),
+            SectionH2("Quick Start"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Add Suite.jl to your Therapy.jl project:"
             ),

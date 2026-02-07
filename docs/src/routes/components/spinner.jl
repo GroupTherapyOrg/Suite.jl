@@ -36,7 +36,7 @@ function SpinnerPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", "Usage"),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 Spinner()
@@ -47,16 +47,16 @@ Spinner(class="text-red-500")""")
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4", "API Reference"),
+            SectionH2("API Reference"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
+                        Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                     )),
-                    Tbody(
+                    Main.TableBody(
                         ApiRow("size", "String", "\"default\"", "Spinner size: \"sm\", \"default\", or \"lg\""),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                         ApiRow("theme", "Symbol", ":default", "Theme preset"),
@@ -67,13 +67,5 @@ Spinner(class="text-red-500")""")
     )
 end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
 SpinnerPage

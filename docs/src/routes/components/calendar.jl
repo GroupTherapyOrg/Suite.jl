@@ -7,14 +7,7 @@
 function CalendarPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Calendar"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A date calendar grid with selection, navigation, and keyboard interaction."
-            )
-        ),
+        PageHeader("Calendar", "A date calendar grid with selection, navigation, and keyboard interaction."),
 
         # Basic Preview
         ComponentPreview(title="Single Date", description="Click a date to select it. Click again to deselect.",
@@ -46,9 +39,7 @@ function CalendarPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 # Single date selection (default)
@@ -75,9 +66,7 @@ Calendar(fixed_weeks=true)""")
 
         # Keyboard Interactions
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Keyboard Interactions"
-            ),
+            SectionH2("Keyboard Interactions"),
             Div(:class => "overflow-x-auto",
                 Main.Table(
                     Main.TableHeader(
@@ -138,9 +127,7 @@ Calendar(fixed_weeks=true)""")
 
         # API Reference
         Div(:class => "mt-12 space-y-8",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
+            SectionH2("API Reference"),
 
             # Calendar
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300", "Calendar"),
@@ -172,13 +159,5 @@ Calendar(fixed_weeks=true)""")
     )
 end
 
-function ApiRow(prop, type, default, description)
-    Main.TableRow(
-        Main.TableCell(Code(:class => "text-sm text-accent-600 dark:text-accent-400", prop)),
-        Main.TableCell(Code(:class => "text-sm", type)),
-        Main.TableCell(Code(:class => "text-sm", default)),
-        Main.TableCell(description),
-    )
-end
 
 CalendarPage

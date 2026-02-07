@@ -6,14 +6,7 @@
 function TablePage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Table"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A responsive table component."
-            )
-        ),
+        PageHeader("Table", "A responsive table component."),
 
         # Default Preview
         ComponentPreview(title="Default", description="A table with header, body, footer, and caption.",
@@ -64,12 +57,10 @@ function TablePage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
-Table(
+Main.Table(
     TableHeader(
         TableRow(
             TableHead("Name"),
@@ -87,84 +78,82 @@ Table(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
+            SectionH2("API Reference"),
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Components"),
             P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-4",
                 "All table sub-components (",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableHeader"),
+                Main.InlineCode("TableHeader"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableBody"),
+                Main.InlineCode("TableBody"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableFooter"),
+                Main.InlineCode("TableFooter"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableRow"),
+                Main.InlineCode("TableRow"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableHead"),
+                Main.InlineCode("TableHead"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableCell"),
+                Main.InlineCode("TableCell"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableCaption"),
+                Main.InlineCode("TableCaption"),
                 ") accept ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "class"),
+                Main.InlineCode("class"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "children..."),
+                Main.InlineCode("children..."),
                 ", and ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "kwargs..."),
+                Main.InlineCode("kwargs..."),
                 "."
             ),
 
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Component"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "HTML Element"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Component"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "HTML Element"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                         )
                     ),
-                    Tbody(
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Table"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "div > table"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Scrollable table container")
+                    Main.TableBody(
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Table"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "div > table"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Scrollable table container")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableHeader"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "thead"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table header section")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableHeader"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "thead"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table header section")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableBody"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "tbody"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table body section")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableBody"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "tbody"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table body section")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableFooter"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "tfoot"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table footer section")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableFooter"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "tfoot"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table footer section")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableRow"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "tr"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table row with hover state")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableRow"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "tr"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table row with hover state")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableHead"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "th"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Header cell")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableHead"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "th"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Header cell")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableCell"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "td"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Data cell")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableCell"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "td"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Data cell")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableCaption"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "caption"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table caption text")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableCaption"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "caption"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table caption text")
                         )
                     )
                 )

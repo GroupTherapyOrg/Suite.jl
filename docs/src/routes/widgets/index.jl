@@ -18,24 +18,22 @@ function WidgetsIndex()
         Div(:class => "prose max-w-none",
 
             # The idea
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "The Big Idea"
-            ),
+            SectionH2("The Big Idea"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Every Suite.jl interactive component serves double duty:"
             ),
             Div(:class => "grid md:grid-cols-2 gap-4 mb-6",
                 Div(:class => "border border-warm-200 dark:border-warm-700 rounded-lg p-5 bg-warm-50/50 dark:bg-warm-900/50",
-                    H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "UI Component"),
+                    SectionH3("UI Component"),
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-3",
                         "In a Therapy.jl app, call the component as a function. It returns a VNode that renders styled HTML."
                     ),
                     Main.CodeBlock(language="julia", "Switch(checked=true)\nInput(type=\"email\", placeholder=\"you@example.com\")")
                 ),
                 Div(:class => "border border-warm-200 dark:border-warm-700 rounded-lg p-5 bg-warm-50/50 dark:bg-warm-900/50",
-                    H3(:class => "text-lg font-serif font-semibold text-warm-800 dark:text-warm-300 mb-2", "Data Widget"),
+                    SectionH3("Data Widget"),
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-3",
-                        "In a Pluto notebook, pass a positional argument to get a bindable struct. Use with ", Code(:class => "text-xs bg-warm-200 dark:bg-warm-800 px-1 py-0.5 rounded", "@bind"), "."
+                        "In a Pluto notebook, pass a positional argument to get a bindable struct. Use with ", Main.InlineCode("@bind"), "."
                     ),
                     Main.CodeBlock(language="julia", "@bind value SuiteSlider(1:100)\n@bind lang SuiteSelect([\"julia\" => \"Julia\"])")
                 )
@@ -47,9 +45,7 @@ function WidgetsIndex()
             ),
 
             # How disambiguation works
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Positional vs Keyword"
-            ),
+            SectionH2("Positional vs Keyword"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "The calling convention determines which mode you get:"
             ),
@@ -80,9 +76,7 @@ function WidgetsIndex()
             ),
 
             # Widget mapping table
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Widget Mapping"
-            ),
+            SectionH2("Widget Mapping"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl provides styled replacements for every PlutoUI widget:"
             ),
@@ -148,9 +142,7 @@ function WidgetsIndex()
             ),
 
             # Three tiers in widget context
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Three Tiers, Two Modes"
-            ),
+            SectionH2("Three Tiers, Two Modes"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl's three implementation tiers interact with the dual-mode widget system:"
             ),
@@ -182,9 +174,7 @@ function WidgetsIndex()
             ),
 
             # Package extension
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Zero-Cost Dependency"
-            ),
+            SectionH2("Zero-Cost Dependency"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "The Pluto integration uses Julia's package extension system. If you only use Therapy.jl, AbstractPlutoDingetjes is never loaded:"
             ),
@@ -211,9 +201,7 @@ end""")
             ),
 
             # Next steps
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Next Steps"
-            ),
+            SectionH2("Next Steps"),
             Ul(:class => "list-disc list-inside space-y-2 text-warm-600 dark:text-warm-400 mb-6",
                 Li(
                     A(:href => "./widgets/bind/", :class => "text-accent-600 dark:text-accent-400 hover:underline", "The @bind Pattern"),

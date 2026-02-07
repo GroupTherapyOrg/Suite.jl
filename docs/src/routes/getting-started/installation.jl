@@ -18,9 +18,7 @@ function InstallationPage()
         Div(:class => "prose max-w-none",
 
             # Prerequisites
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Prerequisites"
-            ),
+            SectionH2("Prerequisites"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl requires:"
             ),
@@ -34,9 +32,7 @@ function InstallationPage()
             ),
 
             # Installation
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Add Suite.jl"
-            ),
+            SectionH2("Add Suite.jl"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Add Suite.jl as a dependency to your project:"
             ),
@@ -61,9 +57,7 @@ Therapy.run(app)""")
             ),
 
             # Tailwind CSS setup
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Tailwind CSS Setup"
-            ),
+            SectionH2("Tailwind CSS Setup"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl components use Tailwind CSS classes. Your app's ", Code(:class => "text-sm bg-warm-200 dark:bg-warm-800 px-1.5 py-0.5 rounded", "input.css"),
                 " needs to include Suite.jl's source directories for Tailwind to scan:"
@@ -84,9 +78,7 @@ Therapy.run(app)""")
             ),
 
             # Using components
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Using Components"
-            ),
+            SectionH2("Using Components"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Once installed, use any Suite.jl component in your routes:"
             ),
@@ -114,9 +106,7 @@ HomePage""")
             ),
 
             # Extraction
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Extracting Components"
-            ),
+            SectionH2("Extracting Components"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "The extraction model is Suite.jl's core feature — just like shadcn/ui, you can copy any component into your project and customize it freely:"
             ),
@@ -145,9 +135,7 @@ Suite.info(:Dialog)""")
             ),
 
             # JS Runtime
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "JS Runtime"
-            ),
+            SectionH2("JS Runtime"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Interactive components (Dialog, Menu, Tooltip, etc.) require the Suite.jl JavaScript runtime. Add it to your layout:"
             ),
@@ -169,9 +157,7 @@ end""")
             ),
 
             # Next steps
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mt-10 mb-4",
-                "Next Steps"
-            ),
+            SectionH2("Next Steps"),
             Ul(:class => "list-disc list-inside space-y-2 text-warm-600 dark:text-warm-400 mb-6",
                 Li(
                     A(:href => "./getting-started/theming/", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Theming"),

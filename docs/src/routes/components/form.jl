@@ -4,25 +4,18 @@
 
 
 function FormApiRow(name, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", name),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
+    Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+        Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", name),
+        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
+        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
+        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
     )
 end
 
 function FormPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Form"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A form component with per-field validation, error messages, and ARIA accessibility."
-            )
-        ),
+        PageHeader("Form", "A form component with per-field validation, error messages, and ARIA accessibility."),
 
         # Basic Form
         ComponentPreview(title="Basic Form", description="A simple contact form with required fields.",
@@ -123,9 +116,7 @@ function FormPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 Form(action="/api/submit",
@@ -148,9 +139,7 @@ Form(action="/api/submit",
 
         # Component Structure
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Component Structure"
-            ),
+            SectionH2("Component Structure"),
             P(:class => "text-warm-600 dark:text-warm-400 mb-4",
                 "Form fields follow a consistent nesting pattern for accessibility and validation:"
             ),
@@ -169,29 +158,27 @@ Form(action="/api/submit",
 
         # Validation Modes
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Validation Modes"
-            ),
+            SectionH2("Validation Modes"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Mode"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Mode"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                         )
                     ),
-                    Tbody(
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "\"submit\""),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Validate all fields on form submit (default)")
+                    Main.TableBody(
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "\"submit\""),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Validate all fields on form submit (default)")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "\"change\""),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Validate each field as the user types")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "\"change\""),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Validate each field as the user types")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "\"blur\""),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Validate each field when it loses focus")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "\"blur\""),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Validate each field when it loses focus")
                         ),
                     )
                 )
@@ -200,22 +187,20 @@ Form(action="/api/submit",
 
         # API Reference — Form
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
+            SectionH2("API Reference"),
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Form"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                         )
                     ),
-                    Tbody(
+                    Main.TableBody(
                         FormApiRow("action", "String", "\"\"", "Form action URL"),
                         FormApiRow("method", "String", "\"post\"", "Form method"),
                         FormApiRow("validate_on", "String", "\"submit\"", "Validation mode: submit, change, or blur"),
@@ -227,16 +212,16 @@ Form(action="/api/submit",
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "FormField"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                         )
                     ),
-                    Tbody(
+                    Main.TableBody(
                         FormApiRow("name", "String", "required", "Field name"),
                         FormApiRow("required", "Bool", "false", "Whether the field is required"),
                         FormApiRow("required_message", "String", "\"This field is required\"", "Custom required error message"),

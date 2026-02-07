@@ -7,14 +7,7 @@
 function DropdownMenuPage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Dropdown Menu"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "Displays a menu of actions or options triggered by a button, supporting items, checkboxes, radio groups, and submenus."
-            )
-        ),
+        PageHeader("Dropdown Menu", "Displays a menu of actions or options triggered by a button, supporting items, checkboxes, radio groups, and submenus."),
 
         # Basic dropdown preview
         ComponentPreview(title="Basic", description="A simple \"My Account\" dropdown with items and keyboard shortcuts.",
@@ -88,9 +81,7 @@ function DropdownMenuPage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 DropdownMenu(
@@ -112,18 +103,16 @@ DropdownMenu(
 
         # Keyboard shortcuts
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Keyboard Interactions"
-            ),
+            SectionH2("Keyboard Interactions"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Key"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Action")
                         )
                     ),
-                    Tbody(
+                    Main.TableBody(
                         KeyRow("Arrow Down", "Move focus to the next menu item"),
                         KeyRow("Arrow Up", "Move focus to the previous menu item"),
                         KeyRow("Enter / Space", "Activate the focused menu item"),
@@ -140,14 +129,12 @@ DropdownMenu(
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenu"),
+            SectionH2("API Reference"),
+            SectionH3("DropdownMenu"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("open", "Bool", "false", "Controlled open state"),
                         ApiRow("default_open", "Bool", "false", "Initial open state (uncontrolled)"),
                         ApiRow("on_open_change", "Function", "nothing", "Callback when open state changes"),
@@ -155,22 +142,22 @@ DropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuTrigger"),
+            SectionH3("DropdownMenuTrigger"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Trigger content (usually a button)"),
                         ApiRow("as_child", "Bool", "false", "Merge props into child element"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuContent"),
+            SectionH3("DropdownMenuContent"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("side", "String", "\"bottom\"", "Preferred side: \"top\", \"right\", \"bottom\", \"left\""),
                         ApiRow("align", "String", "\"start\"", "Alignment: \"start\", \"center\", \"end\""),
                         ApiRow("side_offset", "Number", "4", "Offset from the trigger (px)"),
@@ -178,32 +165,32 @@ DropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuGroup"),
+            SectionH3("DropdownMenuGroup"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Grouped menu items"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuLabel"),
+            SectionH3("DropdownMenuLabel"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Label text"),
                         ApiRow("inset", "Bool", "false", "Add left padding to align with items"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuItem"),
+            SectionH3("DropdownMenuItem"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Item content"),
                         ApiRow("disabled", "Bool", "false", "Disable interaction"),
                         ApiRow("inset", "Bool", "false", "Add left padding to align with labeled groups"),
@@ -212,11 +199,11 @@ DropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuCheckboxItem"),
+            SectionH3("DropdownMenuCheckboxItem"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("checked", "Bool", "false", "Whether the checkbox is checked"),
                         ApiRow("on_checked_change", "Function", "nothing", "Callback when checked state changes"),
                         ApiRow("disabled", "Bool", "false", "Disable interaction"),
@@ -225,11 +212,11 @@ DropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuRadioGroup"),
+            SectionH3("DropdownMenuRadioGroup"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("value", "String", "\"\"", "Currently selected radio value"),
                         ApiRow("on_value_change", "Function", "nothing", "Callback when selection changes"),
                         ApiRow("children...", "Any", "-", "Radio items"),
@@ -237,11 +224,11 @@ DropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuRadioItem"),
+            SectionH3("DropdownMenuRadioItem"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("value", "String", "\"\"", "Value for this radio option (required)"),
                         ApiRow("disabled", "Bool", "false", "Disable interaction"),
                         ApiRow("children...", "Any", "-", "Item content"),
@@ -249,40 +236,40 @@ DropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuItemIndicator"),
+            SectionH3("DropdownMenuItemIndicator"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Custom indicator content (default: check icon)"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuSeparator"),
+            SectionH3("DropdownMenuSeparator"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuShortcut"),
+            SectionH3("DropdownMenuShortcut"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Shortcut text (e.g. \"Cmd+K\")"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuSub"),
+            SectionH3("DropdownMenuSub"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("open", "Bool", "false", "Controlled open state of submenu"),
                         ApiRow("default_open", "Bool", "false", "Initial open state (uncontrolled)"),
                         ApiRow("on_open_change", "Function", "nothing", "Callback when submenu open state changes"),
@@ -290,11 +277,11 @@ DropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuSubTrigger"),
+            SectionH3("DropdownMenuSubTrigger"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("children...", "Any", "-", "Trigger content for the submenu"),
                         ApiRow("disabled", "Bool", "false", "Disable interaction"),
                         ApiRow("inset", "Bool", "false", "Add left padding to align with labeled groups"),
@@ -302,11 +289,11 @@ DropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuSubContent"),
+            SectionH3("DropdownMenuSubContent"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(ApiHead()),
-                    Tbody(
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(ApiHead()),
+                    Main.TableBody(
                         ApiRow("side_offset", "Number", "2", "Offset from the sub-trigger (px)"),
                         ApiRow("align_offset", "Number", "-5", "Vertical alignment offset (px)"),
                         ApiRow("children...", "Any", "-", "Submenu content"),
@@ -318,29 +305,7 @@ DropdownMenu(
     )
 end
 
-function ApiHead()
-    Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-        Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
-    )
-end
 
-function ApiRow(prop, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", prop),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
-    )
-end
 
-function KeyRow(key, action)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", key),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", action)
-    )
-end
 
 DropdownMenuPage

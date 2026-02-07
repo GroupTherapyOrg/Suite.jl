@@ -27,25 +27,18 @@ const _DT_DEMO_COLUMNS = [
 ]
 
 function ApiRow(name, type, default, description)
-    Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-        Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", name),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
-        Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
+    Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+        Main.TableCell(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", name),
+        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", type),
+        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", default),
+        Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", description)
     )
 end
 
 function DataTablePage()
     ComponentsLayout(
         # Header
-        Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
-            H1(:class => "text-4xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-3",
-                "Data Table"
-            ),
-            P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A full-featured data table with sorting, filtering, pagination, and row selection."
-            )
-        ),
+        PageHeader("Data Table", "A full-featured data table with sorting, filtering, pagination, and row selection."),
 
         # Default Preview
         ComponentPreview(title="Default", description="A data table with sortable columns, filtering, and pagination.",
@@ -73,9 +66,7 @@ function DataTablePage()
 
         # Usage
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Usage"
-            ),
+            SectionH2("Usage"),
             Main.CodeBlock(language="julia", """using Suite
 
 # Define your data
@@ -104,12 +95,10 @@ DataTable(data, columns,
 
         # Column Definition
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Column Definition"
-            ),
+            SectionH2("Column Definition"),
             P(:class => "text-warm-600 dark:text-warm-400 mb-4",
                 "Columns are defined using ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "DataTableColumn"),
+                Main.InlineCode("DataTableColumn"),
                 ". Each column specifies a data key, header text, and optional configuration."
             ),
             Main.CodeBlock(language="julia", """# Basic column
@@ -128,37 +117,35 @@ DataTableColumn("status", "Status",
 
         # Keyboard Interactions
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "Features"
-            ),
+            SectionH2("Features"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Feature"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Feature"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                         )
                     ),
-                    Tbody(
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Sorting"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Click column headers to sort ascending/descending/none")
+                    Main.TableBody(
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Sorting"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Click column headers to sort ascending/descending/none")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Filtering"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Type in the filter input to search across all columns")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Filtering"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Type in the filter input to search across all columns")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Pagination"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Navigate pages with Previous/Next buttons")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Pagination"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Navigate pages with Previous/Next buttons")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Row Selection"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Select individual rows or all rows on current page")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Row Selection"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Select individual rows or all rows on current page")
                         ),
-                        Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Column Visibility"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Toggle column display via the Columns dropdown")
+                        Main.TableRow(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
+                            Main.TableCell(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-300", "Column Visibility"),
+                            Main.TableCell(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Toggle column display via the Columns dropdown")
                         ),
                     )
                 )
@@ -167,22 +154,20 @@ DataTableColumn("status", "Status",
 
         # API Reference
         Div(:class => "mt-12 space-y-6",
-            H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-300 mb-4",
-                "API Reference"
-            ),
+            SectionH2("API Reference"),
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "DataTable"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                         )
                     ),
-                    Tbody(
+                    Main.TableBody(
                         ApiRow("data", "Vector", "required", "Data rows (Vector of NamedTuples or Dicts)"),
                         ApiRow("columns", "Vector{DataTableColumn}", "required", "Column definitions"),
                         ApiRow("filterable", "Bool", "true", "Show filter input"),
@@ -202,16 +187,16 @@ DataTableColumn("status", "Status",
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "DataTableColumn"),
             Div(:class => "overflow-x-auto",
-                Table(:class => "w-full text-sm",
-                    Thead(
-                        Tr(:class => "border-b border-warm-200 dark:border-warm-700",
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
-                            Th(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
+                Main.Table(:class => "w-full text-sm",
+                    Main.TableHeader(
+                        Main.TableRow(:class => "border-b border-warm-200 dark:border-warm-700",
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Prop"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Type"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Default"),
+                            Main.TableHead(:class => "py-3 px-4 text-left text-warm-800 dark:text-warm-300 font-semibold", "Description")
                         )
                     ),
-                    Tbody(
+                    Main.TableBody(
                         ApiRow("key", "String", "required", "Data field key (accessor)"),
                         ApiRow("header", "String", "required", "Display header text"),
                         ApiRow("sortable", "Bool", "true", "Whether this column is sortable"),
