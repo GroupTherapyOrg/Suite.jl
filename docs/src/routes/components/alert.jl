@@ -1,10 +1,10 @@
 # Alert — Suite.jl component docs page
 #
-# Showcases SuiteAlert with all variants and sub-components.
+# Showcases Alert with all variants and sub-components.
 
-const SuiteAlert = Main.SuiteAlert
-const SuiteAlertTitle = Main.SuiteAlertTitle
-const SuiteAlertDescription = Main.SuiteAlertDescription
+const Alert = Main.Alert
+const AlertTitle = Main.AlertTitle
+const AlertDescription = Main.AlertDescription
 
 function AlertPage()
     ComponentsLayout(
@@ -20,17 +20,17 @@ function AlertPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="The default alert with neutral styling.",
-            SuiteAlert(
-                SuiteAlertTitle("Heads up!"),
-                SuiteAlertDescription("You can add components to your app using the CLI.")
+            Alert(
+                AlertTitle("Heads up!"),
+                AlertDescription("You can add components to your app using the CLI.")
             )
         ),
 
         # Destructive
         ComponentPreview(title="Destructive", description="Alert with destructive/error styling.",
-            SuiteAlert(variant="destructive",
-                SuiteAlertTitle("Error"),
-                SuiteAlertDescription("Your session has expired. Please log in again.")
+            Alert(variant="destructive",
+                AlertTitle("Error"),
+                AlertDescription("Your session has expired. Please log in again.")
             )
         ),
 
@@ -43,14 +43,14 @@ function AlertPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteAlert(
-    SuiteAlertTitle("Heads up!"),
-    SuiteAlertDescription("You can add components using the CLI."),
+Alert(
+    AlertTitle("Heads up!"),
+    AlertDescription("You can add components using the CLI."),
 )
 
-SuiteAlert(variant="destructive",
-    SuiteAlertTitle("Error"),
-    SuiteAlertDescription("Something went wrong."),
+Alert(variant="destructive",
+    AlertTitle("Error"),
+    AlertDescription("Something went wrong."),
 )""")
                 )
             )
@@ -62,8 +62,8 @@ SuiteAlert(variant="destructive",
                 "API Reference"
             ),
 
-            # SuiteAlert
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteAlert"),
+            # Alert
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Alert"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(
@@ -83,8 +83,8 @@ SuiteAlert(variant="destructive",
                 )
             ),
 
-            # SuiteAlertTitle
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteAlertTitle"),
+            # AlertTitle
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "AlertTitle"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(
@@ -103,8 +103,8 @@ SuiteAlert(variant="destructive",
                 )
             ),
 
-            # SuiteAlertDescription
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteAlertDescription"),
+            # AlertDescription
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "AlertDescription"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(

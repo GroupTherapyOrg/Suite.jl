@@ -1,11 +1,11 @@
-# SuiteHoverCard.jl — Suite.jl HoverCard Component
+# HoverCard.jl — Suite.jl HoverCard Component
 #
 # Tier: js_runtime (requires suite.js)
 # Suite Dependencies: none (leaf component)
 # JS Modules: Floating, DismissLayer, HoverCard
 #
-# Usage via package: using Suite; SuiteHoverCard(...)
-# Usage via extract: include("components/HoverCard.jl"); SuiteHoverCard(...)
+# Usage via package: using Suite; HoverCard(...)
+# Usage via extract: include("components/HoverCard.jl"); HoverCard(...)
 #
 # Behavior (matches Radix HoverCard):
 #   - Hover-triggered preview card for links/anchors
@@ -22,10 +22,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteHoverCard, SuiteHoverCardTrigger, SuiteHoverCardContent
+export HoverCard, HoverCardTrigger, HoverCardContent
 
 """
-    SuiteHoverCard(children...; open_delay, close_delay, class, kwargs...) -> VNode
+    HoverCard(children...; open_delay, close_delay, class, kwargs...) -> VNode
 
 A hover-triggered preview card. Shows rich content when hovering a trigger.
 
@@ -35,13 +35,13 @@ A hover-triggered preview card. Shows rich content when hovering a trigger.
 
 # Examples
 ```julia
-SuiteHoverCard(
-    SuiteHoverCardTrigger(
+HoverCard(
+    HoverCardTrigger(
         A(:href => "#", :class => "underline", "@juliahub")
     ),
-    SuiteHoverCardContent(
+    HoverCardContent(
         Div(:class => "flex gap-4",
-            SuiteAvatar(src="/avatar.png", fallback="JH"),
+            Avatar(src="/avatar.png", fallback="JH"),
             Div(
                 H4(:class => "text-sm font-semibold", "@juliahub"),
                 P(:class => "text-sm", "The Julia Computing platform.")
@@ -51,7 +51,7 @@ SuiteHoverCard(
 )
 ```
 """
-function SuiteHoverCard(children...; open_delay::Int=700, close_delay::Int=300, class::String="", kwargs...)
+function HoverCard(children...; open_delay::Int=700, close_delay::Int=300, class::String="", kwargs...)
     id = "suite-hover-card-" * string(rand(UInt32), base=16)
 
     trigger_nodes = []
@@ -86,12 +86,12 @@ function _hover_card_set_trigger_id(node, id)
 end
 
 """
-    SuiteHoverCardTrigger(children...; class, kwargs...) -> VNode
+    HoverCardTrigger(children...; class, kwargs...) -> VNode
 
 The element that triggers the hover card on hover.
 Typically wraps a link or anchor element.
 """
-function SuiteHoverCardTrigger(children...; class::String="", kwargs...)
+function HoverCardTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-hover-card-trigger-wrapper") => "",
         :style => "display:contents",
         Span(:class => cn("cursor-pointer", class),
@@ -100,7 +100,7 @@ function SuiteHoverCardTrigger(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteHoverCardContent(children...; side, side_offset, align, class, kwargs...) -> VNode
+    HoverCardContent(children...; side, side_offset, align, class, kwargs...) -> VNode
 
 The floating hover card content. Positioned relative to the trigger.
 
@@ -109,7 +109,7 @@ The floating hover card content. Positioned relative to the trigger.
 - `side_offset::Int=4`: Distance from anchor in pixels
 - `align::String="center"`: Alignment along side ("start", "center", "end")
 """
-function SuiteHoverCardContent(children...; side::String="bottom", side_offset::Int=4, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
+function HoverCardContent(children...; side::String="bottom", side_offset::Int=4, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -147,6 +147,6 @@ if @isdefined(register_component!)
         "Hover-triggered preview card with open/close delay",
         Symbol[],
         [:Floating, :DismissLayer, :HoverCard],
-        [:SuiteHoverCard, :SuiteHoverCardTrigger, :SuiteHoverCardContent],
+        [:HoverCard, :HoverCardTrigger, :HoverCardContent],
     ))
 end

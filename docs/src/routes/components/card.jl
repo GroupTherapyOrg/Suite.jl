@@ -1,13 +1,13 @@
 # Card — Suite.jl component docs page
 #
-# Showcases SuiteCard with all sub-components and composition patterns.
+# Showcases Card with all sub-components and composition patterns.
 
-const SuiteCard = Main.SuiteCard
-const SuiteCardHeader = Main.SuiteCardHeader
-const SuiteCardTitle = Main.SuiteCardTitle
-const SuiteCardDescription = Main.SuiteCardDescription
-const SuiteCardContent = Main.SuiteCardContent
-const SuiteCardFooter = Main.SuiteCardFooter
+const Card = Main.Card
+const CardHeader = Main.CardHeader
+const CardTitle = Main.CardTitle
+const CardDescription = Main.CardDescription
+const CardContent = Main.CardContent
+const CardFooter = Main.CardFooter
 
 function CardPage()
     ComponentsLayout(
@@ -23,12 +23,12 @@ function CardPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A simple card with header and content.",
-            SuiteCard(class="w-[350px]",
-                SuiteCardHeader(
-                    SuiteCardTitle("Card Title"),
-                    SuiteCardDescription("Card description text goes here.")
+            Card(class="w-[350px]",
+                CardHeader(
+                    CardTitle("Card Title"),
+                    CardDescription("Card description text goes here.")
                 ),
-                SuiteCardContent(
+                CardContent(
                     P(:class => "text-sm text-warm-600 dark:text-warm-400", "Your card content here.")
                 )
             )
@@ -36,26 +36,26 @@ function CardPage()
 
         # With Footer
         ComponentPreview(title="With Footer", description="Card with header, content, and footer actions.",
-            SuiteCard(class="w-[350px]",
-                SuiteCardHeader(
-                    SuiteCardTitle("Create project"),
-                    SuiteCardDescription("Deploy your new project in one-click.")
+            Card(class="w-[350px]",
+                CardHeader(
+                    CardTitle("Create project"),
+                    CardDescription("Deploy your new project in one-click.")
                 ),
-                SuiteCardContent(
+                CardContent(
                     Div(:class => "space-y-4",
                         Div(:class => "space-y-2",
-                            Main.SuiteLabel("Name"),
-                            Main.SuiteInput(placeholder="Name of your project")
+                            Main.Label("Name"),
+                            Main.Input(placeholder="Name of your project")
                         ),
                         Div(:class => "space-y-2",
-                            Main.SuiteLabel("Framework"),
-                            Main.SuiteInput(placeholder="Select a framework")
+                            Main.Label("Framework"),
+                            Main.Input(placeholder="Select a framework")
                         )
                     )
                 ),
-                SuiteCardFooter(class="flex justify-between",
-                    Main.SuiteButton(variant="outline", "Cancel"),
-                    Main.SuiteButton("Deploy")
+                CardFooter(class="flex justify-between",
+                    Main.Button(variant="outline", "Cancel"),
+                    Main.Button("Deploy")
                 )
             )
         ),
@@ -69,16 +69,16 @@ function CardPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteCard(
-    SuiteCardHeader(
-        SuiteCardTitle("Card Title"),
-        SuiteCardDescription("Card description"),
+Card(
+    CardHeader(
+        CardTitle("Card Title"),
+        CardDescription("Card description"),
     ),
-    SuiteCardContent(
+    CardContent(
         P("Content goes here"),
     ),
-    SuiteCardFooter(
-        SuiteButton("Save"),
+    CardFooter(
+        Button("Save"),
     ),
 )""")
                 )
@@ -91,7 +91,7 @@ SuiteCard(
                 "API Reference"
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteCard"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Card"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(
@@ -112,7 +112,7 @@ SuiteCard(
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Sub-components"),
             P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-4",
-                "SuiteCardHeader, SuiteCardTitle, SuiteCardDescription, SuiteCardContent, and SuiteCardFooter all accept ",
+                "CardHeader, CardTitle, CardDescription, CardContent, and CardFooter all accept ",
                 Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "class"),
                 ", ",
                 Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "children..."),

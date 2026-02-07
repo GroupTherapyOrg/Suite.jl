@@ -1,11 +1,11 @@
-# SuiteSwitch.jl — Suite.jl Switch Component
+# Switch.jl — Suite.jl Switch Component
 #
 # Tier: js_runtime (requires suite.js for checked state toggle)
 # Suite Dependencies: none
 # JS Modules: Switch
 #
-# Usage via package: using Suite; SuiteSwitch()
-# Usage via extract: include("components/Switch.jl"); SuiteSwitch()
+# Usage via package: using Suite; Switch()
+# Usage via extract: include("components/Switch.jl"); Switch()
 #
 # Behavior:
 #   - A toggle switch (role=switch) with sliding thumb
@@ -23,10 +23,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteSwitch
+export Switch
 
 """
-    SuiteSwitch(; checked, disabled, size, class, kwargs...) -> VNode
+    Switch(; checked, disabled, size, class, kwargs...) -> VNode
 
 A toggle switch with sliding thumb animation.
 
@@ -39,12 +39,12 @@ Requires `suite_script()` in your layout for JS behavior.
 
 # Examples
 ```julia
-SuiteSwitch()
-SuiteSwitch(checked=true)
-SuiteSwitch(size="sm", disabled=true)
+Switch()
+Switch(checked=true)
+Switch(size="sm", disabled=true)
 ```
 """
-function SuiteSwitch(; checked::Bool=false, disabled::Bool=false,
+function Switch(; checked::Bool=false, disabled::Bool=false,
                      size::String="default", theme::Symbol=:default,
                      class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
@@ -87,7 +87,7 @@ function SuiteSwitch(; checked::Bool=false, disabled::Bool=false,
         push!(attrs, Symbol("data-disabled") => "")
     end
 
-    Button(attrs..., kwargs...,
+    Therapy.Button(attrs..., kwargs...,
         Span(Symbol("data-state") => state, :class => thumb_classes))
 end
 
@@ -100,6 +100,6 @@ if @isdefined(register_component!)
         "Toggle switch with sliding thumb",
         Symbol[],
         [:Switch],
-        [:SuiteSwitch],
+        [:Switch],
     ))
 end

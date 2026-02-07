@@ -1,11 +1,11 @@
 # Tabs — Suite.jl component docs page
 #
-# Showcases SuiteTabs with roving tabindex and activation modes.
+# Showcases Tabs with roving tabindex and activation modes.
 
-const SuiteTabs = Main.SuiteTabs
-const SuiteTabsList = Main.SuiteTabsList
-const SuiteTabsTrigger = Main.SuiteTabsTrigger
-const SuiteTabsContent = Main.SuiteTabsContent
+const Tabs = Main.Tabs
+const TabsList = Main.TabsList
+const TabsTrigger = Main.TabsTrigger
+const TabsContent = Main.TabsContent
 
 function TabsPage()
     ComponentsLayout(
@@ -22,18 +22,18 @@ function TabsPage()
         # Default Preview
         ComponentPreview(title="Default", description="Click tabs to switch between panels.",
             Div(:class => "w-full max-w-md",
-                SuiteTabs(default_value="account",
-                    SuiteTabsList(
-                        SuiteTabsTrigger("Account", value="account"),
-                        SuiteTabsTrigger("Password", value="password"),
+                Tabs(default_value="account",
+                    TabsList(
+                        TabsTrigger("Account", value="account"),
+                        TabsTrigger("Password", value="password"),
                     ),
-                    SuiteTabsContent(value="account",
+                    TabsContent(value="account",
                         Div(:class => "p-4 space-y-2",
                             P(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", "Account settings"),
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Make changes to your account here."),
                         )
                     ),
-                    SuiteTabsContent(value="password",
+                    TabsContent(value="password",
                         Div(:class => "p-4 space-y-2",
                             P(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", "Password settings"),
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Change your password here."),
@@ -46,23 +46,23 @@ function TabsPage()
         # Three tabs
         ComponentPreview(title="Multiple tabs", description="Tabs with three panels.",
             Div(:class => "w-full max-w-lg",
-                SuiteTabs(default_value="overview",
-                    SuiteTabsList(
-                        SuiteTabsTrigger("Overview", value="overview"),
-                        SuiteTabsTrigger("Analytics", value="analytics"),
-                        SuiteTabsTrigger("Reports", value="reports"),
+                Tabs(default_value="overview",
+                    TabsList(
+                        TabsTrigger("Overview", value="overview"),
+                        TabsTrigger("Analytics", value="analytics"),
+                        TabsTrigger("Reports", value="reports"),
                     ),
-                    SuiteTabsContent(value="overview",
+                    TabsContent(value="overview",
                         Div(:class => "p-4",
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Overview of your project metrics and recent activity.")
                         )
                     ),
-                    SuiteTabsContent(value="analytics",
+                    TabsContent(value="analytics",
                         Div(:class => "p-4",
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Detailed analytics and performance data.")
                         )
                     ),
-                    SuiteTabsContent(value="reports",
+                    TabsContent(value="reports",
                         Div(:class => "p-4",
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Generated reports and exportable summaries.")
                         )
@@ -80,15 +80,15 @@ function TabsPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteTabs(default_value="account",
-    SuiteTabsList(
-        SuiteTabsTrigger("Account", value="account"),
-        SuiteTabsTrigger("Password", value="password"),
+Tabs(default_value="account",
+    TabsList(
+        TabsTrigger("Account", value="account"),
+        TabsTrigger("Password", value="password"),
     ),
-    SuiteTabsContent(value="account",
+    TabsContent(value="account",
         P("Account settings content"),
     ),
-    SuiteTabsContent(value="password",
+    TabsContent(value="password",
         P("Password settings content"),
     ),
 )""")
@@ -127,7 +127,7 @@ SuiteTabs(default_value="account",
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteTabs"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Tabs"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -139,7 +139,7 @@ SuiteTabs(default_value="account",
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteTabsList"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "TabsList"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -149,7 +149,7 @@ SuiteTabs(default_value="account",
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteTabsTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "TabsTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -161,7 +161,7 @@ SuiteTabs(default_value="account",
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteTabsContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "TabsContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

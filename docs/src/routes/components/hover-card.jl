@@ -1,11 +1,11 @@
 # HoverCard — Suite.jl component docs page
 #
-# Showcases SuiteHoverCard with hover-triggered content preview.
+# Showcases HoverCard with hover-triggered content preview.
 # 700ms open delay, 300ms close delay. Touch excluded. No focus trap.
 
-const SuiteHoverCard = Main.SuiteHoverCard
-const SuiteHoverCardTrigger = Main.SuiteHoverCardTrigger
-const SuiteHoverCardContent = Main.SuiteHoverCardContent
+const HoverCard = Main.HoverCard
+const HoverCardTrigger = Main.HoverCardTrigger
+const HoverCardContent = Main.HoverCardContent
 
 function HoverCardPage()
     ComponentsLayout(
@@ -22,11 +22,11 @@ function HoverCardPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="Hover over the link to see a user profile card preview.",
             Div(:class => "w-full max-w-md",
-                SuiteHoverCard(
-                    SuiteHoverCardTrigger(
+                HoverCard(
+                    HoverCardTrigger(
                         Span(:class => "text-accent-600 dark:text-accent-400 underline decoration-dotted underline-offset-4 cursor-pointer font-medium", "@julialang")
                     ),
-                    SuiteHoverCardContent(
+                    HoverCardContent(
                         Div(:class => "flex gap-4",
                             Div(:class => "shrink-0",
                                 Img(:src => "https://avatars.githubusercontent.com/u/743164?s=64", :alt => "Julia", :class => "h-12 w-12 rounded-full")
@@ -55,11 +55,11 @@ function HoverCardPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteHoverCard(
-    SuiteHoverCardTrigger(
+HoverCard(
+    HoverCardTrigger(
         Span("@julialang")
     ),
-    SuiteHoverCardContent(
+    HoverCardContent(
         Div(
             H4("@julialang"),
             P("The Julia Programming Language."),
@@ -75,7 +75,7 @@ SuiteHoverCard(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteHoverCard"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "HoverCard"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -84,7 +84,7 @@ SuiteHoverCard(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteHoverCardTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "HoverCardTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -93,7 +93,7 @@ SuiteHoverCard(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteHoverCardContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "HoverCardContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

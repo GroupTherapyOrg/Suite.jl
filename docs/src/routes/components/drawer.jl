@@ -1,16 +1,16 @@
 # Drawer — Suite.jl component docs page
 #
-# Showcases SuiteDrawer with drag-to-dismiss overlay, directional content, and form usage.
+# Showcases Drawer with drag-to-dismiss overlay, directional content, and form usage.
 
-const SuiteDrawer = Main.SuiteDrawer
-const SuiteDrawerTrigger = Main.SuiteDrawerTrigger
-const SuiteDrawerContent = Main.SuiteDrawerContent
-const SuiteDrawerHeader = Main.SuiteDrawerHeader
-const SuiteDrawerFooter = Main.SuiteDrawerFooter
-const SuiteDrawerTitle = Main.SuiteDrawerTitle
-const SuiteDrawerDescription = Main.SuiteDrawerDescription
-const SuiteDrawerClose = Main.SuiteDrawerClose
-const SuiteDrawerHandle = Main.SuiteDrawerHandle
+const Drawer = Main.Drawer
+const DrawerTrigger = Main.DrawerTrigger
+const DrawerContent = Main.DrawerContent
+const DrawerHeader = Main.DrawerHeader
+const DrawerFooter = Main.DrawerFooter
+const DrawerTitle = Main.DrawerTitle
+const DrawerDescription = Main.DrawerDescription
+const DrawerClose = Main.DrawerClose
+const DrawerHandle = Main.DrawerHandle
 
 function DrawerPage()
     ComponentsLayout(
@@ -27,15 +27,15 @@ function DrawerPage()
         # Default bottom drawer with handle
         ComponentPreview(title="Default", description="Bottom drawer with a visible grab handle.",
             Div(:class => "w-full max-w-md",
-                SuiteDrawer(
-                    SuiteDrawerTrigger(
-                        Main.SuiteButton(variant="outline", "Open Drawer")
+                Drawer(
+                    DrawerTrigger(
+                        Main.Button(variant="outline", "Open Drawer")
                     ),
-                    SuiteDrawerContent(
-                        SuiteDrawerHandle(),
-                        SuiteDrawerHeader(
-                            SuiteDrawerTitle("Move Goal"),
-                            SuiteDrawerDescription("Set your daily activity goal."),
+                    DrawerContent(
+                        DrawerHandle(),
+                        DrawerHeader(
+                            DrawerTitle("Move Goal"),
+                            DrawerDescription("Set your daily activity goal."),
                         ),
                         Div(:class => "p-4 pb-0",
                             Div(:class => "flex items-center justify-center space-x-2",
@@ -45,10 +45,10 @@ function DrawerPage()
                                 )
                             )
                         ),
-                        SuiteDrawerFooter(
-                            Main.SuiteButton("Submit"),
-                            SuiteDrawerClose(
-                                Main.SuiteButton(variant="outline", "Cancel")
+                        DrawerFooter(
+                            Main.Button("Submit"),
+                            DrawerClose(
+                                Main.Button(variant="outline", "Cancel")
                             ),
                         ),
                     ),
@@ -59,30 +59,30 @@ function DrawerPage()
         # With form content (login form)
         ComponentPreview(title="With Form", description="Drawer containing a login form.",
             Div(:class => "w-full max-w-md",
-                SuiteDrawer(
-                    SuiteDrawerTrigger(
-                        Main.SuiteButton(variant="outline", "Open Drawer")
+                Drawer(
+                    DrawerTrigger(
+                        Main.Button(variant="outline", "Open Drawer")
                     ),
-                    SuiteDrawerContent(
-                        SuiteDrawerHandle(),
-                        SuiteDrawerHeader(
-                            SuiteDrawerTitle("Login"),
-                            SuiteDrawerDescription("Enter your credentials to continue."),
+                    DrawerContent(
+                        DrawerHandle(),
+                        DrawerHeader(
+                            DrawerTitle("Login"),
+                            DrawerDescription("Enter your credentials to continue."),
                         ),
                         Div(:class => "p-4 space-y-4",
                             Div(:class => "space-y-2",
-                                Main.SuiteLabel("Email"),
-                                Main.SuiteInput(type="email", placeholder="you@example.com"),
+                                Main.Label("Email"),
+                                Main.Input(type="email", placeholder="you@example.com"),
                             ),
                             Div(:class => "space-y-2",
-                                Main.SuiteLabel("Password"),
-                                Main.SuiteInput(type="password", placeholder="Enter your password"),
+                                Main.Label("Password"),
+                                Main.Input(type="password", placeholder="Enter your password"),
                             ),
                         ),
-                        SuiteDrawerFooter(
-                            Main.SuiteButton("Sign In"),
-                            SuiteDrawerClose(
-                                Main.SuiteButton(variant="outline", "Cancel")
+                        DrawerFooter(
+                            Main.Button("Sign In"),
+                            DrawerClose(
+                                Main.Button(variant="outline", "Cancel")
                             ),
                         ),
                     ),
@@ -99,21 +99,21 @@ function DrawerPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteDrawer(
-    SuiteDrawerTrigger(
-        SuiteButton(variant="outline", "Open Drawer")
+Drawer(
+    DrawerTrigger(
+        Button(variant="outline", "Open Drawer")
     ),
-    SuiteDrawerContent(
-        SuiteDrawerHandle(),
-        SuiteDrawerHeader(
-            SuiteDrawerTitle("Title"),
-            SuiteDrawerDescription("Description text."),
+    DrawerContent(
+        DrawerHandle(),
+        DrawerHeader(
+            DrawerTitle("Title"),
+            DrawerDescription("Description text."),
         ),
         Div(:class => "p-4", P("Drawer body content.")),
-        SuiteDrawerFooter(
-            SuiteButton("Confirm"),
-            SuiteDrawerClose(
-                SuiteButton(variant="outline", "Cancel")
+        DrawerFooter(
+            Button("Confirm"),
+            DrawerClose(
+                Button(variant="outline", "Cancel")
             ),
         ),
     ),
@@ -147,7 +147,7 @@ SuiteDrawer(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDrawer"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Drawer"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -157,7 +157,7 @@ SuiteDrawer(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDrawerTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -167,7 +167,7 @@ SuiteDrawer(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDrawerContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -178,7 +178,7 @@ SuiteDrawer(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDrawerHeader"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerHeader"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -188,7 +188,7 @@ SuiteDrawer(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDrawerFooter"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerFooter"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -198,7 +198,7 @@ SuiteDrawer(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDrawerTitle"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerTitle"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -208,7 +208,7 @@ SuiteDrawer(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDrawerDescription"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerDescription"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -218,7 +218,7 @@ SuiteDrawer(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDrawerClose"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerClose"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -228,7 +228,7 @@ SuiteDrawer(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDrawerHandle"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DrawerHandle"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

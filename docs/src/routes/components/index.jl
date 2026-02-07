@@ -13,8 +13,8 @@ function ComponentsIndex()
             )
         else
             Div(:class => "block p-4 rounded-lg border border-warm-200/50 dark:border-warm-700/50 opacity-50",
-                H3(:class => "text-sm font-medium text-warm-500 dark:text-warm-500", item.title),
-                P(:class => "text-xs text-warm-400 dark:text-warm-600 mt-1", "Coming soon")
+                H3(:class => "text-sm font-medium text-warm-600 dark:text-warm-400", item.title),
+                P(:class => "text-xs text-warm-500 dark:text-warm-400 mt-1", "Coming soon")
             )
         end
     end

@@ -1,11 +1,11 @@
-# SuiteCollapsible.jl — Suite.jl Collapsible Component
+# Collapsible.jl — Suite.jl Collapsible Component
 #
 # Tier: js_runtime (requires suite.js for toggle behavior)
 # Suite Dependencies: none
 # JS Modules: Collapsible
 #
-# Usage via package: using Suite; SuiteCollapsible(...)
-# Usage via extract: include("components/Collapsible.jl"); SuiteCollapsible(...)
+# Usage via package: using Suite; Collapsible(...)
+# Usage via extract: include("components/Collapsible.jl"); Collapsible(...)
 #
 # Behavior:
 #   - Renders a container with trigger button and collapsible content
@@ -22,10 +22,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteCollapsible, SuiteCollapsibleTrigger, SuiteCollapsibleContent
+export Collapsible, CollapsibleTrigger, CollapsibleContent
 
 """
-    SuiteCollapsible(children...; open, disabled, class, kwargs...) -> VNode
+    Collapsible(children...; open, disabled, class, kwargs...) -> VNode
 
 A container that can expand/collapse its content.
 
@@ -33,21 +33,21 @@ Requires `suite_script()` in your layout for JS behavior.
 
 # Examples
 ```julia
-SuiteCollapsible(
-    SuiteCollapsibleTrigger("Toggle"),
-    SuiteCollapsibleContent(
+Collapsible(
+    CollapsibleTrigger("Toggle"),
+    CollapsibleContent(
         Div("Hidden content here")
     ),
 )
 
 # Initially open
-SuiteCollapsible(open=true,
-    SuiteCollapsibleTrigger("Close"),
-    SuiteCollapsibleContent(Div("Visible content")),
+Collapsible(open=true,
+    CollapsibleTrigger("Close"),
+    CollapsibleContent(Div("Visible content")),
 )
 ```
 """
-function SuiteCollapsible(children...; open::Bool=false, disabled::Bool=false,
+function Collapsible(children...; open::Bool=false, disabled::Bool=false,
                           class::String="", kwargs...)
     id = "suite-collapsible-" * string(rand(UInt32), base=16)
     state = open ? "open" : "closed"
@@ -65,19 +65,19 @@ function SuiteCollapsible(children...; open::Bool=false, disabled::Bool=false,
 end
 
 """
-    SuiteCollapsibleTrigger(children...; class, kwargs...) -> VNode
+    CollapsibleTrigger(children...; class, kwargs...) -> VNode
 
 The button that toggles the collapsible open/closed state.
 
-Must be a direct child of `SuiteCollapsible`.
+Must be a direct child of `Collapsible`.
 """
-function SuiteCollapsibleTrigger(children...; theme::Symbol=:default,
+function CollapsibleTrigger(children...; theme::Symbol=:default,
                                 class::String="", kwargs...)
     base = "inline-flex items-center justify-center cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
     classes = cn(base, class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Button(:type => "button",
+    Therapy.Button(:type => "button",
            Symbol("data-suite-collapsible-trigger") => "",
            Symbol("data-state") => "closed",
            :aria_expanded => "false",
@@ -87,15 +87,15 @@ function SuiteCollapsibleTrigger(children...; theme::Symbol=:default,
 end
 
 """
-    SuiteCollapsibleContent(children...; class, kwargs...) -> VNode
+    CollapsibleContent(children...; class, kwargs...) -> VNode
 
 The content that is shown/hidden when the collapsible is toggled.
 
-Must be a direct child of `SuiteCollapsible`.
+Must be a direct child of `Collapsible`.
 
 Uses CSS grid-template-rows animation for smooth expand/collapse.
 """
-function SuiteCollapsibleContent(children...; class::String="", force_mount::Bool=false, kwargs...)
+function CollapsibleContent(children...; class::String="", force_mount::Bool=false, kwargs...)
     classes = cn("overflow-hidden", class)
 
     Div(Symbol("data-suite-collapsible-content") => "",
@@ -115,6 +115,6 @@ if @isdefined(register_component!)
         "Expandable/collapsible content container",
         Symbol[],
         [:Collapsible],
-        [:SuiteCollapsible, :SuiteCollapsibleTrigger, :SuiteCollapsibleContent],
+        [:Collapsible, :CollapsibleTrigger, :CollapsibleContent],
     ))
 end

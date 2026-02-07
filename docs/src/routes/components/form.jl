@@ -1,17 +1,17 @@
 # Form — Suite.jl component docs page
 #
-# Showcases SuiteForm with validation, error messages, and accessibility.
+# Showcases Form with validation, error messages, and accessibility.
 
-const FM_SuiteForm = Main.SuiteForm
-const FM_SuiteFormField = Main.SuiteFormField
-const FM_SuiteFormItem = Main.SuiteFormItem
-const FM_SuiteFormLabel = Main.SuiteFormLabel
-const FM_SuiteFormControl = Main.SuiteFormControl
-const FM_SuiteFormDescription = Main.SuiteFormDescription
-const FM_SuiteFormMessage = Main.SuiteFormMessage
-const FM_SuiteInput = Main.SuiteInput
-const FM_SuiteTextarea = Main.SuiteTextarea
-const FM_SuiteButton = Main.SuiteButton
+const FM_Form = Main.Form
+const FM_FormField = Main.FormField
+const FM_FormItem = Main.FormItem
+const FM_FormLabel = Main.FormLabel
+const FM_FormControl = Main.FormControl
+const FM_FormDescription = Main.FormDescription
+const FM_FormMessage = Main.FormMessage
+const FM_Input = Main.Input
+const FM_Textarea = Main.Textarea
+const FM_Button = Main.Button
 
 function FormApiRow(name, type, default, description)
     Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
@@ -36,46 +36,46 @@ function FormPage()
 
         # Basic Form
         ComponentPreview(title="Basic Form", description="A simple contact form with required fields.",
-            FM_SuiteForm(action="/api/contact",
-                FM_SuiteFormField(name="name",
-                    FM_SuiteFormItem(
-                        FM_SuiteFormLabel("Name"),
-                        FM_SuiteFormControl(
-                            FM_SuiteInput(type="text", placeholder="Enter your name"),
+            FM_Form(action="/api/contact",
+                FM_FormField(name="name",
+                    FM_FormItem(
+                        FM_FormLabel("Name"),
+                        FM_FormControl(
+                            FM_Input(type="text", placeholder="Enter your name"),
                         ),
-                        FM_SuiteFormDescription("Your full name."),
-                        FM_SuiteFormMessage(),
+                        FM_FormDescription("Your full name."),
+                        FM_FormMessage(),
                     ),
                     required=true,
                 ),
-                FM_SuiteFormField(name="email",
-                    FM_SuiteFormItem(
-                        FM_SuiteFormLabel("Email"),
-                        FM_SuiteFormControl(
-                            FM_SuiteInput(type="email", placeholder="Enter your email"),
+                FM_FormField(name="email",
+                    FM_FormItem(
+                        FM_FormLabel("Email"),
+                        FM_FormControl(
+                            FM_Input(type="email", placeholder="Enter your email"),
                         ),
-                        FM_SuiteFormDescription("We'll never share your email."),
-                        FM_SuiteFormMessage(),
+                        FM_FormDescription("We'll never share your email."),
+                        FM_FormMessage(),
                     ),
                     required=true,
                     pattern="[^@]+@[^@]+",
                     pattern_message="Please enter a valid email address",
                 ),
-                FM_SuiteButton(type="submit", "Submit"),
+                FM_Button(type="submit", "Submit"),
             )
         ),
 
         # With Validation Rules
         ComponentPreview(title="With Validation Rules", description="Form fields with min/max length and pattern validation.",
-            FM_SuiteForm(action="/api/register",
-                FM_SuiteFormField(name="username",
-                    FM_SuiteFormItem(
-                        FM_SuiteFormLabel("Username"),
-                        FM_SuiteFormControl(
-                            FM_SuiteInput(type="text", placeholder="Choose a username"),
+            FM_Form(action="/api/register",
+                FM_FormField(name="username",
+                    FM_FormItem(
+                        FM_FormLabel("Username"),
+                        FM_FormControl(
+                            FM_Input(type="text", placeholder="Choose a username"),
                         ),
-                        FM_SuiteFormDescription("Must be 3-20 characters, letters and numbers only."),
-                        FM_SuiteFormMessage(),
+                        FM_FormDescription("Must be 3-20 characters, letters and numbers only."),
+                        FM_FormMessage(),
                     ),
                     required=true,
                     min_length=3,
@@ -83,51 +83,51 @@ function FormPage()
                     pattern="^[a-zA-Z0-9]+\$",
                     pattern_message="Only letters and numbers allowed",
                 ),
-                FM_SuiteFormField(name="bio",
-                    FM_SuiteFormItem(
-                        FM_SuiteFormLabel("Bio"),
-                        FM_SuiteFormControl(
-                            FM_SuiteTextarea(placeholder="Tell us about yourself...", rows="4"),
+                FM_FormField(name="bio",
+                    FM_FormItem(
+                        FM_FormLabel("Bio"),
+                        FM_FormControl(
+                            FM_Textarea(placeholder="Tell us about yourself...", rows="4"),
                         ),
-                        FM_SuiteFormDescription("Maximum 500 characters."),
-                        FM_SuiteFormMessage(),
+                        FM_FormDescription("Maximum 500 characters."),
+                        FM_FormMessage(),
                     ),
                     max_length=500,
                 ),
-                FM_SuiteButton(type="submit", "Register"),
+                FM_Button(type="submit", "Register"),
             )
         ),
 
         # Live Validation
         ComponentPreview(title="Live Validation (onChange)", description="Validates fields as you type.",
-            FM_SuiteForm(action="/api/feedback", validate_on="change",
-                FM_SuiteFormField(name="rating",
-                    FM_SuiteFormItem(
-                        FM_SuiteFormLabel("Rating"),
-                        FM_SuiteFormControl(
-                            FM_SuiteInput(type="number", placeholder="1-5"),
+            FM_Form(action="/api/feedback", validate_on="change",
+                FM_FormField(name="rating",
+                    FM_FormItem(
+                        FM_FormLabel("Rating"),
+                        FM_FormControl(
+                            FM_Input(type="number", placeholder="1-5"),
                         ),
-                        FM_SuiteFormDescription("Enter a number between 1 and 5."),
-                        FM_SuiteFormMessage(),
+                        FM_FormDescription("Enter a number between 1 and 5."),
+                        FM_FormMessage(),
                     ),
                     required=true,
                     min="1",
                     max="5",
                     custom_message="Rating must be between 1 and 5",
                 ),
-                FM_SuiteFormField(name="comment",
-                    FM_SuiteFormItem(
-                        FM_SuiteFormLabel("Comment"),
-                        FM_SuiteFormControl(
-                            FM_SuiteTextarea(placeholder="Your feedback...", rows="3"),
+                FM_FormField(name="comment",
+                    FM_FormItem(
+                        FM_FormLabel("Comment"),
+                        FM_FormControl(
+                            FM_Textarea(placeholder="Your feedback...", rows="3"),
                         ),
-                        FM_SuiteFormMessage(),
+                        FM_FormMessage(),
                     ),
                     required=true,
                     min_length=10,
                     min_length_message="Please provide at least 10 characters of feedback",
                 ),
-                FM_SuiteButton(type="submit", "Send Feedback"),
+                FM_Button(type="submit", "Send Feedback"),
             )
         ),
 
@@ -140,21 +140,21 @@ function FormPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteForm(action="/api/submit",
-    SuiteFormField(name="email",
-        SuiteFormItem(
-            SuiteFormLabel("Email"),
-            SuiteFormControl(
-                SuiteInput(type="email", placeholder="Enter your email"),
+Form(action="/api/submit",
+    FormField(name="email",
+        FormItem(
+            FormLabel("Email"),
+            FormControl(
+                Input(type="email", placeholder="Enter your email"),
             ),
-            SuiteFormDescription("We'll never share your email."),
-            SuiteFormMessage(),
+            FormDescription("We'll never share your email."),
+            FormMessage(),
         ),
         required=true,
         pattern="[^@]+@[^@]+",
         pattern_message="Please enter a valid email address",
     ),
-    SuiteButton(type="submit", "Submit"),
+    Button(type="submit", "Submit"),
 )""")
                 )
             )
@@ -170,15 +170,15 @@ SuiteForm(action="/api/submit",
             ),
             Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
                 Pre(:class => "text-sm text-warm-50",
-                    Code(:class => "language-julia", """SuiteForm(...)               # Form container
-    SuiteFormField(name=...,     # Field with validation rules
-        SuiteFormItem(            # Layout wrapper
-            SuiteFormLabel(...),      # Accessible label
-            SuiteFormControl(         # Control wrapper (display:contents)
-                SuiteInput(...),      #   Your actual input/textarea/select
+                    Code(:class => "language-julia", """Form(...)               # Form container
+    FormField(name=...,     # Field with validation rules
+        FormItem(            # Layout wrapper
+            FormLabel(...),      # Accessible label
+            FormControl(         # Control wrapper (display:contents)
+                Input(...),      #   Your actual input/textarea/select
             ),
-            SuiteFormDescription(...), # Helper text
-            SuiteFormMessage(),        # Error message (hidden until invalid)
+            FormDescription(...), # Helper text
+            FormMessage(),        # Error message (hidden until invalid)
         ),
     )""")
                 )
@@ -216,13 +216,13 @@ SuiteForm(action="/api/submit",
             )
         ),
 
-        # API Reference — SuiteForm
+        # API Reference — Form
         Div(:class => "mt-12 space-y-6",
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteForm"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Form"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(
@@ -243,7 +243,7 @@ SuiteForm(action="/api/submit",
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteFormField"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "FormField"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(

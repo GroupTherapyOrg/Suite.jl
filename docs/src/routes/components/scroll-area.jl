@@ -1,8 +1,8 @@
 # Scroll Area — Suite.jl component docs page
 #
-# Showcases SuiteScrollArea for scrollable containers.
+# Showcases ScrollArea for scrollable containers.
 
-const SuiteScrollArea = Main.SuiteScrollArea
+const ScrollArea = Main.ScrollArea
 
 function ScrollAreaPage()
     ComponentsLayout(
@@ -18,12 +18,12 @@ function ScrollAreaPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A scrollable area with a fixed height.",
-            SuiteScrollArea(class="h-[200px] w-[350px] rounded-md border border-warm-200 dark:border-warm-700 p-4",
+            ScrollArea(class="h-[200px] w-[350px] rounded-md border border-warm-200 dark:border-warm-700 p-4",
                 Div(:class => "space-y-4",
                     map(1:20) do i
                         Fragment(
                             Div(:class => "text-sm text-warm-800 dark:text-warm-300", "Item $i"),
-                            if i < 20; Main.SuiteSeparator() else Fragment() end
+                            if i < 20; Main.Separator() else Fragment() end
                         )
                     end...
                 )
@@ -39,7 +39,7 @@ function ScrollAreaPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteScrollArea(
+ScrollArea(
     class="h-[200px] w-[350px] rounded-md border p-4",
     P("Scrollable content here..."),
 )""")

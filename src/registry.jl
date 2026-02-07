@@ -15,7 +15,7 @@ Metadata for a Suite.jl component, used by the extraction system.
 - `description::String`: Brief description for `Suite.list()`
 - `suite_deps::Vector{Symbol}`: Other Suite components this depends on
 - `js_modules::Vector{Symbol}`: JS runtime modules needed (e.g., `[:FocusTrap]`)
-- `exports::Vector{Symbol}`: Exported function names (e.g., `[:SuiteButton]`)
+- `exports::Vector{Symbol}`: Exported function names (e.g., `[:Button]`)
 """
 struct ComponentMeta
     name::Symbol

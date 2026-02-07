@@ -1,15 +1,15 @@
 # Dialog — Suite.jl component docs page
 #
-# Showcases SuiteDialog with basic modal, form dialog, and keyboard interactions.
+# Showcases Dialog with basic modal, form dialog, and keyboard interactions.
 
-const SuiteDialog = Main.SuiteDialog
-const SuiteDialogTrigger = Main.SuiteDialogTrigger
-const SuiteDialogContent = Main.SuiteDialogContent
-const SuiteDialogHeader = Main.SuiteDialogHeader
-const SuiteDialogFooter = Main.SuiteDialogFooter
-const SuiteDialogTitle = Main.SuiteDialogTitle
-const SuiteDialogDescription = Main.SuiteDialogDescription
-const SuiteDialogClose = Main.SuiteDialogClose
+const Dialog = Main.Dialog
+const DialogTrigger = Main.DialogTrigger
+const DialogContent = Main.DialogContent
+const DialogHeader = Main.DialogHeader
+const DialogFooter = Main.DialogFooter
+const DialogTitle = Main.DialogTitle
+const DialogDescription = Main.DialogDescription
+const DialogClose = Main.DialogClose
 
 function DialogPage()
     ComponentsLayout(
@@ -26,20 +26,20 @@ function DialogPage()
         # Basic Dialog Preview
         ComponentPreview(title="Basic", description="A simple dialog with a title, description, and action buttons.",
             Div(:class => "w-full max-w-md",
-                SuiteDialog(
-                    SuiteDialogTrigger(
-                        Main.SuiteButton(variant="outline", "Open Dialog")
+                Dialog(
+                    DialogTrigger(
+                        Main.Button(variant="outline", "Open Dialog")
                     ),
-                    SuiteDialogContent(
-                        SuiteDialogHeader(
-                            SuiteDialogTitle("Are you sure?"),
-                            SuiteDialogDescription("This action cannot be undone. This will permanently delete your account and remove your data from our servers.")
+                    DialogContent(
+                        DialogHeader(
+                            DialogTitle("Are you sure?"),
+                            DialogDescription("This action cannot be undone. This will permanently delete your account and remove your data from our servers.")
                         ),
-                        SuiteDialogFooter(
-                            SuiteDialogClose(
-                                Main.SuiteButton(variant="outline", "Cancel")
+                        DialogFooter(
+                            DialogClose(
+                                Main.Button(variant="outline", "Cancel")
                             ),
-                            Main.SuiteButton("Continue")
+                            Main.Button("Continue")
                         )
                     )
                 )
@@ -49,14 +49,14 @@ function DialogPage()
         # Dialog with Form
         ComponentPreview(title="With Form", description="A dialog containing form inputs for collecting user information.",
             Div(:class => "w-full max-w-md",
-                SuiteDialog(
-                    SuiteDialogTrigger(
-                        Main.SuiteButton(variant="outline", "Edit Profile")
+                Dialog(
+                    DialogTrigger(
+                        Main.Button(variant="outline", "Edit Profile")
                     ),
-                    SuiteDialogContent(
-                        SuiteDialogHeader(
-                            SuiteDialogTitle("Edit Profile"),
-                            SuiteDialogDescription("Make changes to your profile here. Click save when you're done.")
+                    DialogContent(
+                        DialogHeader(
+                            DialogTitle("Edit Profile"),
+                            DialogDescription("Make changes to your profile here. Click save when you're done.")
                         ),
                         Div(:class => "grid gap-4 py-4",
                             Div(:class => "grid grid-cols-4 items-center gap-4",
@@ -68,11 +68,11 @@ function DialogPage()
                                 Input(:id => "username", :type => "text", :value => "@daleblack", :class => "col-span-3 flex h-10 w-full rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900 px-3 py-2 text-sm text-warm-800 dark:text-warm-200 placeholder:text-warm-400 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2")
                             )
                         ),
-                        SuiteDialogFooter(
-                            SuiteDialogClose(
-                                Main.SuiteButton(variant="outline", "Cancel")
+                        DialogFooter(
+                            DialogClose(
+                                Main.Button(variant="outline", "Cancel")
                             ),
-                            Main.SuiteButton("Save changes")
+                            Main.Button("Save changes")
                         )
                     )
                 )
@@ -88,19 +88,19 @@ function DialogPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteDialog(
-    SuiteDialogTrigger(
-        SuiteButton(variant="outline", "Open Dialog")
+Dialog(
+    DialogTrigger(
+        Button(variant="outline", "Open Dialog")
     ),
-    SuiteDialogContent(
-        SuiteDialogHeader(
-            SuiteDialogTitle("Dialog Title"),
-            SuiteDialogDescription("A brief description of the dialog purpose."),
+    DialogContent(
+        DialogHeader(
+            DialogTitle("Dialog Title"),
+            DialogDescription("A brief description of the dialog purpose."),
         ),
         P("Your dialog content goes here."),
-        SuiteDialogFooter(
-            SuiteDialogClose(SuiteButton(variant="outline", "Cancel")),
-            SuiteButton("Confirm"),
+        DialogFooter(
+            DialogClose(Button(variant="outline", "Cancel")),
+            Button("Confirm"),
         ),
     ),
 )""")
@@ -147,18 +147,18 @@ SuiteDialog(
                     Tbody(
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
                             Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-200", "role=\"dialog\""),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "SuiteDialogContent"),
+                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "DialogContent"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Identifies the element as a dialog")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
                             Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-200", "aria-modal=\"true\""),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "SuiteDialogContent"),
+                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "DialogContent"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Indicates that the dialog is modal and blocks interaction with the rest of the page")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
                             Td(:class => "py-3 px-4 font-mono text-xs text-warm-800 dark:text-warm-200", "aria-describedby"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "SuiteDialogContent"),
-                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Points to the SuiteDialogDescription for screen readers")
+                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "DialogContent"),
+                            Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Points to the DialogDescription for screen readers")
                         ),
                     )
                 )
@@ -170,7 +170,7 @@ SuiteDialog(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDialog"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Dialog"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -179,7 +179,7 @@ SuiteDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDialogTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DialogTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -188,7 +188,7 @@ SuiteDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDialogContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DialogContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -198,7 +198,7 @@ SuiteDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDialogHeader"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DialogHeader"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -208,7 +208,7 @@ SuiteDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDialogFooter"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DialogFooter"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -218,7 +218,7 @@ SuiteDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDialogTitle"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DialogTitle"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -228,7 +228,7 @@ SuiteDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDialogDescription"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DialogDescription"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -238,7 +238,7 @@ SuiteDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDialogClose"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DialogClose"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

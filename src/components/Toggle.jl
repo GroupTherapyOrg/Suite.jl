@@ -1,11 +1,11 @@
-# SuiteToggle.jl — Suite.jl Toggle Component
+# Toggle.jl — Suite.jl Toggle Component
 #
 # Tier: js_runtime (requires suite.js for pressed state toggle)
 # Suite Dependencies: none
 # JS Modules: Toggle
 #
-# Usage via package: using Suite; SuiteToggle("B")
-# Usage via extract: include("components/Toggle.jl"); SuiteToggle("B")
+# Usage via package: using Suite; Toggle("B")
+# Usage via extract: include("components/Toggle.jl"); Toggle("B")
 #
 # Behavior:
 #   - A button that toggles between pressed/unpressed states
@@ -21,10 +21,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteToggle
+export Toggle
 
 """
-    SuiteToggle(children...; variant, size, pressed, disabled, class, kwargs...) -> VNode
+    Toggle(children...; variant, size, pressed, disabled, class, kwargs...) -> VNode
 
 A two-state toggle button (pressed/unpressed).
 
@@ -41,12 +41,12 @@ Requires `suite_script()` in your layout for JS behavior.
 
 # Examples
 ```julia
-SuiteToggle("B")
-SuiteToggle(variant="outline", "I")
-SuiteToggle(pressed=true, "Bold")
+Toggle("B")
+Toggle(variant="outline", "I")
+Toggle(pressed=true, "Bold")
 ```
 """
-function SuiteToggle(children...; variant::String="default", size::String="default",
+function Toggle(children...; variant::String="default", size::String="default",
                      pressed::Bool=false, disabled::Bool=false,
                      theme::Symbol=:default, class::String="", kwargs...)
     base = "inline-flex items-center justify-center gap-2 cursor-pointer rounded-md text-sm font-medium transition-colors hover:bg-warm-100 dark:hover:bg-warm-900 hover:text-warm-600 dark:hover:text-warm-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-warm-100 dark:data-[state=on]:bg-warm-900 data-[state=on]:text-warm-800 dark:data-[state=on]:text-warm-300"
@@ -80,7 +80,7 @@ function SuiteToggle(children...; variant::String="default", size::String="defau
         push!(attrs, Symbol("data-disabled") => "")
     end
 
-    Button(attrs..., kwargs..., children...)
+    Therapy.Button(attrs..., kwargs..., children...)
 end
 
 # --- Registry ---
@@ -92,6 +92,6 @@ if @isdefined(register_component!)
         "Two-state toggle button (pressed/unpressed)",
         Symbol[],
         [:Toggle],
-        [:SuiteToggle],
+        [:Toggle],
     ))
 end

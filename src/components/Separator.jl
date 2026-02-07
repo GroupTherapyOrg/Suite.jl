@@ -1,11 +1,11 @@
-# SuiteSeparator.jl — Suite.jl Separator Component
+# Separator.jl — Suite.jl Separator Component
 #
 # Tier: styling (pure HTML + Tailwind classes, no JS/Wasm)
 # Suite Dependencies: none (leaf component)
 # JS Modules: none
 #
-# Usage via package: using Suite; SuiteSeparator()
-# Usage via extract: include("components/Separator.jl"); SuiteSeparator()
+# Usage via package: using Suite; Separator()
+# Usage via extract: include("components/Separator.jl"); Separator()
 #
 # Reference: shadcn/ui Separator — https://ui.shadcn.com/docs/components/separator
 
@@ -15,10 +15,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteSeparator
+export Separator
 
 """
-    SuiteSeparator(; orientation, decorative, class, kwargs...) -> VNode
+    Separator(; orientation, decorative, class, kwargs...) -> VNode
 
 A visual divider between content sections.
 Equivalent to shadcn/ui's Separator component.
@@ -29,12 +29,12 @@ Equivalent to shadcn/ui's Separator component.
 
 # Examples
 ```julia
-SuiteSeparator()
-SuiteSeparator(orientation="vertical")
-SuiteSeparator(decorative=false)
+Separator()
+Separator(orientation="vertical")
+Separator(decorative=false)
 ```
 """
-function SuiteSeparator(; orientation::String="horizontal", decorative::Bool=true,
+function Separator(; orientation::String="horizontal", decorative::Bool=true,
                          class::String="", theme::Symbol=:default, kwargs...)
     orientation_classes = if orientation == "vertical"
         "h-full w-px"
@@ -63,6 +63,6 @@ if @isdefined(register_component!)
         "Visual divider between content sections",
         Symbol[],
         Symbol[],
-        [:SuiteSeparator],
+        [:Separator],
     ))
 end

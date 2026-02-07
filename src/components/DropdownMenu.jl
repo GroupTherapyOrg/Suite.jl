@@ -1,11 +1,11 @@
-# SuiteDropdownMenu.jl — Suite.jl Dropdown Menu Component
+# DropdownMenu.jl — Suite.jl Dropdown Menu Component
 #
 # Tier: js_runtime (requires suite.js for menu behavior, floating, dismiss)
 # Suite Dependencies: none (leaf component)
 # JS Modules: Menu, DropdownMenu, Floating, DismissLayer, ScrollLock, FocusGuards
 #
-# Usage via package: using Suite; SuiteDropdownMenu(SuiteDropdownMenuTrigger(...), SuiteDropdownMenuContent(...))
-# Usage via extract: include("components/DropdownMenu.jl"); SuiteDropdownMenu(...)
+# Usage via package: using Suite; DropdownMenu(DropdownMenuTrigger(...), DropdownMenuContent(...))
+# Usage via extract: include("components/DropdownMenu.jl"); DropdownMenu(...)
 #
 # Behavior (matches Radix DropdownMenu):
 #   - Click trigger to open/close
@@ -23,13 +23,13 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteDropdownMenu, SuiteDropdownMenuTrigger, SuiteDropdownMenuContent,
-       SuiteDropdownMenuGroup, SuiteDropdownMenuLabel, SuiteDropdownMenuItem,
-       SuiteDropdownMenuCheckboxItem, SuiteDropdownMenuRadioGroup,
-       SuiteDropdownMenuRadioItem, SuiteDropdownMenuItemIndicator,
-       SuiteDropdownMenuSeparator, SuiteDropdownMenuShortcut,
-       SuiteDropdownMenuSub, SuiteDropdownMenuSubTrigger,
-       SuiteDropdownMenuSubContent
+export DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
+       DropdownMenuGroup, DropdownMenuLabel, DropdownMenuItem,
+       DropdownMenuCheckboxItem, DropdownMenuRadioGroup,
+       DropdownMenuRadioItem, DropdownMenuItemIndicator,
+       DropdownMenuSeparator, DropdownMenuShortcut,
+       DropdownMenuSub, DropdownMenuSubTrigger,
+       DropdownMenuSubContent
 
 # --- Chevron SVG ---
 const _DROPDOWN_CHEVRON_RIGHT = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="ml-auto h-4 w-4"><path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
@@ -41,26 +41,26 @@ const _DROPDOWN_CHECK_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16
 const _DROPDOWN_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="h-2 w-2"><circle cx="12" cy="12" r="6"/></svg>"""
 
 """
-    SuiteDropdownMenu(children...; class, kwargs...) -> VNode
+    DropdownMenu(children...; class, kwargs...) -> VNode
 
 A dropdown menu triggered by a button click.
 
 # Examples
 ```julia
-SuiteDropdownMenu(
-    SuiteDropdownMenuTrigger(SuiteButton(variant="outline", "Open")),
-    SuiteDropdownMenuContent(
-        SuiteDropdownMenuLabel("My Account"),
-        SuiteDropdownMenuSeparator(),
-        SuiteDropdownMenuItem("Profile", shortcut="⇧⌘P"),
-        SuiteDropdownMenuItem("Settings", shortcut="⌘S"),
-        SuiteDropdownMenuSeparator(),
-        SuiteDropdownMenuItem("Log out", shortcut="⇧⌘Q"),
+DropdownMenu(
+    DropdownMenuTrigger(Button(variant="outline", "Open")),
+    DropdownMenuContent(
+        DropdownMenuLabel("My Account"),
+        DropdownMenuSeparator(),
+        DropdownMenuItem("Profile", shortcut="⇧⌘P"),
+        DropdownMenuItem("Settings", shortcut="⌘S"),
+        DropdownMenuSeparator(),
+        DropdownMenuItem("Log out", shortcut="⇧⌘Q"),
     )
 )
 ```
 """
-function SuiteDropdownMenu(children...; class::String="", kwargs...)
+function DropdownMenu(children...; class::String="", kwargs...)
     id = "suite-dropdown-menu-" * string(rand(UInt32), base=16)
 
     trigger_nodes = []
@@ -95,25 +95,25 @@ function _dropdown_set_trigger_id(node, id)
 end
 
 """
-    SuiteDropdownMenuTrigger(children...; class, kwargs...) -> VNode
+    DropdownMenuTrigger(children...; class, kwargs...) -> VNode
 
 The button that opens the dropdown menu.
 """
-function SuiteDropdownMenuTrigger(children...; class::String="", kwargs...)
+function DropdownMenuTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-dropdown-menu-trigger-wrapper") => "",
         :style => "display:contents",
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                :class => cn(class),
                kwargs...,
                children...))
 end
 
 """
-    SuiteDropdownMenuContent(children...; side, side_offset, align, class, kwargs...) -> VNode
+    DropdownMenuContent(children...; side, side_offset, align, class, kwargs...) -> VNode
 
 The floating menu content panel. Positioned relative to the trigger.
 """
-function SuiteDropdownMenuContent(children...; side::String="bottom", side_offset::Int=4, align::String="start", theme::Symbol=:default, class::String="", kwargs...)
+function DropdownMenuContent(children...; side::String="bottom", side_offset::Int=4, align::String="start", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "z-50 max-h-[var(--radix-popper-available-height,300px)] min-w-[8rem]",
         "overflow-x-hidden overflow-y-auto rounded-md p-1 shadow-md",
@@ -146,11 +146,11 @@ function SuiteDropdownMenuContent(children...; side::String="bottom", side_offse
 end
 
 """
-    SuiteDropdownMenuGroup(children...; class, kwargs...) -> VNode
+    DropdownMenuGroup(children...; class, kwargs...) -> VNode
 
 Groups related menu items.
 """
-function SuiteDropdownMenuGroup(children...; class::String="", kwargs...)
+function DropdownMenuGroup(children...; class::String="", kwargs...)
     Div(:role => "group",
         :class => cn(class),
         kwargs...,
@@ -158,11 +158,11 @@ function SuiteDropdownMenuGroup(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteDropdownMenuLabel(children...; inset, class, kwargs...) -> VNode
+    DropdownMenuLabel(children...; inset, class, kwargs...) -> VNode
 
 A label for a group of menu items.
 """
-function SuiteDropdownMenuLabel(children...; inset::Bool=false, class::String="", kwargs...)
+function DropdownMenuLabel(children...; inset::Bool=false, class::String="", kwargs...)
     Div(:class => cn(
             "px-2 py-1.5 text-sm font-medium",
             inset && "pl-8",
@@ -173,11 +173,11 @@ function SuiteDropdownMenuLabel(children...; inset::Bool=false, class::String=""
 end
 
 """
-    SuiteDropdownMenuItem(children...; shortcut, disabled, class, kwargs...) -> VNode
+    DropdownMenuItem(children...; shortcut, disabled, class, kwargs...) -> VNode
 
 A menu item. Optionally pass a `shortcut` string to display a keyboard shortcut.
 """
-function SuiteDropdownMenuItem(children...; shortcut::String="", disabled::Bool=false, text_value::String="", theme::Symbol=:default, class::String="", kwargs...)
+function DropdownMenuItem(children...; shortcut::String="", disabled::Bool=false, text_value::String="", theme::Symbol=:default, class::String="", kwargs...)
     item_children = collect(Any, children)
     if !isempty(shortcut)
         push!(item_children, Span(:class => "ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500",
@@ -208,11 +208,11 @@ function SuiteDropdownMenuItem(children...; shortcut::String="", disabled::Bool=
 end
 
 """
-    SuiteDropdownMenuCheckboxItem(children...; checked, disabled, class, kwargs...) -> VNode
+    DropdownMenuCheckboxItem(children...; checked, disabled, class, kwargs...) -> VNode
 
 A menu item with a checkbox. Toggles checked state on click.
 """
-function SuiteDropdownMenuCheckboxItem(children...; checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+function DropdownMenuCheckboxItem(children...; checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
 
     classes = cn(
@@ -242,11 +242,11 @@ function SuiteDropdownMenuCheckboxItem(children...; checked::Bool=false, disable
 end
 
 """
-    SuiteDropdownMenuRadioGroup(children...; value, class, kwargs...) -> VNode
+    DropdownMenuRadioGroup(children...; value, class, kwargs...) -> VNode
 
 Container for radio menu items. Only one item can be checked at a time.
 """
-function SuiteDropdownMenuRadioGroup(children...; value::String="", class::String="", kwargs...)
+function DropdownMenuRadioGroup(children...; value::String="", class::String="", kwargs...)
     Div(Symbol("data-suite-menu-radio-group") => "",
         Symbol("data-value") => value,
         :role => "group",
@@ -256,11 +256,11 @@ function SuiteDropdownMenuRadioGroup(children...; value::String="", class::Strin
 end
 
 """
-    SuiteDropdownMenuRadioItem(children...; value, checked, disabled, class, kwargs...) -> VNode
+    DropdownMenuRadioItem(children...; value, checked, disabled, class, kwargs...) -> VNode
 
 A radio menu item within a RadioGroup.
 """
-function SuiteDropdownMenuRadioItem(children...; value::String="", checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+function DropdownMenuRadioItem(children...; value::String="", checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
 
     classes = cn(
@@ -291,11 +291,11 @@ function SuiteDropdownMenuRadioItem(children...; value::String="", checked::Bool
 end
 
 """
-    SuiteDropdownMenuItemIndicator(children...; class, kwargs...) -> VNode
+    DropdownMenuItemIndicator(children...; class, kwargs...) -> VNode
 
 Custom indicator for checkbox/radio items. Replaces the default check/dot.
 """
-function SuiteDropdownMenuItemIndicator(children...; class::String="", kwargs...)
+function DropdownMenuItemIndicator(children...; class::String="", kwargs...)
     Span(:class => cn("pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center", class),
          Symbol("data-suite-menu-item-indicator") => "",
          kwargs...,
@@ -303,11 +303,11 @@ function SuiteDropdownMenuItemIndicator(children...; class::String="", kwargs...
 end
 
 """
-    SuiteDropdownMenuSeparator(; class, kwargs...) -> VNode
+    DropdownMenuSeparator(; class, kwargs...) -> VNode
 
 A visual separator between menu items.
 """
-function SuiteDropdownMenuSeparator(; theme::Symbol=:default, class::String="", kwargs...)
+function DropdownMenuSeparator(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("-mx-1 my-1 h-px bg-warm-200 dark:bg-warm-700", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -318,11 +318,11 @@ function SuiteDropdownMenuSeparator(; theme::Symbol=:default, class::String="", 
 end
 
 """
-    SuiteDropdownMenuShortcut(children...; class, kwargs...) -> VNode
+    DropdownMenuShortcut(children...; class, kwargs...) -> VNode
 
 Displays a keyboard shortcut hint aligned to the right of a menu item.
 """
-function SuiteDropdownMenuShortcut(children...; theme::Symbol=:default, class::String="", kwargs...)
+function DropdownMenuShortcut(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -333,11 +333,11 @@ function SuiteDropdownMenuShortcut(children...; theme::Symbol=:default, class::S
 end
 
 """
-    SuiteDropdownMenuSub(children...; class, kwargs...) -> VNode
+    DropdownMenuSub(children...; class, kwargs...) -> VNode
 
 Container for a sub-menu. Contains a SubTrigger and SubContent.
 """
-function SuiteDropdownMenuSub(children...; class::String="", kwargs...)
+function DropdownMenuSub(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-menu-sub") => "",
         :class => cn("relative", class),
         kwargs...,
@@ -345,11 +345,11 @@ function SuiteDropdownMenuSub(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteDropdownMenuSubTrigger(children...; inset, disabled, class, kwargs...) -> VNode
+    DropdownMenuSubTrigger(children...; inset, disabled, class, kwargs...) -> VNode
 
 The item that opens a sub-menu on hover or ArrowRight.
 """
-function SuiteDropdownMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+function DropdownMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
         "outline-hidden select-none",
@@ -376,11 +376,11 @@ function SuiteDropdownMenuSubTrigger(children...; inset::Bool=false, disabled::B
 end
 
 """
-    SuiteDropdownMenuSubContent(children...; class, kwargs...) -> VNode
+    DropdownMenuSubContent(children...; class, kwargs...) -> VNode
 
 The floating panel of a sub-menu.
 """
-function SuiteDropdownMenuSubContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+function DropdownMenuSubContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "z-50 min-w-[8rem] overflow-hidden rounded-md p-1 shadow-lg",
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
@@ -417,12 +417,12 @@ if @isdefined(register_component!)
         "Click-triggered dropdown menu with keyboard nav, typeahead, and sub-menus",
         Symbol[],
         [:Menu, :DropdownMenu, :Floating, :DismissLayer, :ScrollLock, :FocusGuards],
-        [:SuiteDropdownMenu, :SuiteDropdownMenuTrigger, :SuiteDropdownMenuContent,
-         :SuiteDropdownMenuGroup, :SuiteDropdownMenuLabel, :SuiteDropdownMenuItem,
-         :SuiteDropdownMenuCheckboxItem, :SuiteDropdownMenuRadioGroup,
-         :SuiteDropdownMenuRadioItem, :SuiteDropdownMenuItemIndicator,
-         :SuiteDropdownMenuSeparator, :SuiteDropdownMenuShortcut,
-         :SuiteDropdownMenuSub, :SuiteDropdownMenuSubTrigger,
-         :SuiteDropdownMenuSubContent],
+        [:DropdownMenu, :DropdownMenuTrigger, :DropdownMenuContent,
+         :DropdownMenuGroup, :DropdownMenuLabel, :DropdownMenuItem,
+         :DropdownMenuCheckboxItem, :DropdownMenuRadioGroup,
+         :DropdownMenuRadioItem, :DropdownMenuItemIndicator,
+         :DropdownMenuSeparator, :DropdownMenuShortcut,
+         :DropdownMenuSub, :DropdownMenuSubTrigger,
+         :DropdownMenuSubContent],
     ))
 end

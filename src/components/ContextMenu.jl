@@ -1,11 +1,11 @@
-# SuiteContextMenu.jl — Suite.jl Context Menu Component
+# ContextMenu.jl — Suite.jl Context Menu Component
 #
 # Tier: js_runtime (requires suite.js for menu behavior, floating, dismiss)
 # Suite Dependencies: none (leaf component)
 # JS Modules: Menu, ContextMenu, Floating, DismissLayer, ScrollLock, FocusGuards
 #
-# Usage via package: using Suite; SuiteContextMenu(SuiteContextMenuTrigger(...), SuiteContextMenuContent(...))
-# Usage via extract: include("components/ContextMenu.jl"); SuiteContextMenu(...)
+# Usage via package: using Suite; ContextMenu(ContextMenuTrigger(...), ContextMenuContent(...))
+# Usage via extract: include("components/ContextMenu.jl"); ContextMenu(...)
 #
 # Behavior (matches Radix ContextMenu):
 #   - Right-click on trigger area opens at pointer position
@@ -20,13 +20,13 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteContextMenu, SuiteContextMenuTrigger, SuiteContextMenuContent,
-       SuiteContextMenuGroup, SuiteContextMenuLabel, SuiteContextMenuItem,
-       SuiteContextMenuCheckboxItem, SuiteContextMenuRadioGroup,
-       SuiteContextMenuRadioItem, SuiteContextMenuItemIndicator,
-       SuiteContextMenuSeparator, SuiteContextMenuShortcut,
-       SuiteContextMenuSub, SuiteContextMenuSubTrigger,
-       SuiteContextMenuSubContent
+export ContextMenu, ContextMenuTrigger, ContextMenuContent,
+       ContextMenuGroup, ContextMenuLabel, ContextMenuItem,
+       ContextMenuCheckboxItem, ContextMenuRadioGroup,
+       ContextMenuRadioItem, ContextMenuItemIndicator,
+       ContextMenuSeparator, ContextMenuShortcut,
+       ContextMenuSub, ContextMenuSubTrigger,
+       ContextMenuSubContent
 
 # Re-use SVGs from DropdownMenu (they're the same icons)
 const _CONTEXT_CHEVRON_RIGHT = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="ml-auto h-4 w-4"><path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
@@ -34,28 +34,28 @@ const _CONTEXT_CHECK_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16"
 const _CONTEXT_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="h-2 w-2"><circle cx="12" cy="12" r="6"/></svg>"""
 
 """
-    SuiteContextMenu(children...; class, kwargs...) -> VNode
+    ContextMenu(children...; class, kwargs...) -> VNode
 
 A context menu triggered by right-click (or long-press on touch).
 
 # Examples
 ```julia
-SuiteContextMenu(
-    SuiteContextMenuTrigger(
+ContextMenu(
+    ContextMenuTrigger(
         Div(:class => "flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed border-warm-200 dark:border-warm-700 text-sm",
             "Right click here")
     ),
-    SuiteContextMenuContent(
-        SuiteContextMenuLabel("Actions"),
-        SuiteContextMenuSeparator(),
-        SuiteContextMenuItem("Cut", shortcut="⌘X"),
-        SuiteContextMenuItem("Copy", shortcut="⌘C"),
-        SuiteContextMenuItem("Paste", shortcut="⌘V"),
+    ContextMenuContent(
+        ContextMenuLabel("Actions"),
+        ContextMenuSeparator(),
+        ContextMenuItem("Cut", shortcut="⌘X"),
+        ContextMenuItem("Copy", shortcut="⌘C"),
+        ContextMenuItem("Paste", shortcut="⌘V"),
     )
 )
 ```
 """
-function SuiteContextMenu(children...; class::String="", kwargs...)
+function ContextMenu(children...; class::String="", kwargs...)
     id = "suite-context-menu-" * string(rand(UInt32), base=16)
 
     trigger_nodes = []
@@ -87,12 +87,12 @@ function _context_set_trigger_id(node, id)
 end
 
 """
-    SuiteContextMenuTrigger(children...; class, kwargs...) -> VNode
+    ContextMenuTrigger(children...; class, kwargs...) -> VNode
 
 The area that responds to right-click. Can wrap any content.
 Renders as a `<span>` (not a button — any content can be right-clicked).
 """
-function SuiteContextMenuTrigger(children...; class::String="", kwargs...)
+function ContextMenuTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-context-menu-trigger-wrapper") => "",
         :style => "display:contents",
         Span(:class => cn(class),
@@ -101,11 +101,11 @@ function SuiteContextMenuTrigger(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteContextMenuContent(children...; class, kwargs...) -> VNode
+    ContextMenuContent(children...; class, kwargs...) -> VNode
 
 The floating menu content panel. Positioned at the right-click location.
 """
-function SuiteContextMenuContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+function ContextMenuContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "z-50 max-h-[var(--radix-popper-available-height,300px)] min-w-[8rem]",
         "overflow-x-hidden overflow-y-auto rounded-md p-1 shadow-md",
@@ -135,11 +135,11 @@ function SuiteContextMenuContent(children...; theme::Symbol=:default, class::Str
 end
 
 """
-    SuiteContextMenuGroup(children...; class, kwargs...) -> VNode
+    ContextMenuGroup(children...; class, kwargs...) -> VNode
 
 Groups related menu items.
 """
-function SuiteContextMenuGroup(children...; class::String="", kwargs...)
+function ContextMenuGroup(children...; class::String="", kwargs...)
     Div(:role => "group",
         :class => cn(class),
         kwargs...,
@@ -147,11 +147,11 @@ function SuiteContextMenuGroup(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteContextMenuLabel(children...; inset, class, kwargs...) -> VNode
+    ContextMenuLabel(children...; inset, class, kwargs...) -> VNode
 
 A label for a group of menu items.
 """
-function SuiteContextMenuLabel(children...; inset::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+function ContextMenuLabel(children...; inset::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "px-2 py-1.5 text-sm font-medium text-warm-800 dark:text-warm-300",
         inset && "pl-8",
@@ -165,11 +165,11 @@ function SuiteContextMenuLabel(children...; inset::Bool=false, theme::Symbol=:de
 end
 
 """
-    SuiteContextMenuItem(children...; shortcut, disabled, class, kwargs...) -> VNode
+    ContextMenuItem(children...; shortcut, disabled, class, kwargs...) -> VNode
 
 A menu item. Optionally pass a `shortcut` string to display a keyboard shortcut.
 """
-function SuiteContextMenuItem(children...; shortcut::String="", disabled::Bool=false, text_value::String="", theme::Symbol=:default, class::String="", kwargs...)
+function ContextMenuItem(children...; shortcut::String="", disabled::Bool=false, text_value::String="", theme::Symbol=:default, class::String="", kwargs...)
     item_children = collect(Any, children)
     if !isempty(shortcut)
         push!(item_children, Span(:class => "ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500",
@@ -197,11 +197,11 @@ function SuiteContextMenuItem(children...; shortcut::String="", disabled::Bool=f
 end
 
 """
-    SuiteContextMenuCheckboxItem(children...; checked, disabled, class, kwargs...) -> VNode
+    ContextMenuCheckboxItem(children...; checked, disabled, class, kwargs...) -> VNode
 
 A menu item with a checkbox.
 """
-function SuiteContextMenuCheckboxItem(children...; checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+function ContextMenuCheckboxItem(children...; checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
 
     classes = cn(
@@ -230,11 +230,11 @@ function SuiteContextMenuCheckboxItem(children...; checked::Bool=false, disabled
 end
 
 """
-    SuiteContextMenuRadioGroup(children...; value, class, kwargs...) -> VNode
+    ContextMenuRadioGroup(children...; value, class, kwargs...) -> VNode
 
 Container for radio menu items.
 """
-function SuiteContextMenuRadioGroup(children...; value::String="", class::String="", kwargs...)
+function ContextMenuRadioGroup(children...; value::String="", class::String="", kwargs...)
     Div(Symbol("data-suite-menu-radio-group") => "",
         Symbol("data-value") => value,
         :role => "group",
@@ -244,11 +244,11 @@ function SuiteContextMenuRadioGroup(children...; value::String="", class::String
 end
 
 """
-    SuiteContextMenuRadioItem(children...; value, checked, disabled, class, kwargs...) -> VNode
+    ContextMenuRadioItem(children...; value, checked, disabled, class, kwargs...) -> VNode
 
 A radio menu item within a RadioGroup.
 """
-function SuiteContextMenuRadioItem(children...; value::String="", checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+function ContextMenuRadioItem(children...; value::String="", checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
 
     classes = cn(
@@ -278,11 +278,11 @@ function SuiteContextMenuRadioItem(children...; value::String="", checked::Bool=
 end
 
 """
-    SuiteContextMenuItemIndicator(children...; class, kwargs...) -> VNode
+    ContextMenuItemIndicator(children...; class, kwargs...) -> VNode
 
 Custom indicator for checkbox/radio items.
 """
-function SuiteContextMenuItemIndicator(children...; class::String="", kwargs...)
+function ContextMenuItemIndicator(children...; class::String="", kwargs...)
     Span(:class => cn("pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center", class),
          Symbol("data-suite-menu-item-indicator") => "",
          kwargs...,
@@ -290,11 +290,11 @@ function SuiteContextMenuItemIndicator(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteContextMenuSeparator(; class, kwargs...) -> VNode
+    ContextMenuSeparator(; class, kwargs...) -> VNode
 
 A visual separator between menu items.
 """
-function SuiteContextMenuSeparator(; theme::Symbol=:default, class::String="", kwargs...)
+function ContextMenuSeparator(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("-mx-1 my-1 h-px bg-warm-200 dark:bg-warm-700", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -305,11 +305,11 @@ function SuiteContextMenuSeparator(; theme::Symbol=:default, class::String="", k
 end
 
 """
-    SuiteContextMenuShortcut(children...; class, kwargs...) -> VNode
+    ContextMenuShortcut(children...; class, kwargs...) -> VNode
 
 Displays a keyboard shortcut hint.
 """
-function SuiteContextMenuShortcut(children...; theme::Symbol=:default, class::String="", kwargs...)
+function ContextMenuShortcut(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -320,11 +320,11 @@ function SuiteContextMenuShortcut(children...; theme::Symbol=:default, class::St
 end
 
 """
-    SuiteContextMenuSub(children...; class, kwargs...) -> VNode
+    ContextMenuSub(children...; class, kwargs...) -> VNode
 
 Container for a sub-menu.
 """
-function SuiteContextMenuSub(children...; class::String="", kwargs...)
+function ContextMenuSub(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-menu-sub") => "",
         :class => cn("relative", class),
         kwargs...,
@@ -332,11 +332,11 @@ function SuiteContextMenuSub(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteContextMenuSubTrigger(children...; inset, disabled, class, kwargs...) -> VNode
+    ContextMenuSubTrigger(children...; inset, disabled, class, kwargs...) -> VNode
 
 The item that opens a sub-menu.
 """
-function SuiteContextMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+function ContextMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
         "outline-hidden select-none",
@@ -363,11 +363,11 @@ function SuiteContextMenuSubTrigger(children...; inset::Bool=false, disabled::Bo
 end
 
 """
-    SuiteContextMenuSubContent(children...; class, kwargs...) -> VNode
+    ContextMenuSubContent(children...; class, kwargs...) -> VNode
 
 The floating panel of a sub-menu.
 """
-function SuiteContextMenuSubContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+function ContextMenuSubContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "z-50 min-w-[8rem] overflow-hidden rounded-md p-1 shadow-lg",
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
@@ -404,12 +404,12 @@ if @isdefined(register_component!)
         "Right-click context menu with keyboard nav, typeahead, and sub-menus",
         Symbol[],
         [:Menu, :ContextMenu, :Floating, :DismissLayer, :ScrollLock, :FocusGuards],
-        [:SuiteContextMenu, :SuiteContextMenuTrigger, :SuiteContextMenuContent,
-         :SuiteContextMenuGroup, :SuiteContextMenuLabel, :SuiteContextMenuItem,
-         :SuiteContextMenuCheckboxItem, :SuiteContextMenuRadioGroup,
-         :SuiteContextMenuRadioItem, :SuiteContextMenuItemIndicator,
-         :SuiteContextMenuSeparator, :SuiteContextMenuShortcut,
-         :SuiteContextMenuSub, :SuiteContextMenuSubTrigger,
-         :SuiteContextMenuSubContent],
+        [:ContextMenu, :ContextMenuTrigger, :ContextMenuContent,
+         :ContextMenuGroup, :ContextMenuLabel, :ContextMenuItem,
+         :ContextMenuCheckboxItem, :ContextMenuRadioGroup,
+         :ContextMenuRadioItem, :ContextMenuItemIndicator,
+         :ContextMenuSeparator, :ContextMenuShortcut,
+         :ContextMenuSub, :ContextMenuSubTrigger,
+         :ContextMenuSubContent],
     ))
 end

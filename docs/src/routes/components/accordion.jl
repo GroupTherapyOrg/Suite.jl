@@ -1,11 +1,11 @@
 # Accordion — Suite.jl component docs page
 #
-# Showcases SuiteAccordion with single/multiple modes, collapsible, and keyboard nav.
+# Showcases Accordion with single/multiple modes, collapsible, and keyboard nav.
 
-const SuiteAccordion = Main.SuiteAccordion
-const SuiteAccordionItem = Main.SuiteAccordionItem
-const SuiteAccordionTrigger = Main.SuiteAccordionTrigger
-const SuiteAccordionContent = Main.SuiteAccordionContent
+const Accordion = Main.Accordion
+const AccordionItem = Main.AccordionItem
+const AccordionTrigger = Main.AccordionTrigger
+const AccordionContent = Main.AccordionContent
 
 function AccordionPage()
     ComponentsLayout(
@@ -22,18 +22,18 @@ function AccordionPage()
         # Default Preview
         ComponentPreview(title="Default", description="Single mode — one item open at a time.",
             Div(:class => "w-full max-w-md",
-                SuiteAccordion(default_value="item-1",
-                    SuiteAccordionItem(value="item-1",
-                        SuiteAccordionTrigger("Is it accessible?"),
-                        SuiteAccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It adheres to the WAI-ARIA design pattern.")),
+                Accordion(default_value="item-1",
+                    AccordionItem(value="item-1",
+                        AccordionTrigger("Is it accessible?"),
+                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It adheres to the WAI-ARIA design pattern.")),
                     ),
-                    SuiteAccordionItem(value="item-2",
-                        SuiteAccordionTrigger("Is it styled?"),
-                        SuiteAccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It comes with default styles that match the Suite.jl design system.")),
+                    AccordionItem(value="item-2",
+                        AccordionTrigger("Is it styled?"),
+                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It comes with default styles that match the Suite.jl design system.")),
                     ),
-                    SuiteAccordionItem(value="item-3",
-                        SuiteAccordionTrigger("Is it animated?"),
-                        SuiteAccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It uses CSS transitions for smooth expand/collapse.")),
+                    AccordionItem(value="item-3",
+                        AccordionTrigger("Is it animated?"),
+                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It uses CSS transitions for smooth expand/collapse.")),
                     ),
                 )
             )
@@ -42,14 +42,14 @@ function AccordionPage()
         # Multiple mode
         ComponentPreview(title="Multiple", description="Multiple items can be open simultaneously.",
             Div(:class => "w-full max-w-md",
-                SuiteAccordion(type="multiple",
-                    SuiteAccordionItem(value="item-1",
-                        SuiteAccordionTrigger("First section"),
-                        SuiteAccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Content for the first section.")),
+                Accordion(type="multiple",
+                    AccordionItem(value="item-1",
+                        AccordionTrigger("First section"),
+                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Content for the first section.")),
                     ),
-                    SuiteAccordionItem(value="item-2",
-                        SuiteAccordionTrigger("Second section"),
-                        SuiteAccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Content for the second section.")),
+                    AccordionItem(value="item-2",
+                        AccordionTrigger("Second section"),
+                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Content for the second section.")),
                     ),
                 )
             )
@@ -58,14 +58,14 @@ function AccordionPage()
         # Collapsible
         ComponentPreview(title="Collapsible", description="Single mode with collapsible — all items can be closed.",
             Div(:class => "w-full max-w-md",
-                SuiteAccordion(collapsible=true,
-                    SuiteAccordionItem(value="item-1",
-                        SuiteAccordionTrigger("Click to expand"),
-                        SuiteAccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Click the trigger again to collapse.")),
+                Accordion(collapsible=true,
+                    AccordionItem(value="item-1",
+                        AccordionTrigger("Click to expand"),
+                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Click the trigger again to collapse.")),
                     ),
-                    SuiteAccordionItem(value="item-2",
-                        SuiteAccordionTrigger("Another item"),
-                        SuiteAccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Both items can be closed simultaneously.")),
+                    AccordionItem(value="item-2",
+                        AccordionTrigger("Another item"),
+                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Both items can be closed simultaneously.")),
                     ),
                 )
             )
@@ -80,14 +80,14 @@ function AccordionPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteAccordion(default_value="item-1",
-    SuiteAccordionItem(value="item-1",
-        SuiteAccordionTrigger("Section 1"),
-        SuiteAccordionContent(P("Content 1")),
+Accordion(default_value="item-1",
+    AccordionItem(value="item-1",
+        AccordionTrigger("Section 1"),
+        AccordionContent(P("Content 1")),
     ),
-    SuiteAccordionItem(value="item-2",
-        SuiteAccordionTrigger("Section 2"),
-        SuiteAccordionContent(P("Content 2")),
+    AccordionItem(value="item-2",
+        AccordionTrigger("Section 2"),
+        AccordionContent(P("Content 2")),
     ),
 )""")
                 )
@@ -123,7 +123,7 @@ SuiteAccordion(default_value="item-1",
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAccordion"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Accordion"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -137,7 +137,7 @@ SuiteAccordion(default_value="item-1",
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAccordionItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AccordionItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -148,7 +148,7 @@ SuiteAccordion(default_value="item-1",
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAccordionTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AccordionTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -158,7 +158,7 @@ SuiteAccordion(default_value="item-1",
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAccordionContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AccordionContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

@@ -1,14 +1,14 @@
 # Pagination — Suite.jl component docs page
 #
-# Showcases SuitePagination navigation bar.
+# Showcases Pagination navigation bar.
 
-const SuitePagination = Main.SuitePagination
-const SuitePaginationContent = Main.SuitePaginationContent
-const SuitePaginationItem = Main.SuitePaginationItem
-const SuitePaginationLink = Main.SuitePaginationLink
-const SuitePaginationPrevious = Main.SuitePaginationPrevious
-const SuitePaginationNext = Main.SuitePaginationNext
-const SuitePaginationEllipsis = Main.SuitePaginationEllipsis
+const Pagination = Main.Pagination
+const PaginationContent = Main.PaginationContent
+const PaginationItem = Main.PaginationItem
+const PaginationLink = Main.PaginationLink
+const PaginationPrevious = Main.PaginationPrevious
+const PaginationNext = Main.PaginationNext
+const PaginationEllipsis = Main.PaginationEllipsis
 
 function PaginationPage()
     ComponentsLayout(
@@ -24,14 +24,14 @@ function PaginationPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A pagination bar with previous, next, and page links.",
-            SuitePagination(
-                SuitePaginationContent(
-                    SuitePaginationItem(SuitePaginationPrevious(href="#")),
-                    SuitePaginationItem(SuitePaginationLink("1", href="#", is_active=true)),
-                    SuitePaginationItem(SuitePaginationLink("2", href="#")),
-                    SuitePaginationItem(SuitePaginationLink("3", href="#")),
-                    SuitePaginationItem(SuitePaginationEllipsis()),
-                    SuitePaginationItem(SuitePaginationNext(href="#"))
+            Pagination(
+                PaginationContent(
+                    PaginationItem(PaginationPrevious(href="#")),
+                    PaginationItem(PaginationLink("1", href="#", is_active=true)),
+                    PaginationItem(PaginationLink("2", href="#")),
+                    PaginationItem(PaginationLink("3", href="#")),
+                    PaginationItem(PaginationEllipsis()),
+                    PaginationItem(PaginationNext(href="#"))
                 )
             )
         ),
@@ -45,14 +45,14 @@ function PaginationPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuitePagination(
-    SuitePaginationContent(
-        SuitePaginationItem(SuitePaginationPrevious(href="/page/1")),
-        SuitePaginationItem(SuitePaginationLink("1", href="/page/1", is_active=true)),
-        SuitePaginationItem(SuitePaginationLink("2", href="/page/2")),
-        SuitePaginationItem(SuitePaginationLink("3", href="/page/3")),
-        SuitePaginationItem(SuitePaginationEllipsis()),
-        SuitePaginationItem(SuitePaginationNext(href="/page/2")),
+Pagination(
+    PaginationContent(
+        PaginationItem(PaginationPrevious(href="/page/1")),
+        PaginationItem(PaginationLink("1", href="/page/1", is_active=true)),
+        PaginationItem(PaginationLink("2", href="/page/2")),
+        PaginationItem(PaginationLink("3", href="/page/3")),
+        PaginationItem(PaginationEllipsis()),
+        PaginationItem(PaginationNext(href="/page/2")),
     ),
 )""")
                 )
@@ -65,7 +65,7 @@ SuitePagination(
                 "API Reference"
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuitePaginationLink"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "PaginationLink"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(
@@ -87,7 +87,7 @@ SuitePagination(
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuitePaginationPrevious / SuitePaginationNext"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "PaginationPrevious / PaginationNext"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(

@@ -1,14 +1,14 @@
-# SuiteToaster.jl — Suite.jl Toast Notification Component (Sonner-style)
+# Toaster.jl — Suite.jl Toast Notification Component (Sonner-style)
 #
 # Tier: js_runtime (requires suite.js for toast queue, auto-dismiss, stacking, swipe)
 # Suite Dependencies: none (leaf component)
 # JS Modules: Toast
 #
-# Usage via package: using Suite; SuiteToaster()
-# Usage via extract: include("components/Toast.jl"); SuiteToaster()
+# Usage via package: using Suite; Toaster()
+# Usage via extract: include("components/Toast.jl"); Toaster()
 #
 # Architecture:
-#   - SuiteToaster() renders an invisible container (placed once in layout)
+#   - Toaster() renders an invisible container (placed once in layout)
 #   - Toasts are triggered from client JS: Suite.toast("Hello")
 #   - JS manages queue, stacking, auto-dismiss timers, swipe-to-dismiss
 #   - Variants: default, success, error, warning, info
@@ -27,10 +27,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteToaster
+export Toaster
 
 """
-    SuiteToaster(; position, duration, visible_toasts, class, kwargs...) -> VNode
+    Toaster(; position, duration, visible_toasts, class, kwargs...) -> VNode
 
 A toast notification container. Place once in your layout (typically at the end of `<body>`).
 
@@ -52,13 +52,13 @@ function Layout(children...)
         Nav(...),
         Main(children...),
         Footer(...),
-        SuiteToaster(),           # Default: bottom-right, 4s duration
+        Toaster(),           # Default: bottom-right, 4s duration
         suite_script()
     )
 end
 
 # With custom position:
-SuiteToaster(position="top-center", duration=5000)
+Toaster(position="top-center", duration=5000)
 ```
 
 # Client-side API (JavaScript)
@@ -78,7 +78,7 @@ Suite.toast.dismiss(id)
 Suite.toast.dismissAll()
 ```
 """
-function SuiteToaster(;
+function Toaster(;
     theme::Symbol=:default,
     position::String="bottom-right",
     duration::Int=4000,
@@ -112,6 +112,6 @@ if @isdefined(register_component!)
         "Sonner-style toast notification system",
         Symbol[],
         [:Toast],
-        [:SuiteToaster],
+        [:Toaster],
     ))
 end

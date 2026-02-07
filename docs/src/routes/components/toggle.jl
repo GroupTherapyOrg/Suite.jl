@@ -1,8 +1,8 @@
 # Toggle — Suite.jl component docs page
 #
-# Showcases SuiteToggle with variants, sizes, and pressed state.
+# Showcases Toggle with variants, sizes, and pressed state.
 
-const SuiteToggle = Main.SuiteToggle
+const Toggle = Main.Toggle
 
 function TogglePage()
     ComponentsLayout(
@@ -19,37 +19,37 @@ function TogglePage()
         # Default Preview
         ComponentPreview(title="Default", description="Click to toggle between pressed and unpressed states.",
             Div(:class => "flex items-center gap-4",
-                SuiteToggle("B"),
-                SuiteToggle("I"),
-                SuiteToggle("U"),
+                Toggle("B"),
+                Toggle("I"),
+                Toggle("U"),
             )
         ),
 
         # Pressed
         ComponentPreview(title="Pressed", description="A toggle that starts in the pressed state.",
-            SuiteToggle(pressed=true, "Bold")
+            Toggle(pressed=true, "Bold")
         ),
 
         # Variants
         ComponentPreview(title="Variants", description="Default and outline variants.",
             Div(:class => "flex items-center gap-4",
-                SuiteToggle("Default"),
-                SuiteToggle(variant="outline", "Outline"),
+                Toggle("Default"),
+                Toggle(variant="outline", "Outline"),
             )
         ),
 
         # Sizes
         ComponentPreview(title="Sizes", description="Small, default, and large sizes.",
             Div(:class => "flex items-center gap-4",
-                SuiteToggle(size="sm", "Sm"),
-                SuiteToggle("Default"),
-                SuiteToggle(size="lg", "Lg"),
+                Toggle(size="sm", "Sm"),
+                Toggle("Default"),
+                Toggle(size="lg", "Lg"),
             )
         ),
 
         # Disabled
         ComponentPreview(title="Disabled", description="A disabled toggle that cannot be interacted with.",
-            SuiteToggle(disabled=true, "Disabled")
+            Toggle(disabled=true, "Disabled")
         ),
 
         # Usage
@@ -61,10 +61,10 @@ function TogglePage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteToggle("B")
-SuiteToggle(variant="outline", "I")
-SuiteToggle(pressed=true, "Bold")
-SuiteToggle(size="sm", disabled=true, "X")""")
+Toggle("B")
+Toggle(variant="outline", "I")
+Toggle(pressed=true, "Bold")
+Toggle(size="sm", disabled=true, "X")""")
                 )
             )
         ),

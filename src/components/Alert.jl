@@ -1,11 +1,11 @@
-# SuiteAlert.jl — Suite.jl Alert Component
+# Alert.jl — Suite.jl Alert Component
 #
 # Tier: styling (pure HTML + Tailwind classes, no JS/Wasm)
 # Suite Dependencies: none (leaf component)
 # JS Modules: none
 #
-# Usage via package: using Suite; SuiteAlert(SuiteAlertTitle("Heads up"), SuiteAlertDescription("..."))
-# Usage via extract: include("components/Alert.jl"); SuiteAlert(...)
+# Usage via package: using Suite; Alert(AlertTitle("Heads up"), AlertDescription("..."))
+# Usage via extract: include("components/Alert.jl"); Alert(...)
 #
 # Reference: shadcn/ui Alert — https://ui.shadcn.com/docs/components/alert
 
@@ -15,10 +15,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteAlert, SuiteAlertTitle, SuiteAlertDescription
+export Alert, AlertTitle, AlertDescription
 
 """
-    SuiteAlert(children...; variant, class, kwargs...) -> VNode
+    Alert(children...; variant, class, kwargs...) -> VNode
 
 A callout alert box with title and description.
 Equivalent to shadcn/ui's Alert component.
@@ -29,17 +29,17 @@ Equivalent to shadcn/ui's Alert component.
 
 # Examples
 ```julia
-SuiteAlert(
-    SuiteAlertTitle("Heads up!"),
-    SuiteAlertDescription("You can add components using the CLI."),
+Alert(
+    AlertTitle("Heads up!"),
+    AlertDescription("You can add components using the CLI."),
 )
-SuiteAlert(variant="destructive",
-    SuiteAlertTitle("Error"),
-    SuiteAlertDescription("Something went wrong."),
+Alert(variant="destructive",
+    AlertTitle("Error"),
+    AlertDescription("Something went wrong."),
 )
 ```
 """
-function SuiteAlert(children...; variant::String="default", class::String="", theme::Symbol=:default, kwargs...)
+function Alert(children...; variant::String="default", class::String="", theme::Symbol=:default, kwargs...)
     base = "relative w-full rounded-lg border px-4 py-3 text-sm grid gap-1"
 
     variant_classes = Dict(
@@ -55,21 +55,21 @@ function SuiteAlert(children...; variant::String="default", class::String="", th
 end
 
 """
-    SuiteAlertTitle(children...; class, kwargs...) -> VNode
+    AlertTitle(children...; class, kwargs...) -> VNode
 
-Title text inside a SuiteAlert.
+Title text inside a Alert.
 """
-function SuiteAlertTitle(children...; class::String="", kwargs...)
+function AlertTitle(children...; class::String="", kwargs...)
     classes = cn("font-medium leading-none tracking-tight", class)
     Div(:class => classes, kwargs..., children...)
 end
 
 """
-    SuiteAlertDescription(children...; class, kwargs...) -> VNode
+    AlertDescription(children...; class, kwargs...) -> VNode
 
-Description text inside a SuiteAlert.
+Description text inside a Alert.
 """
-function SuiteAlertDescription(children...; class::String="", kwargs...)
+function AlertDescription(children...; class::String="", kwargs...)
     classes = cn("text-sm text-warm-600 dark:text-warm-500", class)
     Div(:class => classes, kwargs..., children...)
 end
@@ -83,6 +83,6 @@ if @isdefined(register_component!)
         "Callout alert box with title and description",
         Symbol[],
         Symbol[],
-        [:SuiteAlert, :SuiteAlertTitle, :SuiteAlertDescription],
+        [:Alert, :AlertTitle, :AlertDescription],
     ))
 end

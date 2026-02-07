@@ -1,22 +1,22 @@
 # Menubar — Suite.jl component docs page
 #
-# Showcases SuiteMenubar with File/Edit/View menus, submenus, checkbox items, and keyboard nav.
+# Showcases Menubar with File/Edit/View menus, submenus, checkbox items, and keyboard nav.
 
-const SuiteMenubar = Main.SuiteMenubar
-const SuiteMenubarMenu = Main.SuiteMenubarMenu
-const SuiteMenubarTrigger = Main.SuiteMenubarTrigger
-const SuiteMenubarContent = Main.SuiteMenubarContent
-const SuiteMenubarItem = Main.SuiteMenubarItem
-const SuiteMenubarCheckboxItem = Main.SuiteMenubarCheckboxItem
-const SuiteMenubarRadioGroup = Main.SuiteMenubarRadioGroup
-const SuiteMenubarRadioItem = Main.SuiteMenubarRadioItem
-const SuiteMenubarItemIndicator = Main.SuiteMenubarItemIndicator
-const SuiteMenubarLabel = Main.SuiteMenubarLabel
-const SuiteMenubarSeparator = Main.SuiteMenubarSeparator
-const SuiteMenubarShortcut = Main.SuiteMenubarShortcut
-const SuiteMenubarSub = Main.SuiteMenubarSub
-const SuiteMenubarSubTrigger = Main.SuiteMenubarSubTrigger
-const SuiteMenubarSubContent = Main.SuiteMenubarSubContent
+const Menubar = Main.Menubar
+const MenubarMenu = Main.MenubarMenu
+const MenubarTrigger = Main.MenubarTrigger
+const MenubarContent = Main.MenubarContent
+const MenubarItem = Main.MenubarItem
+const MenubarCheckboxItem = Main.MenubarCheckboxItem
+const MenubarRadioGroup = Main.MenubarRadioGroup
+const MenubarRadioItem = Main.MenubarRadioItem
+const MenubarItemIndicator = Main.MenubarItemIndicator
+const MenubarLabel = Main.MenubarLabel
+const MenubarSeparator = Main.MenubarSeparator
+const MenubarShortcut = Main.MenubarShortcut
+const MenubarSub = Main.MenubarSub
+const MenubarSubTrigger = Main.MenubarSubTrigger
+const MenubarSubContent = Main.MenubarSubContent
 
 function MenubarPage()
     ComponentsLayout(
@@ -33,45 +33,45 @@ function MenubarPage()
         # Default Preview — File / Edit / View
         ComponentPreview(title="Default", description="Classic desktop-style menubar with File, Edit, and View menus.",
             Div(:class => "w-full max-w-lg",
-                SuiteMenubar(
+                Menubar(
                     # File menu
-                    SuiteMenubarMenu(
-                        SuiteMenubarTrigger("File"),
-                        SuiteMenubarContent(
-                            SuiteMenubarItem("New Tab", SuiteMenubarShortcut("Ctrl+T")),
-                            SuiteMenubarItem("New Window", SuiteMenubarShortcut("Ctrl+N")),
-                            SuiteMenubarSeparator(),
-                            SuiteMenubarSub(
-                                SuiteMenubarSubTrigger("Share"),
-                                SuiteMenubarSubContent(
-                                    SuiteMenubarItem("Email"),
-                                    SuiteMenubarItem("Messages"),
+                    MenubarMenu(
+                        MenubarTrigger("File"),
+                        MenubarContent(
+                            MenubarItem("New Tab", MenubarShortcut("Ctrl+T")),
+                            MenubarItem("New Window", MenubarShortcut("Ctrl+N")),
+                            MenubarSeparator(),
+                            MenubarSub(
+                                MenubarSubTrigger("Share"),
+                                MenubarSubContent(
+                                    MenubarItem("Email"),
+                                    MenubarItem("Messages"),
                                 ),
                             ),
-                            SuiteMenubarSeparator(),
-                            SuiteMenubarItem("Print", SuiteMenubarShortcut("Ctrl+P")),
+                            MenubarSeparator(),
+                            MenubarItem("Print", MenubarShortcut("Ctrl+P")),
                         ),
                     ),
 
                     # Edit menu
-                    SuiteMenubarMenu(
-                        SuiteMenubarTrigger("Edit"),
-                        SuiteMenubarContent(
-                            SuiteMenubarItem("Undo", SuiteMenubarShortcut("Ctrl+Z")),
-                            SuiteMenubarItem("Redo", SuiteMenubarShortcut("Ctrl+Shift+Z")),
-                            SuiteMenubarSeparator(),
-                            SuiteMenubarItem("Cut", SuiteMenubarShortcut("Ctrl+X")),
-                            SuiteMenubarItem("Copy", SuiteMenubarShortcut("Ctrl+C")),
-                            SuiteMenubarItem("Paste", SuiteMenubarShortcut("Ctrl+V")),
+                    MenubarMenu(
+                        MenubarTrigger("Edit"),
+                        MenubarContent(
+                            MenubarItem("Undo", MenubarShortcut("Ctrl+Z")),
+                            MenubarItem("Redo", MenubarShortcut("Ctrl+Shift+Z")),
+                            MenubarSeparator(),
+                            MenubarItem("Cut", MenubarShortcut("Ctrl+X")),
+                            MenubarItem("Copy", MenubarShortcut("Ctrl+C")),
+                            MenubarItem("Paste", MenubarShortcut("Ctrl+V")),
                         ),
                     ),
 
                     # View menu
-                    SuiteMenubarMenu(
-                        SuiteMenubarTrigger("View"),
-                        SuiteMenubarContent(
-                            SuiteMenubarCheckboxItem("Always Show Bookmarks", checked=true),
-                            SuiteMenubarCheckboxItem("Always Show Full URLs"),
+                    MenubarMenu(
+                        MenubarTrigger("View"),
+                        MenubarContent(
+                            MenubarCheckboxItem("Always Show Bookmarks", checked=true),
+                            MenubarCheckboxItem("Always Show Full URLs"),
                         ),
                     ),
                 )
@@ -87,28 +87,28 @@ function MenubarPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteMenubar(
-    SuiteMenubarMenu(
-        SuiteMenubarTrigger("File"),
-        SuiteMenubarContent(
-            SuiteMenubarItem("New Tab", SuiteMenubarShortcut("Ctrl+T")),
-            SuiteMenubarItem("New Window"),
-            SuiteMenubarSeparator(),
-            SuiteMenubarSub(
-                SuiteMenubarSubTrigger("Share"),
-                SuiteMenubarSubContent(
-                    SuiteMenubarItem("Email"),
-                    SuiteMenubarItem("Messages"),
+Menubar(
+    MenubarMenu(
+        MenubarTrigger("File"),
+        MenubarContent(
+            MenubarItem("New Tab", MenubarShortcut("Ctrl+T")),
+            MenubarItem("New Window"),
+            MenubarSeparator(),
+            MenubarSub(
+                MenubarSubTrigger("Share"),
+                MenubarSubContent(
+                    MenubarItem("Email"),
+                    MenubarItem("Messages"),
                 ),
             ),
-            SuiteMenubarSeparator(),
-            SuiteMenubarItem("Print"),
+            MenubarSeparator(),
+            MenubarItem("Print"),
         ),
     ),
-    SuiteMenubarMenu(
-        SuiteMenubarTrigger("View"),
-        SuiteMenubarContent(
-            SuiteMenubarCheckboxItem("Show Bookmarks", checked=true),
+    MenubarMenu(
+        MenubarTrigger("View"),
+        MenubarContent(
+            MenubarCheckboxItem("Show Bookmarks", checked=true),
         ),
     ),
 )""")
@@ -146,17 +146,17 @@ SuiteMenubar(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubar"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Menubar"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
                     Tbody(
-                        ApiRow("children...", "Any", "-", "SuiteMenubarMenu items"),
+                        ApiRow("children...", "Any", "-", "MenubarMenu items"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarMenu"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarMenu"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -166,7 +166,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -176,7 +176,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -188,7 +188,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -199,7 +199,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarCheckboxItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarCheckboxItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -211,18 +211,18 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarRadioGroup"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarRadioGroup"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
                     Tbody(
-                        ApiRow("children...", "Any", "-", "SuiteMenubarRadioItem children"),
+                        ApiRow("children...", "Any", "-", "MenubarRadioItem children"),
                         ApiRow("value", "String", "\"\"", "Currently selected value"),
                         ApiRow("class", "String", "\"\"", "Additional CSS classes"),
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarRadioItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarRadioItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -233,7 +233,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarSeparator"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarSeparator"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -242,7 +242,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarShortcut"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarShortcut"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -252,7 +252,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarSub"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarSub"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -262,7 +262,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarSubTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarSubTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -272,7 +272,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarSubContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarSubContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -282,7 +282,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarLabel"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarLabel"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -293,7 +293,7 @@ SuiteMenubar(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteMenubarItemIndicator"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "MenubarItemIndicator"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

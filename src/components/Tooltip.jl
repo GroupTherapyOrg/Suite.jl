@@ -1,11 +1,11 @@
-# SuiteTooltip.jl — Suite.jl Tooltip Component
+# Tooltip.jl — Suite.jl Tooltip Component
 #
 # Tier: js_runtime (requires suite.js)
 # Suite Dependencies: none (leaf component)
 # JS Modules: Floating, DismissLayer, Tooltip
 #
-# Usage via package: using Suite; SuiteTooltip(...)
-# Usage via extract: include("components/Tooltip.jl"); SuiteTooltip(...)
+# Usage via package: using Suite; Tooltip(...)
+# Usage via extract: include("components/Tooltip.jl"); Tooltip(...)
 #
 # Behavior (matches Radix Tooltip):
 #   - Hover/focus-triggered informational popup
@@ -22,10 +22,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteTooltipProvider, SuiteTooltip, SuiteTooltipTrigger, SuiteTooltipContent
+export TooltipProvider, Tooltip, TooltipTrigger, TooltipContent
 
 """
-    SuiteTooltipProvider(children...; delay_duration, skip_delay_duration, kwargs...) -> VNode
+    TooltipProvider(children...; delay_duration, skip_delay_duration, kwargs...) -> VNode
 
 Provider that manages tooltip delay state. Wrap around a group of tooltips
 for coordinated delay behavior (instant-open for quick succession).
@@ -34,7 +34,7 @@ for coordinated delay behavior (instant-open for quick succession).
 - `delay_duration::Int=700`: Milliseconds before tooltip opens on hover
 - `skip_delay_duration::Int=300`: Milliseconds window for instant-open after close
 """
-function SuiteTooltipProvider(children...; delay_duration::Int=700, skip_delay_duration::Int=300, class::String="", kwargs...)
+function TooltipProvider(children...; delay_duration::Int=700, skip_delay_duration::Int=300, class::String="", kwargs...)
     Div(Symbol("data-suite-tooltip-provider") => "",
         Symbol("data-suite-tooltip-delay") => string(delay_duration),
         Symbol("data-suite-tooltip-skip-delay") => string(skip_delay_duration),
@@ -45,21 +45,21 @@ function SuiteTooltipProvider(children...; delay_duration::Int=700, skip_delay_d
 end
 
 """
-    SuiteTooltip(children...; class, kwargs...) -> VNode
+    Tooltip(children...; class, kwargs...) -> VNode
 
 A hover/focus-triggered informational popup.
 
 # Examples
 ```julia
-SuiteTooltipProvider(
-    SuiteTooltip(
-        SuiteTooltipTrigger(SuiteButton(variant="outline", "Hover me")),
-        SuiteTooltipContent(P("Tooltip text"))
+TooltipProvider(
+    Tooltip(
+        TooltipTrigger(Button(variant="outline", "Hover me")),
+        TooltipContent(P("Tooltip text"))
     )
 )
 ```
 """
-function SuiteTooltip(children...; class::String="", kwargs...)
+function Tooltip(children...; class::String="", kwargs...)
     id = "suite-tooltip-" * string(rand(UInt32), base=16)
 
     trigger_nodes = []
@@ -92,21 +92,21 @@ function _tooltip_set_trigger_id(node, id)
 end
 
 """
-    SuiteTooltipTrigger(children...; class, kwargs...) -> VNode
+    TooltipTrigger(children...; class, kwargs...) -> VNode
 
 The element that triggers the tooltip on hover/focus.
 """
-function SuiteTooltipTrigger(children...; class::String="", kwargs...)
+function TooltipTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-tooltip-trigger-wrapper") => "",
         :style => "display:contents",
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end
 
 """
-    SuiteTooltipContent(children...; side, side_offset, align, class, kwargs...) -> VNode
+    TooltipContent(children...; side, side_offset, align, class, kwargs...) -> VNode
 
 The tooltip content popup. Positioned relative to the trigger.
 
@@ -115,7 +115,7 @@ The tooltip content popup. Positioned relative to the trigger.
 - `side_offset::Int=4`: Distance from anchor in pixels
 - `align::String="center"`: Alignment along side ("start", "center", "end")
 """
-function SuiteTooltipContent(children...; side::String="top", side_offset::Int=4, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
+function TooltipContent(children...; side::String="top", side_offset::Int=4, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "bg-warm-800 dark:bg-warm-300 text-warm-50 dark:text-warm-950",
         "animate-in fade-in-0 zoom-in-95",
@@ -152,6 +152,6 @@ if @isdefined(register_component!)
         "Hover/focus-triggered informational popup with delay state machine",
         Symbol[],
         [:Floating, :DismissLayer, :Tooltip],
-        [:SuiteTooltipProvider, :SuiteTooltip, :SuiteTooltipTrigger, :SuiteTooltipContent],
+        [:TooltipProvider, :Tooltip, :TooltipTrigger, :TooltipContent],
     ))
 end

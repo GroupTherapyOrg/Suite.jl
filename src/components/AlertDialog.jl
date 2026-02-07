@@ -1,11 +1,11 @@
-# SuiteAlertDialog.jl — Suite.jl Alert Dialog Component
+# AlertDialog.jl — Suite.jl Alert Dialog Component
 #
 # Tier: js_runtime (requires suite.js)
 # Suite Dependencies: none (leaf component)
 # JS Modules: FocusGuards, FocusTrap, DismissLayer, ScrollLock, AlertDialog
 #
-# Usage via package: using Suite; SuiteAlertDialog(...)
-# Usage via extract: include("components/AlertDialog.jl"); SuiteAlertDialog(...)
+# Usage via package: using Suite; AlertDialog(...)
+# Usage via extract: include("components/AlertDialog.jl"); AlertDialog(...)
 #
 # Behavior (matches Radix AlertDialog):
 #   - Always modal: focus trapped, scroll locked
@@ -21,34 +21,34 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteAlertDialog, SuiteAlertDialogTrigger, SuiteAlertDialogContent,
-       SuiteAlertDialogHeader, SuiteAlertDialogFooter, SuiteAlertDialogTitle,
-       SuiteAlertDialogDescription, SuiteAlertDialogAction, SuiteAlertDialogCancel
+export AlertDialog, AlertDialogTrigger, AlertDialogContent,
+       AlertDialogHeader, AlertDialogFooter, AlertDialogTitle,
+       AlertDialogDescription, AlertDialogAction, AlertDialogCancel
 
 """
-    SuiteAlertDialog(children...; class, kwargs...) -> VNode
+    AlertDialog(children...; class, kwargs...) -> VNode
 
 A modal alert dialog that requires explicit user action to dismiss.
 Cannot be dismissed by Escape key or clicking outside.
 
 # Examples
 ```julia
-SuiteAlertDialog(
-    SuiteAlertDialogTrigger(SuiteButton(variant="destructive", "Delete Account")),
-    SuiteAlertDialogContent(
-        SuiteAlertDialogHeader(
-            SuiteAlertDialogTitle("Are you absolutely sure?"),
-            SuiteAlertDialogDescription("This action cannot be undone.")
+AlertDialog(
+    AlertDialogTrigger(Button(variant="destructive", "Delete Account")),
+    AlertDialogContent(
+        AlertDialogHeader(
+            AlertDialogTitle("Are you absolutely sure?"),
+            AlertDialogDescription("This action cannot be undone.")
         ),
-        SuiteAlertDialogFooter(
-            SuiteAlertDialogCancel(SuiteButton(variant="outline", "Cancel")),
-            SuiteAlertDialogAction(SuiteButton(variant="destructive", "Delete"))
+        AlertDialogFooter(
+            AlertDialogCancel(Button(variant="outline", "Cancel")),
+            AlertDialogAction(Button(variant="destructive", "Delete"))
         )
     )
 )
 ```
 """
-function SuiteAlertDialog(children...; class::String="", kwargs...)
+function AlertDialog(children...; class::String="", kwargs...)
     id = "suite-alert-dialog-" * string(rand(UInt32), base=16)
 
     # Separate trigger from content children
@@ -84,25 +84,25 @@ function _alert_dialog_set_trigger_id(node, id)
 end
 
 """
-    SuiteAlertDialogTrigger(children...; class, kwargs...) -> VNode
+    AlertDialogTrigger(children...; class, kwargs...) -> VNode
 
 The button that opens the alert dialog.
 """
-function SuiteAlertDialogTrigger(children...; class::String="", kwargs...)
+function AlertDialogTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-alert-dialog-trigger-wrapper") => "",
         :style => "display:contents",
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end
 
 """
-    SuiteAlertDialogContent(children...; class, kwargs...) -> VNode
+    AlertDialogContent(children...; class, kwargs...) -> VNode
 
 The alert dialog content panel. Cannot be dismissed by Escape or click-outside.
 """
-function SuiteAlertDialogContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+function AlertDialogContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -138,55 +138,55 @@ function SuiteAlertDialogContent(children...; theme::Symbol=:default, class::Str
 end
 
 """
-    SuiteAlertDialogHeader(children...; class, kwargs...) -> VNode
+    AlertDialogHeader(children...; class, kwargs...) -> VNode
 
 Header section (title + description).
 """
-function SuiteAlertDialogHeader(children...; class::String="", kwargs...)
+function AlertDialogHeader(children...; class::String="", kwargs...)
     Div(:class => cn("flex flex-col gap-2 text-center sm:text-left", class),
         kwargs...,
         children...)
 end
 
 """
-    SuiteAlertDialogFooter(children...; class, kwargs...) -> VNode
+    AlertDialogFooter(children...; class, kwargs...) -> VNode
 
 Footer section (action + cancel buttons).
 """
-function SuiteAlertDialogFooter(children...; class::String="", kwargs...)
+function AlertDialogFooter(children...; class::String="", kwargs...)
     Div(:class => cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", class),
         kwargs...,
         children...)
 end
 
 """
-    SuiteAlertDialogTitle(children...; class, kwargs...) -> VNode
+    AlertDialogTitle(children...; class, kwargs...) -> VNode
 
 Title of the alert dialog. Renders as h2.
 """
-function SuiteAlertDialogTitle(children...; class::String="", kwargs...)
+function AlertDialogTitle(children...; class::String="", kwargs...)
     H2(:class => cn("text-lg leading-none font-semibold", class),
        kwargs...,
        children...)
 end
 
 """
-    SuiteAlertDialogDescription(children...; class, kwargs...) -> VNode
+    AlertDialogDescription(children...; class, kwargs...) -> VNode
 
 Description text for the alert dialog.
 """
-function SuiteAlertDialogDescription(children...; class::String="", kwargs...)
+function AlertDialogDescription(children...; class::String="", kwargs...)
     P(:class => cn("text-warm-600 dark:text-warm-500 text-sm", class),
       kwargs...,
       children...)
 end
 
 """
-    SuiteAlertDialogAction(children...; class, kwargs...) -> VNode
+    AlertDialogAction(children...; class, kwargs...) -> VNode
 
 Confirm action button. Clicking closes the alert dialog.
 """
-function SuiteAlertDialogAction(children...; class::String="", kwargs...)
+function AlertDialogAction(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-alert-dialog-action") => "",
          :class => cn(class),
          :style => "display:contents",
@@ -195,11 +195,11 @@ function SuiteAlertDialogAction(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteAlertDialogCancel(children...; class, kwargs...) -> VNode
+    AlertDialogCancel(children...; class, kwargs...) -> VNode
 
 Cancel button. Clicking closes the alert dialog. Auto-focused on open.
 """
-function SuiteAlertDialogCancel(children...; class::String="", kwargs...)
+function AlertDialogCancel(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-alert-dialog-cancel") => "",
          :class => cn(class),
          :style => "display:contents",
@@ -216,8 +216,8 @@ if @isdefined(register_component!)
         "Modal alert dialog requiring explicit user action to dismiss",
         Symbol[],
         [:FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :AlertDialog],
-        [:SuiteAlertDialog, :SuiteAlertDialogTrigger, :SuiteAlertDialogContent,
-         :SuiteAlertDialogHeader, :SuiteAlertDialogFooter, :SuiteAlertDialogTitle,
-         :SuiteAlertDialogDescription, :SuiteAlertDialogAction, :SuiteAlertDialogCancel],
+        [:AlertDialog, :AlertDialogTrigger, :AlertDialogContent,
+         :AlertDialogHeader, :AlertDialogFooter, :AlertDialogTitle,
+         :AlertDialogDescription, :AlertDialogAction, :AlertDialogCancel],
     ))
 end

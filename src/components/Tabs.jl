@@ -1,11 +1,11 @@
-# SuiteTabs.jl — Suite.jl Tabs Component
+# Tabs.jl — Suite.jl Tabs Component
 #
 # Tier: js_runtime (requires suite.js for tab selection + roving tabindex)
 # Suite Dependencies: none
 # JS Modules: Tabs
 #
-# Usage via package: using Suite; SuiteTabs(...)
-# Usage via extract: include("components/Tabs.jl"); SuiteTabs(...)
+# Usage via package: using Suite; Tabs(...)
+# Usage via extract: include("components/Tabs.jl"); Tabs(...)
 #
 # Behavior:
 #   - TabsList with roving tabindex (arrow keys move focus)
@@ -22,10 +22,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteTabs, SuiteTabsList, SuiteTabsTrigger, SuiteTabsContent
+export Tabs, TabsList, TabsTrigger, TabsContent
 
 """
-    SuiteTabs(children...; default_value, orientation, activation, class, kwargs...) -> VNode
+    Tabs(children...; default_value, orientation, activation, class, kwargs...) -> VNode
 
 A set of layered panels, each associated with a tab trigger.
 
@@ -38,21 +38,21 @@ Requires `suite_script()` in your layout for JS behavior.
 
 # Examples
 ```julia
-SuiteTabs(default_value="tab1",
-    SuiteTabsList(
-        SuiteTabsTrigger("Account", value="tab1"),
-        SuiteTabsTrigger("Password", value="tab2"),
+Tabs(default_value="tab1",
+    TabsList(
+        TabsTrigger("Account", value="tab1"),
+        TabsTrigger("Password", value="tab2"),
     ),
-    SuiteTabsContent(value="tab1",
+    TabsContent(value="tab1",
         P("Account settings content"),
     ),
-    SuiteTabsContent(value="tab2",
+    TabsContent(value="tab2",
         P("Password settings content"),
     ),
 )
 ```
 """
-function SuiteTabs(children...; default_value::String="",
+function Tabs(children...; default_value::String="",
                    orientation::String="horizontal", activation::String="automatic",
                    class::String="", kwargs...)
     id = "suite-tabs-" * string(rand(UInt32), base=16)
@@ -68,14 +68,14 @@ function SuiteTabs(children...; default_value::String="",
 end
 
 """
-    SuiteTabsList(children...; loop, class, kwargs...) -> VNode
+    TabsList(children...; loop, class, kwargs...) -> VNode
 
 Contains the tab triggers. Renders as a tablist with roving tabindex.
 
 # Props
 - `loop`: whether keyboard navigation wraps (default `true`)
 """
-function SuiteTabsList(children...; loop::Bool=true, theme::Symbol=:default,
+function TabsList(children...; loop::Bool=true, theme::Symbol=:default,
                        class::String="", kwargs...)
     base = "inline-flex h-9 items-center justify-center rounded-lg bg-warm-100 dark:bg-warm-900 p-1 text-warm-600 dark:text-warm-500"
     classes = cn(base, class)
@@ -95,7 +95,7 @@ function SuiteTabsList(children...; loop::Bool=true, theme::Symbol=:default,
 end
 
 """
-    SuiteTabsTrigger(children...; value, disabled, class, kwargs...) -> VNode
+    TabsTrigger(children...; value, disabled, class, kwargs...) -> VNode
 
 A tab trigger button. When clicked/focused, activates the corresponding content panel.
 
@@ -103,7 +103,7 @@ A tab trigger button. When clicked/focused, activates the corresponding content 
 - `value`: identifies which TabsContent this trigger activates (required)
 - `disabled`: disable this tab
 """
-function SuiteTabsTrigger(children...; value::String="", disabled::Bool=false,
+function TabsTrigger(children...; value::String="", disabled::Bool=false,
                           theme::Symbol=:default, class::String="", kwargs...)
     base = "inline-flex items-center justify-center whitespace-nowrap cursor-pointer rounded-md px-3 py-1 text-sm font-medium ring-offset-warm-50 dark:ring-offset-warm-950 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-warm-50 dark:data-[state=active]:bg-warm-950 data-[state=active]:text-warm-800 dark:data-[state=active]:text-warm-300 data-[state=active]:shadow"
     classes = cn(base, class)
@@ -123,18 +123,18 @@ function SuiteTabsTrigger(children...; value::String="", disabled::Bool=false,
         push!(attrs, Symbol("data-disabled") => "")
     end
 
-    Button(attrs..., kwargs..., children...)
+    Therapy.Button(attrs..., kwargs..., children...)
 end
 
 """
-    SuiteTabsContent(children...; value, class, kwargs...) -> VNode
+    TabsContent(children...; value, class, kwargs...) -> VNode
 
 The content panel associated with a tab trigger.
 
 # Props
 - `value`: identifies which TabsTrigger activates this panel (required)
 """
-function SuiteTabsContent(children...; value::String="", theme::Symbol=:default,
+function TabsContent(children...; value::String="", theme::Symbol=:default,
                           class::String="", kwargs...)
     base = "mt-2 ring-offset-warm-50 dark:ring-offset-warm-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2"
     classes = cn(base, class)
@@ -195,6 +195,6 @@ if @isdefined(register_component!)
         "Tabbed interface with keyboard navigation and roving tabindex",
         Symbol[],
         [:Tabs],
-        [:SuiteTabs, :SuiteTabsList, :SuiteTabsTrigger, :SuiteTabsContent],
+        [:Tabs, :TabsList, :TabsTrigger, :TabsContent],
     ))
 end

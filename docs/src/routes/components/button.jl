@@ -1,9 +1,9 @@
 # Button — Suite.jl component docs page
 #
-# Showcases SuiteButton with all variants, sizes, and usage examples.
+# Showcases Button with all variants, sizes, and usage examples.
 # Mirrors shadcn/ui docs layout: preview, usage, API reference.
 
-const SuiteButton = Main.SuiteButton
+const Button = Main.Button
 
 function ButtonPage()
     ComponentsLayout(
@@ -19,36 +19,36 @@ function ButtonPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="The default button with accent background.",
-            SuiteButton("Button")
+            Button("Button")
         ),
 
         # All Variants
         ComponentPreview(title="Variants", description="All available button variants.",
             Div(:class => "flex flex-wrap gap-4",
-                SuiteButton(variant="default", "Default"),
-                SuiteButton(variant="secondary", "Secondary"),
-                SuiteButton(variant="outline", "Outline"),
-                SuiteButton(variant="ghost", "Ghost"),
-                SuiteButton(variant="link", "Link"),
-                SuiteButton(variant="destructive", "Destructive")
+                Button(variant="default", "Default"),
+                Button(variant="secondary", "Secondary"),
+                Button(variant="outline", "Outline"),
+                Button(variant="ghost", "Ghost"),
+                Button(variant="link", "Link"),
+                Button(variant="destructive", "Destructive")
             )
         ),
 
         # All Sizes
         ComponentPreview(title="Sizes", description="Available button sizes.",
             Div(:class => "flex flex-wrap items-center gap-4",
-                SuiteButton(size="sm", "Small"),
-                SuiteButton(size="default", "Default"),
-                SuiteButton(size="lg", "Large"),
-                SuiteButton(size="icon", "X")
+                Button(size="sm", "Small"),
+                Button(size="default", "Default"),
+                Button(size="lg", "Large"),
+                Button(size="icon", "X")
             )
         ),
 
         # Disabled
         ComponentPreview(title="Disabled", description="Buttons with disabled state.",
             Div(:class => "flex flex-wrap gap-4",
-                SuiteButton(:disabled => true, "Disabled"),
-                SuiteButton(variant="outline", :disabled => true, "Disabled")
+                Button(:disabled => true, "Disabled"),
+                Button(variant="outline", :disabled => true, "Disabled")
             )
         ),
 
@@ -61,10 +61,10 @@ function ButtonPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteButton("Click me")
-SuiteButton(variant="outline", "Settings")
-SuiteButton(variant="destructive", size="sm", "Delete")
-SuiteButton(variant="icon", size="icon", "X")""")
+Button("Click me")
+Button(variant="outline", "Settings")
+Button(variant="destructive", size="sm", "Delete")
+Button(variant="icon", size="icon", "X")""")
                 )
             )
         ),

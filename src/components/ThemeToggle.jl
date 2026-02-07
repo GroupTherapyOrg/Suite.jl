@@ -1,11 +1,11 @@
-# SuiteThemeToggle.jl — Suite.jl Theme Toggle Component
+# ThemeToggle.jl — Suite.jl Theme Toggle Component
 #
 # Tier: js_runtime (requires suite.js for dark class toggle + localStorage)
 # Suite Dependencies: none (leaf component)
 # JS Modules: ThemeToggle
 #
-# Usage via package: using Suite; SuiteThemeToggle()
-# Usage via extract: include("components/ThemeToggle.jl"); SuiteThemeToggle()
+# Usage via package: using Suite; ThemeToggle()
+# Usage via extract: include("components/ThemeToggle.jl"); ThemeToggle()
 #
 # Behavior:
 #   - Renders a button with sun/moon SVG icon
@@ -20,10 +20,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteThemeToggle
+export ThemeToggle
 
 """
-    SuiteThemeToggle(; class, kwargs...) -> VNode
+    ThemeToggle(; class, kwargs...) -> VNode
 
 A theme toggle button that switches between light and dark mode.
 
@@ -36,13 +36,13 @@ Also include `suite_theme_script()` in `<head>` to prevent flash of wrong theme.
 suite_theme_script()
 
 # In navbar:
-SuiteThemeToggle()
+ThemeToggle()
 
 # With custom class:
-SuiteThemeToggle(class="ml-2")
+ThemeToggle(class="ml-2")
 ```
 """
-function SuiteThemeToggle(; theme::Symbol=:default, class::String="", kwargs...)
+function ThemeToggle(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("inline-flex items-center justify-center rounded-md p-2 hover:bg-warm-200 dark:hover:bg-warm-800 transition-colors cursor-pointer", class)
     sun_classes = "hidden dark:block w-5 h-5 text-warm-300"
     moon_classes = "block dark:hidden w-5 h-5 text-warm-600"
@@ -52,7 +52,7 @@ function SuiteThemeToggle(; theme::Symbol=:default, class::String="", kwargs...)
         sun_classes = apply_theme(sun_classes, t)
         moon_classes = apply_theme(moon_classes, t)
     end
-    Button(:type => "button",
+    Therapy.Button(:type => "button",
            :class => classes,
            Symbol("data-suite-theme-toggle") => "",
            :aria_label => "Toggle dark mode",
@@ -82,6 +82,6 @@ if @isdefined(register_component!)
         "Dark/light mode toggle button",
         Symbol[],
         [:ThemeToggle],
-        [:SuiteThemeToggle],
+        [:ThemeToggle],
     ))
 end

@@ -1,11 +1,11 @@
-# SuitePagination.jl — Suite.jl Pagination Component
+# Pagination.jl — Suite.jl Pagination Component
 #
 # Tier: styling (pure HTML + Tailwind classes, no JS/Wasm)
 # Suite Dependencies: Button (uses button variant styling)
 # JS Modules: none
 #
-# Usage via package: using Suite; SuitePagination(SuitePaginationContent(...))
-# Usage via extract: include("components/Pagination.jl"); SuitePagination(...)
+# Usage via package: using Suite; Pagination(PaginationContent(...))
+# Usage via extract: include("components/Pagination.jl"); Pagination(...)
 #
 # Reference: shadcn/ui Pagination — https://ui.shadcn.com/docs/components/pagination
 
@@ -15,9 +15,9 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuitePagination, SuitePaginationContent, SuitePaginationItem,
-       SuitePaginationLink, SuitePaginationPrevious, SuitePaginationNext,
-       SuitePaginationEllipsis
+export Pagination, PaginationContent, PaginationItem,
+       PaginationLink, PaginationPrevious, PaginationNext,
+       PaginationEllipsis
 
 # Button variant classes reused for pagination links
 const _PAGINATION_OUTLINE = "border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-950 hover:bg-warm-100 dark:hover:bg-warm-900 text-warm-800 dark:text-warm-300"
@@ -25,56 +25,56 @@ const _PAGINATION_GHOST = "hover:bg-warm-100 dark:hover:bg-warm-900 text-warm-80
 const _PAGINATION_BTN_BASE = "inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600"
 
 """
-    SuitePagination(children...; class, kwargs...) -> VNode
+    Pagination(children...; class, kwargs...) -> VNode
 
 A pagination navigation bar.
 Equivalent to shadcn/ui's Pagination component.
 
 # Examples
 ```julia
-SuitePagination(
-    SuitePaginationContent(
-        SuitePaginationItem(SuitePaginationPrevious(href="/page/1")),
-        SuitePaginationItem(SuitePaginationLink("1", href="/page/1", is_active=true)),
-        SuitePaginationItem(SuitePaginationLink("2", href="/page/2")),
-        SuitePaginationItem(SuitePaginationLink("3", href="/page/3")),
-        SuitePaginationItem(SuitePaginationEllipsis()),
-        SuitePaginationItem(SuitePaginationNext(href="/page/2")),
+Pagination(
+    PaginationContent(
+        PaginationItem(PaginationPrevious(href="/page/1")),
+        PaginationItem(PaginationLink("1", href="/page/1", is_active=true)),
+        PaginationItem(PaginationLink("2", href="/page/2")),
+        PaginationItem(PaginationLink("3", href="/page/3")),
+        PaginationItem(PaginationEllipsis()),
+        PaginationItem(PaginationNext(href="/page/2")),
     ),
 )
 ```
 """
-function SuitePagination(children...; class::String="", kwargs...)
+function Pagination(children...; class::String="", kwargs...)
     classes = cn("mx-auto flex w-full justify-center", class)
     Nav(:role => "navigation", :aria_label => "pagination",
         :class => classes, kwargs..., children...)
 end
 
 """
-    SuitePaginationContent(children...; class, kwargs...) -> VNode
+    PaginationContent(children...; class, kwargs...) -> VNode
 
 Container for pagination items.
 """
-function SuitePaginationContent(children...; class::String="", kwargs...)
+function PaginationContent(children...; class::String="", kwargs...)
     classes = cn("flex flex-row items-center gap-1", class)
     Ul(:class => classes, kwargs..., children...)
 end
 
 """
-    SuitePaginationItem(children...; kwargs...) -> VNode
+    PaginationItem(children...; kwargs...) -> VNode
 
 Wrapper for individual pagination elements.
 """
-function SuitePaginationItem(children...; kwargs...)
+function PaginationItem(children...; kwargs...)
     Li(kwargs..., children...)
 end
 
 """
-    SuitePaginationLink(children...; is_active, size, href, class, kwargs...) -> VNode
+    PaginationLink(children...; is_active, size, href, class, kwargs...) -> VNode
 
 A pagination page number link.
 """
-function SuitePaginationLink(children...; is_active::Bool=false, size::String="icon",
+function PaginationLink(children...; is_active::Bool=false, size::String="icon",
                               href::String="#", class::String="", theme::Symbol=:default, kwargs...)
     size_classes = Dict(
         "default" => "h-10 px-4 py-2",
@@ -93,11 +93,11 @@ function SuitePaginationLink(children...; is_active::Bool=false, size::String="i
 end
 
 """
-    SuitePaginationPrevious(; href, class, kwargs...) -> VNode
+    PaginationPrevious(; href, class, kwargs...) -> VNode
 
 Previous page navigation link.
 """
-function SuitePaginationPrevious(; href::String="#", class::String="", kwargs...)
+function PaginationPrevious(; href::String="#", class::String="", kwargs...)
     classes = cn(_PAGINATION_BTN_BASE, _PAGINATION_GHOST, "h-10 px-4 py-2 gap-1", class)
     A(:href => href, :aria_label => "Go to previous page",
       :class => classes, kwargs...,
@@ -106,11 +106,11 @@ function SuitePaginationPrevious(; href::String="#", class::String="", kwargs...
 end
 
 """
-    SuitePaginationNext(; href, class, kwargs...) -> VNode
+    PaginationNext(; href, class, kwargs...) -> VNode
 
 Next page navigation link.
 """
-function SuitePaginationNext(; href::String="#", class::String="", kwargs...)
+function PaginationNext(; href::String="#", class::String="", kwargs...)
     classes = cn(_PAGINATION_BTN_BASE, _PAGINATION_GHOST, "h-10 px-4 py-2 gap-1", class)
     A(:href => href, :aria_label => "Go to next page",
       :class => classes, kwargs...,
@@ -119,11 +119,11 @@ function SuitePaginationNext(; href::String="#", class::String="", kwargs...)
 end
 
 """
-    SuitePaginationEllipsis(; class, kwargs...) -> VNode
+    PaginationEllipsis(; class, kwargs...) -> VNode
 
 Ellipsis indicator for skipped pages.
 """
-function SuitePaginationEllipsis(; class::String="", kwargs...)
+function PaginationEllipsis(; class::String="", kwargs...)
     classes = cn("flex size-9 items-center justify-center", class)
     Span(:aria_hidden => "true", :class => classes, kwargs...,
          "...",
@@ -140,8 +140,8 @@ if @isdefined(register_component!)
         "Pagination navigation bar",
         [:Button],
         Symbol[],
-        [:SuitePagination, :SuitePaginationContent, :SuitePaginationItem,
-         :SuitePaginationLink, :SuitePaginationPrevious, :SuitePaginationNext,
-         :SuitePaginationEllipsis],
+        [:Pagination, :PaginationContent, :PaginationItem,
+         :PaginationLink, :PaginationPrevious, :PaginationNext,
+         :PaginationEllipsis],
     ))
 end

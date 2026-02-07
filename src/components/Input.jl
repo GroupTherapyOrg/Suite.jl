@@ -1,11 +1,11 @@
-# SuiteInput.jl — Suite.jl Input Component
+# Input.jl — Suite.jl Input Component
 #
 # Tier: styling (pure HTML + Tailwind classes, no JS/Wasm)
 # Suite Dependencies: none (leaf component)
 # JS Modules: none
 #
-# Usage via package: using Suite; SuiteInput(type="email", placeholder="Email")
-# Usage via extract: include("components/Input.jl"); SuiteInput(...)
+# Usage via package: using Suite; Input(type="email", placeholder="Email")
+# Usage via extract: include("components/Input.jl"); Input(...)
 #
 # Reference: shadcn/ui Input — https://ui.shadcn.com/docs/components/input
 
@@ -15,23 +15,23 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteInput
+export Input
 
 """
-    SuiteInput(; type, class, kwargs...) -> VNode
+    Input(; type, class, kwargs...) -> VNode
 
 A styled text input field.
 Equivalent to shadcn/ui's Input component.
 
 # Examples
 ```julia
-SuiteInput(placeholder="Email")
-SuiteInput(type="password", placeholder="Password")
-SuiteInput(type="file")
-SuiteInput(:disabled => true, placeholder="Disabled")
+Input(placeholder="Email")
+Input(type="password", placeholder="Password")
+Input(type="file")
+Input(:disabled => true, placeholder="Disabled")
 ```
 """
-function SuiteInput(; type::String="text", class::String="", theme::Symbol=:default, kwargs...)
+function Input(; type::String="text", class::String="", theme::Symbol=:default, kwargs...)
     classes = cn(
         "h-9 w-full min-w-0 rounded-md border border-warm-200 dark:border-warm-700 bg-transparent px-3 py-1 text-base shadow-sm transition-colors outline-none",
         "placeholder:text-warm-500 dark:placeholder:text-warm-600",
@@ -43,7 +43,7 @@ function SuiteInput(; type::String="text", class::String="", theme::Symbol=:defa
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Input(:type => type, :class => classes, kwargs...)
+    Therapy.Input(:type => type, :class => classes, kwargs...)
 end
 
 # --- Registry ---
@@ -55,6 +55,6 @@ if @isdefined(register_component!)
         "Styled text input field",
         Symbol[],
         Symbol[],
-        [:SuiteInput],
+        [:Input],
     ))
 end

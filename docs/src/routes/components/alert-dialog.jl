@@ -1,17 +1,17 @@
 # Alert Dialog — Suite.jl component docs page
 #
-# Showcases SuiteAlertDialog with basic confirmation and destructive variant.
+# Showcases AlertDialog with basic confirmation and destructive variant.
 # Uses role=alertdialog — cannot be dismissed by Escape or click-outside.
 
-const SuiteAlertDialog = Main.SuiteAlertDialog
-const SuiteAlertDialogTrigger = Main.SuiteAlertDialogTrigger
-const SuiteAlertDialogContent = Main.SuiteAlertDialogContent
-const SuiteAlertDialogHeader = Main.SuiteAlertDialogHeader
-const SuiteAlertDialogFooter = Main.SuiteAlertDialogFooter
-const SuiteAlertDialogTitle = Main.SuiteAlertDialogTitle
-const SuiteAlertDialogDescription = Main.SuiteAlertDialogDescription
-const SuiteAlertDialogAction = Main.SuiteAlertDialogAction
-const SuiteAlertDialogCancel = Main.SuiteAlertDialogCancel
+const AlertDialog = Main.AlertDialog
+const AlertDialogTrigger = Main.AlertDialogTrigger
+const AlertDialogContent = Main.AlertDialogContent
+const AlertDialogHeader = Main.AlertDialogHeader
+const AlertDialogFooter = Main.AlertDialogFooter
+const AlertDialogTitle = Main.AlertDialogTitle
+const AlertDialogDescription = Main.AlertDialogDescription
+const AlertDialogAction = Main.AlertDialogAction
+const AlertDialogCancel = Main.AlertDialogCancel
 
 function AlertDialogPage()
     ComponentsLayout(
@@ -28,18 +28,18 @@ function AlertDialogPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="A simple confirmation dialog with Cancel and Continue actions.",
             Div(:class => "w-full max-w-md",
-                SuiteAlertDialog(
-                    SuiteAlertDialogTrigger(
-                        Main.SuiteButton(variant="outline", "Show Alert Dialog")
+                AlertDialog(
+                    AlertDialogTrigger(
+                        Main.Button(variant="outline", "Show Alert Dialog")
                     ),
-                    SuiteAlertDialogContent(
-                        SuiteAlertDialogHeader(
-                            SuiteAlertDialogTitle("Are you sure?"),
-                            SuiteAlertDialogDescription("This action cannot be undone. This will permanently apply the changes to your account."),
+                    AlertDialogContent(
+                        AlertDialogHeader(
+                            AlertDialogTitle("Are you sure?"),
+                            AlertDialogDescription("This action cannot be undone. This will permanently apply the changes to your account."),
                         ),
-                        SuiteAlertDialogFooter(
-                            SuiteAlertDialogCancel("Cancel"),
-                            SuiteAlertDialogAction("Continue"),
+                        AlertDialogFooter(
+                            AlertDialogCancel("Cancel"),
+                            AlertDialogAction("Continue"),
                         ),
                     ),
                 )
@@ -49,18 +49,18 @@ function AlertDialogPage()
         # Destructive Preview
         ComponentPreview(title="Destructive", description="A destructive confirmation dialog with a styled delete action.",
             Div(:class => "w-full max-w-md",
-                SuiteAlertDialog(
-                    SuiteAlertDialogTrigger(
-                        Main.SuiteButton(variant="destructive", "Delete")
+                AlertDialog(
+                    AlertDialogTrigger(
+                        Main.Button(variant="destructive", "Delete")
                     ),
-                    SuiteAlertDialogContent(
-                        SuiteAlertDialogHeader(
-                            SuiteAlertDialogTitle("Delete item?"),
-                            SuiteAlertDialogDescription("This action cannot be undone. This will permanently delete this item and remove its data from our servers."),
+                    AlertDialogContent(
+                        AlertDialogHeader(
+                            AlertDialogTitle("Delete item?"),
+                            AlertDialogDescription("This action cannot be undone. This will permanently delete this item and remove its data from our servers."),
                         ),
-                        SuiteAlertDialogFooter(
-                            SuiteAlertDialogCancel("Cancel"),
-                            SuiteAlertDialogAction("Delete"),
+                        AlertDialogFooter(
+                            AlertDialogCancel("Cancel"),
+                            AlertDialogAction("Delete"),
                         ),
                     ),
                 )
@@ -76,18 +76,18 @@ function AlertDialogPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteAlertDialog(
-    SuiteAlertDialogTrigger(
-        SuiteButton(variant="outline", "Show Alert Dialog")
+AlertDialog(
+    AlertDialogTrigger(
+        Button(variant="outline", "Show Alert Dialog")
     ),
-    SuiteAlertDialogContent(
-        SuiteAlertDialogHeader(
-            SuiteAlertDialogTitle("Are you sure?"),
-            SuiteAlertDialogDescription("This action cannot be undone."),
+    AlertDialogContent(
+        AlertDialogHeader(
+            AlertDialogTitle("Are you sure?"),
+            AlertDialogDescription("This action cannot be undone."),
         ),
-        SuiteAlertDialogFooter(
-            SuiteAlertDialogCancel("Cancel"),
-            SuiteAlertDialogAction("Continue"),
+        AlertDialogFooter(
+            AlertDialogCancel("Cancel"),
+            AlertDialogAction("Continue"),
         ),
     ),
 )""")
@@ -121,7 +121,7 @@ SuiteAlertDialog(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAlertDialog"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialog"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -131,7 +131,7 @@ SuiteAlertDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAlertDialogTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -141,7 +141,7 @@ SuiteAlertDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAlertDialogContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -151,7 +151,7 @@ SuiteAlertDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAlertDialogHeader"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogHeader"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -161,7 +161,7 @@ SuiteAlertDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAlertDialogFooter"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogFooter"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -171,7 +171,7 @@ SuiteAlertDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAlertDialogTitle"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogTitle"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -181,7 +181,7 @@ SuiteAlertDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAlertDialogDescription"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogDescription"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -191,7 +191,7 @@ SuiteAlertDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAlertDialogAction"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogAction"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -201,7 +201,7 @@ SuiteAlertDialog(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteAlertDialogCancel"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "AlertDialogCancel"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

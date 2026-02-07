@@ -1,9 +1,9 @@
 # Toast — Suite.jl component docs page
 #
-# Showcases SuiteToaster with default, success, error, warning, and info toast variants.
-# Toasts are triggered from client-side JS; SuiteToaster is placed once in the layout.
+# Showcases Toaster with default, success, error, warning, and info toast variants.
+# Toasts are triggered from client-side JS; Toaster is placed once in the layout.
 
-const SuiteToaster = Main.SuiteToaster
+const Toaster = Main.Toaster
 
 function ToastPage()
     ComponentsLayout(
@@ -13,7 +13,7 @@ function ToastPage()
                 "Toast"
             ),
             P(:class => "text-lg text-warm-600 dark:text-warm-300",
-                "A succinct message that is displayed temporarily. Toasts are triggered from client-side JavaScript and managed by a single SuiteToaster placed in your layout."
+                "A succinct message that is displayed temporarily. Toasts are triggered from client-side JavaScript and managed by a single Toaster placed in your layout."
             )
         ),
 
@@ -44,8 +44,8 @@ function ToastPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-# Place SuiteToaster once in your layout (e.g. at the root)
-SuiteToaster(position="bottom-right")
+# Place Toaster once in your layout (e.g. at the root)
+Toaster(position="bottom-right")
 
 # Toasts are triggered from client-side JavaScript:
 #   Suite.toast("Event created")
@@ -67,8 +67,8 @@ SuiteToaster(position="bottom-right")
                 "Notes"
             ),
             Div(:class => "space-y-3 text-warm-600 dark:text-warm-300",
-                P("Toasts are entirely client-side. The ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "SuiteToaster"), " component renders the container element; individual toasts are created and managed by the ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "Suite.toast"), " JavaScript API."),
-                P("Place ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "SuiteToaster"), " once in your root layout. Multiple toasters on the same page will result in duplicate notifications."),
+                P("Toasts are entirely client-side. The ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "Toaster"), " component renders the container element; individual toasts are created and managed by the ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "Suite.toast"), " JavaScript API."),
+                P("Place ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "Toaster"), " once in your root layout. Multiple toasters on the same page will result in duplicate notifications."),
                 P("Each call to ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "Suite.toast()"), " returns a toast ID that can be passed to ", Span(:class => "font-mono text-sm text-accent-600 dark:text-accent-400", "Suite.toast.dismiss(id)"), " for programmatic dismissal."),
             )
         ),
@@ -78,7 +78,7 @@ SuiteToaster(position="bottom-right")
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteToaster"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Toaster"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

@@ -1,11 +1,11 @@
-# SuiteToggleGroup.jl — Suite.jl Toggle Group Component
+# ToggleGroup.jl — Suite.jl Toggle Group Component
 #
 # Tier: js_runtime (requires suite.js for selection management + roving focus)
 # Suite Dependencies: none (contains own toggle item rendering)
 # JS Modules: ToggleGroup
 #
-# Usage via package: using Suite; SuiteToggleGroup(...)
-# Usage via extract: include("components/ToggleGroup.jl"); SuiteToggleGroup(...)
+# Usage via package: using Suite; ToggleGroup(...)
+# Usage via extract: include("components/ToggleGroup.jl"); ToggleGroup(...)
 #
 # Behavior:
 #   - Single mode: one item selected at a time, deselection allowed
@@ -22,10 +22,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteToggleGroup, SuiteToggleGroupItem
+export ToggleGroup, ToggleGroupItem
 
 """
-    SuiteToggleGroup(children...; type, default_value, variant, size, orientation, disabled, class, kwargs...) -> VNode
+    ToggleGroup(children...; type, default_value, variant, size, orientation, disabled, class, kwargs...) -> VNode
 
 A group of toggle buttons where selection is managed collectively.
 
@@ -42,21 +42,21 @@ Requires `suite_script()` in your layout for JS behavior.
 # Examples
 ```julia
 # Single selection
-SuiteToggleGroup(type="single", default_value="center",
-    SuiteToggleGroupItem(value="left", "Left"),
-    SuiteToggleGroupItem(value="center", "Center"),
-    SuiteToggleGroupItem(value="right", "Right"),
+ToggleGroup(type="single", default_value="center",
+    ToggleGroupItem(value="left", "Left"),
+    ToggleGroupItem(value="center", "Center"),
+    ToggleGroupItem(value="right", "Right"),
 )
 
 # Multiple selection, outline variant
-SuiteToggleGroup(type="multiple", variant="outline",
-    SuiteToggleGroupItem(value="bold", "B"),
-    SuiteToggleGroupItem(value="italic", "I"),
-    SuiteToggleGroupItem(value="underline", "U"),
+ToggleGroup(type="multiple", variant="outline",
+    ToggleGroupItem(value="bold", "B"),
+    ToggleGroupItem(value="italic", "I"),
+    ToggleGroupItem(value="underline", "U"),
 )
 ```
 """
-function SuiteToggleGroup(children...; type::String="single", default_value=nothing,
+function ToggleGroup(children...; type::String="single", default_value=nothing,
                           variant::String="default", size::String="default",
                           orientation::String="horizontal", disabled::Bool=false,
                           theme::Symbol=:default, class::String="", kwargs...)
@@ -89,7 +89,7 @@ function SuiteToggleGroup(children...; type::String="single", default_value=noth
 end
 
 """
-    SuiteToggleGroupItem(children...; value, variant, size, disabled, class, kwargs...) -> VNode
+    ToggleGroupItem(children...; value, variant, size, disabled, class, kwargs...) -> VNode
 
 A single item within a toggle group.
 
@@ -99,7 +99,7 @@ A single item within a toggle group.
 - `size`: override group size for this item
 - `disabled`: disable this specific item
 """
-function SuiteToggleGroupItem(children...; value::String="", variant::String="default",
+function ToggleGroupItem(children...; value::String="", variant::String="default",
                               size::String="default", disabled::Bool=false,
                               theme::Symbol=:default, class::String="", kwargs...)
     base = "inline-flex items-center justify-center gap-2 cursor-pointer rounded-md text-sm font-medium transition-colors hover:bg-warm-100 dark:hover:bg-warm-900 hover:text-warm-600 dark:hover:text-warm-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-warm-100 dark:data-[state=on]:bg-warm-900 data-[state=on]:text-warm-800 dark:data-[state=on]:text-warm-300"
@@ -131,7 +131,7 @@ function SuiteToggleGroupItem(children...; value::String="", variant::String="de
         push!(attrs, Symbol("data-disabled") => "")
     end
 
-    Button(attrs..., kwargs..., children...)
+    Therapy.Button(attrs..., kwargs..., children...)
 end
 
 # --- Registry ---
@@ -143,6 +143,6 @@ if @isdefined(register_component!)
         "Group of toggle buttons with single/multiple selection",
         Symbol[],
         [:ToggleGroup],
-        [:SuiteToggleGroup, :SuiteToggleGroupItem],
+        [:ToggleGroup, :ToggleGroupItem],
     ))
 end

@@ -1,11 +1,11 @@
-# SuiteForm.jl — Suite.jl Form Component
+# Form.jl — Suite.jl Form Component
 #
 # Tier: js_runtime (requires suite.js for validation)
 # Suite Dependencies: none (leaf component)
 # JS Modules: Form
 #
-# Usage via package: using Suite; SuiteForm(...)
-# Usage via extract: include("components/Form.jl"); SuiteForm(...)
+# Usage via package: using Suite; Form(...)
+# Usage via extract: include("components/Form.jl"); Form(...)
 #
 # Behavior (matches shadcn/ui Form pattern):
 #   - Per-field validation with error messages
@@ -20,8 +20,8 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteForm, SuiteFormField, SuiteFormItem, SuiteFormLabel,
-       SuiteFormControl, SuiteFormDescription, SuiteFormMessage
+export Form, FormField, FormItem, FormLabel,
+       FormControl, FormDescription, FormMessage
 
 # Counter for unique form field IDs
 const _FORM_ID_COUNTER = Ref(0)
@@ -32,7 +32,7 @@ function _form_next_id()
 end
 
 """
-    SuiteForm(children...; action, method, validate_on, class, theme, kwargs...) -> VNode
+    Form(children...; action, method, validate_on, class, theme, kwargs...) -> VNode
 
 A form container with client-side validation support.
 
@@ -45,32 +45,32 @@ A form container with client-side validation support.
 
 # Examples
 ```julia
-SuiteForm(action="/api/submit",
-    SuiteFormField(name="email",
-        SuiteFormItem(
-            SuiteFormLabel("Email"),
-            SuiteFormControl(
-                SuiteInput(type="email", placeholder="Enter your email"),
+Form(action="/api/submit",
+    FormField(name="email",
+        FormItem(
+            FormLabel("Email"),
+            FormControl(
+                Input(type="email", placeholder="Enter your email"),
             ),
-            SuiteFormDescription("We'll never share your email."),
-            SuiteFormMessage(),
+            FormDescription("We'll never share your email."),
+            FormMessage(),
         ),
         required=true,
         pattern="[^@]+@[^@]+",
         pattern_message="Please enter a valid email address",
     ),
-    SuiteButton(type="submit", "Submit"),
+    Button(type="submit", "Submit"),
 )
 ```
 """
-function SuiteForm(children...; action::String="", method::String="post",
+function Form(children...; action::String="", method::String="post",
                    validate_on::String="submit", class::String="",
                    theme::Symbol=:default, kwargs...)
     id = "suite-form-" * string(rand(UInt32), base=16)
     form_classes = cn("space-y-6", class)
     theme !== :default && (form_classes = apply_theme(form_classes, get_theme(theme)))
 
-    Form(:class => form_classes,
+    Therapy.Form(:class => form_classes,
          :action => action,
          :method => method,
          Symbol("data-suite-form") => id,
@@ -81,10 +81,10 @@ function SuiteForm(children...; action::String="", method::String="post",
 end
 
 """
-    SuiteFormField(children...; name, required, min_length, max_length, pattern, pattern_message, min, max, custom_message, kwargs...) -> VNode
+    FormField(children...; name, required, min_length, max_length, pattern, pattern_message, min, max, custom_message, kwargs...) -> VNode
 
 A form field container that manages validation rules for a named field.
-Wraps SuiteFormItem and its contents.
+Wraps FormItem and its contents.
 
 # Arguments
 - `name::String`: Field name (required)
@@ -100,7 +100,7 @@ Wraps SuiteFormItem and its contents.
 - `max::String=""`: Maximum value (for number inputs)
 - `custom_message::String=""`: Default error message for any validation failure
 """
-function SuiteFormField(children...; name::String,
+function FormField(children...; name::String,
                         required::Bool=false,
                         required_message::String="This field is required",
                         min_length::Int=0,
@@ -137,11 +137,11 @@ function SuiteFormField(children...; name::String,
 end
 
 """
-    SuiteFormItem(children...; class, kwargs...) -> VNode
+    FormItem(children...; class, kwargs...) -> VNode
 
 Layout container for a single form field. Groups label, control, description, and message.
 """
-function SuiteFormItem(children...; class::String="", theme::Symbol=:default, kwargs...)
+function FormItem(children...; class::String="", theme::Symbol=:default, kwargs...)
     item_classes = cn("grid gap-2", class)
     theme !== :default && (item_classes = apply_theme(item_classes, get_theme(theme)))
     Div(:class => item_classes,
@@ -151,27 +151,27 @@ function SuiteFormItem(children...; class::String="", theme::Symbol=:default, kw
 end
 
 """
-    SuiteFormLabel(children...; class, kwargs...) -> VNode
+    FormLabel(children...; class, kwargs...) -> VNode
 
 Accessible label for a form field. Automatically links to the form control via `for` attribute.
 Turns red when the field has a validation error.
 """
-function SuiteFormLabel(children...; class::String="", theme::Symbol=:default, kwargs...)
+function FormLabel(children...; class::String="", theme::Symbol=:default, kwargs...)
     label_classes = cn("text-sm font-medium text-warm-800 dark:text-warm-300 data-[error=true]:text-accent-secondary-600 dark:data-[error=true]:text-accent-secondary-500", class)
     theme !== :default && (label_classes = apply_theme(label_classes, get_theme(theme)))
-    Label(:class => label_classes,
+    Therapy.Label(:class => label_classes,
           Symbol("data-suite-form-label") => "",
           kwargs...,
           children...)
 end
 
 """
-    SuiteFormControl(children...; kwargs...) -> VNode
+    FormControl(children...; kwargs...) -> VNode
 
 Wrapper for the actual form control (input, select, textarea, etc.).
 Injects ARIA attributes (aria-invalid, aria-describedby) via JS runtime.
 """
-function SuiteFormControl(children...; kwargs...)
+function FormControl(children...; kwargs...)
     Div(Symbol("data-suite-form-control") => "",
         :style => "display:contents",
         kwargs...,
@@ -179,11 +179,11 @@ function SuiteFormControl(children...; kwargs...)
 end
 
 """
-    SuiteFormDescription(children...; class, kwargs...) -> VNode
+    FormDescription(children...; class, kwargs...) -> VNode
 
 Helper text for a form field. Linked to the control via `aria-describedby`.
 """
-function SuiteFormDescription(children...; class::String="", theme::Symbol=:default, kwargs...)
+function FormDescription(children...; class::String="", theme::Symbol=:default, kwargs...)
     desc_classes = cn("text-sm text-warm-600 dark:text-warm-500", class)
     theme !== :default && (desc_classes = apply_theme(desc_classes, get_theme(theme)))
     P(:class => desc_classes,
@@ -193,11 +193,11 @@ function SuiteFormDescription(children...; class::String="", theme::Symbol=:defa
 end
 
 """
-    SuiteFormMessage(children...; class, kwargs...) -> VNode
+    FormMessage(children...; class, kwargs...) -> VNode
 
 Error message for a form field. Hidden by default, shown when validation fails.
 """
-function SuiteFormMessage(children...; class::String="", theme::Symbol=:default, kwargs...)
+function FormMessage(children...; class::String="", theme::Symbol=:default, kwargs...)
     msg_classes = cn("text-sm text-accent-secondary-600 dark:text-accent-secondary-500 hidden", class)
     theme !== :default && (msg_classes = apply_theme(msg_classes, get_theme(theme)))
     P(:class => msg_classes,
@@ -217,7 +217,7 @@ if @isdefined(register_component!)
         "Form with per-field validation, error messages, and accessibility",
         Symbol[],
         [:Form],
-        [:SuiteForm, :SuiteFormField, :SuiteFormItem, :SuiteFormLabel,
-         :SuiteFormControl, :SuiteFormDescription, :SuiteFormMessage],
+        [:Form, :FormField, :FormItem, :FormLabel,
+         :FormControl, :FormDescription, :FormMessage],
     ))
 end

@@ -1,11 +1,11 @@
-# SuiteSelect.jl — Suite.jl Select Component
+# Select.jl — Suite.jl Select Component
 #
 # Tier: js_runtime (requires suite.js for typeahead, keyboard nav, floating)
 # Suite Dependencies: none (leaf component)
 # JS Modules: Floating, DismissLayer, ScrollLock, FocusGuards, Select
 #
-# Usage via package: using Suite; SuiteSelect(...)
-# Usage via extract: include("components/Select.jl"); SuiteSelect(...)
+# Usage via package: using Suite; Select(...)
+# Usage via extract: include("components/Select.jl"); Select(...)
 #
 # Behavior (matches Radix Select):
 #   - Custom styled select dropdown replacing native <select>
@@ -24,9 +24,9 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteSelect, SuiteSelectTrigger, SuiteSelectValue, SuiteSelectContent,
-       SuiteSelectItem, SuiteSelectGroup, SuiteSelectLabel,
-       SuiteSelectSeparator, SuiteSelectScrollUpButton, SuiteSelectScrollDownButton
+export Select, SelectTrigger, SelectValue, SelectContent,
+       SelectItem, SelectGroup, SelectLabel,
+       SelectSeparator, SelectScrollUpButton, SelectScrollDownButton
 
 # --- SVG Icons ---
 const _SELECT_CHEVRON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 opacity-50"><path d="m6 9 6 6 6-6"/></svg>"""
@@ -38,7 +38,7 @@ const _SELECT_SCROLL_UP_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="
 const _SELECT_SCROLL_DOWN_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="m6 9 6 6 6-6"/></svg>"""
 
 """
-    SuiteSelect(children...; value, default_value, name, disabled, required, class, kwargs...) -> VNode
+    Select(children...; value, default_value, name, disabled, required, class, kwargs...) -> VNode
 
 A custom styled select dropdown replacing native `<select>`.
 
@@ -51,20 +51,20 @@ A custom styled select dropdown replacing native `<select>`.
 
 # Examples
 ```julia
-SuiteSelect(
-    SuiteSelectTrigger(SuiteSelectValue(placeholder="Select a fruit...")),
-    SuiteSelectContent(
-        SuiteSelectGroup(
-            SuiteSelectLabel("Fruits"),
-            SuiteSelectItem("Apple", value="apple"),
-            SuiteSelectItem("Banana", value="banana"),
-            SuiteSelectItem("Orange", value="orange"),
+Select(
+    SelectTrigger(SelectValue(placeholder="Select a fruit...")),
+    SelectContent(
+        SelectGroup(
+            SelectLabel("Fruits"),
+            SelectItem("Apple", value="apple"),
+            SelectItem("Banana", value="banana"),
+            SelectItem("Orange", value="orange"),
         )
     )
 )
 ```
 """
-function SuiteSelect(children...; value::String="", default_value::String="",
+function Select(children...; value::String="", default_value::String="",
                      name::String="", disabled::Bool=false, required::Bool=false,
                      class::String="", kwargs...)
     id = "suite-select-" * string(rand(UInt32), base=16)
@@ -110,11 +110,11 @@ function _select_set_trigger_id(node, id)
 end
 
 """
-    SuiteSelectTrigger(children...; class, kwargs...) -> VNode
+    SelectTrigger(children...; class, kwargs...) -> VNode
 
 The button that opens the select dropdown.
 """
-function SuiteSelectTrigger(children...; theme::Symbol=:default, class::String="", kwargs...)
+function SelectTrigger(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "border-warm-200 dark:border-warm-700",
         "focus-visible:border-accent-600 focus-visible:ring-accent-600/50",
@@ -130,7 +130,7 @@ function SuiteSelectTrigger(children...; theme::Symbol=:default, class::String="
 
     Div(Symbol("data-suite-select-trigger-wrapper") => "",
         :style => "display:contents",
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                :class => classes,
                kwargs...,
                Span(:class => "line-clamp-1 flex items-center gap-2",
@@ -141,11 +141,11 @@ function SuiteSelectTrigger(children...; theme::Symbol=:default, class::String="
 end
 
 """
-    SuiteSelectValue(; placeholder, class, kwargs...) -> VNode
+    SelectValue(; placeholder, class, kwargs...) -> VNode
 
 Displays the currently selected value, or placeholder if none selected.
 """
-function SuiteSelectValue(; placeholder::String="", class::String="", kwargs...)
+function SelectValue(; placeholder::String="", class::String="", kwargs...)
     Span(Symbol("data-suite-select-display") => "",
          Symbol("data-placeholder") => "",
          :class => cn(class),
@@ -154,7 +154,7 @@ function SuiteSelectValue(; placeholder::String="", class::String="", kwargs...)
 end
 
 """
-    SuiteSelectContent(children...; side, side_offset, align, class, kwargs...) -> VNode
+    SelectContent(children...; side, side_offset, align, class, kwargs...) -> VNode
 
 The floating dropdown content containing items.
 
@@ -163,7 +163,7 @@ The floating dropdown content containing items.
 - `side_offset::Int=4`: Distance from trigger in pixels
 - `align::String="start"`: Alignment along side ("start", "center", "end")
 """
-function SuiteSelectContent(children...; side::String="bottom", side_offset::Int=4,
+function SelectContent(children...; side::String="bottom", side_offset::Int=4,
                             align::String="start", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
@@ -200,7 +200,7 @@ function SuiteSelectContent(children...; side::String="bottom", side_offset::Int
 end
 
 """
-    SuiteSelectItem(children...; value, disabled, text_value, class, kwargs...) -> VNode
+    SelectItem(children...; value, disabled, text_value, class, kwargs...) -> VNode
 
 An individual option in the select dropdown.
 
@@ -209,7 +209,7 @@ An individual option in the select dropdown.
 - `disabled::Bool=false`: Whether this item is disabled
 - `text_value::String=""`: Override text used for typeahead (defaults to content text)
 """
-function SuiteSelectItem(children...; value::String="", disabled::Bool=false,
+function SelectItem(children...; value::String="", disabled::Bool=false,
                          text_value::String="", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "focus:bg-warm-100 dark:focus:bg-warm-800",
@@ -242,11 +242,11 @@ function SuiteSelectItem(children...; value::String="", disabled::Bool=false,
 end
 
 """
-    SuiteSelectGroup(children...; class, kwargs...) -> VNode
+    SelectGroup(children...; class, kwargs...) -> VNode
 
 Groups related select items together.
 """
-function SuiteSelectGroup(children...; class::String="", kwargs...)
+function SelectGroup(children...; class::String="", kwargs...)
     Div(:role => "group",
         Symbol("data-suite-select-group") => "",
         :class => cn("overflow-hidden p-1", class),
@@ -255,11 +255,11 @@ function SuiteSelectGroup(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteSelectLabel(children...; class, kwargs...) -> VNode
+    SelectLabel(children...; class, kwargs...) -> VNode
 
 A label for a group of select items.
 """
-function SuiteSelectLabel(children...; theme::Symbol=:default, class::String="", kwargs...)
+function SelectLabel(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("px-2 py-1.5 text-sm font-semibold text-warm-800 dark:text-warm-300", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -271,11 +271,11 @@ function SuiteSelectLabel(children...; theme::Symbol=:default, class::String="",
 end
 
 """
-    SuiteSelectSeparator(; class, kwargs...) -> VNode
+    SelectSeparator(; class, kwargs...) -> VNode
 
 A visual separator between select items.
 """
-function SuiteSelectSeparator(; theme::Symbol=:default, class::String="", kwargs...)
+function SelectSeparator(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("bg-warm-200 dark:bg-warm-700 -mx-1 my-1 h-px", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -286,11 +286,11 @@ function SuiteSelectSeparator(; theme::Symbol=:default, class::String="", kwargs
 end
 
 """
-    SuiteSelectScrollUpButton(children...; class, kwargs...) -> VNode
+    SelectScrollUpButton(children...; class, kwargs...) -> VNode
 
 A button at the top of the select content that scrolls items upward.
 """
-function SuiteSelectScrollUpButton(children...; class::String="", kwargs...)
+function SelectScrollUpButton(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-select-scroll-up") => "",
         Symbol("aria-hidden") => "true",
         :class => cn("flex cursor-pointer items-center justify-center py-1", class),
@@ -299,11 +299,11 @@ function SuiteSelectScrollUpButton(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteSelectScrollDownButton(children...; class, kwargs...) -> VNode
+    SelectScrollDownButton(children...; class, kwargs...) -> VNode
 
 A button at the bottom of the select content that scrolls items downward.
 """
-function SuiteSelectScrollDownButton(children...; class::String="", kwargs...)
+function SelectScrollDownButton(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-select-scroll-down") => "",
         Symbol("aria-hidden") => "true",
         :class => cn("flex cursor-pointer items-center justify-center py-1", class),
@@ -320,8 +320,8 @@ if @isdefined(register_component!)
         "Custom styled select dropdown with typeahead, keyboard navigation, and floating positioning",
         Symbol[],
         [:Floating, :DismissLayer, :ScrollLock, :FocusGuards, :Select],
-        [:SuiteSelect, :SuiteSelectTrigger, :SuiteSelectValue, :SuiteSelectContent,
-         :SuiteSelectItem, :SuiteSelectGroup, :SuiteSelectLabel,
-         :SuiteSelectSeparator, :SuiteSelectScrollUpButton, :SuiteSelectScrollDownButton],
+        [:Select, :SelectTrigger, :SelectValue, :SelectContent,
+         :SelectItem, :SelectGroup, :SelectLabel,
+         :SelectSeparator, :SelectScrollUpButton, :SelectScrollDownButton],
     ))
 end

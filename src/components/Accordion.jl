@@ -1,11 +1,11 @@
-# SuiteAccordion.jl — Suite.jl Accordion Component
+# Accordion.jl — Suite.jl Accordion Component
 #
 # Tier: js_runtime (requires suite.js for toggle + keyboard navigation)
 # Suite Dependencies: none (built on Collapsible concepts but independent)
 # JS Modules: Accordion
 #
-# Usage via package: using Suite; SuiteAccordion(...)
-# Usage via extract: include("components/Accordion.jl"); SuiteAccordion(...)
+# Usage via package: using Suite; Accordion(...)
+# Usage via extract: include("components/Accordion.jl"); Accordion(...)
 #
 # Behavior:
 #   - Single mode: one item open at a time, optional collapsible flag
@@ -23,10 +23,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteAccordion, SuiteAccordionItem, SuiteAccordionTrigger, SuiteAccordionContent
+export Accordion, AccordionItem, AccordionTrigger, AccordionContent
 
 """
-    SuiteAccordion(children...; type, collapsible, default_value, orientation, disabled, class, kwargs...) -> VNode
+    Accordion(children...; type, collapsible, default_value, orientation, disabled, class, kwargs...) -> VNode
 
 A vertically stacked set of interactive headings that reveal/hide content sections.
 
@@ -42,27 +42,27 @@ Requires `suite_script()` in your layout for JS behavior.
 # Examples
 ```julia
 # Single mode (default)
-SuiteAccordion(
-    SuiteAccordionItem(value="item-1",
-        SuiteAccordionTrigger("Section 1"),
-        SuiteAccordionContent(P("Content for section 1")),
+Accordion(
+    AccordionItem(value="item-1",
+        AccordionTrigger("Section 1"),
+        AccordionContent(P("Content for section 1")),
     ),
-    SuiteAccordionItem(value="item-2",
-        SuiteAccordionTrigger("Section 2"),
-        SuiteAccordionContent(P("Content for section 2")),
+    AccordionItem(value="item-2",
+        AccordionTrigger("Section 2"),
+        AccordionContent(P("Content for section 2")),
     ),
 )
 
 # Multiple mode, first item open by default
-SuiteAccordion(type="multiple", default_value=["item-1"],
-    SuiteAccordionItem(value="item-1",
-        SuiteAccordionTrigger("Always visible header"),
-        SuiteAccordionContent(P("Initially open content")),
+Accordion(type="multiple", default_value=["item-1"],
+    AccordionItem(value="item-1",
+        AccordionTrigger("Always visible header"),
+        AccordionContent(P("Initially open content")),
     ),
 )
 ```
 """
-function SuiteAccordion(children...; type::String="single", collapsible::Bool=false,
+function Accordion(children...; type::String="single", collapsible::Bool=false,
                         default_value=nothing, orientation::String="vertical",
                         disabled::Bool=false, theme::Symbol=:default,
                         class::String="", kwargs...)
@@ -104,7 +104,7 @@ function SuiteAccordion(children...; type::String="single", collapsible::Bool=fa
 end
 
 """
-    SuiteAccordionItem(children...; value, disabled, class, kwargs...) -> VNode
+    AccordionItem(children...; value, disabled, class, kwargs...) -> VNode
 
 A single accordion item containing a trigger and content.
 
@@ -112,7 +112,7 @@ A single accordion item containing a trigger and content.
 - `value`: unique identifier for this item (required)
 - `disabled`: disable this specific item
 """
-function SuiteAccordionItem(children...; value::String="", disabled::Bool=false,
+function AccordionItem(children...; value::String="", disabled::Bool=false,
                             class::String="", kwargs...)
     classes = cn("", class)
 
@@ -129,14 +129,14 @@ function SuiteAccordionItem(children...; value::String="", disabled::Bool=false,
 end
 
 """
-    SuiteAccordionTrigger(children...; class, kwargs...) -> VNode
+    AccordionTrigger(children...; class, kwargs...) -> VNode
 
 The button that toggles an accordion item open/closed.
 
 Rendered as a heading (h3) containing a button, matching Radix/shadcn structure.
 Includes a chevron indicator that rotates on open.
 """
-function SuiteAccordionTrigger(children...; theme::Symbol=:default,
+function AccordionTrigger(children...; theme::Symbol=:default,
                                class::String="", kwargs...)
     base = "flex flex-1 items-center justify-between py-4 cursor-pointer text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180"
     classes = cn(base, class)
@@ -153,7 +153,7 @@ function SuiteAccordionTrigger(children...; theme::Symbol=:default,
                   Path(:d => "M6 9l6 6 6-6"))
 
     H3(:class => "flex",
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                Symbol("data-suite-accordion-trigger") => "",
                Symbol("data-state") => "closed",
                :aria_expanded => "false",
@@ -164,13 +164,13 @@ function SuiteAccordionTrigger(children...; theme::Symbol=:default,
 end
 
 """
-    SuiteAccordionContent(children...; class, kwargs...) -> VNode
+    AccordionContent(children...; class, kwargs...) -> VNode
 
 The content panel revealed when an accordion item is opened.
 
 Has `role="region"` and is labelled by its trigger for accessibility.
 """
-function SuiteAccordionContent(children...; class::String="", kwargs...)
+function AccordionContent(children...; class::String="", kwargs...)
     base = "overflow-hidden text-sm"
     inner_class = "pb-4 pt-0"
     classes = cn(base, class)
@@ -231,6 +231,6 @@ if @isdefined(register_component!)
         "Vertically stacked expandable sections with keyboard navigation",
         Symbol[],
         [:Accordion],
-        [:SuiteAccordion, :SuiteAccordionItem, :SuiteAccordionTrigger, :SuiteAccordionContent],
+        [:Accordion, :AccordionItem, :AccordionTrigger, :AccordionContent],
     ))
 end

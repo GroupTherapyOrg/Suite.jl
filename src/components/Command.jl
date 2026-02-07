@@ -1,11 +1,11 @@
-# SuiteCommand.jl — Suite.jl Command Component (cmdk-style command palette)
+# Command.jl — Suite.jl Command Component (cmdk-style command palette)
 #
 # Tier: js_runtime (requires suite.js for filtering, scoring, keyboard nav)
 # Suite Dependencies: Dialog (for CommandDialog variant)
 # JS Modules: Command
 #
-# Usage via package: using Suite; SuiteCommand(...)
-# Usage via extract: include("components/Command.jl"); SuiteCommand(...)
+# Usage via package: using Suite; Command(...)
+# Usage via extract: include("components/Command.jl"); Command(...)
 #
 # Behavior (matches cmdk):
 #   - Search input filters items using fuzzy scoring
@@ -21,15 +21,15 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteCommand, SuiteCommandInput, SuiteCommandList,
-       SuiteCommandEmpty, SuiteCommandGroup, SuiteCommandItem,
-       SuiteCommandSeparator, SuiteCommandShortcut, SuiteCommandDialog
+export Command, CommandInput, CommandList,
+       CommandEmpty, CommandGroup, CommandItem,
+       CommandSeparator, CommandShortcut, CommandDialog
 
 # --- SVG Icons ---
 const _COMMAND_SEARCH_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 size-4 shrink-0 opacity-50"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>"""
 
 """
-    SuiteCommand(children...; should_filter, loop, class, kwargs...) -> VNode
+    Command(children...; should_filter, loop, class, kwargs...) -> VNode
 
 A command palette / search interface for filtering and selecting items.
 
@@ -39,26 +39,26 @@ A command palette / search interface for filtering and selecting items.
 
 # Examples
 ```julia
-SuiteCommand(
-    SuiteCommandInput(placeholder="Type a command or search..."),
-    SuiteCommandList(
-        SuiteCommandEmpty("No results found."),
-        SuiteCommandGroup(heading="Suggestions",
-            SuiteCommandItem("Calendar", value="calendar"),
-            SuiteCommandItem("Search Emoji", value="emoji"),
-            SuiteCommandItem("Calculator", value="calculator"),
+Command(
+    CommandInput(placeholder="Type a command or search..."),
+    CommandList(
+        CommandEmpty("No results found."),
+        CommandGroup(heading="Suggestions",
+            CommandItem("Calendar", value="calendar"),
+            CommandItem("Search Emoji", value="emoji"),
+            CommandItem("Calculator", value="calculator"),
         ),
-        SuiteCommandSeparator(),
-        SuiteCommandGroup(heading="Settings",
-            SuiteCommandItem("Profile", value="profile"),
-            SuiteCommandItem("Billing", value="billing"),
-            SuiteCommandItem("Settings", value="settings"),
+        CommandSeparator(),
+        CommandGroup(heading="Settings",
+            CommandItem("Profile", value="profile"),
+            CommandItem("Billing", value="billing"),
+            CommandItem("Settings", value="settings"),
         ),
     )
 )
 ```
 """
-function SuiteCommand(children...; should_filter::Bool=true, loop::Bool=true,
+function Command(children...; should_filter::Bool=true, loop::Bool=true,
                       theme::Symbol=:default, class::String="", kwargs...)
     id = "suite-command-" * string(rand(UInt32), base=16)
 
@@ -79,11 +79,11 @@ function SuiteCommand(children...; should_filter::Bool=true, loop::Bool=true,
 end
 
 """
-    SuiteCommandInput(; placeholder, class, kwargs...) -> VNode
+    CommandInput(; placeholder, class, kwargs...) -> VNode
 
 The search input for the command palette.
 """
-function SuiteCommandInput(; placeholder::String="", theme::Symbol=:default, class::String="", kwargs...)
+function CommandInput(; placeholder::String="", theme::Symbol=:default, class::String="", kwargs...)
     wrapper_classes = "flex h-9 items-center gap-2 border-b border-warm-200 dark:border-warm-700 px-3"
     input_classes = cn(
         "placeholder:text-warm-600 dark:placeholder:text-warm-500",
@@ -99,7 +99,7 @@ function SuiteCommandInput(; placeholder::String="", theme::Symbol=:default, cla
 
     Div(:class => wrapper_classes,
         Therapy.RawHtml(_COMMAND_SEARCH_SVG),
-        Input(Symbol("data-suite-command-input") => "",
+        Therapy.Input(Symbol("data-suite-command-input") => "",
               :type => "text",
               :placeholder => placeholder,
               :autocomplete => "off",
@@ -110,11 +110,11 @@ function SuiteCommandInput(; placeholder::String="", theme::Symbol=:default, cla
 end
 
 """
-    SuiteCommandList(children...; class, kwargs...) -> VNode
+    CommandList(children...; class, kwargs...) -> VNode
 
 The scrollable container for command items and groups.
 """
-function SuiteCommandList(children...; class::String="", kwargs...)
+function CommandList(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-command-list") => "",
         :role => "listbox",
         Symbol("aria-label") => "Suggestions",
@@ -128,11 +128,11 @@ function SuiteCommandList(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteCommandEmpty(children...; class, kwargs...) -> VNode
+    CommandEmpty(children...; class, kwargs...) -> VNode
 
 Shown when the search yields no matching items.
 """
-function SuiteCommandEmpty(children...; class::String="", kwargs...)
+function CommandEmpty(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-command-empty") => "",
         :role => "presentation",
         :class => cn("py-6 text-center text-sm", class),
@@ -143,14 +143,14 @@ function SuiteCommandEmpty(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteCommandGroup(children...; heading, class, kwargs...) -> VNode
+    CommandGroup(children...; heading, class, kwargs...) -> VNode
 
 A group of related command items with an optional heading.
 
 # Arguments
 - `heading::String=""`: Group heading text
 """
-function SuiteCommandGroup(children...; heading::String="", theme::Symbol=:default, class::String="", kwargs...)
+function CommandGroup(children...; heading::String="", theme::Symbol=:default, class::String="", kwargs...)
     group_id = "suite-cmd-group-" * string(rand(UInt32), base=16)
     heading_id = group_id * "-heading"
 
@@ -182,7 +182,7 @@ function SuiteCommandGroup(children...; heading::String="", theme::Symbol=:defau
 end
 
 """
-    SuiteCommandItem(children...; value, disabled, keywords, class, kwargs...) -> VNode
+    CommandItem(children...; value, disabled, keywords, class, kwargs...) -> VNode
 
 An individual item in the command palette.
 
@@ -191,7 +191,7 @@ An individual item in the command palette.
 - `disabled::Bool=false`: Whether this item is disabled
 - `keywords::Vector{String}=String[]`: Additional searchable text
 """
-function SuiteCommandItem(children...; value::String="", disabled::Bool=false,
+function CommandItem(children...; value::String="", disabled::Bool=false,
                           keywords::Vector{String}=String[], theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "data-[selected=true]:bg-warm-100 dark:data-[selected=true]:bg-warm-800",
@@ -217,11 +217,11 @@ function SuiteCommandItem(children...; value::String="", disabled::Bool=false,
 end
 
 """
-    SuiteCommandSeparator(; class, kwargs...) -> VNode
+    CommandSeparator(; class, kwargs...) -> VNode
 
 A visual separator between command groups.
 """
-function SuiteCommandSeparator(; theme::Symbol=:default, class::String="", kwargs...)
+function CommandSeparator(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("bg-warm-200 dark:bg-warm-700 -mx-1 h-px", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -232,11 +232,11 @@ function SuiteCommandSeparator(; theme::Symbol=:default, class::String="", kwarg
 end
 
 """
-    SuiteCommandShortcut(children...; class, kwargs...) -> VNode
+    CommandShortcut(children...; class, kwargs...) -> VNode
 
 Displays a keyboard shortcut alongside a command item.
 """
-function SuiteCommandShortcut(children...; theme::Symbol=:default, class::String="", kwargs...)
+function CommandShortcut(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("text-warm-600 dark:text-warm-500 ml-auto text-xs tracking-widest", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -246,14 +246,14 @@ function SuiteCommandShortcut(children...; theme::Symbol=:default, class::String
 end
 
 """
-    SuiteCommandDialog(children...; class, kwargs...) -> VNode
+    CommandDialog(children...; class, kwargs...) -> VNode
 
 A command palette inside a dialog overlay. Useful for ⌘K command palette pattern.
 
 The dialog is triggered externally (e.g. via keyboard shortcut).
-Uses SuiteDialog internally.
+Uses Dialog internally.
 """
-function SuiteCommandDialog(children...; theme::Symbol=:default, class::String="", kwargs...)
+function CommandDialog(children...; theme::Symbol=:default, class::String="", kwargs...)
     id = "suite-command-dialog-" * string(rand(UInt32), base=16)
 
     overlay_classes = "fixed inset-0 bg-warm-950/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
@@ -285,7 +285,7 @@ function SuiteCommandDialog(children...; theme::Symbol=:default, class::String="
         Div(:class => content_classes,
             Symbol("data-suite-command-dialog-content") => id,
             kwargs...,
-            SuiteCommand(children...; theme=theme),
+            Command(children...; theme=theme),
         ),
     )
 end
@@ -299,8 +299,8 @@ if @isdefined(register_component!)
         "Command palette with fuzzy search, keyboard navigation, and item filtering",
         Symbol[:Dialog],
         [:Command],
-        [:SuiteCommand, :SuiteCommandInput, :SuiteCommandList,
-         :SuiteCommandEmpty, :SuiteCommandGroup, :SuiteCommandItem,
-         :SuiteCommandSeparator, :SuiteCommandShortcut, :SuiteCommandDialog],
+        [:Command, :CommandInput, :CommandList,
+         :CommandEmpty, :CommandGroup, :CommandItem,
+         :CommandSeparator, :CommandShortcut, :CommandDialog],
     ))
 end

@@ -1,8 +1,8 @@
 # Badge — Suite.jl component docs page
 #
-# Showcases SuiteBadge with all variants and usage examples.
+# Showcases Badge with all variants and usage examples.
 
-const SuiteBadge = Main.SuiteBadge
+const Badge = Main.Badge
 
 function BadgePage()
     ComponentsLayout(
@@ -18,16 +18,16 @@ function BadgePage()
 
         # Default Preview
         ComponentPreview(title="Default", description="The default badge with accent background.",
-            SuiteBadge("Badge")
+            Badge("Badge")
         ),
 
         # All Variants
         ComponentPreview(title="Variants", description="All available badge variants.",
             Div(:class => "flex flex-wrap gap-4",
-                SuiteBadge(variant="default", "Default"),
-                SuiteBadge(variant="secondary", "Secondary"),
-                SuiteBadge(variant="outline", "Outline"),
-                SuiteBadge(variant="destructive", "Destructive")
+                Badge(variant="default", "Default"),
+                Badge(variant="secondary", "Secondary"),
+                Badge(variant="outline", "Outline"),
+                Badge(variant="destructive", "Destructive")
             )
         ),
 
@@ -40,10 +40,10 @@ function BadgePage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteBadge("New")
-SuiteBadge(variant="secondary", "Secondary")
-SuiteBadge(variant="destructive", "Error")
-SuiteBadge(variant="outline", "v2.0")""")
+Badge("New")
+Badge(variant="secondary", "Secondary")
+Badge(variant="destructive", "Error")
+Badge(variant="outline", "v2.0")""")
                 )
             )
         ),

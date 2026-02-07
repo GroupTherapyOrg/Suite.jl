@@ -1,11 +1,11 @@
-# SuiteNavigationMenu.jl — Suite.jl Navigation Menu Component
+# NavigationMenu.jl — Suite.jl Navigation Menu Component
 #
 # Tier: js_runtime (requires suite.js for hover timers, viewport sizing, animation)
 # Suite Dependencies: none (leaf component)
 # JS Modules: NavigationMenu, DismissLayer
 #
-# Usage via package: using Suite; SuiteNavigationMenu(SuiteNavigationMenuList(...))
-# Usage via extract: include("components/NavigationMenu.jl"); SuiteNavigationMenu(...)
+# Usage via package: using Suite; NavigationMenu(NavigationMenuList(...))
+# Usage via extract: include("components/NavigationMenu.jl"); NavigationMenu(...)
 #
 # Behavior (matches Radix NavigationMenu):
 #   - Hover trigger to open content panel (200ms delay)
@@ -22,39 +22,39 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteNavigationMenu, SuiteNavigationMenuList, SuiteNavigationMenuItem,
-       SuiteNavigationMenuTrigger, SuiteNavigationMenuContent,
-       SuiteNavigationMenuLink, SuiteNavigationMenuViewport,
-       SuiteNavigationMenuIndicator
+export NavigationMenu, NavigationMenuList, NavigationMenuItem,
+       NavigationMenuTrigger, NavigationMenuContent,
+       NavigationMenuLink, NavigationMenuViewport,
+       NavigationMenuIndicator
 
 # --- Chevron Down SVG ---
 const _NAV_CHEVRON_DOWN = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="relative top-[1px] ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
 
 """
-    SuiteNavigationMenu(children...; class, kwargs...) -> VNode
+    NavigationMenu(children...; class, kwargs...) -> VNode
 
 A site navigation menu with hover-triggered content panels.
 
 # Examples
 ```julia
-SuiteNavigationMenu(
-    SuiteNavigationMenuList(
-        SuiteNavigationMenuItem(
-            SuiteNavigationMenuTrigger("Getting Started"),
-            SuiteNavigationMenuContent(
-                SuiteNavigationMenuLink("Introduction", href="/docs/", description="Learn about Suite.jl"),
-                SuiteNavigationMenuLink("Installation", href="/docs/install/", description="How to install"),
+NavigationMenu(
+    NavigationMenuList(
+        NavigationMenuItem(
+            NavigationMenuTrigger("Getting Started"),
+            NavigationMenuContent(
+                NavigationMenuLink("Introduction", href="/docs/", description="Learn about Suite.jl"),
+                NavigationMenuLink("Installation", href="/docs/install/", description="How to install"),
             )
         ),
-        SuiteNavigationMenuItem(
-            SuiteNavigationMenuLink("Documentation", href="/docs/")
+        NavigationMenuItem(
+            NavigationMenuLink("Documentation", href="/docs/")
         ),
     ),
-    SuiteNavigationMenuViewport(),
+    NavigationMenuViewport(),
 )
 ```
 """
-function SuiteNavigationMenu(children...; orientation::String="horizontal", delay_duration::Int=200, skip_delay_duration::Int=300, theme::Symbol=:default, class::String="", kwargs...)
+function NavigationMenu(children...; orientation::String="horizontal", delay_duration::Int=200, skip_delay_duration::Int=300, theme::Symbol=:default, class::String="", kwargs...)
     id = "suite-nav-menu-" * string(rand(UInt32), base=16)
 
     classes = cn(
@@ -74,11 +74,11 @@ function SuiteNavigationMenu(children...; orientation::String="horizontal", dela
 end
 
 """
-    SuiteNavigationMenuList(children...; class, kwargs...) -> VNode
+    NavigationMenuList(children...; class, kwargs...) -> VNode
 
 Container for navigation menu items. Renders as a `<ul>`.
 """
-function SuiteNavigationMenuList(children...; class::String="", kwargs...)
+function NavigationMenuList(children...; class::String="", kwargs...)
     Ul(Symbol("data-suite-nav-menu-list") => "",
        :class => cn(
            "flex flex-1 list-none items-center justify-center gap-1",
@@ -90,11 +90,11 @@ function SuiteNavigationMenuList(children...; class::String="", kwargs...)
 end
 
 """
-    SuiteNavigationMenuItem(children...; value, class, kwargs...) -> VNode
+    NavigationMenuItem(children...; value, class, kwargs...) -> VNode
 
 A single item within the navigation menu. Can contain a trigger + content or just a link.
 """
-function SuiteNavigationMenuItem(children...; value::String="", class::String="", kwargs...)
+function NavigationMenuItem(children...; value::String="", class::String="", kwargs...)
     item_value = isempty(value) ? "nav-item-" * string(rand(UInt32), base=16) : value
 
     Li(Symbol("data-suite-nav-menu-item") => "",
@@ -106,11 +106,11 @@ function SuiteNavigationMenuItem(children...; value::String="", class::String=""
 end
 
 """
-    SuiteNavigationMenuTrigger(children...; disabled, class, kwargs...) -> VNode
+    NavigationMenuTrigger(children...; disabled, class, kwargs...) -> VNode
 
 The trigger button that opens a navigation menu content panel.
 """
-function SuiteNavigationMenuTrigger(children...; disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+function NavigationMenuTrigger(children...; disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "group inline-flex h-9 w-max items-center justify-center cursor-pointer rounded-md px-4 py-2",
         "text-sm font-medium transition-[color,box-shadow]",
@@ -124,7 +124,7 @@ function SuiteNavigationMenuTrigger(children...; disabled::Bool=false, theme::Sy
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Button(Symbol("data-suite-nav-menu-trigger") => "",
+    Therapy.Button(Symbol("data-suite-nav-menu-trigger") => "",
            Symbol("data-state") => "closed",
            :type => "button",
            :class => classes,
@@ -136,11 +136,11 @@ function SuiteNavigationMenuTrigger(children...; disabled::Bool=false, theme::Sy
 end
 
 """
-    SuiteNavigationMenuContent(children...; class, kwargs...) -> VNode
+    NavigationMenuContent(children...; class, kwargs...) -> VNode
 
 The content panel that appears when a trigger is hovered/clicked.
 """
-function SuiteNavigationMenuContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+function NavigationMenuContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "top-0 left-0 w-full p-4 md:absolute md:w-auto",
         "data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out",
@@ -163,11 +163,11 @@ function SuiteNavigationMenuContent(children...; theme::Symbol=:default, class::
 end
 
 """
-    SuiteNavigationMenuLink(children...; href, active, description, class, kwargs...) -> VNode
+    NavigationMenuLink(children...; href, active, description, class, kwargs...) -> VNode
 
 A link item within the navigation menu content. Can include a description.
 """
-function SuiteNavigationMenuLink(children...; href::String="#", active::Bool=false, description::String="", theme::Symbol=:default, class::String="", kwargs...)
+function NavigationMenuLink(children...; href::String="#", active::Bool=false, description::String="", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "flex flex-col gap-1 rounded-sm p-2 text-sm cursor-pointer transition-all outline-none",
         "hover:bg-warm-100 hover:dark:bg-warm-800",
@@ -193,11 +193,11 @@ function SuiteNavigationMenuLink(children...; href::String="#", active::Bool=fal
 end
 
 """
-    SuiteNavigationMenuViewport(; class, kwargs...) -> VNode
+    NavigationMenuViewport(; class, kwargs...) -> VNode
 
 Dynamic sizing viewport container for navigation menu content panels.
 """
-function SuiteNavigationMenuViewport(; theme::Symbol=:default, class::String="", kwargs...)
+function NavigationMenuViewport(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "origin-top-center mt-1.5 overflow-hidden rounded-md shadow",
         "bg-warm-50 dark:bg-warm-900",
@@ -218,11 +218,11 @@ function SuiteNavigationMenuViewport(; theme::Symbol=:default, class::String="",
 end
 
 """
-    SuiteNavigationMenuIndicator(; class, kwargs...) -> VNode
+    NavigationMenuIndicator(; class, kwargs...) -> VNode
 
 Visual indicator arrow that slides to show the active trigger position.
 """
-function SuiteNavigationMenuIndicator(; theme::Symbol=:default, class::String="", kwargs...)
+function NavigationMenuIndicator(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden",
         "data-[state=visible]:animate-in data-[state=hidden]:animate-out",
@@ -250,9 +250,9 @@ if @isdefined(register_component!)
         "Site navigation menu with hover-triggered content panels and viewport",
         Symbol[],
         [:NavigationMenu, :DismissLayer],
-        [:SuiteNavigationMenu, :SuiteNavigationMenuList, :SuiteNavigationMenuItem,
-         :SuiteNavigationMenuTrigger, :SuiteNavigationMenuContent,
-         :SuiteNavigationMenuLink, :SuiteNavigationMenuViewport,
-         :SuiteNavigationMenuIndicator],
+        [:NavigationMenu, :NavigationMenuList, :NavigationMenuItem,
+         :NavigationMenuTrigger, :NavigationMenuContent,
+         :NavigationMenuLink, :NavigationMenuViewport,
+         :NavigationMenuIndicator],
     ))
 end

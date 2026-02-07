@@ -1,11 +1,11 @@
-# SuiteBadge.jl — Suite.jl Badge Component
+# Badge.jl — Suite.jl Badge Component
 #
 # Tier: styling (pure HTML + Tailwind classes, no JS/Wasm)
 # Suite Dependencies: none (leaf component)
 # JS Modules: none
 #
-# Usage via package: using Suite; SuiteBadge("New")
-# Usage via extract: include("components/Badge.jl"); SuiteBadge("New")
+# Usage via package: using Suite; Badge("New")
+# Usage via extract: include("components/Badge.jl"); Badge("New")
 #
 # Reference: shadcn/ui Badge — https://ui.shadcn.com/docs/components/badge
 
@@ -15,10 +15,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteBadge
+export Badge
 
 """
-    SuiteBadge(children...; variant, class, kwargs...) -> VNode
+    Badge(children...; variant, class, kwargs...) -> VNode
 
 A small status indicator badge/pill.
 Equivalent to shadcn/ui's Badge component.
@@ -31,12 +31,12 @@ Equivalent to shadcn/ui's Badge component.
 
 # Examples
 ```julia
-SuiteBadge("New")
-SuiteBadge(variant="destructive", "Error")
-SuiteBadge(variant="outline", "v2.0")
+Badge("New")
+Badge(variant="destructive", "Error")
+Badge(variant="outline", "v2.0")
 ```
 """
-function SuiteBadge(children...; variant::String="default", class::String="", theme::Symbol=:default, kwargs...)
+function Badge(children...; variant::String="default", class::String="", theme::Symbol=:default, kwargs...)
     base = "inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 rounded-full border border-transparent px-2 py-0.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600"
 
     variant_classes = Dict(
@@ -62,6 +62,6 @@ if @isdefined(register_component!)
         "Small status indicator badge/pill",
         Symbol[],
         Symbol[],
-        [:SuiteBadge],
+        [:Badge],
     ))
 end

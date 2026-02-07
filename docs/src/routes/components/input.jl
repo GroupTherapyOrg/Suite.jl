@@ -1,8 +1,8 @@
 # Input — Suite.jl component docs page
 #
-# Showcases SuiteInput with types, states, and form patterns.
+# Showcases Input with types, states, and form patterns.
 
-const SuiteInput = Main.SuiteInput
+const Input = Main.Input
 
 function InputPage()
     ComponentsLayout(
@@ -18,28 +18,28 @@ function InputPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A default text input.",
-            SuiteInput(placeholder="Email", class="max-w-sm")
+            Input(placeholder="Email", class="max-w-sm")
         ),
 
         # With Label
         ComponentPreview(title="With Label", description="Input paired with a label.",
             Div(:class => "grid w-full max-w-sm items-center gap-1.5",
-                Main.SuiteLabel("Email"),
-                SuiteInput(type="email", placeholder="Email")
+                Main.Label("Email"),
+                Input(type="email", placeholder="Email")
             )
         ),
 
         # File Input
         ComponentPreview(title="File", description="Input for file uploads.",
             Div(:class => "grid w-full max-w-sm items-center gap-1.5",
-                Main.SuiteLabel("Picture"),
-                SuiteInput(type="file")
+                Main.Label("Picture"),
+                Input(type="file")
             )
         ),
 
         # Disabled
         ComponentPreview(title="Disabled", description="Input in disabled state.",
-            SuiteInput(disabled=true, placeholder="Disabled", class="max-w-sm")
+            Input(disabled=true, placeholder="Disabled", class="max-w-sm")
         ),
 
         # Usage
@@ -51,10 +51,10 @@ function InputPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteInput(placeholder="Email")
-SuiteInput(type="password", placeholder="Password")
-SuiteInput(type="file")
-SuiteInput(:disabled => true, placeholder="Disabled")""")
+Input(placeholder="Email")
+Input(type="password", placeholder="Password")
+Input(type="file")
+Input(:disabled => true, placeholder="Disabled")""")
                 )
             )
         ),

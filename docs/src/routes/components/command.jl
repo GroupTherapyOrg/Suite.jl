@@ -1,16 +1,16 @@
 # Command — Suite.jl component docs page
 #
-# Showcases SuiteCommand with grouped items, fuzzy search, and dialog variant.
+# Showcases Command with grouped items, fuzzy search, and dialog variant.
 
-const SuiteCommand = Main.SuiteCommand
-const SuiteCommandInput = Main.SuiteCommandInput
-const SuiteCommandList = Main.SuiteCommandList
-const SuiteCommandEmpty = Main.SuiteCommandEmpty
-const SuiteCommandGroup = Main.SuiteCommandGroup
-const SuiteCommandItem = Main.SuiteCommandItem
-const SuiteCommandSeparator = Main.SuiteCommandSeparator
-const SuiteCommandShortcut = Main.SuiteCommandShortcut
-const SuiteCommandDialog = Main.SuiteCommandDialog
+const Command = Main.Command
+const CommandInput = Main.CommandInput
+const CommandList = Main.CommandList
+const CommandEmpty = Main.CommandEmpty
+const CommandGroup = Main.CommandGroup
+const CommandItem = Main.CommandItem
+const CommandSeparator = Main.CommandSeparator
+const CommandShortcut = Main.CommandShortcut
+const CommandDialog = Main.CommandDialog
 
 function CommandPage()
     ComponentsLayout(
@@ -27,20 +27,20 @@ function CommandPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="Command palette with suggestion and settings groups.",
             Div(:class => "w-full max-w-md",
-                SuiteCommand(
-                    SuiteCommandInput(placeholder="Type a command or search..."),
-                    SuiteCommandList(
-                        SuiteCommandEmpty("No results found."),
-                        SuiteCommandGroup(heading="Suggestions",
-                            SuiteCommandItem(value="calendar", "Calendar"),
-                            SuiteCommandItem(value="search", "Search"),
-                            SuiteCommandItem(value="emoji", "Emoji"),
+                Command(
+                    CommandInput(placeholder="Type a command or search..."),
+                    CommandList(
+                        CommandEmpty("No results found."),
+                        CommandGroup(heading="Suggestions",
+                            CommandItem(value="calendar", "Calendar"),
+                            CommandItem(value="search", "Search"),
+                            CommandItem(value="emoji", "Emoji"),
                         ),
-                        SuiteCommandSeparator(),
-                        SuiteCommandGroup(heading="Settings",
-                            SuiteCommandItem(value="profile", "Profile", SuiteCommandShortcut("⌘P")),
-                            SuiteCommandItem(value="billing", "Billing", SuiteCommandShortcut("⌘B")),
-                            SuiteCommandItem(value="settings", "Settings", SuiteCommandShortcut("⌘,")),
+                        CommandSeparator(),
+                        CommandGroup(heading="Settings",
+                            CommandItem(value="profile", "Profile", CommandShortcut("⌘P")),
+                            CommandItem(value="billing", "Billing", CommandShortcut("⌘B")),
+                            CommandItem(value="settings", "Settings", CommandShortcut("⌘,")),
                         ),
                     ),
                 )
@@ -50,20 +50,20 @@ function CommandPage()
         # Dialog variant
         ComponentPreview(title="Dialog", description="Command palette rendered inside a dialog overlay.",
             Div(:class => "w-full max-w-md",
-                SuiteCommandDialog(
-                    SuiteCommandInput(placeholder="Type a command or search..."),
-                    SuiteCommandList(
-                        SuiteCommandEmpty("No results found."),
-                        SuiteCommandGroup(heading="Suggestions",
-                            SuiteCommandItem(value="calendar", "Calendar"),
-                            SuiteCommandItem(value="search", "Search"),
-                            SuiteCommandItem(value="emoji", "Emoji"),
+                CommandDialog(
+                    CommandInput(placeholder="Type a command or search..."),
+                    CommandList(
+                        CommandEmpty("No results found."),
+                        CommandGroup(heading="Suggestions",
+                            CommandItem(value="calendar", "Calendar"),
+                            CommandItem(value="search", "Search"),
+                            CommandItem(value="emoji", "Emoji"),
                         ),
-                        SuiteCommandSeparator(),
-                        SuiteCommandGroup(heading="Settings",
-                            SuiteCommandItem(value="profile", "Profile", SuiteCommandShortcut("⌘P")),
-                            SuiteCommandItem(value="billing", "Billing", SuiteCommandShortcut("⌘B")),
-                            SuiteCommandItem(value="settings", "Settings", SuiteCommandShortcut("⌘,")),
+                        CommandSeparator(),
+                        CommandGroup(heading="Settings",
+                            CommandItem(value="profile", "Profile", CommandShortcut("⌘P")),
+                            CommandItem(value="billing", "Billing", CommandShortcut("⌘B")),
+                            CommandItem(value="settings", "Settings", CommandShortcut("⌘,")),
                         ),
                     ),
                 )
@@ -79,20 +79,20 @@ function CommandPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteCommand(
-    SuiteCommandInput(placeholder="Type a command or search..."),
-    SuiteCommandList(
-        SuiteCommandEmpty("No results found."),
-        SuiteCommandGroup(heading="Suggestions",
-            SuiteCommandItem(value="calendar", "Calendar"),
-            SuiteCommandItem(value="search", "Search"),
+Command(
+    CommandInput(placeholder="Type a command or search..."),
+    CommandList(
+        CommandEmpty("No results found."),
+        CommandGroup(heading="Suggestions",
+            CommandItem(value="calendar", "Calendar"),
+            CommandItem(value="search", "Search"),
         ),
-        SuiteCommandSeparator(),
-        SuiteCommandGroup(heading="Settings",
-            SuiteCommandItem(value="profile", "Profile",
-                SuiteCommandShortcut("⌘P")),
-            SuiteCommandItem(value="settings", "Settings",
-                SuiteCommandShortcut("⌘,")),
+        CommandSeparator(),
+        CommandGroup(heading="Settings",
+            CommandItem(value="profile", "Profile",
+                CommandShortcut("⌘P")),
+            CommandItem(value="settings", "Settings",
+                CommandShortcut("⌘,")),
         ),
     ),
 )""")
@@ -133,7 +133,7 @@ SuiteCommand(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteCommand"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Command"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -142,7 +142,7 @@ SuiteCommand(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteCommandInput"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CommandInput"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -151,7 +151,7 @@ SuiteCommand(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteCommandList"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CommandList"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -160,7 +160,7 @@ SuiteCommand(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteCommandEmpty"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CommandEmpty"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -169,7 +169,7 @@ SuiteCommand(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteCommandGroup"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CommandGroup"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -178,7 +178,7 @@ SuiteCommand(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteCommandItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CommandItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -188,7 +188,7 @@ SuiteCommand(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteCommandSeparator"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CommandSeparator"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -197,7 +197,7 @@ SuiteCommand(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteCommandShortcut"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CommandShortcut"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -206,7 +206,7 @@ SuiteCommand(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteCommandDialog"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "CommandDialog"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

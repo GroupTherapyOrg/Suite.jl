@@ -1,8 +1,8 @@
 # Label — Suite.jl component docs page
 #
-# Showcases SuiteLabel for form field labels.
+# Showcases Label for form field labels.
 
-const SuiteLabel = Main.SuiteLabel
+const Label = Main.Label
 
 function LabelPage()
     ComponentsLayout(
@@ -19,8 +19,8 @@ function LabelPage()
         # Default Preview
         ComponentPreview(title="Default", description="A label paired with an input.",
             Div(:class => "grid w-full max-w-sm items-center gap-1.5",
-                SuiteLabel("Email"),
-                Main.SuiteInput(type="email", placeholder="Email")
+                Label("Email"),
+                Main.Input(type="email", placeholder="Email")
             )
         ),
 
@@ -33,8 +33,8 @@ function LabelPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteLabel("Email", :for => "email")
-SuiteLabel("Username")""")
+Label("Email", :for => "email")
+Label("Username")""")
                 )
             )
         ),

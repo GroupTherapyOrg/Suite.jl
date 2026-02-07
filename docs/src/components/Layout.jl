@@ -47,7 +47,7 @@ function Layout(children...; title="Suite.jl")
                             )
                         ),
                         # Theme toggle
-                        Main.SuiteThemeToggle()
+                        Main.ThemeToggle()
                     )
                 )
             )
@@ -58,8 +58,8 @@ function Layout(children...; title="Suite.jl")
             children...
         ),
 
-        # Footer separator (dogfooding SuiteSeparator)
-        Main.SuiteSeparator(),
+        # Footer separator (dogfooding Separator)
+        Main.Separator(),
 
         # Footer
         Footer(:class => "bg-warm-100 dark:bg-warm-900 mt-auto transition-colors duration-200",
@@ -75,7 +75,7 @@ function Layout(children...; title="Suite.jl")
         ),
 
         # Toast notification container (Sonner-style)
-        Main.SuiteToaster(),
+        Main.Toaster(),
 
         # Suite.jl JS Runtime (theme toggle + all interactive components)
         Main.suite_script()

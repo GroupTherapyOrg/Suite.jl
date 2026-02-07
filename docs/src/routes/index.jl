@@ -66,14 +66,14 @@ function Index()
 Suite.extract(:Card, "src/components/")
 
 # Then use your own copy:
-SuiteCard(
-    SuiteCardHeader(
-        SuiteCardTitle("Welcome"),
-        SuiteCardDescription("Your new Julia web app")
+Card(
+    CardHeader(
+        CardTitle("Welcome"),
+        CardDescription("Your new Julia web app")
     ),
-    SuiteCardContent(
-        SuiteButton(variant="default", "Get Started"),
-        SuiteButton(variant="outline", "Learn More")
+    CardContent(
+        Button(variant="default", "Get Started"),
+        Button(variant="outline", "Learn More")
     )
 )""")
                 )

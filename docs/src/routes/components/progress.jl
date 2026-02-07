@@ -1,8 +1,8 @@
 # Progress — Suite.jl component docs page
 #
-# Showcases SuiteProgress bar with different values.
+# Showcases Progress bar with different values.
 
-const SuiteProgress = Main.SuiteProgress
+const Progress = Main.Progress
 
 function ProgressPage()
     ComponentsLayout(
@@ -18,7 +18,7 @@ function ProgressPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="Progress bar at 33%.",
-            SuiteProgress(value=33, class="w-[60%]")
+            Progress(value=33, class="w-[60%]")
         ),
 
         # Multiple Values
@@ -26,23 +26,23 @@ function ProgressPage()
             Div(:class => "space-y-4 w-[60%]",
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "0%"),
-                    SuiteProgress(value=0)
+                    Progress(value=0)
                 ),
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "25%"),
-                    SuiteProgress(value=25)
+                    Progress(value=25)
                 ),
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "50%"),
-                    SuiteProgress(value=50)
+                    Progress(value=50)
                 ),
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "75%"),
-                    SuiteProgress(value=75)
+                    Progress(value=75)
                 ),
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "100%"),
-                    SuiteProgress(value=100)
+                    Progress(value=100)
                 )
             )
         ),
@@ -56,8 +56,8 @@ function ProgressPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteProgress(value=33)
-SuiteProgress(value=75, class="w-[60%]")""")
+Progress(value=33)
+Progress(value=75, class="w-[60%]")""")
                 )
             )
         ),

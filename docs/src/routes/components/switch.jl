@@ -1,8 +1,8 @@
 # Switch — Suite.jl component docs page
 #
-# Showcases SuiteSwitch with sizes and states.
+# Showcases Switch with sizes and states.
 
-const SuiteSwitch = Main.SuiteSwitch
+const Switch = Main.Switch
 
 function SwitchPage()
     ComponentsLayout(
@@ -19,7 +19,7 @@ function SwitchPage()
         # Default Preview
         ComponentPreview(title="Default", description="Click to toggle the switch on and off.",
             Div(:class => "flex items-center gap-3",
-                SuiteSwitch(),
+                Switch(),
                 Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Airplane Mode"),
             )
         ),
@@ -27,7 +27,7 @@ function SwitchPage()
         # Checked
         ComponentPreview(title="Checked", description="A switch that starts in the checked state.",
             Div(:class => "flex items-center gap-3",
-                SuiteSwitch(checked=true),
+                Switch(checked=true),
                 Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Notifications enabled"),
             )
         ),
@@ -36,11 +36,11 @@ function SwitchPage()
         ComponentPreview(title="Sizes", description="Default and small sizes.",
             Div(:class => "flex items-center gap-6",
                 Div(:class => "flex items-center gap-2",
-                    SuiteSwitch(),
+                    Switch(),
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Default"),
                 ),
                 Div(:class => "flex items-center gap-2",
-                    SuiteSwitch(size="sm"),
+                    Switch(size="sm"),
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Small"),
                 ),
             )
@@ -50,21 +50,21 @@ function SwitchPage()
         ComponentPreview(title="Disabled", description="Disabled switches cannot be toggled.",
             Div(:class => "flex items-center gap-6",
                 Div(:class => "flex items-center gap-2",
-                    SuiteSwitch(disabled=true),
+                    Switch(disabled=true),
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Disabled off"),
                 ),
                 Div(:class => "flex items-center gap-2",
-                    SuiteSwitch(checked=true, disabled=true),
+                    Switch(checked=true, disabled=true),
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Disabled on"),
                 ),
             )
         ),
 
-        # With label using SuiteLabel
+        # With label using Label
         ComponentPreview(title="With Label", description="Switch paired with a label.",
             Div(:class => "flex items-center gap-3",
-                SuiteSwitch(),
-                Main.SuiteLabel("Email notifications"),
+                Switch(),
+                Main.Label("Email notifications"),
             )
         ),
 
@@ -77,14 +77,14 @@ function SwitchPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteSwitch()
-SuiteSwitch(checked=true)
-SuiteSwitch(size="sm", disabled=true)
+Switch()
+Switch(checked=true)
+Switch(size="sm", disabled=true)
 
 # With a label
 Div(
-    SuiteSwitch(:id => "notifications"),
-    SuiteLabel(:htmlFor => "notifications", "Enable notifications"),
+    Switch(:id => "notifications"),
+    Label(:htmlFor => "notifications", "Enable notifications"),
 )""")
                 )
             )

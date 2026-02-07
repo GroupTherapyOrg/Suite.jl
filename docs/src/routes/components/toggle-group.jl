@@ -1,9 +1,9 @@
 # Toggle Group — Suite.jl component docs page
 #
-# Showcases SuiteToggleGroup with single/multiple modes and variants.
+# Showcases ToggleGroup with single/multiple modes and variants.
 
-const SuiteToggleGroup = Main.SuiteToggleGroup
-const SuiteToggleGroupItem = Main.SuiteToggleGroupItem
+const ToggleGroup = Main.ToggleGroup
+const ToggleGroupItem = Main.ToggleGroupItem
 
 function ToggleGroupPage()
     ComponentsLayout(
@@ -19,54 +19,54 @@ function ToggleGroupPage()
 
         # Single selection
         ComponentPreview(title="Single selection", description="Only one item can be active at a time.",
-            SuiteToggleGroup(type="single", default_value="center",
-                SuiteToggleGroupItem(value="left", "Left"),
-                SuiteToggleGroupItem(value="center", "Center"),
-                SuiteToggleGroupItem(value="right", "Right"),
+            ToggleGroup(type="single", default_value="center",
+                ToggleGroupItem(value="left", "Left"),
+                ToggleGroupItem(value="center", "Center"),
+                ToggleGroupItem(value="right", "Right"),
             )
         ),
 
         # Multiple selection
         ComponentPreview(title="Multiple selection", description="Any combination of items can be active.",
-            SuiteToggleGroup(type="multiple", default_value=["bold", "italic"],
-                SuiteToggleGroupItem(value="bold", "B"),
-                SuiteToggleGroupItem(value="italic", "I"),
-                SuiteToggleGroupItem(value="underline", "U"),
+            ToggleGroup(type="multiple", default_value=["bold", "italic"],
+                ToggleGroupItem(value="bold", "B"),
+                ToggleGroupItem(value="italic", "I"),
+                ToggleGroupItem(value="underline", "U"),
             )
         ),
 
         # Outline variant
         ComponentPreview(title="Outline variant", description="Toggle group with outlined items.",
-            SuiteToggleGroup(type="single", variant="outline",
-                SuiteToggleGroupItem(value="a", "A"),
-                SuiteToggleGroupItem(value="b", "B"),
-                SuiteToggleGroupItem(value="c", "C"),
+            ToggleGroup(type="single", variant="outline",
+                ToggleGroupItem(value="a", "A"),
+                ToggleGroupItem(value="b", "B"),
+                ToggleGroupItem(value="c", "C"),
             )
         ),
 
         # Sizes
         ComponentPreview(title="Sizes", description="Small, default, and large sizes.",
             Div(:class => "flex flex-col gap-4",
-                SuiteToggleGroup(type="single", size="sm",
-                    SuiteToggleGroupItem(value="1", "Sm"),
-                    SuiteToggleGroupItem(value="2", "Sm"),
+                ToggleGroup(type="single", size="sm",
+                    ToggleGroupItem(value="1", "Sm"),
+                    ToggleGroupItem(value="2", "Sm"),
                 ),
-                SuiteToggleGroup(type="single",
-                    SuiteToggleGroupItem(value="1", "Default"),
-                    SuiteToggleGroupItem(value="2", "Default"),
+                ToggleGroup(type="single",
+                    ToggleGroupItem(value="1", "Default"),
+                    ToggleGroupItem(value="2", "Default"),
                 ),
-                SuiteToggleGroup(type="single", size="lg",
-                    SuiteToggleGroupItem(value="1", "Lg"),
-                    SuiteToggleGroupItem(value="2", "Lg"),
+                ToggleGroup(type="single", size="lg",
+                    ToggleGroupItem(value="1", "Lg"),
+                    ToggleGroupItem(value="2", "Lg"),
                 ),
             )
         ),
 
         # Disabled
         ComponentPreview(title="Disabled", description="A disabled toggle group.",
-            SuiteToggleGroup(type="single", disabled=true,
-                SuiteToggleGroupItem(value="a", "A"),
-                SuiteToggleGroupItem(value="b", "B"),
+            ToggleGroup(type="single", disabled=true,
+                ToggleGroupItem(value="a", "A"),
+                ToggleGroupItem(value="b", "B"),
             )
         ),
 
@@ -80,17 +80,17 @@ function ToggleGroupPage()
                     Code(:class => "language-julia", """using Suite
 
 # Single selection
-SuiteToggleGroup(type="single", default_value="center",
-    SuiteToggleGroupItem(value="left", "Left"),
-    SuiteToggleGroupItem(value="center", "Center"),
-    SuiteToggleGroupItem(value="right", "Right"),
+ToggleGroup(type="single", default_value="center",
+    ToggleGroupItem(value="left", "Left"),
+    ToggleGroupItem(value="center", "Center"),
+    ToggleGroupItem(value="right", "Right"),
 )
 
 # Multiple selection
-SuiteToggleGroup(type="multiple",
-    SuiteToggleGroupItem(value="bold", "B"),
-    SuiteToggleGroupItem(value="italic", "I"),
-    SuiteToggleGroupItem(value="underline", "U"),
+ToggleGroup(type="multiple",
+    ToggleGroupItem(value="bold", "B"),
+    ToggleGroupItem(value="italic", "I"),
+    ToggleGroupItem(value="underline", "U"),
 )""")
                 )
             )
@@ -125,7 +125,7 @@ SuiteToggleGroup(type="multiple",
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteToggleGroup"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ToggleGroup"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -140,7 +140,7 @@ SuiteToggleGroup(type="multiple",
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteToggleGroupItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ToggleGroupItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

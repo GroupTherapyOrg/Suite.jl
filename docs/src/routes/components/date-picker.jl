@@ -1,9 +1,9 @@
 # Date Picker — Suite.jl component docs page
 #
-# Showcases SuiteDatePicker — a Calendar inside a Popover dropdown,
+# Showcases DatePicker — a Calendar inside a Popover dropdown,
 # with single, range, and multiple selection modes.
 
-const SuiteDatePicker_ = Main.SuiteDatePicker
+const DatePicker_ = Main.DatePicker
 
 function DatePickerPage()
     ComponentsLayout(
@@ -20,21 +20,21 @@ function DatePickerPage()
         # Basic Preview
         ComponentPreview(title="Single Date", description="Click the button to open a calendar. Select a date to populate the field.",
             Div(:class => "flex justify-center",
-                SuiteDatePicker_(month=2, year=2026)
+                DatePicker_(month=2, year=2026)
             )
         ),
 
         # Range Date Picker
         ComponentPreview(title="Date Range", description="Select a start and end date. Shows two months side by side.",
             Div(:class => "flex justify-center",
-                SuiteDatePicker_(mode="range", number_of_months=2, month=1, year=2026, placeholder="Select date range")
+                DatePicker_(mode="range", number_of_months=2, month=1, year=2026, placeholder="Select date range")
             )
         ),
 
         # Pre-selected
         ComponentPreview(title="Pre-selected Date", description="A date picker with a date already selected.",
             Div(:class => "flex justify-center",
-                SuiteDatePicker_(selected="2026-02-14", month=2, year=2026)
+                DatePicker_(selected="2026-02-14", month=2, year=2026)
             )
         ),
 
@@ -48,19 +48,19 @@ function DatePickerPage()
                     """using Suite
 
 # Simple date picker
-SuiteDatePicker()
+DatePicker()
 
 # Range picker with two months
-SuiteDatePicker(mode="range", number_of_months=2, placeholder="Select dates")
+DatePicker(mode="range", number_of_months=2, placeholder="Select dates")
 
 # Pre-selected date
-SuiteDatePicker(selected="2026-02-14")
+DatePicker(selected="2026-02-14")
 
 # Custom placeholder
-SuiteDatePicker(placeholder="Choose a birthday")
+DatePicker(placeholder="Choose a birthday")
 
 # Disabled dates
-SuiteDatePicker(disabled_dates="2026-02-14,2026-02-15")"""
+DatePicker(disabled_dates="2026-02-14,2026-02-15")"""
                 )
             )
         ),
@@ -71,15 +71,15 @@ SuiteDatePicker(disabled_dates="2026-02-14,2026-02-15")"""
                 "Composition"
             ),
             P(:class => "text-warm-600 dark:text-warm-300 mb-4",
-                "SuiteDatePicker is a composition of a trigger button with a SuiteCalendar inside a floating dropdown. For more control, you can compose these yourself using SuitePopover + SuiteCalendar."
+                "DatePicker is a composition of a trigger button with a Calendar inside a floating dropdown. For more control, you can compose these yourself using Popover + Calendar."
             ),
             Pre(:class => "bg-warm-100 dark:bg-warm-900 rounded-lg p-4 text-sm overflow-x-auto",
                 Code(:class => "text-warm-800 dark:text-warm-300",
                     """# Manual composition with Popover + Calendar
-SuitePopover(
-    SuitePopoverTrigger(SuiteButton(variant="outline", "Pick a date")),
-    SuitePopoverContent(class="w-auto p-0",
-        SuiteCalendar(mode="single")
+Popover(
+    PopoverTrigger(Button(variant="outline", "Pick a date")),
+    PopoverContent(class="w-auto p-0",
+        Calendar(mode="single")
     )
 )"""
                 )
@@ -92,14 +92,14 @@ SuitePopover(
                 "Keyboard Interactions"
             ),
             Div(:class => "overflow-x-auto",
-                Main.SuiteTable(
-                    Main.SuiteTableHeader(
-                        Main.SuiteTableRow(
-                            Main.SuiteTableHead("Key"),
-                            Main.SuiteTableHead("Action"),
+                Main.Table(
+                    Main.TableHeader(
+                        Main.TableRow(
+                            Main.TableHead("Key"),
+                            Main.TableHead("Action"),
                         )
                     ),
-                    Main.SuiteTableBody(
+                    Main.TableBody(
                         KeyRow("Space / Enter", "Open calendar (on trigger button)"),
                         KeyRow("Escape", "Close calendar and return focus to trigger"),
                         KeyRow("Arrow keys", "Navigate days in the calendar grid"),
@@ -116,19 +116,19 @@ SuitePopover(
                 "API Reference"
             ),
 
-            # SuiteDatePicker
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-50", "SuiteDatePicker"),
+            # DatePicker
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-50", "DatePicker"),
             Div(:class => "overflow-x-auto",
-                Main.SuiteTable(
-                    Main.SuiteTableHeader(
-                        Main.SuiteTableRow(
-                            Main.SuiteTableHead("Prop"),
-                            Main.SuiteTableHead("Type"),
-                            Main.SuiteTableHead("Default"),
-                            Main.SuiteTableHead("Description"),
+                Main.Table(
+                    Main.TableHeader(
+                        Main.TableRow(
+                            Main.TableHead("Prop"),
+                            Main.TableHead("Type"),
+                            Main.TableHead("Default"),
+                            Main.TableHead("Description"),
                         )
                     ),
-                    Main.SuiteTableBody(
+                    Main.TableBody(
                         ApiRow("mode", "String", "\"single\"", "Selection mode: single, multiple, or range"),
                         ApiRow("month", "Int", "current month", "Initial displayed month (1-12)"),
                         ApiRow("year", "Int", "current year", "Initial displayed year"),
@@ -147,18 +147,18 @@ SuitePopover(
 end
 
 function KeyRow(key, action)
-    Main.SuiteTableRow(
-        Main.SuiteTableCell(Code(:class => "text-sm", key)),
-        Main.SuiteTableCell(action),
+    Main.TableRow(
+        Main.TableCell(Code(:class => "text-sm", key)),
+        Main.TableCell(action),
     )
 end
 
 function ApiRow(prop, type, default, description)
-    Main.SuiteTableRow(
-        Main.SuiteTableCell(Code(:class => "text-sm text-accent-600 dark:text-accent-400", prop)),
-        Main.SuiteTableCell(Code(:class => "text-sm", type)),
-        Main.SuiteTableCell(Code(:class => "text-sm", default)),
-        Main.SuiteTableCell(description),
+    Main.TableRow(
+        Main.TableCell(Code(:class => "text-sm text-accent-600 dark:text-accent-400", prop)),
+        Main.TableCell(Code(:class => "text-sm", type)),
+        Main.TableCell(Code(:class => "text-sm", default)),
+        Main.TableCell(description),
     )
 end
 

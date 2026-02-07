@@ -1,15 +1,15 @@
 # Navigation Menu — Suite.jl component docs page
 #
-# Showcases SuiteNavigationMenu with trigger panels, content links, and direct link items.
+# Showcases NavigationMenu with trigger panels, content links, and direct link items.
 
-const SuiteNavigationMenu = Main.SuiteNavigationMenu
-const SuiteNavigationMenuList = Main.SuiteNavigationMenuList
-const SuiteNavigationMenuItem = Main.SuiteNavigationMenuItem
-const SuiteNavigationMenuTrigger = Main.SuiteNavigationMenuTrigger
-const SuiteNavigationMenuContent = Main.SuiteNavigationMenuContent
-const SuiteNavigationMenuLink = Main.SuiteNavigationMenuLink
-const SuiteNavigationMenuViewport = Main.SuiteNavigationMenuViewport
-const SuiteNavigationMenuIndicator = Main.SuiteNavigationMenuIndicator
+const NavigationMenu = Main.NavigationMenu
+const NavigationMenuList = Main.NavigationMenuList
+const NavigationMenuItem = Main.NavigationMenuItem
+const NavigationMenuTrigger = Main.NavigationMenuTrigger
+const NavigationMenuContent = Main.NavigationMenuContent
+const NavigationMenuLink = Main.NavigationMenuLink
+const NavigationMenuViewport = Main.NavigationMenuViewport
+const NavigationMenuIndicator = Main.NavigationMenuIndicator
 
 function NavigationMenuPage()
     ComponentsLayout(
@@ -26,48 +26,48 @@ function NavigationMenuPage()
         # Default Preview
         ComponentPreview(title="Default", description="Site navigation with trigger panels and a direct link.",
             Div(:class => "w-full max-w-2xl",
-                SuiteNavigationMenu(
-                    SuiteNavigationMenuList(
+                NavigationMenu(
+                    NavigationMenuList(
                         # Getting Started
-                        SuiteNavigationMenuItem(
-                            SuiteNavigationMenuTrigger("Getting Started"),
-                            SuiteNavigationMenuContent(
-                                SuiteNavigationMenuLink(href="/docs/introduction", title="Introduction",
+                        NavigationMenuItem(
+                            NavigationMenuTrigger("Getting Started"),
+                            NavigationMenuContent(
+                                NavigationMenuLink(href="/docs/introduction", title="Introduction",
                                     "Re-usable components built with Therapy.jl and Tailwind CSS."
                                 ),
-                                SuiteNavigationMenuLink(href="/docs/installation", title="Installation",
+                                NavigationMenuLink(href="/docs/installation", title="Installation",
                                     "How to install dependencies and structure your app."
                                 ),
-                                SuiteNavigationMenuLink(href="/docs/typography", title="Typography",
+                                NavigationMenuLink(href="/docs/typography", title="Typography",
                                     "Styles for headings, paragraphs, lists, and inline code."
                                 ),
                             ),
                         ),
 
                         # Components
-                        SuiteNavigationMenuItem(
-                            SuiteNavigationMenuTrigger("Components"),
-                            SuiteNavigationMenuContent(
-                                SuiteNavigationMenuLink(href="/docs/components/button", title="Button",
+                        NavigationMenuItem(
+                            NavigationMenuTrigger("Components"),
+                            NavigationMenuContent(
+                                NavigationMenuLink(href="/docs/components/button", title="Button",
                                     "Displays a button or a component that looks like a button."
                                 ),
-                                SuiteNavigationMenuLink(href="/docs/components/dialog", title="Dialog",
+                                NavigationMenuLink(href="/docs/components/dialog", title="Dialog",
                                     "A window overlaid on the primary content."
                                 ),
-                                SuiteNavigationMenuLink(href="/docs/components/tabs", title="Tabs",
+                                NavigationMenuLink(href="/docs/components/tabs", title="Tabs",
                                     "A set of layered sections of content, known as tab panels."
                                 ),
                             ),
                         ),
 
                         # Direct link
-                        SuiteNavigationMenuItem(
-                            SuiteNavigationMenuLink(href="/docs", title="Documentation",
+                        NavigationMenuItem(
+                            NavigationMenuLink(href="/docs", title="Documentation",
                                 "Browse the full documentation."
                             ),
                         ),
                     ),
-                    SuiteNavigationMenuViewport(),
+                    NavigationMenuViewport(),
                 )
             )
         ),
@@ -81,23 +81,23 @@ function NavigationMenuPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteNavigationMenu(
-    SuiteNavigationMenuList(
-        SuiteNavigationMenuItem(
-            SuiteNavigationMenuTrigger("Getting Started"),
-            SuiteNavigationMenuContent(
-                SuiteNavigationMenuLink(href="/intro", title="Introduction",
+NavigationMenu(
+    NavigationMenuList(
+        NavigationMenuItem(
+            NavigationMenuTrigger("Getting Started"),
+            NavigationMenuContent(
+                NavigationMenuLink(href="/intro", title="Introduction",
                     "A brief overview of the project."
                 ),
             ),
         ),
-        SuiteNavigationMenuItem(
-            SuiteNavigationMenuLink(href="/docs", title="Documentation",
+        NavigationMenuItem(
+            NavigationMenuLink(href="/docs", title="Documentation",
                 "Browse the full docs."
             ),
         ),
     ),
-    SuiteNavigationMenuViewport(),
+    NavigationMenuViewport(),
 )""")
                 )
             )
@@ -133,7 +133,7 @@ SuiteNavigationMenu(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteNavigationMenu"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "NavigationMenu"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -144,7 +144,7 @@ SuiteNavigationMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteNavigationMenuList"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "NavigationMenuList"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -154,7 +154,7 @@ SuiteNavigationMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteNavigationMenuItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "NavigationMenuItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -164,7 +164,7 @@ SuiteNavigationMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteNavigationMenuTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "NavigationMenuTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -174,7 +174,7 @@ SuiteNavigationMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteNavigationMenuContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "NavigationMenuContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -184,7 +184,7 @@ SuiteNavigationMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteNavigationMenuLink"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "NavigationMenuLink"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -196,7 +196,7 @@ SuiteNavigationMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteNavigationMenuViewport"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "NavigationMenuViewport"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -205,7 +205,7 @@ SuiteNavigationMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteNavigationMenuIndicator"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "NavigationMenuIndicator"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

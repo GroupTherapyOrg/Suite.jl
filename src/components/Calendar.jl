@@ -1,11 +1,11 @@
-# SuiteCalendar.jl — Suite.jl Calendar Component
+# Calendar.jl — Suite.jl Calendar Component
 #
 # Tier: js_runtime (requires suite.js)
 # Suite Dependencies: Button (for nav buttons)
 # JS Modules: Calendar
 #
-# Usage via package: using Suite; SuiteCalendar()
-# Usage via extract: include("components/Calendar.jl"); SuiteCalendar()
+# Usage via package: using Suite; Calendar()
+# Usage via extract: include("components/Calendar.jl"); Calendar()
 #
 # Behavior (matches shadcn/ui Calendar / react-day-picker):
 #   - Month grid with day selection
@@ -25,7 +25,7 @@ using Dates
 
 # --- Component Implementation ---
 
-export SuiteCalendar, SuiteDatePicker
+export Calendar, DatePicker
 
 # --- SVG Icons ---
 const _CALENDAR_CHEVRON_LEFT = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>"""
@@ -88,7 +88,7 @@ function _calendar_weeks(year::Int, month::Int; show_outside_days::Bool=true)
 end
 
 """
-    SuiteCalendar(; mode, month, year, selected, disabled_dates,
+    Calendar(; mode, month, year, selected, disabled_dates,
                    show_outside_days, fixed_weeks, class, theme, kwargs...) -> VNode
 
 A date calendar grid with selection, navigation, and keyboard interaction.
@@ -108,16 +108,16 @@ A date calendar grid with selection, navigation, and keyboard interaction.
 # Examples
 ```julia
 # Single date selection
-SuiteCalendar()
+Calendar()
 
 # Range selection with 2 months
-SuiteCalendar(mode="range", number_of_months=2)
+Calendar(mode="range", number_of_months=2)
 
 # Pre-selected date
-SuiteCalendar(selected="2026-02-14")
+Calendar(selected="2026-02-14")
 ```
 """
-function SuiteCalendar(; mode::String="single",
+function Calendar(; mode::String="single",
                         month::Int=Dates.month(Dates.today()),
                         year::Int=Dates.year(Dates.today()),
                         selected::String="",
@@ -152,12 +152,12 @@ function SuiteCalendar(; mode::String="single",
     # Navigation buttons
     nav = Nav(:class => "flex items-center justify-between absolute top-3 inset-x-3 z-10",
               :aria_label => "Calendar navigation",
-              Button(:type => "button",
+              Therapy.Button(:type => "button",
                      :class => cn(_nav_button_classes(theme)),
                      Symbol("data-suite-calendar-prev") => id,
                      :aria_label => "Go to previous month",
                      Therapy.RawHtml(_CALENDAR_CHEVRON_LEFT)),
-              Button(:type => "button",
+              Therapy.Button(:type => "button",
                      :class => cn(_nav_button_classes(theme)),
                      Symbol("data-suite-calendar-next") => id,
                      :aria_label => "Go to next month",
@@ -257,7 +257,7 @@ function _calendar_month_panel(cal_id, year, month, show_outside_days, fixed_wee
     Div(:class => "flex flex-col gap-4 w-full",
         Symbol("data-suite-calendar-month-panel") => string(month_index),
         caption,
-        Table(grid_attrs..., thead, tbody))
+        Therapy.Table(grid_attrs..., thead, tbody))
 end
 
 function _weekday_classes(theme::Symbol=:default)
@@ -317,7 +317,7 @@ function _calendar_day_cell(cal_id, day, show_outside_days, mode, theme)
     Td(:class => cell_classes,
        :role => "gridcell",
        data_attrs...,
-       Button(:type => "button",
+       Therapy.Button(:type => "button",
               :class => btn_classes,
               :tabindex => "-1",
               Symbol("data-suite-calendar-day-btn") => day.iso_date,
@@ -326,7 +326,7 @@ function _calendar_day_cell(cal_id, day, show_outside_days, mode, theme)
 end
 
 """
-    SuiteDatePicker(; mode, month, year, selected, placeholder,
+    DatePicker(; mode, month, year, selected, placeholder,
                      show_outside_days, class, theme, kwargs...) -> VNode
 
 A date picker combining a trigger button with a Calendar in a Popover.
@@ -346,16 +346,16 @@ A date picker combining a trigger button with a Calendar in a Popover.
 # Examples
 ```julia
 # Simple date picker
-SuiteDatePicker()
+DatePicker()
 
 # Range picker with 2 months
-SuiteDatePicker(mode="range", number_of_months=2, placeholder="Select dates")
+DatePicker(mode="range", number_of_months=2, placeholder="Select dates")
 
 # Pre-selected date
-SuiteDatePicker(selected="2026-02-14")
+DatePicker(selected="2026-02-14")
 ```
 """
-function SuiteDatePicker(; mode::String="single",
+function DatePicker(; mode::String="single",
                           month::Int=Dates.month(Dates.today()),
                           year::Int=Dates.year(Dates.today()),
                           selected::String="",
@@ -403,7 +403,7 @@ function SuiteDatePicker(; mode::String="single",
         :style => "display:contents",
         kwargs...,
         # Trigger button
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                :class => trigger_classes,
                Symbol("data-suite-datepicker-trigger") => id,
                :aria_haspopup => "dialog",
@@ -423,7 +423,7 @@ function SuiteDatePicker(; mode::String="single",
             :style => "display:none",
             :class => content_classes,
             # Calendar inside
-            SuiteCalendar(mode=mode, month=month, year=year, selected=selected,
+            Calendar(mode=mode, month=month, year=year, selected=selected,
                          disabled_dates=disabled_dates, show_outside_days=show_outside_days,
                          number_of_months=number_of_months, theme=theme)),
     )
@@ -464,6 +464,6 @@ if @isdefined(register_component!)
         "Date calendar grid with selection, navigation, and keyboard interaction",
         Symbol[],
         [:Calendar],
-        [:SuiteCalendar, :SuiteDatePicker],
+        [:Calendar, :DatePicker],
     ))
 end

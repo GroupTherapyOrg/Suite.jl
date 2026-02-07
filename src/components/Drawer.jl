@@ -1,11 +1,11 @@
-# SuiteDrawer.jl — Suite.jl Drawer Component
+# Drawer.jl — Suite.jl Drawer Component
 #
 # Tier: js_runtime (requires suite.js)
 # Suite Dependencies: none (leaf component)
 # JS Modules: FocusGuards, FocusTrap, DismissLayer, ScrollLock, Drawer
 #
-# Usage via package: using Suite; SuiteDrawer(...)
-# Usage via extract: include("components/Drawer.jl"); SuiteDrawer(...)
+# Usage via package: using Suite; Drawer(...)
+# Usage via extract: include("components/Drawer.jl"); Drawer(...)
 #
 # Behavior (matches Vaul drawer):
 #   - Bottom sheet with drag-to-dismiss
@@ -23,36 +23,36 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteDrawer, SuiteDrawerTrigger, SuiteDrawerContent,
-       SuiteDrawerHeader, SuiteDrawerFooter, SuiteDrawerTitle,
-       SuiteDrawerDescription, SuiteDrawerClose, SuiteDrawerHandle
+export Drawer, DrawerTrigger, DrawerContent,
+       DrawerHeader, DrawerFooter, DrawerTitle,
+       DrawerDescription, DrawerClose, DrawerHandle
 
 """
-    SuiteDrawer(children...; class, kwargs...) -> VNode
+    Drawer(children...; class, kwargs...) -> VNode
 
 A draggable bottom sheet overlay. Supports drag-to-dismiss with velocity
 and distance thresholds.
 
 # Examples
 ```julia
-SuiteDrawer(
-    SuiteDrawerTrigger(SuiteButton(variant="outline", "Open Drawer")),
-    SuiteDrawerContent(
-        SuiteDrawerHandle(),
-        SuiteDrawerHeader(
-            SuiteDrawerTitle("Move Goal"),
-            SuiteDrawerDescription("Set your daily activity goal.")
+Drawer(
+    DrawerTrigger(Button(variant="outline", "Open Drawer")),
+    DrawerContent(
+        DrawerHandle(),
+        DrawerHeader(
+            DrawerTitle("Move Goal"),
+            DrawerDescription("Set your daily activity goal.")
         ),
         # ... content
-        SuiteDrawerFooter(
-            SuiteDrawerClose(SuiteButton(variant="outline", "Cancel")),
-            SuiteButton("Submit")
+        DrawerFooter(
+            DrawerClose(Button(variant="outline", "Cancel")),
+            Button("Submit")
         )
     )
 )
 ```
 """
-function SuiteDrawer(children...; class::String="", kwargs...)
+function Drawer(children...; class::String="", kwargs...)
     id = "suite-drawer-" * string(rand(UInt32), base=16)
 
     trigger_nodes = []
@@ -87,28 +87,28 @@ function _drawer_set_trigger_id(node, id)
 end
 
 """
-    SuiteDrawerTrigger(children...; class, kwargs...) -> VNode
+    DrawerTrigger(children...; class, kwargs...) -> VNode
 
 The button that opens the drawer.
 """
-function SuiteDrawerTrigger(children...; class::String="", kwargs...)
+function DrawerTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-drawer-trigger-wrapper") => "",
         :style => "display:contents",
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end
 
 """
-    SuiteDrawerContent(children...; direction, class, kwargs...) -> VNode
+    DrawerContent(children...; direction, class, kwargs...) -> VNode
 
 The drawer content panel. Supports drag-to-dismiss.
 
 # Arguments
 - `direction::String="bottom"`: Direction to slide from ("bottom", "top", "left", "right")
 """
-function SuiteDrawerContent(children...; direction::String="bottom", theme::Symbol=:default, class::String="", kwargs...)
+function DrawerContent(children...; direction::String="bottom", theme::Symbol=:default, class::String="", kwargs...)
     # Direction-specific positioning classes
     dir_classes = if direction == "bottom"
         "inset-x-0 bottom-0 mt-24 rounded-t-[10px] border-t"
@@ -154,11 +154,11 @@ function SuiteDrawerContent(children...; direction::String="bottom", theme::Symb
 end
 
 """
-    SuiteDrawerHandle(; class, kwargs...) -> VNode
+    DrawerHandle(; class, kwargs...) -> VNode
 
 A visual drag handle indicator for the drawer.
 """
-function SuiteDrawerHandle(; theme::Symbol=:default, class::String="", kwargs...)
+function DrawerHandle(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("mx-auto mt-4 h-2 w-[100px] rounded-full bg-warm-200 dark:bg-warm-800", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -167,55 +167,55 @@ function SuiteDrawerHandle(; theme::Symbol=:default, class::String="", kwargs...
 end
 
 """
-    SuiteDrawerHeader(children...; class, kwargs...) -> VNode
+    DrawerHeader(children...; class, kwargs...) -> VNode
 
 Header section of the drawer.
 """
-function SuiteDrawerHeader(children...; class::String="", kwargs...)
+function DrawerHeader(children...; class::String="", kwargs...)
     Div(:class => cn("flex flex-col gap-2 p-4 text-center sm:text-left", class),
         kwargs...,
         children...)
 end
 
 """
-    SuiteDrawerFooter(children...; class, kwargs...) -> VNode
+    DrawerFooter(children...; class, kwargs...) -> VNode
 
 Footer section of the drawer.
 """
-function SuiteDrawerFooter(children...; class::String="", kwargs...)
+function DrawerFooter(children...; class::String="", kwargs...)
     Div(:class => cn("flex flex-col gap-2 p-4", class),
         kwargs...,
         children...)
 end
 
 """
-    SuiteDrawerTitle(children...; class, kwargs...) -> VNode
+    DrawerTitle(children...; class, kwargs...) -> VNode
 
 Title of the drawer. Renders as h2.
 """
-function SuiteDrawerTitle(children...; class::String="", kwargs...)
+function DrawerTitle(children...; class::String="", kwargs...)
     H2(:class => cn("text-lg leading-none font-semibold", class),
        kwargs...,
        children...)
 end
 
 """
-    SuiteDrawerDescription(children...; class, kwargs...) -> VNode
+    DrawerDescription(children...; class, kwargs...) -> VNode
 
 Description text for the drawer.
 """
-function SuiteDrawerDescription(children...; class::String="", kwargs...)
+function DrawerDescription(children...; class::String="", kwargs...)
     P(:class => cn("text-warm-600 dark:text-warm-500 text-sm", class),
       kwargs...,
       children...)
 end
 
 """
-    SuiteDrawerClose(children...; class, kwargs...) -> VNode
+    DrawerClose(children...; class, kwargs...) -> VNode
 
 A button that closes the drawer when clicked.
 """
-function SuiteDrawerClose(children...; class::String="", kwargs...)
+function DrawerClose(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-drawer-close") => "",
          :class => cn(class),
          :style => "display:contents",
@@ -232,8 +232,8 @@ if @isdefined(register_component!)
         "Draggable bottom sheet with velocity-based dismiss",
         Symbol[],
         [:FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :Drawer],
-        [:SuiteDrawer, :SuiteDrawerTrigger, :SuiteDrawerContent,
-         :SuiteDrawerHeader, :SuiteDrawerFooter, :SuiteDrawerTitle,
-         :SuiteDrawerDescription, :SuiteDrawerClose, :SuiteDrawerHandle],
+        [:Drawer, :DrawerTrigger, :DrawerContent,
+         :DrawerHeader, :DrawerFooter, :DrawerTitle,
+         :DrawerDescription, :DrawerClose, :DrawerHandle],
     ))
 end

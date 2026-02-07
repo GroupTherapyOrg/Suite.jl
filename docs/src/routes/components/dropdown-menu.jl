@@ -1,23 +1,23 @@
 # DropdownMenu — Suite.jl component docs page
 #
-# Showcases SuiteDropdownMenu with basic items, checkboxes, radio groups,
+# Showcases DropdownMenu with basic items, checkboxes, radio groups,
 # submenus, keyboard shortcuts, and full keyboard navigation.
 
-const SuiteDropdownMenu = Main.SuiteDropdownMenu
-const SuiteDropdownMenuTrigger = Main.SuiteDropdownMenuTrigger
-const SuiteDropdownMenuContent = Main.SuiteDropdownMenuContent
-const SuiteDropdownMenuGroup = Main.SuiteDropdownMenuGroup
-const SuiteDropdownMenuLabel = Main.SuiteDropdownMenuLabel
-const SuiteDropdownMenuItem = Main.SuiteDropdownMenuItem
-const SuiteDropdownMenuCheckboxItem = Main.SuiteDropdownMenuCheckboxItem
-const SuiteDropdownMenuRadioGroup = Main.SuiteDropdownMenuRadioGroup
-const SuiteDropdownMenuRadioItem = Main.SuiteDropdownMenuRadioItem
-const SuiteDropdownMenuItemIndicator = Main.SuiteDropdownMenuItemIndicator
-const SuiteDropdownMenuSeparator = Main.SuiteDropdownMenuSeparator
-const SuiteDropdownMenuShortcut = Main.SuiteDropdownMenuShortcut
-const SuiteDropdownMenuSub = Main.SuiteDropdownMenuSub
-const SuiteDropdownMenuSubTrigger = Main.SuiteDropdownMenuSubTrigger
-const SuiteDropdownMenuSubContent = Main.SuiteDropdownMenuSubContent
+const DropdownMenu = Main.DropdownMenu
+const DropdownMenuTrigger = Main.DropdownMenuTrigger
+const DropdownMenuContent = Main.DropdownMenuContent
+const DropdownMenuGroup = Main.DropdownMenuGroup
+const DropdownMenuLabel = Main.DropdownMenuLabel
+const DropdownMenuItem = Main.DropdownMenuItem
+const DropdownMenuCheckboxItem = Main.DropdownMenuCheckboxItem
+const DropdownMenuRadioGroup = Main.DropdownMenuRadioGroup
+const DropdownMenuRadioItem = Main.DropdownMenuRadioItem
+const DropdownMenuItemIndicator = Main.DropdownMenuItemIndicator
+const DropdownMenuSeparator = Main.DropdownMenuSeparator
+const DropdownMenuShortcut = Main.DropdownMenuShortcut
+const DropdownMenuSub = Main.DropdownMenuSub
+const DropdownMenuSubTrigger = Main.DropdownMenuSubTrigger
+const DropdownMenuSubContent = Main.DropdownMenuSubContent
 
 function DropdownMenuPage()
     ComponentsLayout(
@@ -34,29 +34,29 @@ function DropdownMenuPage()
         # Basic dropdown preview
         ComponentPreview(title="Basic", description="A simple \"My Account\" dropdown with items and keyboard shortcuts.",
             Div(:class => "w-full max-w-md flex justify-center",
-                SuiteDropdownMenu(
-                    SuiteDropdownMenuTrigger(
-                        SuiteButton(variant="outline", "My Account")
+                DropdownMenu(
+                    DropdownMenuTrigger(
+                        Button(variant="outline", "My Account")
                     ),
-                    SuiteDropdownMenuContent(
-                        SuiteDropdownMenuLabel("My Account"),
-                        SuiteDropdownMenuSeparator(),
-                        SuiteDropdownMenuGroup(
-                            SuiteDropdownMenuItem(
+                    DropdownMenuContent(
+                        DropdownMenuLabel("My Account"),
+                        DropdownMenuSeparator(),
+                        DropdownMenuGroup(
+                            DropdownMenuItem(
                                 "Profile",
-                                SuiteDropdownMenuShortcut("Shift+Cmd+P")
+                                DropdownMenuShortcut("Shift+Cmd+P")
                             ),
-                            SuiteDropdownMenuItem(
+                            DropdownMenuItem(
                                 "Billing",
-                                SuiteDropdownMenuShortcut("Cmd+B")
+                                DropdownMenuShortcut("Cmd+B")
                             ),
-                            SuiteDropdownMenuItem(
+                            DropdownMenuItem(
                                 "Settings",
-                                SuiteDropdownMenuShortcut("Cmd+,")
+                                DropdownMenuShortcut("Cmd+,")
                             ),
                         ),
-                        SuiteDropdownMenuSeparator(),
-                        SuiteDropdownMenuItem("Log out", SuiteDropdownMenuShortcut("Shift+Cmd+Q")),
+                        DropdownMenuSeparator(),
+                        DropdownMenuItem("Log out", DropdownMenuShortcut("Shift+Cmd+Q")),
                     )
                 )
             )
@@ -65,34 +65,34 @@ function DropdownMenuPage()
         # Checkboxes and Radio groups
         ComponentPreview(title="With Checkboxes & Radio", description="Checkbox items for toggles and radio groups for single-select options.",
             Div(:class => "w-full max-w-md flex justify-center",
-                SuiteDropdownMenu(
-                    SuiteDropdownMenuTrigger(
-                        SuiteButton(variant="outline", "Options")
+                DropdownMenu(
+                    DropdownMenuTrigger(
+                        Button(variant="outline", "Options")
                     ),
-                    SuiteDropdownMenuContent(
-                        SuiteDropdownMenuLabel("Appearance"),
-                        SuiteDropdownMenuSeparator(),
-                        SuiteDropdownMenuCheckboxItem(checked=true,
-                            SuiteDropdownMenuItemIndicator(),
+                    DropdownMenuContent(
+                        DropdownMenuLabel("Appearance"),
+                        DropdownMenuSeparator(),
+                        DropdownMenuCheckboxItem(checked=true,
+                            DropdownMenuItemIndicator(),
                             "Status Bar"
                         ),
-                        SuiteDropdownMenuCheckboxItem(checked=false,
-                            SuiteDropdownMenuItemIndicator(),
+                        DropdownMenuCheckboxItem(checked=false,
+                            DropdownMenuItemIndicator(),
                             "Activity Bar"
                         ),
-                        SuiteDropdownMenuSeparator(),
-                        SuiteDropdownMenuLabel("Theme"),
-                        SuiteDropdownMenuRadioGroup(value="system",
-                            SuiteDropdownMenuRadioItem(value="system",
-                                SuiteDropdownMenuItemIndicator(),
+                        DropdownMenuSeparator(),
+                        DropdownMenuLabel("Theme"),
+                        DropdownMenuRadioGroup(value="system",
+                            DropdownMenuRadioItem(value="system",
+                                DropdownMenuItemIndicator(),
                                 "System"
                             ),
-                            SuiteDropdownMenuRadioItem(value="light",
-                                SuiteDropdownMenuItemIndicator(),
+                            DropdownMenuRadioItem(value="light",
+                                DropdownMenuItemIndicator(),
                                 "Light"
                             ),
-                            SuiteDropdownMenuRadioItem(value="dark",
-                                SuiteDropdownMenuItemIndicator(),
+                            DropdownMenuRadioItem(value="dark",
+                                DropdownMenuItemIndicator(),
                                 "Dark"
                             ),
                         ),
@@ -110,19 +110,19 @@ function DropdownMenuPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteDropdownMenu(
-    SuiteDropdownMenuTrigger(
-        SuiteButton(variant="outline", "Open Menu")
+DropdownMenu(
+    DropdownMenuTrigger(
+        Button(variant="outline", "Open Menu")
     ),
-    SuiteDropdownMenuContent(
-        SuiteDropdownMenuLabel("Actions"),
-        SuiteDropdownMenuSeparator(),
-        SuiteDropdownMenuGroup(
-            SuiteDropdownMenuItem("Profile", SuiteDropdownMenuShortcut("Cmd+P")),
-            SuiteDropdownMenuItem("Settings", SuiteDropdownMenuShortcut("Cmd+,")),
+    DropdownMenuContent(
+        DropdownMenuLabel("Actions"),
+        DropdownMenuSeparator(),
+        DropdownMenuGroup(
+            DropdownMenuItem("Profile", DropdownMenuShortcut("Cmd+P")),
+            DropdownMenuItem("Settings", DropdownMenuShortcut("Cmd+,")),
         ),
-        SuiteDropdownMenuSeparator(),
-        SuiteDropdownMenuItem("Log out"),
+        DropdownMenuSeparator(),
+        DropdownMenuItem("Log out"),
     )
 )""")
                 )
@@ -162,7 +162,7 @@ SuiteDropdownMenu(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenu"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenu"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -174,7 +174,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -185,7 +185,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -197,7 +197,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuGroup"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuGroup"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -207,7 +207,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuLabel"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuLabel"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -218,7 +218,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -231,7 +231,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuCheckboxItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuCheckboxItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -244,7 +244,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuRadioGroup"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuRadioGroup"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -256,7 +256,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuRadioItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuRadioItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -268,7 +268,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuItemIndicator"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuItemIndicator"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -278,7 +278,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuSeparator"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuSeparator"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -287,7 +287,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuShortcut"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuShortcut"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -297,7 +297,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuSub"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuSub"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -309,7 +309,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuSubTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuSubTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -321,7 +321,7 @@ SuiteDropdownMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteDropdownMenuSubContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "DropdownMenuSubContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

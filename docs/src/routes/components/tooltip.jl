@@ -1,11 +1,11 @@
 # Tooltip — Suite.jl component docs page
 #
-# Showcases SuiteTooltip with basic hover, multiple tooltips, and shared delay via provider.
+# Showcases Tooltip with basic hover, multiple tooltips, and shared delay via provider.
 
-const SuiteTooltipProvider = Main.SuiteTooltipProvider
-const SuiteTooltip = Main.SuiteTooltip
-const SuiteTooltipTrigger = Main.SuiteTooltipTrigger
-const SuiteTooltipContent = Main.SuiteTooltipContent
+const TooltipProvider = Main.TooltipProvider
+const Tooltip = Main.Tooltip
+const TooltipTrigger = Main.TooltipTrigger
+const TooltipContent = Main.TooltipContent
 
 function TooltipPage()
     ComponentsLayout(
@@ -22,12 +22,12 @@ function TooltipPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="Hover over the button to see tooltip text.",
             Div(:class => "w-full max-w-md flex items-center justify-center",
-                SuiteTooltipProvider(
-                    SuiteTooltip(
-                        SuiteTooltipTrigger(
+                TooltipProvider(
+                    Tooltip(
+                        TooltipTrigger(
                             Button(:class => "inline-flex items-center justify-center rounded-md bg-accent-600 px-4 py-2 text-sm font-medium text-white hover:bg-accent-700", "Hover me")
                         ),
-                        SuiteTooltipContent(side="top",
+                        TooltipContent(side="top",
                             P(:class => "text-sm", "Add to library")
                         ),
                     )
@@ -36,30 +36,30 @@ function TooltipPage()
         ),
 
         # Multiple Tooltips
-        ComponentPreview(title="Multiple Tooltips", description="Wrap all in a SuiteTooltipProvider for shared delay state. Consecutive tooltips open instantly within the skip window.",
+        ComponentPreview(title="Multiple Tooltips", description="Wrap all in a TooltipProvider for shared delay state. Consecutive tooltips open instantly within the skip window.",
             Div(:class => "w-full max-w-md flex items-center justify-center gap-4",
-                SuiteTooltipProvider(
-                    SuiteTooltip(
-                        SuiteTooltipTrigger(
+                TooltipProvider(
+                    Tooltip(
+                        TooltipTrigger(
                             Button(:class => "inline-flex items-center justify-center rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-800 px-4 py-2 text-sm font-medium text-warm-800 dark:text-warm-200 hover:bg-warm-100 dark:hover:bg-warm-700", "Bold")
                         ),
-                        SuiteTooltipContent(side="bottom",
+                        TooltipContent(side="bottom",
                             P(:class => "text-sm", "Toggle bold")
                         ),
                     ),
-                    SuiteTooltip(
-                        SuiteTooltipTrigger(
+                    Tooltip(
+                        TooltipTrigger(
                             Button(:class => "inline-flex items-center justify-center rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-800 px-4 py-2 text-sm font-medium text-warm-800 dark:text-warm-200 hover:bg-warm-100 dark:hover:bg-warm-700", "Italic")
                         ),
-                        SuiteTooltipContent(side="bottom",
+                        TooltipContent(side="bottom",
                             P(:class => "text-sm", "Toggle italic")
                         ),
                     ),
-                    SuiteTooltip(
-                        SuiteTooltipTrigger(
+                    Tooltip(
+                        TooltipTrigger(
                             Button(:class => "inline-flex items-center justify-center rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-800 px-4 py-2 text-sm font-medium text-warm-800 dark:text-warm-200 hover:bg-warm-100 dark:hover:bg-warm-700", "Underline")
                         ),
-                        SuiteTooltipContent(side="bottom",
+                        TooltipContent(side="bottom",
                             P(:class => "text-sm", "Toggle underline")
                         ),
                     ),
@@ -76,12 +76,12 @@ function TooltipPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteTooltipProvider(
-    SuiteTooltip(
-        SuiteTooltipTrigger(
-            SuiteButton("Hover me"),
+TooltipProvider(
+    Tooltip(
+        TooltipTrigger(
+            Button("Hover me"),
         ),
-        SuiteTooltipContent(
+        TooltipContent(
             P("Add to library"),
         ),
     ),
@@ -128,7 +128,7 @@ SuiteTooltipProvider(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteTooltipProvider"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "TooltipProvider"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -138,7 +138,7 @@ SuiteTooltipProvider(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteTooltip"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Tooltip"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -147,7 +147,7 @@ SuiteTooltipProvider(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteTooltipTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "TooltipTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -156,7 +156,7 @@ SuiteTooltipProvider(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteTooltipContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "TooltipContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

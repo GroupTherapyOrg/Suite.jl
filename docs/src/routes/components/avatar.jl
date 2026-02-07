@@ -1,10 +1,10 @@
 # Avatar — Suite.jl component docs page
 #
-# Showcases SuiteAvatar with image, fallback, and sizes.
+# Showcases Avatar with image, fallback, and sizes.
 
-const SuiteAvatar = Main.SuiteAvatar
-const SuiteAvatarImage = Main.SuiteAvatarImage
-const SuiteAvatarFallback = Main.SuiteAvatarFallback
+const Avatar = Main.Avatar
+const AvatarImage = Main.AvatarImage
+const AvatarFallback = Main.AvatarFallback
 
 function AvatarPage()
     ComponentsLayout(
@@ -21,18 +21,18 @@ function AvatarPage()
         # Default Preview
         ComponentPreview(title="With Fallback", description="Avatar showing initials when no image is available.",
             Div(:class => "flex items-center gap-4",
-                SuiteAvatar(SuiteAvatarFallback("JD")),
-                SuiteAvatar(SuiteAvatarFallback("AB")),
-                SuiteAvatar(SuiteAvatarFallback("CN"))
+                Avatar(AvatarFallback("JD")),
+                Avatar(AvatarFallback("AB")),
+                Avatar(AvatarFallback("CN"))
             )
         ),
 
         # Sizes
         ComponentPreview(title="Sizes", description="Available avatar sizes.",
             Div(:class => "flex items-center gap-4",
-                SuiteAvatar(size="sm", SuiteAvatarFallback("S")),
-                SuiteAvatar(SuiteAvatarFallback("M")),
-                SuiteAvatar(size="lg", SuiteAvatarFallback("L"))
+                Avatar(size="sm", AvatarFallback("S")),
+                Avatar(AvatarFallback("M")),
+                Avatar(size="lg", AvatarFallback("L"))
             )
         ),
 
@@ -45,13 +45,13 @@ function AvatarPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteAvatar(
-    SuiteAvatarImage(src="/avatar.jpg", alt="User"),
-    SuiteAvatarFallback("JD"),
+Avatar(
+    AvatarImage(src="/avatar.jpg", alt="User"),
+    AvatarFallback("JD"),
 )
 
-SuiteAvatar(size="lg",
-    SuiteAvatarFallback("AB"),
+Avatar(size="lg",
+    AvatarFallback("AB"),
 )""")
                 )
             )
@@ -63,7 +63,7 @@ SuiteAvatar(size="lg",
                 "API Reference"
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteAvatar"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Avatar"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(
@@ -83,7 +83,7 @@ SuiteAvatar(size="lg",
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteAvatarImage"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "AvatarImage"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(
@@ -103,7 +103,7 @@ SuiteAvatar(size="lg",
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteAvatarFallback"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "AvatarFallback"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(

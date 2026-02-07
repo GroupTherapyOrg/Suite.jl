@@ -1,15 +1,15 @@
 # Sheet — Suite.jl component docs page
 #
-# Showcases SuiteSheet with side variants (right, left, bottom, top) and keyboard dismiss.
+# Showcases Sheet with side variants (right, left, bottom, top) and keyboard dismiss.
 
-const SuiteSheet = Main.SuiteSheet
-const SuiteSheetTrigger = Main.SuiteSheetTrigger
-const SuiteSheetContent = Main.SuiteSheetContent
-const SuiteSheetHeader = Main.SuiteSheetHeader
-const SuiteSheetFooter = Main.SuiteSheetFooter
-const SuiteSheetTitle = Main.SuiteSheetTitle
-const SuiteSheetDescription = Main.SuiteSheetDescription
-const SuiteSheetClose = Main.SuiteSheetClose
+const Sheet = Main.Sheet
+const SheetTrigger = Main.SheetTrigger
+const SheetContent = Main.SheetContent
+const SheetHeader = Main.SheetHeader
+const SheetFooter = Main.SheetFooter
+const SheetTitle = Main.SheetTitle
+const SheetDescription = Main.SheetDescription
+const SheetClose = Main.SheetClose
 
 function SheetPage()
     ComponentsLayout(
@@ -26,30 +26,30 @@ function SheetPage()
         # Default (right side) — Settings panel
         ComponentPreview(title="Default (Right)", description="A settings panel sliding in from the right side.",
             Div(:class => "w-full max-w-md",
-                SuiteSheet(
-                    SuiteSheetTrigger(
-                        Main.SuiteButton(variant="outline", "Open Settings")
+                Sheet(
+                    SheetTrigger(
+                        Main.Button(variant="outline", "Open Settings")
                     ),
-                    SuiteSheetContent(
-                        SuiteSheetHeader(
-                            SuiteSheetTitle("Settings"),
-                            SuiteSheetDescription("Adjust your preferences below.")
+                    SheetContent(
+                        SheetHeader(
+                            SheetTitle("Settings"),
+                            SheetDescription("Adjust your preferences below.")
                         ),
                         Div(:class => "py-4 space-y-4",
                             Div(:class => "space-y-2",
-                                Main.SuiteLabel("Name"),
-                                Main.SuiteInput(placeholder="Your name")
+                                Main.Label("Name"),
+                                Main.Input(placeholder="Your name")
                             ),
                             Div(:class => "space-y-2",
-                                Main.SuiteLabel("Email"),
-                                Main.SuiteInput(placeholder="you@example.com")
+                                Main.Label("Email"),
+                                Main.Input(placeholder="you@example.com")
                             ),
                         ),
-                        SuiteSheetFooter(
-                            SuiteSheetClose(
-                                Main.SuiteButton(variant="outline", "Cancel")
+                        SheetFooter(
+                            SheetClose(
+                                Main.Button(variant="outline", "Cancel")
                             ),
-                            Main.SuiteButton("Save changes")
+                            Main.Button("Save changes")
                         )
                     )
                 )
@@ -59,14 +59,14 @@ function SheetPage()
         # Left side — Navigation panel
         ComponentPreview(title="Left Side", description="A navigation panel sliding in from the left.",
             Div(:class => "w-full max-w-md",
-                SuiteSheet(
-                    SuiteSheetTrigger(
-                        Main.SuiteButton(variant="outline", "Open Navigation")
+                Sheet(
+                    SheetTrigger(
+                        Main.Button(variant="outline", "Open Navigation")
                     ),
-                    SuiteSheetContent(side="left",
-                        SuiteSheetHeader(
-                            SuiteSheetTitle("Navigation"),
-                            SuiteSheetDescription("Browse sections of the application.")
+                    SheetContent(side="left",
+                        SheetHeader(
+                            SheetTitle("Navigation"),
+                            SheetDescription("Browse sections of the application.")
                         ),
                         Div(:class => "py-4 space-y-1",
                             Div(:class => "px-3 py-2 rounded-md text-sm font-medium text-accent-600 dark:text-accent-400 bg-accent-50 dark:bg-accent-950", "Dashboard"),
@@ -74,9 +74,9 @@ function SheetPage()
                             Div(:class => "px-3 py-2 rounded-md text-sm text-warm-600 dark:text-warm-400 hover:bg-warm-100 dark:hover:bg-warm-800 cursor-pointer", "Team"),
                             Div(:class => "px-3 py-2 rounded-md text-sm text-warm-600 dark:text-warm-400 hover:bg-warm-100 dark:hover:bg-warm-800 cursor-pointer", "Settings"),
                         ),
-                        SuiteSheetFooter(
-                            SuiteSheetClose(
-                                Main.SuiteButton(variant="outline", "Close")
+                        SheetFooter(
+                            SheetClose(
+                                Main.Button(variant="outline", "Close")
                             )
                         )
                     )
@@ -87,14 +87,14 @@ function SheetPage()
         # Bottom side — Notification panel
         ComponentPreview(title="Bottom Side", description="A notification panel sliding up from the bottom.",
             Div(:class => "w-full max-w-md",
-                SuiteSheet(
-                    SuiteSheetTrigger(
-                        Main.SuiteButton(variant="outline", "Open Notifications")
+                Sheet(
+                    SheetTrigger(
+                        Main.Button(variant="outline", "Open Notifications")
                     ),
-                    SuiteSheetContent(side="bottom",
-                        SuiteSheetHeader(
-                            SuiteSheetTitle("Notifications"),
-                            SuiteSheetDescription("You have 3 unread notifications.")
+                    SheetContent(side="bottom",
+                        SheetHeader(
+                            SheetTitle("Notifications"),
+                            SheetDescription("You have 3 unread notifications.")
                         ),
                         Div(:class => "py-4 space-y-3",
                             Div(:class => "flex items-start gap-3 p-3 rounded-md bg-warm-50 dark:bg-warm-900",
@@ -119,9 +119,9 @@ function SheetPage()
                                 )
                             ),
                         ),
-                        SuiteSheetFooter(
-                            SuiteSheetClose(
-                                Main.SuiteButton(variant="outline", "Dismiss All")
+                        SheetFooter(
+                            SheetClose(
+                                Main.Button(variant="outline", "Dismiss All")
                             )
                         )
                     )
@@ -138,19 +138,19 @@ function SheetPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteSheet(
-    SuiteSheetTrigger(
-        SuiteButton(variant="outline", "Open Sheet")
+Sheet(
+    SheetTrigger(
+        Button(variant="outline", "Open Sheet")
     ),
-    SuiteSheetContent(side="right",
-        SuiteSheetHeader(
-            SuiteSheetTitle("Title"),
-            SuiteSheetDescription("Description text.")
+    SheetContent(side="right",
+        SheetHeader(
+            SheetTitle("Title"),
+            SheetDescription("Description text.")
         ),
         P("Sheet body content goes here."),
-        SuiteSheetFooter(
-            SuiteSheetClose(SuiteButton(variant="outline", "Cancel")),
-            SuiteButton("Confirm")
+        SheetFooter(
+            SheetClose(Button(variant="outline", "Cancel")),
+            Button("Confirm")
         )
     )
 )""")
@@ -183,7 +183,7 @@ SuiteSheet(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSheet"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Sheet"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -193,7 +193,7 @@ SuiteSheet(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSheetTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SheetTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -203,7 +203,7 @@ SuiteSheet(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSheetContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SheetContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -214,7 +214,7 @@ SuiteSheet(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSheetHeader"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SheetHeader"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -224,7 +224,7 @@ SuiteSheet(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSheetFooter"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SheetFooter"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -234,7 +234,7 @@ SuiteSheet(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSheetTitle"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SheetTitle"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -244,7 +244,7 @@ SuiteSheet(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSheetDescription"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SheetDescription"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -254,7 +254,7 @@ SuiteSheet(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSheetClose"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SheetClose"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

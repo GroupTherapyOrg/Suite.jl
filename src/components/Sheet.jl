@@ -1,11 +1,11 @@
-# SuiteSheet.jl — Suite.jl Sheet Component
+# Sheet.jl — Suite.jl Sheet Component
 #
 # Tier: js_runtime (requires suite.js)
 # Suite Dependencies: none (leaf component)
 # JS Modules: FocusGuards, FocusTrap, DismissLayer, ScrollLock, Sheet
 #
-# Usage via package: using Suite; SuiteSheet(...)
-# Usage via extract: include("components/Sheet.jl"); SuiteSheet(...)
+# Usage via package: using Suite; Sheet(...)
+# Usage via extract: include("components/Sheet.jl"); Sheet(...)
 #
 # Behavior (matches shadcn Sheet = Radix Dialog + slide animation):
 #   - Modal: focus trapped, scroll locked
@@ -20,9 +20,9 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteSheet, SuiteSheetTrigger, SuiteSheetContent,
-       SuiteSheetHeader, SuiteSheetFooter, SuiteSheetTitle,
-       SuiteSheetDescription, SuiteSheetClose
+export Sheet, SheetTrigger, SheetContent,
+       SheetHeader, SheetFooter, SheetTitle,
+       SheetDescription, SheetClose
 
 # Side-specific CSS classes for slide animations
 const SHEET_SIDE_CLASSES = Dict{String, String}(
@@ -33,30 +33,30 @@ const SHEET_SIDE_CLASSES = Dict{String, String}(
 )
 
 """
-    SuiteSheet(children...; class, kwargs...) -> VNode
+    Sheet(children...; class, kwargs...) -> VNode
 
 A slide-in panel from the edge of the screen. Uses the same focus trap,
 dismiss layer, and scroll lock as Dialog.
 
 # Examples
 ```julia
-SuiteSheet(
-    SuiteSheetTrigger(SuiteButton("Open Sheet")),
-    SuiteSheetContent(side="right",
-        SuiteSheetHeader(
-            SuiteSheetTitle("Edit Profile"),
-            SuiteSheetDescription("Make changes to your profile.")
+Sheet(
+    SheetTrigger(Button("Open Sheet")),
+    SheetContent(side="right",
+        SheetHeader(
+            SheetTitle("Edit Profile"),
+            SheetDescription("Make changes to your profile.")
         ),
         # ... content
-        SuiteSheetFooter(
-            SuiteSheetClose(SuiteButton(variant="outline", "Cancel")),
-            SuiteButton("Save")
+        SheetFooter(
+            SheetClose(Button(variant="outline", "Cancel")),
+            Button("Save")
         )
     )
 )
 ```
 """
-function SuiteSheet(children...; class::String="", kwargs...)
+function Sheet(children...; class::String="", kwargs...)
     id = "suite-sheet-" * string(rand(UInt32), base=16)
 
     trigger_nodes = []
@@ -91,28 +91,28 @@ function _sheet_set_trigger_id(node, id)
 end
 
 """
-    SuiteSheetTrigger(children...; class, kwargs...) -> VNode
+    SheetTrigger(children...; class, kwargs...) -> VNode
 
 The button that opens the sheet.
 """
-function SuiteSheetTrigger(children...; class::String="", kwargs...)
+function SheetTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-sheet-trigger-wrapper") => "",
         :style => "display:contents",
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end
 
 """
-    SuiteSheetContent(children...; side, class, kwargs...) -> VNode
+    SheetContent(children...; side, class, kwargs...) -> VNode
 
 The sheet content panel. Slides from the specified edge.
 
 # Arguments
 - `side::String="right"`: Edge to slide from ("top", "right", "bottom", "left")
 """
-function SuiteSheetContent(children...; side::String="right", theme::Symbol=:default, class::String="", kwargs...)
+function SheetContent(children...; side::String="right", theme::Symbol=:default, class::String="", kwargs...)
     side_classes = get(SHEET_SIDE_CLASSES, side, SHEET_SIDE_CLASSES["right"])
 
     classes = cn(
@@ -143,7 +143,7 @@ function SuiteSheetContent(children...; side::String="right", theme::Symbol=:def
             kwargs...,
             children...,
             # Default close button (X in top-right)
-            Button(:type => "button",
+            Therapy.Button(:type => "button",
                    Symbol("data-suite-sheet-close") => "",
                    :class => "absolute right-4 top-4 rounded-sm opacity-70 cursor-pointer ring-offset-warm-50 dark:ring-offset-warm-950 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2 disabled:pointer-events-none",
                    :aria_label => "Close",
@@ -157,55 +157,55 @@ function SuiteSheetContent(children...; side::String="right", theme::Symbol=:def
 end
 
 """
-    SuiteSheetHeader(children...; class, kwargs...) -> VNode
+    SheetHeader(children...; class, kwargs...) -> VNode
 
 Header section of the sheet.
 """
-function SuiteSheetHeader(children...; class::String="", kwargs...)
+function SheetHeader(children...; class::String="", kwargs...)
     Div(:class => cn("flex flex-col gap-2 text-center sm:text-left", class),
         kwargs...,
         children...)
 end
 
 """
-    SuiteSheetFooter(children...; class, kwargs...) -> VNode
+    SheetFooter(children...; class, kwargs...) -> VNode
 
 Footer section of the sheet.
 """
-function SuiteSheetFooter(children...; class::String="", kwargs...)
+function SheetFooter(children...; class::String="", kwargs...)
     Div(:class => cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", class),
         kwargs...,
         children...)
 end
 
 """
-    SuiteSheetTitle(children...; class, kwargs...) -> VNode
+    SheetTitle(children...; class, kwargs...) -> VNode
 
 Title of the sheet. Renders as h2.
 """
-function SuiteSheetTitle(children...; class::String="", kwargs...)
+function SheetTitle(children...; class::String="", kwargs...)
     H2(:class => cn("text-lg leading-none font-semibold", class),
        kwargs...,
        children...)
 end
 
 """
-    SuiteSheetDescription(children...; class, kwargs...) -> VNode
+    SheetDescription(children...; class, kwargs...) -> VNode
 
 Description text for the sheet.
 """
-function SuiteSheetDescription(children...; class::String="", kwargs...)
+function SheetDescription(children...; class::String="", kwargs...)
     P(:class => cn("text-warm-600 dark:text-warm-500 text-sm", class),
       kwargs...,
       children...)
 end
 
 """
-    SuiteSheetClose(children...; class, kwargs...) -> VNode
+    SheetClose(children...; class, kwargs...) -> VNode
 
 A button that closes the sheet when clicked.
 """
-function SuiteSheetClose(children...; class::String="", kwargs...)
+function SheetClose(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-sheet-close") => "",
          :class => cn(class),
          :style => "display:contents",
@@ -222,8 +222,8 @@ if @isdefined(register_component!)
         "Slide-in panel from screen edge with focus trap and dismiss layer",
         Symbol[],
         [:FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :Sheet],
-        [:SuiteSheet, :SuiteSheetTrigger, :SuiteSheetContent,
-         :SuiteSheetHeader, :SuiteSheetFooter, :SuiteSheetTitle,
-         :SuiteSheetDescription, :SuiteSheetClose],
+        [:Sheet, :SheetTrigger, :SheetContent,
+         :SheetHeader, :SheetFooter, :SheetTitle,
+         :SheetDescription, :SheetClose],
     ))
 end

@@ -1,11 +1,11 @@
-# SuitePopover.jl — Suite.jl Popover Component
+# Popover.jl — Suite.jl Popover Component
 #
 # Tier: js_runtime (requires suite.js)
 # Suite Dependencies: none (leaf component)
 # JS Modules: Floating, FocusGuards, FocusTrap, DismissLayer, ScrollLock, Popover
 #
-# Usage via package: using Suite; SuitePopover(...)
-# Usage via extract: include("components/Popover.jl"); SuitePopover(...)
+# Usage via package: using Suite; Popover(...)
+# Usage via extract: include("components/Popover.jl"); Popover(...)
 #
 # Behavior (matches Radix Popover):
 #   - Click-triggered floating panel
@@ -21,25 +21,25 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuitePopover, SuitePopoverTrigger, SuitePopoverContent,
-       SuitePopoverClose, SuitePopoverAnchor
+export Popover, PopoverTrigger, PopoverContent,
+       PopoverClose, PopoverAnchor
 
 """
-    SuitePopover(children...; class, kwargs...) -> VNode
+    Popover(children...; class, kwargs...) -> VNode
 
 A click-triggered floating panel. Contains trigger and floating content.
 
 # Examples
 ```julia
-SuitePopover(
-    SuitePopoverTrigger(SuiteButton(variant="outline", "Open")),
-    SuitePopoverContent(
+Popover(
+    PopoverTrigger(Button(variant="outline", "Open")),
+    PopoverContent(
         P("Place content for the popover here.")
     )
 )
 ```
 """
-function SuitePopover(children...; class::String="", kwargs...)
+function Popover(children...; class::String="", kwargs...)
     id = "suite-popover-" * string(rand(UInt32), base=16)
 
     trigger_nodes = []
@@ -74,21 +74,21 @@ function _popover_set_trigger_id(node, id)
 end
 
 """
-    SuitePopoverTrigger(children...; class, kwargs...) -> VNode
+    PopoverTrigger(children...; class, kwargs...) -> VNode
 
 The button that opens the popover.
 """
-function SuitePopoverTrigger(children...; class::String="", kwargs...)
+function PopoverTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-popover-trigger-wrapper") => "",
         :style => "display:contents",
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end
 
 """
-    SuitePopoverContent(children...; side, side_offset, align, class, kwargs...) -> VNode
+    PopoverContent(children...; side, side_offset, align, class, kwargs...) -> VNode
 
 The floating content panel. Positioned relative to the trigger.
 
@@ -97,7 +97,7 @@ The floating content panel. Positioned relative to the trigger.
 - `side_offset::Int=0`: Distance from anchor in pixels
 - `align::String="center"`: Alignment along side ("start", "center", "end")
 """
-function SuitePopoverContent(children...; side::String="bottom", side_offset::Int=0, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
+function PopoverContent(children...; side::String="bottom", side_offset::Int=0, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -129,11 +129,11 @@ function SuitePopoverContent(children...; side::String="bottom", side_offset::In
 end
 
 """
-    SuitePopoverClose(children...; class, kwargs...) -> VNode
+    PopoverClose(children...; class, kwargs...) -> VNode
 
 A button that closes the popover when clicked.
 """
-function SuitePopoverClose(children...; class::String="", kwargs...)
+function PopoverClose(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-popover-close") => "",
          :class => cn(class),
          :style => "display:contents",
@@ -142,12 +142,12 @@ function SuitePopoverClose(children...; class::String="", kwargs...)
 end
 
 """
-    SuitePopoverAnchor(children...; class, kwargs...) -> VNode
+    PopoverAnchor(children...; class, kwargs...) -> VNode
 
 Optional custom anchor element. When used, the popover positions relative
 to this element instead of the trigger.
 """
-function SuitePopoverAnchor(children...; class::String="", kwargs...)
+function PopoverAnchor(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-popover-anchor") => "",
         :class => cn(class),
         kwargs...,
@@ -163,7 +163,7 @@ if @isdefined(register_component!)
         "Click-triggered floating panel with focus trap and positioning",
         Symbol[],
         [:Floating, :FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :Popover],
-        [:SuitePopover, :SuitePopoverTrigger, :SuitePopoverContent,
-         :SuitePopoverClose, :SuitePopoverAnchor],
+        [:Popover, :PopoverTrigger, :PopoverContent,
+         :PopoverClose, :PopoverAnchor],
     ))
 end

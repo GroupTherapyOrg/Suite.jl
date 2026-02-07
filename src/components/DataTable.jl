@@ -1,11 +1,11 @@
-# SuiteDataTable.jl — Suite.jl DataTable Component
+# DataTable.jl — Suite.jl DataTable Component
 #
 # Tier: js_runtime (requires suite.js for sorting, filtering, pagination)
-# Suite Dependencies: Table (renders via SuiteTable sub-components)
+# Suite Dependencies: Table (renders via Table sub-components)
 # JS Modules: DataTable
 #
-# Usage via package: using Suite; SuiteDataTable(data, columns)
-# Usage via extract: include("components/DataTable.jl"); SuiteDataTable(...)
+# Usage via package: using Suite; DataTable(data, columns)
+# Usage via extract: include("components/DataTable.jl"); DataTable(...)
 #
 # Behavior (matches shadcn/ui DataTable pattern):
 #   - Column sorting (click header, asc/desc/none cycle)
@@ -21,7 +21,7 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteDataTable, SuiteDataTableColumn
+export DataTable, DataTableColumn
 
 # --- SVG Icons ---
 const _DT_SORT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 h-4 w-4 inline-block"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>"""
@@ -33,9 +33,9 @@ const _DT_SORT_DESC_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
 const _DT_CHEVRON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="m6 9 6 6 6-6"/></svg>"""
 
 """
-    SuiteDataTableColumn
+    DataTableColumn
 
-Column definition for SuiteDataTable.
+Column definition for DataTable.
 
 # Fields
 - `key::String`: Data field key (accessor)
@@ -47,7 +47,7 @@ Column definition for SuiteDataTable.
 - `cell_class::String`: Additional CSS classes for data cells
 - `align::String`: Text alignment: "left", "center", "right" (default "left")
 """
-struct SuiteDataTableColumn
+struct DataTableColumn
     key::String
     header::String
     sortable::Bool
@@ -58,32 +58,32 @@ struct SuiteDataTableColumn
     align::String
 end
 
-function SuiteDataTableColumn(key::String, header::String;
+function DataTableColumn(key::String, header::String;
     sortable::Bool=true,
     hideable::Bool=true,
     cell::Union{Function,Nothing}=nothing,
     header_class::String="",
     cell_class::String="",
     align::String="left")
-    SuiteDataTableColumn(key, header, sortable, hideable, cell, header_class, cell_class, align)
+    DataTableColumn(key, header, sortable, hideable, cell, header_class, cell_class, align)
 end
 
 # Convenience: pair syntax "key" => "Header"
-function SuiteDataTableColumn(pair::Pair{String,String}; kwargs...)
-    SuiteDataTableColumn(pair.first, pair.second; kwargs...)
+function DataTableColumn(pair::Pair{String,String}; kwargs...)
+    DataTableColumn(pair.first, pair.second; kwargs...)
 end
 
 """
-    SuiteDataTable(data, columns; kwargs...) -> VNode
+    DataTable(data, columns; kwargs...) -> VNode
 
 A full-featured data table with sorting, filtering, pagination, row selection,
-and column visibility. Built on SuiteTable sub-components with suite.js runtime.
+and column visibility. Built on Table sub-components with suite.js runtime.
 
 Follows the shadcn/ui DataTable pattern (TanStack Table equivalent for Julia).
 
 # Arguments
 - `data`: Vector of NamedTuples, Dicts, or any objects with property access
-- `columns`: Vector of SuiteDataTableColumn definitions
+- `columns`: Vector of DataTableColumn definitions
 - `filterable::Bool=true`: Show filter input
 - `filter_placeholder::String="Filter..."`: Placeholder text for filter input
 - `filter_columns::Vector{String}=String[]`: Columns to filter on (empty = all)
@@ -104,16 +104,16 @@ data = [
 ]
 
 columns = [
-    SuiteDataTableColumn("name", "Name"),
-    SuiteDataTableColumn("email", "Email"),
-    SuiteDataTableColumn("status", "Status"),
-    SuiteDataTableColumn("amount", "Amount", align="right"),
+    DataTableColumn("name", "Name"),
+    DataTableColumn("email", "Email"),
+    DataTableColumn("status", "Status"),
+    DataTableColumn("amount", "Amount", align="right"),
 ]
 
-SuiteDataTable(data, columns, paginated=true, page_size=5, selectable=true)
+DataTable(data, columns, paginated=true, page_size=5, selectable=true)
 ```
 """
-function SuiteDataTable(data::Vector, columns::Vector{SuiteDataTableColumn};
+function DataTable(data::Vector, columns::Vector{DataTableColumn};
     filterable::Bool=true,
     filter_placeholder::String="Filter...",
     filter_columns::Vector{String}=String[],
@@ -175,7 +175,7 @@ end
 
 # --- Internal: Serialize data to JSON ---
 
-function _dt_serialize_data(data::Vector, columns::Vector{SuiteDataTableColumn})
+function _dt_serialize_data(data::Vector, columns::Vector{DataTableColumn})
     rows = String[]
     for row in data
         fields = String[]
@@ -188,7 +188,7 @@ function _dt_serialize_data(data::Vector, columns::Vector{SuiteDataTableColumn})
     "[" * join(rows, ",") * "]"
 end
 
-function _dt_serialize_columns(columns::Vector{SuiteDataTableColumn})
+function _dt_serialize_columns(columns::Vector{DataTableColumn})
     cols = String[]
     for col in columns
         push!(cols, "{\"key\":\"$(col.key)\",\"header\":\"$(col.header)\",\"sortable\":$(col.sortable),\"hideable\":$(col.hideable),\"align\":\"$(col.align)\"}")
@@ -229,7 +229,7 @@ function _dt_toolbar(id, filterable, placeholder, filter_columns, column_visibil
         filter_cols_attr = isempty(filter_columns) ? "" : join(filter_columns, ",")
         input_classes = cn("flex h-9 w-full max-w-sm rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-950 px-3 py-1 text-sm text-warm-800 dark:text-warm-300 placeholder:text-warm-500 dark:placeholder:text-warm-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:border-accent-600 disabled:cursor-not-allowed disabled:opacity-50")
         theme !== :default && (input_classes = apply_theme(input_classes, get_theme(theme)))
-        push!(items, Input(:type => "text",
+        push!(items, Therapy.Input(:type => "text",
                           :placeholder => placeholder,
                           :class => input_classes,
                           Symbol("data-suite-datatable-filter") => id,
@@ -246,8 +246,8 @@ function _dt_toolbar(id, filterable, placeholder, filter_columns, column_visibil
             item_classes = cn("flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer rounded hover:bg-warm-100 dark:hover:bg-warm-900 text-warm-800 dark:text-warm-300")
             theme !== :default && (item_classes = apply_theme(item_classes, get_theme(theme)))
             push!(col_items,
-                Label(:class => item_classes,
-                    Input(:type => "checkbox",
+                Therapy.Label(:class => item_classes,
+                    Therapy.Input(:type => "checkbox",
                           :checked => "checked",
                           :class => "sr-only",
                           Symbol("data-suite-datatable-col-toggle") => id,
@@ -263,7 +263,7 @@ function _dt_toolbar(id, filterable, placeholder, filter_columns, column_visibil
 
         push!(items, Div(:class => "relative ml-auto",
             Symbol("data-suite-datatable-col-vis") => id,
-            Button(:type => "button",
+            Therapy.Button(:type => "button",
                    :class => vis_btn_classes,
                    Symbol("data-suite-datatable-col-vis-trigger") => id,
                    "Columns ",
@@ -289,7 +289,7 @@ function _dt_table(id, data, columns, selectable, sortable, caption, theme)
         cb_classes = cn("h-4 w-4 rounded border border-warm-300 dark:border-warm-600 accent-accent-600")
         push!(header_cells,
             Th(:class => "w-12 px-2 align-middle",
-                Input(:type => "checkbox",
+                Therapy.Input(:type => "checkbox",
                       :class => cb_classes,
                       Symbol("data-suite-datatable-select-all") => id,
                       Symbol("aria-label") => "Select all rows")))
@@ -305,7 +305,7 @@ function _dt_table(id, data, columns, selectable, sortable, caption, theme)
             push!(header_cells,
                 Th(:class => head_classes,
                     Symbol("data-suite-datatable-col") => col.key,
-                    Button(:type => "button",
+                    Therapy.Button(:type => "button",
                            :class => btn_classes,
                            Symbol("data-suite-datatable-sort") => id,
                            :value => col.key,
@@ -331,7 +331,7 @@ function _dt_table(id, data, columns, selectable, sortable, caption, theme)
 
     Div(:class => "relative w-full overflow-x-auto rounded-md border border-warm-200 dark:border-warm-700",
         Symbol("data-suite-datatable-wrapper") => id,
-        Table(:class => table_classes,
+        Therapy.Table(:class => table_classes,
             Thead(:class => header_row_classes,
                 Tr(header_cells...)),
             Tbody(Symbol("data-suite-datatable-body") => id,
@@ -361,7 +361,7 @@ function _dt_render_rows(id, data, columns, selectable, theme)
             cb_classes = cn("h-4 w-4 rounded border border-warm-300 dark:border-warm-600 accent-accent-600")
             push!(cells,
                 Td(:class => "w-12 px-2 align-middle",
-                    Input(:type => "checkbox",
+                    Therapy.Input(:type => "checkbox",
                           :class => cb_classes,
                           Symbol("data-suite-datatable-select-row") => id,
                           :value => string(i - 1),
@@ -418,12 +418,12 @@ function _dt_pagination(id, total_rows, total_pages, page_size, selectable, them
             Span(:class => "text-sm text-warm-600 dark:text-warm-500",
                  Symbol("data-suite-datatable-page-info") => id,
                  "Page 1 of $total_pages"),
-            Button(:type => "button",
+            Therapy.Button(:type => "button",
                    :class => btn_base,
                    :disabled => "disabled",
                    Symbol("data-suite-datatable-prev") => id,
                    "Previous"),
-            Button(:type => "button",
+            Therapy.Button(:type => "button",
                    :class => btn_base,
                    total_pages <= 1 ? (:disabled => "disabled") : (:data_x => ""),
                    Symbol("data-suite-datatable-next") => id,
@@ -441,6 +441,6 @@ if @isdefined(register_component!)
         "Full-featured data table with sorting, filtering, pagination, row selection",
         [:Table],
         [:DataTable],
-        [:SuiteDataTable, :SuiteDataTableColumn],
+        [:DataTable, :DataTableColumn],
     ))
 end

@@ -1,10 +1,10 @@
 # Data Table — Suite.jl component docs page
 #
-# Showcases SuiteDataTable with sorting, filtering, pagination, row selection.
+# Showcases DataTable with sorting, filtering, pagination, row selection.
 
-const DT_SuiteDataTable = Main.SuiteDataTable
-const DT_SuiteDataTableColumn = Main.SuiteDataTableColumn
-const DT_SuiteBadge = Main.SuiteBadge
+const DT_DataTable = Main.DataTable
+const DT_DataTableColumn = Main.DataTableColumn
+const DT_Badge = Main.Badge
 
 # Sample data for demos
 const _DT_DEMO_DATA = [
@@ -23,10 +23,10 @@ const _DT_DEMO_DATA = [
 ]
 
 const _DT_DEMO_COLUMNS = [
-    DT_SuiteDataTableColumn("invoice", "Invoice"),
-    DT_SuiteDataTableColumn("status", "Status"),
-    DT_SuiteDataTableColumn("method", "Method"),
-    DT_SuiteDataTableColumn("amount", "Amount", align="right"),
+    DT_DataTableColumn("invoice", "Invoice"),
+    DT_DataTableColumn("status", "Status"),
+    DT_DataTableColumn("method", "Method"),
+    DT_DataTableColumn("amount", "Amount", align="right"),
 ]
 
 function ApiRow(name, type, default, description)
@@ -52,24 +52,24 @@ function DataTablePage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A data table with sortable columns, filtering, and pagination.",
-            DT_SuiteDataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS, page_size=5)
+            DT_DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS, page_size=5)
         ),
 
         # With Row Selection
         ComponentPreview(title="With Row Selection", description="Enable row selection with checkboxes.",
-            DT_SuiteDataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
+            DT_DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
                 page_size=5, selectable=true)
         ),
 
         # With Column Visibility
         ComponentPreview(title="Column Visibility", description="Toggle column visibility with the Columns dropdown.",
-            DT_SuiteDataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
+            DT_DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
                 page_size=5, column_visibility=true)
         ),
 
         # All Features
         ComponentPreview(title="All Features", description="Sorting, filtering, pagination, row selection, and column visibility.",
-            DT_SuiteDataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
+            DT_DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
                 page_size=5, selectable=true, column_visibility=true,
                 filter_placeholder="Search invoices...")
         ),
@@ -92,13 +92,13 @@ data = [
 
 # Define columns
 columns = [
-    SuiteDataTableColumn("name", "Name"),
-    SuiteDataTableColumn("email", "Email"),
-    SuiteDataTableColumn("role", "Role"),
+    DataTableColumn("name", "Name"),
+    DataTableColumn("email", "Email"),
+    DataTableColumn("role", "Role"),
 ]
 
 # Render the table
-SuiteDataTable(data, columns,
+DataTable(data, columns,
     paginated=true,
     page_size=10,
     selectable=true,
@@ -116,23 +116,23 @@ SuiteDataTable(data, columns,
             ),
             P(:class => "text-warm-600 dark:text-warm-400 mb-4",
                 "Columns are defined using ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "SuiteDataTableColumn"),
+                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "DataTableColumn"),
                 ". Each column specifies a data key, header text, and optional configuration."
             ),
             Div(:class => "bg-warm-800 dark:bg-warm-950 rounded-md border border-warm-700 p-6 overflow-x-auto",
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """# Basic column
-SuiteDataTableColumn("name", "Name")
+DataTableColumn("name", "Name")
 
 # Right-aligned column
-SuiteDataTableColumn("amount", "Amount", align="right")
+DataTableColumn("amount", "Amount", align="right")
 
 # Non-sortable column
-SuiteDataTableColumn("actions", "Actions", sortable=false, hideable=false)
+DataTableColumn("actions", "Actions", sortable=false, hideable=false)
 
 # Custom cell renderer
-SuiteDataTableColumn("status", "Status",
-    cell=(val, row) -> SuiteBadge(val, variant=val == "Active" ? "default" : "secondary"))""")
+DataTableColumn("status", "Status",
+    cell=(val, row) -> Badge(val, variant=val == "Active" ? "default" : "secondary"))""")
                 )
             )
         ),
@@ -182,7 +182,7 @@ SuiteDataTableColumn("status", "Status",
                 "API Reference"
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteDataTable"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "DataTable"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(
@@ -195,7 +195,7 @@ SuiteDataTableColumn("status", "Status",
                     ),
                     Tbody(
                         ApiRow("data", "Vector", "required", "Data rows (Vector of NamedTuples or Dicts)"),
-                        ApiRow("columns", "Vector{SuiteDataTableColumn}", "required", "Column definitions"),
+                        ApiRow("columns", "Vector{DataTableColumn}", "required", "Column definitions"),
                         ApiRow("filterable", "Bool", "true", "Show filter input"),
                         ApiRow("filter_placeholder", "String", "\"Filter...\"", "Filter input placeholder text"),
                         ApiRow("filter_columns", "Vector{String}", "[] (all)", "Columns to filter on"),
@@ -211,7 +211,7 @@ SuiteDataTableColumn("status", "Status",
                 )
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteDataTableColumn"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "DataTableColumn"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(

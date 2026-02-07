@@ -1,11 +1,11 @@
-# SuiteButton.jl — Suite.jl Button Component
+# Button.jl — Suite.jl Button Component
 #
 # Tier: styling (pure HTML + Tailwind classes, no JS/Wasm)
 # Suite Dependencies: none (leaf component)
 # JS Modules: none
 #
-# Usage via package: using Suite; SuiteButton("Click")
-# Usage via extract: include("components/Button.jl"); SuiteButton("Click")
+# Usage via package: using Suite; Button("Click")
+# Usage via extract: include("components/Button.jl"); Button("Click")
 #
 # Reference: shadcn/ui Button — https://ui.shadcn.com/docs/components/button
 
@@ -15,10 +15,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteButton
+export Button
 
 """
-    SuiteButton(children...; variant, size, class, kwargs...) -> VNode
+    Button(children...; variant, size, class, kwargs...) -> VNode
 
 A clickable button with multiple visual variants and sizes.
 Equivalent to shadcn/ui's Button component.
@@ -39,13 +39,13 @@ Equivalent to shadcn/ui's Button component.
 
 # Examples
 ```julia
-SuiteButton("Click me")
-SuiteButton(variant="outline", size="sm", "Settings")
-SuiteButton(variant="destructive", "Delete")
-SuiteButton(variant="icon", size="icon", "✕")
+Button("Click me")
+Button(variant="outline", size="sm", "Settings")
+Button(variant="destructive", "Delete")
+Button(variant="icon", size="icon", "✕")
 ```
 """
-function SuiteButton(children...; variant::String="default", size::String="default",
+function Button(children...; variant::String="default", size::String="default",
                      class::String="", theme::Symbol=:default, kwargs...)
     base = "inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
 
@@ -70,7 +70,7 @@ function SuiteButton(children...; variant::String="default", size::String="defau
     classes = cn(base, vc, sc, class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Button(:class => classes, kwargs..., children...)
+    Therapy.Button(:class => classes, kwargs..., children...)
 end
 
 # --- Registry ---
@@ -82,6 +82,6 @@ if @isdefined(register_component!)
         "Clickable button with multiple variants and sizes",
         Symbol[],
         Symbol[],
-        [:SuiteButton],
+        [:Button],
     ))
 end

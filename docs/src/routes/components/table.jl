@@ -1,15 +1,15 @@
 # Table — Suite.jl component docs page
 #
-# Showcases SuiteTable with all sub-components.
+# Showcases Table with all sub-components.
 
-const SuiteTable = Main.SuiteTable
-const SuiteTableHeader = Main.SuiteTableHeader
-const SuiteTableBody = Main.SuiteTableBody
-const SuiteTableFooter = Main.SuiteTableFooter
-const SuiteTableRow = Main.SuiteTableRow
-const SuiteTableHead = Main.SuiteTableHead
-const SuiteTableCell = Main.SuiteTableCell
-const SuiteTableCaption = Main.SuiteTableCaption
+const Table = Main.Table
+const TableHeader = Main.TableHeader
+const TableBody = Main.TableBody
+const TableFooter = Main.TableFooter
+const TableRow = Main.TableRow
+const TableHead = Main.TableHead
+const TableCell = Main.TableCell
+const TableCaption = Main.TableCaption
 
 function TablePage()
     ComponentsLayout(
@@ -25,46 +25,46 @@ function TablePage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A table with header, body, footer, and caption.",
-            SuiteTable(
-                SuiteTableCaption("A list of your recent invoices."),
-                SuiteTableHeader(
-                    SuiteTableRow(
-                        SuiteTableHead("Invoice"),
-                        SuiteTableHead("Status"),
-                        SuiteTableHead("Method"),
-                        SuiteTableHead(class="text-right", "Amount")
+            Table(
+                TableCaption("A list of your recent invoices."),
+                TableHeader(
+                    TableRow(
+                        TableHead("Invoice"),
+                        TableHead("Status"),
+                        TableHead("Method"),
+                        TableHead(class="text-right", "Amount")
                     )
                 ),
-                SuiteTableBody(
-                    SuiteTableRow(
-                        SuiteTableCell(class="font-medium", "INV001"),
-                        SuiteTableCell("Paid"),
-                        SuiteTableCell("Credit Card"),
-                        SuiteTableCell(class="text-right", "\$250.00")
+                TableBody(
+                    TableRow(
+                        TableCell(class="font-medium", "INV001"),
+                        TableCell("Paid"),
+                        TableCell("Credit Card"),
+                        TableCell(class="text-right", "\$250.00")
                     ),
-                    SuiteTableRow(
-                        SuiteTableCell(class="font-medium", "INV002"),
-                        SuiteTableCell("Pending"),
-                        SuiteTableCell("PayPal"),
-                        SuiteTableCell(class="text-right", "\$150.00")
+                    TableRow(
+                        TableCell(class="font-medium", "INV002"),
+                        TableCell("Pending"),
+                        TableCell("PayPal"),
+                        TableCell(class="text-right", "\$150.00")
                     ),
-                    SuiteTableRow(
-                        SuiteTableCell(class="font-medium", "INV003"),
-                        SuiteTableCell("Unpaid"),
-                        SuiteTableCell("Bank Transfer"),
-                        SuiteTableCell(class="text-right", "\$350.00")
+                    TableRow(
+                        TableCell(class="font-medium", "INV003"),
+                        TableCell("Unpaid"),
+                        TableCell("Bank Transfer"),
+                        TableCell(class="text-right", "\$350.00")
                     ),
-                    SuiteTableRow(
-                        SuiteTableCell(class="font-medium", "INV004"),
-                        SuiteTableCell("Paid"),
-                        SuiteTableCell("Credit Card"),
-                        SuiteTableCell(class="text-right", "\$450.00")
+                    TableRow(
+                        TableCell(class="font-medium", "INV004"),
+                        TableCell("Paid"),
+                        TableCell("Credit Card"),
+                        TableCell(class="text-right", "\$450.00")
                     )
                 ),
-                SuiteTableFooter(
-                    SuiteTableRow(
-                        SuiteTableCell(:colspan => "3", "Total"),
-                        SuiteTableCell(class="text-right", "\$1,200.00")
+                TableFooter(
+                    TableRow(
+                        TableCell(:colspan => "3", "Total"),
+                        TableCell(class="text-right", "\$1,200.00")
                     )
                 )
             )
@@ -79,17 +79,17 @@ function TablePage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteTable(
-    SuiteTableHeader(
-        SuiteTableRow(
-            SuiteTableHead("Name"),
-            SuiteTableHead("Email"),
+Table(
+    TableHeader(
+        TableRow(
+            TableHead("Name"),
+            TableHead("Email"),
         ),
     ),
-    SuiteTableBody(
-        SuiteTableRow(
-            SuiteTableCell("Alice"),
-            SuiteTableCell("alice@example.com"),
+    TableBody(
+        TableRow(
+            TableCell("Alice"),
+            TableCell("alice@example.com"),
         ),
     ),
 )""")
@@ -106,19 +106,19 @@ SuiteTable(
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Components"),
             P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-4",
                 "All table sub-components (",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "SuiteTableHeader"),
+                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableHeader"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "SuiteTableBody"),
+                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableBody"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "SuiteTableFooter"),
+                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableFooter"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "SuiteTableRow"),
+                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableRow"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "SuiteTableHead"),
+                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableHead"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "SuiteTableCell"),
+                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableCell"),
                 ", ",
-                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "SuiteTableCaption"),
+                Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "TableCaption"),
                 ") accept ",
                 Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "class"),
                 ", ",
@@ -139,42 +139,42 @@ SuiteTable(
                     ),
                     Tbody(
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "SuiteTable"),
+                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "Table"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "div > table"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Scrollable table container")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "SuiteTableHeader"),
+                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableHeader"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "thead"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table header section")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "SuiteTableBody"),
+                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableBody"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "tbody"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table body section")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "SuiteTableFooter"),
+                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableFooter"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "tfoot"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table footer section")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "SuiteTableRow"),
+                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableRow"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "tr"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table row with hover state")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "SuiteTableHead"),
+                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableHead"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "th"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Header cell")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "SuiteTableCell"),
+                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableCell"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "td"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Data cell")
                         ),
                         Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
-                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "SuiteTableCaption"),
+                            Td(:class => "py-3 px-4 text-accent-600 dark:text-accent-400 font-mono text-xs", "TableCaption"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400 font-mono text-xs", "caption"),
                             Td(:class => "py-3 px-4 text-warm-600 dark:text-warm-400", "Table caption text")
                         )

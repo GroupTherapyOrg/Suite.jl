@@ -1,22 +1,22 @@
 # Context Menu — Suite.jl component docs page
 #
-# Showcases SuiteContextMenu with basic items, checkboxes, radio groups, and keyboard nav.
+# Showcases ContextMenu with basic items, checkboxes, radio groups, and keyboard nav.
 
-const SuiteContextMenu = Main.SuiteContextMenu
-const SuiteContextMenuTrigger = Main.SuiteContextMenuTrigger
-const SuiteContextMenuContent = Main.SuiteContextMenuContent
-const SuiteContextMenuGroup = Main.SuiteContextMenuGroup
-const SuiteContextMenuLabel = Main.SuiteContextMenuLabel
-const SuiteContextMenuItem = Main.SuiteContextMenuItem
-const SuiteContextMenuCheckboxItem = Main.SuiteContextMenuCheckboxItem
-const SuiteContextMenuRadioGroup = Main.SuiteContextMenuRadioGroup
-const SuiteContextMenuRadioItem = Main.SuiteContextMenuRadioItem
-const SuiteContextMenuItemIndicator = Main.SuiteContextMenuItemIndicator
-const SuiteContextMenuSeparator = Main.SuiteContextMenuSeparator
-const SuiteContextMenuShortcut = Main.SuiteContextMenuShortcut
-const SuiteContextMenuSub = Main.SuiteContextMenuSub
-const SuiteContextMenuSubTrigger = Main.SuiteContextMenuSubTrigger
-const SuiteContextMenuSubContent = Main.SuiteContextMenuSubContent
+const ContextMenu = Main.ContextMenu
+const ContextMenuTrigger = Main.ContextMenuTrigger
+const ContextMenuContent = Main.ContextMenuContent
+const ContextMenuGroup = Main.ContextMenuGroup
+const ContextMenuLabel = Main.ContextMenuLabel
+const ContextMenuItem = Main.ContextMenuItem
+const ContextMenuCheckboxItem = Main.ContextMenuCheckboxItem
+const ContextMenuRadioGroup = Main.ContextMenuRadioGroup
+const ContextMenuRadioItem = Main.ContextMenuRadioItem
+const ContextMenuItemIndicator = Main.ContextMenuItemIndicator
+const ContextMenuSeparator = Main.ContextMenuSeparator
+const ContextMenuShortcut = Main.ContextMenuShortcut
+const ContextMenuSub = Main.ContextMenuSub
+const ContextMenuSubTrigger = Main.ContextMenuSubTrigger
+const ContextMenuSubContent = Main.ContextMenuSubContent
 
 function ContextMenuPage()
     ComponentsLayout(
@@ -33,25 +33,25 @@ function ContextMenuPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="Right-click the area to open a context menu with navigation items.",
             Div(:class => "w-full max-w-md",
-                SuiteContextMenu(
-                    SuiteContextMenuTrigger(
+                ContextMenu(
+                    ContextMenuTrigger(
                         Div(:class => "flex h-36 w-full items-center justify-center rounded-md border border-dashed border-warm-300 dark:border-warm-600 text-sm text-warm-600 dark:text-warm-400",
                             "Right click here"
                         )
                     ),
-                    SuiteContextMenuContent(
-                        SuiteContextMenuItem("Back",
-                            SuiteContextMenuShortcut("Ctrl+[")
+                    ContextMenuContent(
+                        ContextMenuItem("Back",
+                            ContextMenuShortcut("Ctrl+[")
                         ),
-                        SuiteContextMenuItem("Forward",
-                            SuiteContextMenuShortcut("Ctrl+]")
+                        ContextMenuItem("Forward",
+                            ContextMenuShortcut("Ctrl+]")
                         ),
-                        SuiteContextMenuItem("Reload",
-                            SuiteContextMenuShortcut("Ctrl+R")
+                        ContextMenuItem("Reload",
+                            ContextMenuShortcut("Ctrl+R")
                         ),
-                        SuiteContextMenuSeparator(),
-                        SuiteContextMenuItem("Bookmark",
-                            SuiteContextMenuShortcut("Ctrl+D")
+                        ContextMenuSeparator(),
+                        ContextMenuItem("Bookmark",
+                            ContextMenuShortcut("Ctrl+D")
                         ),
                     )
                 )
@@ -61,30 +61,30 @@ function ContextMenuPage()
         # With Checkboxes & Radio Group
         ComponentPreview(title="With Checkboxes", description="Context menu with checkbox items and a radio group.",
             Div(:class => "w-full max-w-md",
-                SuiteContextMenu(
-                    SuiteContextMenuTrigger(
+                ContextMenu(
+                    ContextMenuTrigger(
                         Div(:class => "flex h-36 w-full items-center justify-center rounded-md border border-dashed border-warm-300 dark:border-warm-600 text-sm text-warm-600 dark:text-warm-400",
                             "Right click here"
                         )
                     ),
-                    SuiteContextMenuContent(
-                        SuiteContextMenuCheckboxItem(checked=true,
-                            SuiteContextMenuItemIndicator(),
+                    ContextMenuContent(
+                        ContextMenuCheckboxItem(checked=true,
+                            ContextMenuItemIndicator(),
                             "Show Toolbar"
                         ),
-                        SuiteContextMenuSeparator(),
-                        SuiteContextMenuLabel("People"),
-                        SuiteContextMenuRadioGroup(value="alice",
-                            SuiteContextMenuRadioItem(value="alice",
-                                SuiteContextMenuItemIndicator(),
+                        ContextMenuSeparator(),
+                        ContextMenuLabel("People"),
+                        ContextMenuRadioGroup(value="alice",
+                            ContextMenuRadioItem(value="alice",
+                                ContextMenuItemIndicator(),
                                 "Alice"
                             ),
-                            SuiteContextMenuRadioItem(value="bob",
-                                SuiteContextMenuItemIndicator(),
+                            ContextMenuRadioItem(value="bob",
+                                ContextMenuItemIndicator(),
                                 "Bob"
                             ),
-                            SuiteContextMenuRadioItem(value="charlie",
-                                SuiteContextMenuItemIndicator(),
+                            ContextMenuRadioItem(value="charlie",
+                                ContextMenuItemIndicator(),
                                 "Charlie"
                             ),
                         )
@@ -102,18 +102,18 @@ function ContextMenuPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteContextMenu(
-    SuiteContextMenuTrigger(
+ContextMenu(
+    ContextMenuTrigger(
         Div(:class => "flex h-36 w-full items-center justify-center rounded-md border border-dashed",
             "Right click here"
         )
     ),
-    SuiteContextMenuContent(
-        SuiteContextMenuItem("Back"),
-        SuiteContextMenuItem("Forward"),
-        SuiteContextMenuItem("Reload"),
-        SuiteContextMenuSeparator(),
-        SuiteContextMenuItem("Bookmark"),
+    ContextMenuContent(
+        ContextMenuItem("Back"),
+        ContextMenuItem("Forward"),
+        ContextMenuItem("Reload"),
+        ContextMenuSeparator(),
+        ContextMenuItem("Bookmark"),
     )
 )""")
                 )
@@ -151,7 +151,7 @@ SuiteContextMenu(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenu"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenu"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -161,7 +161,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -171,7 +171,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -182,7 +182,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -193,7 +193,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuCheckboxItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuCheckboxItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -205,7 +205,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuRadioGroup"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuRadioGroup"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -216,7 +216,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuRadioItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuRadioItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -228,7 +228,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuSub"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuSub"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -238,7 +238,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuSubTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuSubTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -249,7 +249,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuSubContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuSubContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -259,7 +259,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuGroup"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuGroup"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -269,7 +269,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuLabel"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuLabel"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -279,7 +279,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuSeparator"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuSeparator"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -288,7 +288,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuShortcut"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuShortcut"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -298,7 +298,7 @@ SuiteContextMenu(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteContextMenuItemIndicator"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "ContextMenuItemIndicator"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

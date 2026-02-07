@@ -1,8 +1,8 @@
 # Skeleton — Suite.jl component docs page
 #
-# Showcases SuiteSkeleton loading placeholder patterns.
+# Showcases Skeleton loading placeholder patterns.
 
-const SuiteSkeleton = Main.SuiteSkeleton
+const Skeleton = Main.Skeleton
 
 function SkeletonPage()
     ComponentsLayout(
@@ -19,19 +19,19 @@ function SkeletonPage()
         # Default Preview
         ComponentPreview(title="Default", description="Basic skeleton shapes.",
             Div(:class => "space-y-4 w-full max-w-sm",
-                SuiteSkeleton(class="h-4 w-[250px]"),
-                SuiteSkeleton(class="h-4 w-[200px]"),
-                SuiteSkeleton(class="h-4 w-[150px]")
+                Skeleton(class="h-4 w-[250px]"),
+                Skeleton(class="h-4 w-[200px]"),
+                Skeleton(class="h-4 w-[150px]")
             )
         ),
 
         # Card Skeleton
         ComponentPreview(title="Card", description="Skeleton mimicking a card layout.",
             Div(:class => "flex items-center space-x-4",
-                SuiteSkeleton(class="h-12 w-12 rounded-full"),
+                Skeleton(class="h-12 w-12 rounded-full"),
                 Div(:class => "space-y-2",
-                    SuiteSkeleton(class="h-4 w-[250px]"),
-                    SuiteSkeleton(class="h-4 w-[200px]")
+                    Skeleton(class="h-4 w-[250px]"),
+                    Skeleton(class="h-4 w-[200px]")
                 )
             )
         ),
@@ -46,13 +46,13 @@ function SkeletonPage()
                     Code(:class => "language-julia", """using Suite
 
 # Text line skeleton
-SuiteSkeleton(class="h-4 w-[250px]")
+Skeleton(class="h-4 w-[250px]")
 
 # Circle avatar skeleton
-SuiteSkeleton(class="h-12 w-12 rounded-full")
+Skeleton(class="h-12 w-12 rounded-full")
 
 # Full-width block skeleton
-SuiteSkeleton(class="h-[125px] w-full rounded-xl")""")
+Skeleton(class="h-[125px] w-full rounded-xl")""")
                 )
             )
         ),

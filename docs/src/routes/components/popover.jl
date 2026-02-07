@@ -1,12 +1,12 @@
 # Popover — Suite.jl component docs page
 #
-# Showcases SuitePopover with basic usage, close button, and positioning.
+# Showcases Popover with basic usage, close button, and positioning.
 
-const SuitePopover = Main.SuitePopover
-const SuitePopoverTrigger = Main.SuitePopoverTrigger
-const SuitePopoverContent = Main.SuitePopoverContent
-const SuitePopoverClose = Main.SuitePopoverClose
-const SuitePopoverAnchor = Main.SuitePopoverAnchor
+const Popover = Main.Popover
+const PopoverTrigger = Main.PopoverTrigger
+const PopoverContent = Main.PopoverContent
+const PopoverClose = Main.PopoverClose
+const PopoverAnchor = Main.PopoverAnchor
 
 function PopoverPage()
     ComponentsLayout(
@@ -23,11 +23,11 @@ function PopoverPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="Click the trigger to open a popover with form inputs.",
             Div(:class => "w-full max-w-md",
-                SuitePopover(
-                    SuitePopoverTrigger(
-                        SuiteButton(variant="outline", "Open popover")
+                Popover(
+                    PopoverTrigger(
+                        Button(variant="outline", "Open popover")
                     ),
-                    SuitePopoverContent(side="bottom", align="center", side_offset=4, class="w-80",
+                    PopoverContent(side="bottom", align="center", side_offset=4, class="w-80",
                         Div(:class => "grid gap-4",
                             Div(:class => "space-y-2",
                                 H4(:class => "font-medium text-sm text-warm-800 dark:text-warm-50 leading-none", "Dimensions"),
@@ -52,15 +52,15 @@ function PopoverPage()
         # With close button
         ComponentPreview(title="With Close Button", description="Popover with an explicit close button inside the content.",
             Div(:class => "w-full max-w-md",
-                SuitePopover(
-                    SuitePopoverTrigger(
-                        SuiteButton(variant="outline", "Open popover")
+                Popover(
+                    PopoverTrigger(
+                        Button(variant="outline", "Open popover")
                     ),
-                    SuitePopoverContent(side="bottom", align="center", side_offset=4, class="w-72",
+                    PopoverContent(side="bottom", align="center", side_offset=4, class="w-72",
                         Div(:class => "flex items-center justify-between mb-3",
                             H4(:class => "font-medium text-sm text-warm-800 dark:text-warm-50 leading-none", "Notifications"),
-                            SuitePopoverClose(
-                                Button(:class => "h-6 w-6 inline-flex items-center justify-center rounded-sm text-warm-500 hover:text-warm-800 dark:hover:text-warm-200",
+                            PopoverClose(
+                                Button(:class => "h-6 w-6 inline-flex items-center justify-center rounded-sm text-warm-500 dark:text-warm-400 hover:text-warm-800 dark:hover:text-warm-200",
                                     Span(:class => "sr-only", "Close"),
                                     Span(:aria_hidden => "true", "\u00d7")
                                 )
@@ -81,11 +81,11 @@ function PopoverPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuitePopover(
-    SuitePopoverTrigger(
-        SuiteButton(variant="outline", "Open popover")
+Popover(
+    PopoverTrigger(
+        Button(variant="outline", "Open popover")
     ),
-    SuitePopoverContent(side="bottom", align="center",
+    PopoverContent(side="bottom", align="center",
         Div(
             H4("Dimensions"),
             P("Set the dimensions for the layer."),
@@ -121,7 +121,7 @@ SuitePopover(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuitePopover"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Popover"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -131,7 +131,7 @@ SuitePopover(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuitePopoverTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "PopoverTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -141,7 +141,7 @@ SuitePopover(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuitePopoverContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "PopoverContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -154,7 +154,7 @@ SuitePopover(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuitePopoverClose"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "PopoverClose"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -164,7 +164,7 @@ SuitePopover(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuitePopoverAnchor"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "PopoverAnchor"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

@@ -1,9 +1,9 @@
 # Calendar — Suite.jl component docs page
 #
-# Showcases SuiteCalendar with single/multiple/range selection modes,
+# Showcases Calendar with single/multiple/range selection modes,
 # keyboard navigation, and customization options.
 
-const SuiteCalendar_ = Main.SuiteCalendar
+const Calendar_ = Main.Calendar
 
 function CalendarPage()
     ComponentsLayout(
@@ -20,28 +20,28 @@ function CalendarPage()
         # Basic Preview
         ComponentPreview(title="Single Date", description="Click a date to select it. Click again to deselect.",
             Div(:class => "flex justify-center",
-                SuiteCalendar_(month=2, year=2026)
+                Calendar_(month=2, year=2026)
             )
         ),
 
         # Range Selection
         ComponentPreview(title="Date Range", description="Select a start and end date to create a range.",
             Div(:class => "flex justify-center",
-                SuiteCalendar_(mode="range", month=2, year=2026)
+                Calendar_(mode="range", month=2, year=2026)
             )
         ),
 
         # Multiple Selection
         ComponentPreview(title="Multiple Dates", description="Click multiple dates to select them individually.",
             Div(:class => "flex justify-center",
-                SuiteCalendar_(mode="multiple", month=2, year=2026)
+                Calendar_(mode="multiple", month=2, year=2026)
             )
         ),
 
         # Two Months
         ComponentPreview(title="Two Months", description="Display two months side by side for range selection.",
             Div(:class => "flex justify-center",
-                SuiteCalendar_(mode="range", number_of_months=2, month=1, year=2026)
+                Calendar_(mode="range", number_of_months=2, month=1, year=2026)
             )
         ),
 
@@ -55,25 +55,25 @@ function CalendarPage()
                     """using Suite
 
 # Single date selection (default)
-SuiteCalendar()
+Calendar()
 
 # Range selection with two months
-SuiteCalendar(mode="range", number_of_months=2)
+Calendar(mode="range", number_of_months=2)
 
 # Multiple date selection
-SuiteCalendar(mode="multiple")
+Calendar(mode="multiple")
 
 # Pre-selected date
-SuiteCalendar(selected="2026-02-14", month=2, year=2026)
+Calendar(selected="2026-02-14", month=2, year=2026)
 
 # Disabled dates
-SuiteCalendar(disabled_dates="2026-02-14,2026-02-15")
+Calendar(disabled_dates="2026-02-14,2026-02-15")
 
 # Without outside days
-SuiteCalendar(show_outside_days=false)
+Calendar(show_outside_days=false)
 
 # Fixed 6-week grid
-SuiteCalendar(fixed_weeks=true)"""
+Calendar(fixed_weeks=true)"""
                 )
             )
         ),
@@ -84,57 +84,57 @@ SuiteCalendar(fixed_weeks=true)"""
                 "Keyboard Interactions"
             ),
             Div(:class => "overflow-x-auto",
-                Main.SuiteTable(
-                    Main.SuiteTableHeader(
-                        Main.SuiteTableRow(
-                            Main.SuiteTableHead("Key"),
-                            Main.SuiteTableHead("Action"),
+                Main.Table(
+                    Main.TableHeader(
+                        Main.TableRow(
+                            Main.TableHead("Key"),
+                            Main.TableHead("Action"),
                         )
                     ),
-                    Main.SuiteTableBody(
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "ArrowLeft")),
-                            Main.SuiteTableCell("Move focus to previous day"),
+                    Main.TableBody(
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "ArrowLeft")),
+                            Main.TableCell("Move focus to previous day"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "ArrowRight")),
-                            Main.SuiteTableCell("Move focus to next day"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "ArrowRight")),
+                            Main.TableCell("Move focus to next day"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "ArrowUp")),
-                            Main.SuiteTableCell("Move focus to same day in previous week"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "ArrowUp")),
+                            Main.TableCell("Move focus to same day in previous week"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "ArrowDown")),
-                            Main.SuiteTableCell("Move focus to same day in next week"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "ArrowDown")),
+                            Main.TableCell("Move focus to same day in next week"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "PageUp")),
-                            Main.SuiteTableCell("Move focus to same day in previous month"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "PageUp")),
+                            Main.TableCell("Move focus to same day in previous month"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "PageDown")),
-                            Main.SuiteTableCell("Move focus to same day in next month"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "PageDown")),
+                            Main.TableCell("Move focus to same day in next month"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "Shift+PageUp")),
-                            Main.SuiteTableCell("Move focus to same day in previous year"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "Shift+PageUp")),
+                            Main.TableCell("Move focus to same day in previous year"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "Shift+PageDown")),
-                            Main.SuiteTableCell("Move focus to same day in next year"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "Shift+PageDown")),
+                            Main.TableCell("Move focus to same day in next year"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "Home")),
-                            Main.SuiteTableCell("Move focus to start of week (Monday)"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "Home")),
+                            Main.TableCell("Move focus to start of week (Monday)"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "End")),
-                            Main.SuiteTableCell("Move focus to end of week (Sunday)"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "End")),
+                            Main.TableCell("Move focus to end of week (Sunday)"),
                         ),
-                        Main.SuiteTableRow(
-                            Main.SuiteTableCell(Code(:class => "text-sm", "Space / Enter")),
-                            Main.SuiteTableCell("Select focused date"),
+                        Main.TableRow(
+                            Main.TableCell(Code(:class => "text-sm", "Space / Enter")),
+                            Main.TableCell("Select focused date"),
                         ),
                     )
                 )
@@ -147,19 +147,19 @@ SuiteCalendar(fixed_weeks=true)"""
                 "API Reference"
             ),
 
-            # SuiteCalendar
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-50", "SuiteCalendar"),
+            # Calendar
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-50", "Calendar"),
             Div(:class => "overflow-x-auto",
-                Main.SuiteTable(
-                    Main.SuiteTableHeader(
-                        Main.SuiteTableRow(
-                            Main.SuiteTableHead("Prop"),
-                            Main.SuiteTableHead("Type"),
-                            Main.SuiteTableHead("Default"),
-                            Main.SuiteTableHead("Description"),
+                Main.Table(
+                    Main.TableHeader(
+                        Main.TableRow(
+                            Main.TableHead("Prop"),
+                            Main.TableHead("Type"),
+                            Main.TableHead("Default"),
+                            Main.TableHead("Description"),
                         )
                     ),
-                    Main.SuiteTableBody(
+                    Main.TableBody(
                         ApiRow("mode", "String", "\"single\"", "Selection mode: single, multiple, or range"),
                         ApiRow("month", "Int", "current month", "Displayed month (1-12)"),
                         ApiRow("year", "Int", "current year", "Displayed year"),
@@ -178,11 +178,11 @@ SuiteCalendar(fixed_weeks=true)"""
 end
 
 function ApiRow(prop, type, default, description)
-    Main.SuiteTableRow(
-        Main.SuiteTableCell(Code(:class => "text-sm text-accent-600 dark:text-accent-400", prop)),
-        Main.SuiteTableCell(Code(:class => "text-sm", type)),
-        Main.SuiteTableCell(Code(:class => "text-sm", default)),
-        Main.SuiteTableCell(description),
+    Main.TableRow(
+        Main.TableCell(Code(:class => "text-sm text-accent-600 dark:text-accent-400", prop)),
+        Main.TableCell(Code(:class => "text-sm", type)),
+        Main.TableCell(Code(:class => "text-sm", default)),
+        Main.TableCell(description),
     )
 end
 

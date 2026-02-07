@@ -1,17 +1,17 @@
 # Select — Suite.jl component docs page
 #
-# Showcases SuiteSelect with basic usage, grouped items, and keyboard nav.
+# Showcases Select with basic usage, grouped items, and keyboard nav.
 
-const SuiteSelect = Main.SuiteSelect
-const SuiteSelectTrigger = Main.SuiteSelectTrigger
-const SuiteSelectValue = Main.SuiteSelectValue
-const SuiteSelectContent = Main.SuiteSelectContent
-const SuiteSelectItem = Main.SuiteSelectItem
-const SuiteSelectGroup = Main.SuiteSelectGroup
-const SuiteSelectLabel = Main.SuiteSelectLabel
-const SuiteSelectSeparator = Main.SuiteSelectSeparator
-const SuiteSelectScrollUpButton = Main.SuiteSelectScrollUpButton
-const SuiteSelectScrollDownButton = Main.SuiteSelectScrollDownButton
+const Select = Main.Select
+const SelectTrigger = Main.SelectTrigger
+const SelectValue = Main.SelectValue
+const SelectContent = Main.SelectContent
+const SelectItem = Main.SelectItem
+const SelectGroup = Main.SelectGroup
+const SelectLabel = Main.SelectLabel
+const SelectSeparator = Main.SelectSeparator
+const SelectScrollUpButton = Main.SelectScrollUpButton
+const SelectScrollDownButton = Main.SelectScrollDownButton
 
 function SelectPage()
     ComponentsLayout(
@@ -28,18 +28,18 @@ function SelectPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="A simple fruit selector with five options.",
             Div(:class => "w-full max-w-xs",
-                SuiteSelect(
-                    SuiteSelectTrigger(
-                        SuiteSelectValue(placeholder="Select a fruit"),
+                Select(
+                    SelectTrigger(
+                        SelectValue(placeholder="Select a fruit"),
                     ),
-                    SuiteSelectContent(
-                        SuiteSelectScrollUpButton(),
-                        SuiteSelectItem(value="apple", "Apple"),
-                        SuiteSelectItem(value="banana", "Banana"),
-                        SuiteSelectItem(value="orange", "Orange"),
-                        SuiteSelectItem(value="grape", "Grape"),
-                        SuiteSelectItem(value="mango", "Mango"),
-                        SuiteSelectScrollDownButton(),
+                    SelectContent(
+                        SelectScrollUpButton(),
+                        SelectItem(value="apple", "Apple"),
+                        SelectItem(value="banana", "Banana"),
+                        SelectItem(value="orange", "Orange"),
+                        SelectItem(value="grape", "Grape"),
+                        SelectItem(value="mango", "Mango"),
+                        SelectScrollDownButton(),
                     ),
                 )
             )
@@ -48,26 +48,26 @@ function SelectPage()
         # With Groups
         ComponentPreview(title="With Groups", description="Items organized into labeled groups with a separator.",
             Div(:class => "w-full max-w-xs",
-                SuiteSelect(
-                    SuiteSelectTrigger(
-                        SuiteSelectValue(placeholder="Select an option"),
+                Select(
+                    SelectTrigger(
+                        SelectValue(placeholder="Select an option"),
                     ),
-                    SuiteSelectContent(
-                        SuiteSelectScrollUpButton(),
-                        SuiteSelectGroup(
-                            SuiteSelectLabel("Fruits"),
-                            SuiteSelectItem(value="apple", "Apple"),
-                            SuiteSelectItem(value="banana", "Banana"),
-                            SuiteSelectItem(value="orange", "Orange"),
+                    SelectContent(
+                        SelectScrollUpButton(),
+                        SelectGroup(
+                            SelectLabel("Fruits"),
+                            SelectItem(value="apple", "Apple"),
+                            SelectItem(value="banana", "Banana"),
+                            SelectItem(value="orange", "Orange"),
                         ),
-                        SuiteSelectSeparator(),
-                        SuiteSelectGroup(
-                            SuiteSelectLabel("Vegetables"),
-                            SuiteSelectItem(value="carrot", "Carrot"),
-                            SuiteSelectItem(value="broccoli", "Broccoli"),
-                            SuiteSelectItem(value="spinach", "Spinach"),
+                        SelectSeparator(),
+                        SelectGroup(
+                            SelectLabel("Vegetables"),
+                            SelectItem(value="carrot", "Carrot"),
+                            SelectItem(value="broccoli", "Broccoli"),
+                            SelectItem(value="spinach", "Spinach"),
                         ),
-                        SuiteSelectScrollDownButton(),
+                        SelectScrollDownButton(),
                     ),
                 )
             )
@@ -82,14 +82,14 @@ function SelectPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteSelect(
-    SuiteSelectTrigger(
-        SuiteSelectValue(placeholder="Select a fruit"),
+Select(
+    SelectTrigger(
+        SelectValue(placeholder="Select a fruit"),
     ),
-    SuiteSelectContent(
-        SuiteSelectItem(value="apple", "Apple"),
-        SuiteSelectItem(value="banana", "Banana"),
-        SuiteSelectItem(value="orange", "Orange"),
+    SelectContent(
+        SelectItem(value="apple", "Apple"),
+        SelectItem(value="banana", "Banana"),
+        SelectItem(value="orange", "Orange"),
     ),
 )""")
                 )
@@ -127,7 +127,7 @@ SuiteSelect(
             H2(:class => "text-2xl font-serif font-semibold text-warm-800 dark:text-warm-50 mb-4",
                 "API Reference"
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelect"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "Select"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -136,7 +136,7 @@ SuiteSelect(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelectTrigger"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SelectTrigger"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -145,7 +145,7 @@ SuiteSelect(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelectValue"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SelectValue"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -154,7 +154,7 @@ SuiteSelect(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelectContent"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SelectContent"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -164,7 +164,7 @@ SuiteSelect(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelectItem"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SelectItem"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -175,7 +175,7 @@ SuiteSelect(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelectGroup"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SelectGroup"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -184,7 +184,7 @@ SuiteSelect(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelectLabel"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SelectLabel"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -193,7 +193,7 @@ SuiteSelect(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelectSeparator"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SelectSeparator"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -202,7 +202,7 @@ SuiteSelect(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelectScrollUpButton"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SelectScrollUpButton"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),
@@ -211,7 +211,7 @@ SuiteSelect(
                     )
                 )
             ),
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SuiteSelectScrollDownButton"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-100 mt-6 mb-2", "SelectScrollDownButton"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(ApiHead()),

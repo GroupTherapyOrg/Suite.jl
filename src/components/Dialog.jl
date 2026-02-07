@@ -1,11 +1,11 @@
-# SuiteDialog.jl — Suite.jl Dialog Component
+# Dialog.jl — Suite.jl Dialog Component
 #
 # Tier: js_runtime (requires suite.js for focus trap, dismiss layer, scroll lock)
 # Suite Dependencies: none (leaf component)
 # JS Modules: FocusGuards, FocusTrap, DismissLayer, ScrollLock, Dialog
 #
-# Usage via package: using Suite; SuiteDialog(SuiteDialogTrigger(SuiteButton("Open")), SuiteDialogContent(...))
-# Usage via extract: include("components/Dialog.jl"); SuiteDialog(...)
+# Usage via package: using Suite; Dialog(DialogTrigger(Button("Open")), DialogContent(...))
+# Usage via extract: include("components/Dialog.jl"); Dialog(...)
 #
 # Behavior (matches Radix Dialog):
 #   - Modal by default: focus trapped, scroll locked, outside pointer disabled
@@ -20,34 +20,34 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteDialog, SuiteDialogTrigger, SuiteDialogContent,
-       SuiteDialogHeader, SuiteDialogFooter, SuiteDialogTitle,
-       SuiteDialogDescription, SuiteDialogClose
+export Dialog, DialogTrigger, DialogContent,
+       DialogHeader, DialogFooter, DialogTitle,
+       DialogDescription, DialogClose
 
 """
-    SuiteDialog(children...; class, kwargs...) -> VNode
+    Dialog(children...; class, kwargs...) -> VNode
 
 A modal dialog overlay. Contains trigger, overlay, and content.
 
 # Examples
 ```julia
-SuiteDialog(
-    SuiteDialogTrigger(SuiteButton("Open Dialog")),
-    SuiteDialogContent(
-        SuiteDialogHeader(
-            SuiteDialogTitle("Edit Profile"),
-            SuiteDialogDescription("Make changes to your profile here.")
+Dialog(
+    DialogTrigger(Button("Open Dialog")),
+    DialogContent(
+        DialogHeader(
+            DialogTitle("Edit Profile"),
+            DialogDescription("Make changes to your profile here.")
         ),
         # ... form fields
-        SuiteDialogFooter(
-            SuiteDialogClose(SuiteButton(variant="outline", "Cancel")),
-            SuiteButton("Save changes")
+        DialogFooter(
+            DialogClose(Button(variant="outline", "Cancel")),
+            Button("Save changes")
         )
     )
 )
 ```
 """
-function SuiteDialog(children...; class::String="", kwargs...)
+function Dialog(children...; class::String="", kwargs...)
     id = "suite-dialog-" * string(rand(UInt32), base=16)
 
     # Separate trigger from content children
@@ -85,27 +85,27 @@ function _dialog_set_trigger_id(node, id)
 end
 
 """
-    SuiteDialogTrigger(children...; class, kwargs...) -> VNode
+    DialogTrigger(children...; class, kwargs...) -> VNode
 
-The button that opens the dialog. Wrap around a SuiteButton or any clickable element.
+The button that opens the dialog. Wrap around a Button or any clickable element.
 """
-function SuiteDialogTrigger(children...; class::String="", kwargs...)
-    # Wrap in a marker div so SuiteDialog can find and wire it
+function DialogTrigger(children...; class::String="", kwargs...)
+    # Wrap in a marker div so Dialog can find and wire it
     Div(Symbol("data-suite-dialog-trigger-wrapper") => "",
         :style => "display:contents",
-        Button(:type => "button",
+        Therapy.Button(:type => "button",
                :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end
 
 """
-    SuiteDialogContent(children...; class, kwargs...) -> VNode
+    DialogContent(children...; class, kwargs...) -> VNode
 
 The dialog content panel. Contains header, body, footer, and close button.
 Renders with overlay backdrop. Hidden by default, shown by JS.
 """
-function SuiteDialogContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+function DialogContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -136,7 +136,7 @@ function SuiteDialogContent(children...; theme::Symbol=:default, class::String="
             kwargs...,
             children...,
             # Default close button (X in top-right)
-            Button(:type => "button",
+            Therapy.Button(:type => "button",
                    Symbol("data-suite-dialog-close") => "",
                    :class => "absolute right-4 top-4 rounded-sm opacity-70 cursor-pointer ring-offset-warm-50 dark:ring-offset-warm-950 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2 disabled:pointer-events-none",
                    :aria_label => "Close",
@@ -151,55 +151,55 @@ function SuiteDialogContent(children...; theme::Symbol=:default, class::String="
 end
 
 """
-    SuiteDialogHeader(children...; class, kwargs...) -> VNode
+    DialogHeader(children...; class, kwargs...) -> VNode
 
 Header section of the dialog (typically contains title and description).
 """
-function SuiteDialogHeader(children...; class::String="", kwargs...)
+function DialogHeader(children...; class::String="", kwargs...)
     Div(:class => cn("flex flex-col gap-2 text-center sm:text-left", class),
         kwargs...,
         children...)
 end
 
 """
-    SuiteDialogFooter(children...; class, kwargs...) -> VNode
+    DialogFooter(children...; class, kwargs...) -> VNode
 
 Footer section of the dialog (typically contains action buttons).
 """
-function SuiteDialogFooter(children...; class::String="", kwargs...)
+function DialogFooter(children...; class::String="", kwargs...)
     Div(:class => cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", class),
         kwargs...,
         children...)
 end
 
 """
-    SuiteDialogTitle(children...; class, kwargs...) -> VNode
+    DialogTitle(children...; class, kwargs...) -> VNode
 
 Title of the dialog. Renders as h2.
 """
-function SuiteDialogTitle(children...; class::String="", kwargs...)
+function DialogTitle(children...; class::String="", kwargs...)
     H2(:class => cn("text-lg leading-none font-semibold", class),
        kwargs...,
        children...)
 end
 
 """
-    SuiteDialogDescription(children...; class, kwargs...) -> VNode
+    DialogDescription(children...; class, kwargs...) -> VNode
 
 Description text for the dialog.
 """
-function SuiteDialogDescription(children...; class::String="", kwargs...)
+function DialogDescription(children...; class::String="", kwargs...)
     P(:class => cn("text-warm-600 dark:text-warm-500 text-sm", class),
       kwargs...,
       children...)
 end
 
 """
-    SuiteDialogClose(children...; class, kwargs...) -> VNode
+    DialogClose(children...; class, kwargs...) -> VNode
 
-A button that closes the dialog when clicked. Wrap around a SuiteButton or any element.
+A button that closes the dialog when clicked. Wrap around a Button or any element.
 """
-function SuiteDialogClose(children...; class::String="", kwargs...)
+function DialogClose(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-dialog-close") => "",
          :class => cn(class),
          :style => "display:contents",
@@ -216,8 +216,8 @@ if @isdefined(register_component!)
         "Modal dialog overlay with focus trap, scroll lock, and dismiss layer",
         Symbol[],
         [:FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :Dialog],
-        [:SuiteDialog, :SuiteDialogTrigger, :SuiteDialogContent,
-         :SuiteDialogHeader, :SuiteDialogFooter, :SuiteDialogTitle,
-         :SuiteDialogDescription, :SuiteDialogClose],
+        [:Dialog, :DialogTrigger, :DialogContent,
+         :DialogHeader, :DialogFooter, :DialogTitle,
+         :DialogDescription, :DialogClose],
     ))
 end

@@ -1,8 +1,8 @@
 # Textarea — Suite.jl component docs page
 #
-# Showcases SuiteTextarea for multi-line text input.
+# Showcases Textarea for multi-line text input.
 
-const SuiteTextarea = Main.SuiteTextarea
+const Textarea = Main.Textarea
 
 function TextareaPage()
     ComponentsLayout(
@@ -18,20 +18,20 @@ function TextareaPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A default textarea.",
-            SuiteTextarea(placeholder="Type your message here.", class="max-w-sm")
+            Textarea(placeholder="Type your message here.", class="max-w-sm")
         ),
 
         # With Label
         ComponentPreview(title="With Label", description="Textarea paired with a label.",
             Div(:class => "grid w-full max-w-sm gap-1.5",
-                Main.SuiteLabel("Your message"),
-                SuiteTextarea(placeholder="Type your message here.")
+                Main.Label("Your message"),
+                Textarea(placeholder="Type your message here.")
             )
         ),
 
         # Disabled
         ComponentPreview(title="Disabled", description="Textarea in disabled state.",
-            SuiteTextarea(disabled=true, placeholder="Disabled", class="max-w-sm")
+            Textarea(disabled=true, placeholder="Disabled", class="max-w-sm")
         ),
 
         # Usage
@@ -43,9 +43,9 @@ function TextareaPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteTextarea(placeholder="Type your message here.")
-SuiteTextarea(:rows => "5", placeholder="Bio")
-SuiteTextarea(:disabled => true, placeholder="Disabled")""")
+Textarea(placeholder="Type your message here.")
+Textarea(:rows => "5", placeholder="Bio")
+Textarea(:disabled => true, placeholder="Disabled")""")
                 )
             )
         ),

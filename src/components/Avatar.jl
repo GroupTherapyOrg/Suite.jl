@@ -1,11 +1,11 @@
-# SuiteAvatar.jl — Suite.jl Avatar Component
+# Avatar.jl — Suite.jl Avatar Component
 #
 # Tier: styling (pure HTML + Tailwind classes, no JS/Wasm)
 # Suite Dependencies: none (leaf component)
 # JS Modules: none
 #
-# Usage via package: using Suite; SuiteAvatar(SuiteAvatarImage(src="/avatar.jpg", alt="User"))
-# Usage via extract: include("components/Avatar.jl"); SuiteAvatar(...)
+# Usage via package: using Suite; Avatar(AvatarImage(src="/avatar.jpg", alt="User"))
+# Usage via extract: include("components/Avatar.jl"); Avatar(...)
 #
 # Reference: shadcn/ui Avatar — https://ui.shadcn.com/docs/components/avatar
 
@@ -15,10 +15,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteAvatar, SuiteAvatarImage, SuiteAvatarFallback
+export Avatar, AvatarImage, AvatarFallback
 
 """
-    SuiteAvatar(children...; size, class, kwargs...) -> VNode
+    Avatar(children...; size, class, kwargs...) -> VNode
 
 A circular avatar container for user images with fallback.
 Equivalent to shadcn/ui's Avatar component.
@@ -30,16 +30,16 @@ Equivalent to shadcn/ui's Avatar component.
 
 # Examples
 ```julia
-SuiteAvatar(
-    SuiteAvatarImage(src="/avatar.jpg", alt="User"),
-    SuiteAvatarFallback("JD"),
+Avatar(
+    AvatarImage(src="/avatar.jpg", alt="User"),
+    AvatarFallback("JD"),
 )
-SuiteAvatar(size="lg",
-    SuiteAvatarFallback("AB"),
+Avatar(size="lg",
+    AvatarFallback("AB"),
 )
 ```
 """
-function SuiteAvatar(children...; size::String="default", class::String="", kwargs...)
+function Avatar(children...; size::String="default", class::String="", kwargs...)
     size_classes = Dict(
         "default" => "size-8",
         "sm"      => "size-6",
@@ -53,21 +53,21 @@ function SuiteAvatar(children...; size::String="default", class::String="", kwar
 end
 
 """
-    SuiteAvatarImage(; src, alt, class, kwargs...) -> VNode
+    AvatarImage(; src, alt, class, kwargs...) -> VNode
 
-Image displayed inside a SuiteAvatar.
+Image displayed inside a Avatar.
 """
-function SuiteAvatarImage(; src::String="", alt::String="", class::String="", kwargs...)
+function AvatarImage(; src::String="", alt::String="", class::String="", kwargs...)
     classes = cn("aspect-square size-full", class)
     Img(:src => src, :alt => alt, :class => classes, kwargs...)
 end
 
 """
-    SuiteAvatarFallback(children...; class, kwargs...) -> VNode
+    AvatarFallback(children...; class, kwargs...) -> VNode
 
 Fallback content (initials/icon) shown when avatar image is unavailable.
 """
-function SuiteAvatarFallback(children...; class::String="", theme::Symbol=:default, kwargs...)
+function AvatarFallback(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn(
         "flex size-full items-center justify-center rounded-full text-sm",
         "bg-warm-100 dark:bg-warm-900 text-warm-600 dark:text-warm-500",
@@ -86,6 +86,6 @@ if @isdefined(register_component!)
         "Circular avatar with image and fallback",
         Symbol[],
         Symbol[],
-        [:SuiteAvatar, :SuiteAvatarImage, :SuiteAvatarFallback],
+        [:Avatar, :AvatarImage, :AvatarFallback],
     ))
 end

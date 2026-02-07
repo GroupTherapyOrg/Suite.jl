@@ -1,14 +1,14 @@
 # Breadcrumb — Suite.jl component docs page
 #
-# Showcases SuiteBreadcrumb navigation trail.
+# Showcases Breadcrumb navigation trail.
 
-const SuiteBreadcrumb = Main.SuiteBreadcrumb
-const SuiteBreadcrumbList = Main.SuiteBreadcrumbList
-const SuiteBreadcrumbItem = Main.SuiteBreadcrumbItem
-const SuiteBreadcrumbLink = Main.SuiteBreadcrumbLink
-const SuiteBreadcrumbPage = Main.SuiteBreadcrumbPage
-const SuiteBreadcrumbSeparator = Main.SuiteBreadcrumbSeparator
-const SuiteBreadcrumbEllipsis = Main.SuiteBreadcrumbEllipsis
+const Breadcrumb = Main.Breadcrumb
+const BreadcrumbList = Main.BreadcrumbList
+const BreadcrumbItem = Main.BreadcrumbItem
+const BreadcrumbLink = Main.BreadcrumbLink
+const BreadcrumbPage = Main.BreadcrumbPage
+const BreadcrumbSeparator = Main.BreadcrumbSeparator
+const BreadcrumbEllipsis = Main.BreadcrumbEllipsis
 
 function BreadcrumbPage()
     ComponentsLayout(
@@ -24,28 +24,28 @@ function BreadcrumbPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A basic breadcrumb trail.",
-            SuiteBreadcrumb(
-                SuiteBreadcrumbList(
-                    SuiteBreadcrumbItem(SuiteBreadcrumbLink("Home", href="#")),
-                    SuiteBreadcrumbSeparator(),
-                    SuiteBreadcrumbItem(SuiteBreadcrumbLink("Components", href="#")),
-                    SuiteBreadcrumbSeparator(),
-                    SuiteBreadcrumbItem(SuiteBreadcrumbPage("Breadcrumb"))
+            Breadcrumb(
+                BreadcrumbList(
+                    BreadcrumbItem(BreadcrumbLink("Home", href="#")),
+                    BreadcrumbSeparator(),
+                    BreadcrumbItem(BreadcrumbLink("Components", href="#")),
+                    BreadcrumbSeparator(),
+                    BreadcrumbItem(BreadcrumbPage("Breadcrumb"))
                 )
             )
         ),
 
         # With Ellipsis
         ComponentPreview(title="With Ellipsis", description="Breadcrumb with collapsed items.",
-            SuiteBreadcrumb(
-                SuiteBreadcrumbList(
-                    SuiteBreadcrumbItem(SuiteBreadcrumbLink("Home", href="#")),
-                    SuiteBreadcrumbSeparator(),
-                    SuiteBreadcrumbItem(SuiteBreadcrumbEllipsis()),
-                    SuiteBreadcrumbSeparator(),
-                    SuiteBreadcrumbItem(SuiteBreadcrumbLink("Components", href="#")),
-                    SuiteBreadcrumbSeparator(),
-                    SuiteBreadcrumbItem(SuiteBreadcrumbPage("Breadcrumb"))
+            Breadcrumb(
+                BreadcrumbList(
+                    BreadcrumbItem(BreadcrumbLink("Home", href="#")),
+                    BreadcrumbSeparator(),
+                    BreadcrumbItem(BreadcrumbEllipsis()),
+                    BreadcrumbSeparator(),
+                    BreadcrumbItem(BreadcrumbLink("Components", href="#")),
+                    BreadcrumbSeparator(),
+                    BreadcrumbItem(BreadcrumbPage("Breadcrumb"))
                 )
             )
         ),
@@ -59,13 +59,13 @@ function BreadcrumbPage()
                 Pre(:class => "text-sm text-warm-50",
                     Code(:class => "language-julia", """using Suite
 
-SuiteBreadcrumb(
-    SuiteBreadcrumbList(
-        SuiteBreadcrumbItem(SuiteBreadcrumbLink("Home", href="/")),
-        SuiteBreadcrumbSeparator(),
-        SuiteBreadcrumbItem(SuiteBreadcrumbLink("Components", href="/components")),
-        SuiteBreadcrumbSeparator(),
-        SuiteBreadcrumbItem(SuiteBreadcrumbPage("Breadcrumb")),
+Breadcrumb(
+    BreadcrumbList(
+        BreadcrumbItem(BreadcrumbLink("Home", href="/")),
+        BreadcrumbSeparator(),
+        BreadcrumbItem(BreadcrumbLink("Components", href="/components")),
+        BreadcrumbSeparator(),
+        BreadcrumbItem(BreadcrumbPage("Breadcrumb")),
     ),
 )""")
                 )
@@ -78,7 +78,7 @@ SuiteBreadcrumb(
                 "API Reference"
             ),
 
-            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "SuiteBreadcrumbLink"),
+            H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "BreadcrumbLink"),
             Div(:class => "overflow-x-auto",
                 Table(:class => "w-full text-sm",
                     Thead(
@@ -100,7 +100,7 @@ SuiteBreadcrumb(
 
             H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300 mt-6 mb-3", "Sub-components"),
             P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-4",
-                "SuiteBreadcrumb, SuiteBreadcrumbList, SuiteBreadcrumbItem, SuiteBreadcrumbPage, SuiteBreadcrumbSeparator, and SuiteBreadcrumbEllipsis all accept ",
+                "Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage, BreadcrumbSeparator, and BreadcrumbEllipsis all accept ",
                 Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "class"),
                 " and ",
                 Code(:class => "text-xs bg-warm-100 dark:bg-warm-900 px-1 py-0.5 rounded", "kwargs..."),

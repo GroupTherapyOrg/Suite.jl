@@ -10,8 +10,8 @@ using Therapy
 using Suite
 
 # Use components directly
-SuiteButton(variant="outline", "Click me")
-SuiteCard(SuiteCardHeader(SuiteCardTitle("Hello")), SuiteCardContent("World"))
+Button(variant="outline", "Click me")
+Card(CardHeader(CardTitle("Hello")), CardContent("World"))
 
 # Extract components to customize
 Suite.extract(:Button, "src/components/")  # copies source to your project
@@ -58,7 +58,7 @@ Suite.jl/
 ### Pure Styling Pattern
 
 ```julia
-function SuiteButton(children...; variant="default", size="default", class="", kwargs...)
+function Button(children...; variant="default", size="default", class="", kwargs...)
     base = "inline-flex items-center ..."
     variants = Dict("default" => "bg-accent-600 text-white ...", ...)
     sizes = Dict("default" => "h-10 px-4 py-2", ...)
@@ -70,7 +70,7 @@ end
 ### Island Pattern (future)
 
 ```julia
-@island function SuiteAccordion(; items=[])
+@island function Accordion(; items=[])
     open_index, set_open_index = create_signal(Int32(-1))
     # ... renders with signals
 end
@@ -79,7 +79,7 @@ end
 ### JS Runtime Pattern (future)
 
 ```julia
-function SuiteDialog(children...; class="", kwargs...)
+function Dialog(children...; class="", kwargs...)
     id = "suite-dialog-" * string(rand(UInt32), base=16)
     Div(:data_suite_dialog => id,
         # Julia renders HTML, suite.js handles focus trap + dismiss
@@ -97,7 +97,7 @@ if !@isdefined(Div); using Therapy end
 if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
-function SuiteFoo(children...; variant="default", class="", kwargs...)
+function Foo(children...; variant="default", class="", kwargs...)
     # ... implementation
 end
 
@@ -105,7 +105,7 @@ end
 if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Foo, "Foo.jl", :styling, "Description",
-        Symbol[], Symbol[], [:SuiteFoo],
+        Symbol[], Symbol[], [:Foo],
     ))
 end
 ```
@@ -140,11 +140,11 @@ The `@isdefined` guards enable dual-mode usage:
 
 ## Naming Conventions
 
-- **Components**: `SuiteButton`, `SuiteCard`, `SuiteDialog` (Suite prefix)
-- **Sub-components**: `SuiteCardHeader`, `SuiteCardTitle`, etc.
+- **Components**: `Button`, `Card`, `Dialog` (Suite prefix)
+- **Sub-components**: `CardHeader`, `CardTitle`, etc.
 - **Variants**: kwargs with String values: `variant="outline"`, `size="sm"`
 - **HTML elements**: Pair syntax: `Div(:class => "...", children...)`
-- **User components**: kwargs: `SuiteButton(variant="outline", "Click")`
+- **User components**: kwargs: `Button(variant="outline", "Click")`
 
 ## Commands
 

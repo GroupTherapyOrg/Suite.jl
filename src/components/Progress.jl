@@ -1,11 +1,11 @@
-# SuiteProgress.jl — Suite.jl Progress Component
+# Progress.jl — Suite.jl Progress Component
 #
 # Tier: styling (pure HTML + Tailwind classes, no JS/Wasm)
 # Suite Dependencies: none (leaf component)
 # JS Modules: none
 #
-# Usage via package: using Suite; SuiteProgress(value=60)
-# Usage via extract: include("components/Progress.jl"); SuiteProgress(...)
+# Usage via package: using Suite; Progress(value=60)
+# Usage via extract: include("components/Progress.jl"); Progress(...)
 #
 # Reference: shadcn/ui Progress — https://ui.shadcn.com/docs/components/progress
 
@@ -15,10 +15,10 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export SuiteProgress
+export Progress
 
 """
-    SuiteProgress(; value, class, kwargs...) -> VNode
+    Progress(; value, class, kwargs...) -> VNode
 
 A horizontal progress bar.
 Equivalent to shadcn/ui's Progress component.
@@ -28,11 +28,11 @@ Equivalent to shadcn/ui's Progress component.
 
 # Examples
 ```julia
-SuiteProgress(value=33)
-SuiteProgress(value=75, class="w-[60%]")
+Progress(value=33)
+Progress(value=75, class="w-[60%]")
 ```
 """
-function SuiteProgress(; value::Real=0, class::String="", theme::Symbol=:default, kwargs...)
+function Progress(; value::Real=0, class::String="", theme::Symbol=:default, kwargs...)
     clamped = clamp(value, 0, 100)
     transform_val = "translateX(-$(100 - clamped)%)"
 
@@ -70,6 +70,6 @@ if @isdefined(register_component!)
         "Horizontal progress bar",
         Symbol[],
         Symbol[],
-        [:SuiteProgress],
+        [:Progress],
     ))
 end
