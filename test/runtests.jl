@@ -3067,4 +3067,500 @@ using Test
             @test :DismissLayer in meta.js_modules
         end
     end
+
+    # ==================== Select ===============================================
+    @testset "SuiteSelect" begin
+        @testset "Basic rendering" begin
+            html = Therapy.render_to_string(SuiteSelect(
+                SuiteSelectTrigger(SuiteSelectValue(placeholder="Pick a fruit...")),
+                SuiteSelectContent(
+                    SuiteSelectItem("Apple", value="apple"),
+                    SuiteSelectItem("Banana", value="banana"),
+                )
+            ))
+            @test occursin("data-suite-select=", html)
+            @test occursin("data-suite-select-trigger=", html)
+            @test occursin("data-suite-select-content", html)
+            @test occursin("role=\"combobox\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("aria-autocomplete=\"none\"", html)
+            @test occursin("Apple", html)
+            @test occursin("Banana", html)
+            @test occursin("Pick a fruit...", html)
+        end
+
+        @testset "Select with initial value" begin
+            html = Therapy.render_to_string(SuiteSelect(default_value="banana",
+                SuiteSelectTrigger(SuiteSelectValue(placeholder="Pick...")),
+                SuiteSelectContent(
+                    SuiteSelectItem("Apple", value="apple"),
+                    SuiteSelectItem("Banana", value="banana"),
+                )
+            ))
+            @test occursin("data-suite-select-value=\"banana\"", html)
+        end
+
+        @testset "Select disabled" begin
+            html = Therapy.render_to_string(SuiteSelect(disabled=true,
+                SuiteSelectTrigger(SuiteSelectValue(placeholder="Pick...")),
+                SuiteSelectContent(
+                    SuiteSelectItem("A", value="a"),
+                )
+            ))
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "Select required" begin
+            html = Therapy.render_to_string(SuiteSelect(required=true,
+                SuiteSelectTrigger(SuiteSelectValue(placeholder="Pick...")),
+                SuiteSelectContent(
+                    SuiteSelectItem("A", value="a"),
+                )
+            ))
+            @test occursin("data-required", html)
+        end
+
+        @testset "SelectTrigger styling" begin
+            html = Therapy.render_to_string(SuiteSelectTrigger(SuiteSelectValue(placeholder="Pick...")))
+            @test occursin("border-warm-200", html)
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("h-9", html)
+            @test occursin("rounded-md", html)
+            @test occursin("shadow-xs", html)
+            @test occursin("focus-visible:ring-", html)
+            # Chevron icon
+            @test occursin("opacity-50", html)
+        end
+
+        @testset "SelectTrigger custom class" begin
+            html = Therapy.render_to_string(SuiteSelectTrigger(class="w-[200px]",
+                SuiteSelectValue(placeholder="Pick...")))
+            @test occursin("w-[200px]", html)
+        end
+
+        @testset "SelectValue placeholder" begin
+            html = Therapy.render_to_string(SuiteSelectValue(placeholder="Choose..."))
+            @test occursin("data-suite-select-display", html)
+            @test occursin("data-placeholder", html)
+            @test occursin("Choose...", html)
+        end
+
+        @testset "SelectContent styling" begin
+            html = Therapy.render_to_string(SuiteSelectContent(
+                SuiteSelectItem("A", value="a")
+            ))
+            @test occursin("role=\"listbox\"", html)
+            @test occursin("bg-warm-50", html)
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("rounded-md", html)
+            @test occursin("border-warm-200", html)
+            @test occursin("shadow-md", html)
+            @test occursin("animate-in", html)
+            @test occursin("animate-out", html)
+            @test occursin("slide-in-from-top-2", html)
+            @test occursin("min-w-[8rem]", html)
+            @test occursin("translate-y-1", html)
+        end
+
+        @testset "SelectContent custom side/align" begin
+            html = Therapy.render_to_string(SuiteSelectContent(side="top", align="end", side_offset=8,
+                SuiteSelectItem("A", value="a")
+            ))
+            @test occursin("data-suite-select-side=\"top\"", html)
+            @test occursin("data-suite-select-align=\"end\"", html)
+            @test occursin("data-suite-select-side-offset=\"8\"", html)
+        end
+
+        @testset "SelectContent custom class" begin
+            html = Therapy.render_to_string(SuiteSelectContent(class="w-[300px]",
+                SuiteSelectItem("A", value="a")
+            ))
+            @test occursin("w-[300px]", html)
+        end
+
+        @testset "SelectItem basic" begin
+            html = Therapy.render_to_string(SuiteSelectItem("Apple", value="apple"))
+            @test occursin("data-suite-select-item", html)
+            @test occursin("data-suite-select-item-value=\"apple\"", html)
+            @test occursin("role=\"option\"", html)
+            @test occursin("aria-selected=\"false\"", html)
+            @test occursin("data-state=\"unchecked\"", html)
+            @test occursin("Apple", html)
+            @test occursin("rounded-sm", html)
+            @test occursin("pr-8", html)
+            @test occursin("pl-2", html)
+            # Check indicator hidden by default
+            @test occursin("data-suite-select-item-indicator", html)
+        end
+
+        @testset "SelectItem disabled" begin
+            html = Therapy.render_to_string(SuiteSelectItem("Apple", value="apple", disabled=true))
+            @test occursin("data-disabled", html)
+            @test occursin("aria-disabled=\"true\"", html)
+            @test occursin("data-[disabled]", html)
+        end
+
+        @testset "SelectItem with text_value" begin
+            html = Therapy.render_to_string(SuiteSelectItem("🍎 Apple", value="apple", text_value="Apple"))
+            @test occursin("data-suite-select-item-text=\"Apple\"", html)
+        end
+
+        @testset "SelectItem custom class" begin
+            html = Therapy.render_to_string(SuiteSelectItem("A", value="a", class="font-bold"))
+            @test occursin("font-bold", html)
+        end
+
+        @testset "SelectGroup" begin
+            html = Therapy.render_to_string(SuiteSelectGroup(
+                SuiteSelectLabel("Fruits"),
+                SuiteSelectItem("Apple", value="apple"),
+            ))
+            @test occursin("role=\"group\"", html)
+            @test occursin("data-suite-select-group", html)
+            @test occursin("Fruits", html)
+            @test occursin("Apple", html)
+        end
+
+        @testset "SelectLabel" begin
+            html = Therapy.render_to_string(SuiteSelectLabel("Category"))
+            @test occursin("data-suite-select-label", html)
+            @test occursin("role=\"presentation\"", html)
+            @test occursin("font-semibold", html)
+            @test occursin("Category", html)
+        end
+
+        @testset "SelectSeparator" begin
+            html = Therapy.render_to_string(SuiteSelectSeparator())
+            @test occursin("data-suite-select-separator", html)
+            @test occursin("role=\"separator\"", html)
+            @test occursin("h-px", html)
+            @test occursin("bg-warm-200", html)
+        end
+
+        @testset "SelectScrollUpButton" begin
+            html = Therapy.render_to_string(SuiteSelectScrollUpButton())
+            @test occursin("data-suite-select-scroll-up", html)
+            @test occursin("aria-hidden=\"true\"", html)
+            # Default chevron up icon
+            @test occursin("m18 15-6-6-6 6", html)
+        end
+
+        @testset "SelectScrollDownButton" begin
+            html = Therapy.render_to_string(SuiteSelectScrollDownButton())
+            @test occursin("data-suite-select-scroll-down", html)
+            @test occursin("aria-hidden=\"true\"", html)
+            # Default chevron down icon
+            @test occursin("m6 9 6 6 6-6", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(SuiteSelectContent(
+                SuiteSelectItem("A", value="a"),
+                SuiteSelectSeparator(),
+            ))
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:text-warm-300", html)
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:bg-warm-700", html)
+        end
+
+        @testset "Full composition" begin
+            html = Therapy.render_to_string(SuiteSelect(
+                SuiteSelectTrigger(SuiteSelectValue(placeholder="Select a fruit...")),
+                SuiteSelectContent(
+                    SuiteSelectGroup(
+                        SuiteSelectLabel("Fruits"),
+                        SuiteSelectItem("Apple", value="apple"),
+                        SuiteSelectItem("Banana", value="banana"),
+                        SuiteSelectItem("Orange", value="orange"),
+                    ),
+                    SuiteSelectSeparator(),
+                    SuiteSelectGroup(
+                        SuiteSelectLabel("Vegetables"),
+                        SuiteSelectItem("Carrot", value="carrot"),
+                        SuiteSelectItem("Broccoli", value="broccoli"),
+                    ),
+                )
+            ))
+            @test occursin("data-suite-select=", html)
+            @test occursin("Select a fruit...", html)
+            @test occursin("Fruits", html)
+            @test occursin("Apple", html)
+            @test occursin("Banana", html)
+            @test occursin("Vegetables", html)
+            @test occursin("Carrot", html)
+            @test occursin("Broccoli", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Select)
+            meta = Suite.COMPONENT_REGISTRY[:Select]
+            @test meta.tier == :js_runtime
+            @test :SuiteSelect in meta.exports
+            @test :SuiteSelectTrigger in meta.exports
+            @test :SuiteSelectValue in meta.exports
+            @test :SuiteSelectContent in meta.exports
+            @test :SuiteSelectItem in meta.exports
+            @test :SuiteSelectGroup in meta.exports
+            @test :SuiteSelectLabel in meta.exports
+            @test :SuiteSelectSeparator in meta.exports
+            @test :Select in meta.js_modules
+            @test :Floating in meta.js_modules
+        end
+    end
+
+    # ==================== Command ==============================================
+    @testset "SuiteCommand" begin
+        @testset "Basic rendering" begin
+            html = Therapy.render_to_string(SuiteCommand(
+                SuiteCommandInput(placeholder="Type a command..."),
+                SuiteCommandList(
+                    SuiteCommandEmpty("No results found."),
+                    SuiteCommandGroup(heading="Suggestions",
+                        SuiteCommandItem("Calendar", value="calendar"),
+                        SuiteCommandItem("Search", value="search"),
+                    ),
+                )
+            ))
+            @test occursin("data-suite-command=", html)
+            @test occursin("data-suite-command-input", html)
+            @test occursin("data-suite-command-list", html)
+            @test occursin("role=\"listbox\"", html)
+            @test occursin("Type a command...", html)
+            @test occursin("Calendar", html)
+            @test occursin("Search", html)
+        end
+
+        @testset "Command root styling" begin
+            html = Therapy.render_to_string(SuiteCommand(
+                SuiteCommandInput(placeholder="Search..."),
+                SuiteCommandList(
+                    SuiteCommandItem("Test", value="test"),
+                )
+            ))
+            @test occursin("bg-warm-50", html)
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("rounded-md", html)
+            @test occursin("overflow-hidden", html)
+        end
+
+        @testset "Command filter attribute" begin
+            html = Therapy.render_to_string(SuiteCommand(should_filter=false,
+                SuiteCommandInput(placeholder="Search..."),
+                SuiteCommandList(
+                    SuiteCommandItem("Test", value="test"),
+                )
+            ))
+            @test occursin("data-suite-command-filter=\"false\"", html)
+        end
+
+        @testset "Command loop attribute" begin
+            html = Therapy.render_to_string(SuiteCommand(loop=false,
+                SuiteCommandInput(placeholder="Search..."),
+                SuiteCommandList(
+                    SuiteCommandItem("Test", value="test"),
+                )
+            ))
+            @test occursin("data-suite-command-loop=\"false\"", html)
+        end
+
+        @testset "Command custom class" begin
+            html = Therapy.render_to_string(SuiteCommand(class="max-w-lg",
+                SuiteCommandInput(placeholder="Search..."),
+                SuiteCommandList(
+                    SuiteCommandItem("Test", value="test"),
+                )
+            ))
+            @test occursin("max-w-lg", html)
+        end
+
+        @testset "CommandInput" begin
+            html = Therapy.render_to_string(SuiteCommandInput(placeholder="Search..."))
+            @test occursin("data-suite-command-input", html)
+            @test occursin("placeholder=\"Search...\"", html)
+            @test occursin("autocomplete=\"off\"", html)
+            @test occursin("spellcheck=\"false\"", html)
+            @test occursin("border-b", html)
+            # Search icon
+            @test occursin("circle cx=\"11\" cy=\"11\"", html)
+        end
+
+        @testset "CommandInput custom class" begin
+            html = Therapy.render_to_string(SuiteCommandInput(placeholder="Search...", class="font-bold"))
+            @test occursin("font-bold", html)
+        end
+
+        @testset "CommandList" begin
+            html = Therapy.render_to_string(SuiteCommandList(
+                SuiteCommandItem("A", value="a"),
+            ))
+            @test occursin("data-suite-command-list", html)
+            @test occursin("role=\"listbox\"", html)
+            @test occursin("aria-label=\"Suggestions\"", html)
+            @test occursin("max-h-[300px]", html)
+            @test occursin("overflow-y-auto", html)
+        end
+
+        @testset "CommandEmpty" begin
+            html = Therapy.render_to_string(SuiteCommandEmpty("No results found."))
+            @test occursin("data-suite-command-empty", html)
+            @test occursin("role=\"presentation\"", html)
+            @test occursin("No results found.", html)
+            @test occursin("text-center", html)
+            @test occursin("display:none", html)  # hidden by default
+        end
+
+        @testset "CommandGroup" begin
+            html = Therapy.render_to_string(SuiteCommandGroup(heading="Suggestions",
+                SuiteCommandItem("Calendar", value="calendar"),
+            ))
+            @test occursin("data-suite-command-group", html)
+            @test occursin("role=\"group\"", html)
+            @test occursin("aria-labelledby=", html)
+            @test occursin("Suggestions", html)
+            @test occursin("data-suite-command-group-heading", html)
+            @test occursin("font-medium", html)
+            @test occursin("text-xs", html)
+        end
+
+        @testset "CommandGroup without heading" begin
+            html = Therapy.render_to_string(SuiteCommandGroup(
+                SuiteCommandItem("A", value="a"),
+            ))
+            @test occursin("data-suite-command-group", html)
+            @test occursin("role=\"group\"", html)
+            @test !occursin("aria-labelledby", html)
+        end
+
+        @testset "CommandItem basic" begin
+            html = Therapy.render_to_string(SuiteCommandItem("Calendar", value="calendar"))
+            @test occursin("data-suite-command-item", html)
+            @test occursin("data-suite-command-item-value=\"calendar\"", html)
+            @test occursin("role=\"option\"", html)
+            @test occursin("aria-selected=\"false\"", html)
+            @test occursin("Calendar", html)
+            @test occursin("rounded-sm", html)
+            @test occursin("cursor-default", html)
+            @test occursin("data-[selected=true]:bg-warm-100", html)
+        end
+
+        @testset "CommandItem disabled" begin
+            html = Therapy.render_to_string(SuiteCommandItem("Disabled", value="disabled", disabled=true))
+            @test occursin("data-disabled=\"true\"", html)
+            @test occursin("data-[disabled=true]:pointer-events-none", html)
+            @test occursin("data-[disabled=true]:opacity-50", html)
+        end
+
+        @testset "CommandItem with keywords" begin
+            html = Therapy.render_to_string(SuiteCommandItem("Settings", value="settings",
+                keywords=["preferences", "config"]))
+            @test occursin("data-suite-command-item-keywords=\"preferences,config\"", html)
+        end
+
+        @testset "CommandItem custom class" begin
+            html = Therapy.render_to_string(SuiteCommandItem("A", value="a", class="font-bold"))
+            @test occursin("font-bold", html)
+        end
+
+        @testset "CommandSeparator" begin
+            html = Therapy.render_to_string(SuiteCommandSeparator())
+            @test occursin("data-suite-command-separator", html)
+            @test occursin("role=\"separator\"", html)
+            @test occursin("h-px", html)
+            @test occursin("bg-warm-200", html)
+        end
+
+        @testset "CommandShortcut" begin
+            html = Therapy.render_to_string(SuiteCommandShortcut("⌘K"))
+            @test occursin("data-suite-command-shortcut", html)
+            @test occursin("⌘K", html)
+            @test occursin("tracking-widest", html)
+            @test occursin("text-xs", html)
+            @test occursin("ml-auto", html)
+        end
+
+        @testset "CommandDialog" begin
+            html = Therapy.render_to_string(SuiteCommandDialog(
+                SuiteCommandInput(placeholder="Type a command..."),
+                SuiteCommandList(
+                    SuiteCommandItem("Test", value="test"),
+                )
+            ))
+            @test occursin("data-suite-command-dialog=", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("display:none", html)
+            @test occursin("data-suite-command-dialog-overlay", html)
+            @test occursin("data-suite-command-dialog-content", html)
+            @test occursin("data-suite-command=", html)
+            # Should contain the Command inside
+            @test occursin("Type a command...", html)
+            @test occursin("Test", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(SuiteCommand(
+                SuiteCommandInput(placeholder="Search..."),
+                SuiteCommandList(
+                    SuiteCommandGroup(heading="Test",
+                        SuiteCommandItem("A", value="a"),
+                    ),
+                    SuiteCommandSeparator(),
+                )
+            ))
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:text-warm-300", html)
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:bg-warm-700", html)
+        end
+
+        @testset "Full composition" begin
+            html = Therapy.render_to_string(SuiteCommand(
+                SuiteCommandInput(placeholder="Type a command or search..."),
+                SuiteCommandList(
+                    SuiteCommandEmpty("No results found."),
+                    SuiteCommandGroup(heading="Suggestions",
+                        SuiteCommandItem("Calendar", value="calendar"),
+                        SuiteCommandItem(
+                            Span("Search Emoji"),
+                            SuiteCommandShortcut("⌘E"),
+                            value="emoji"),
+                        SuiteCommandItem("Calculator", value="calculator"),
+                    ),
+                    SuiteCommandSeparator(),
+                    SuiteCommandGroup(heading="Settings",
+                        SuiteCommandItem("Profile", value="profile"),
+                        SuiteCommandItem("Billing", value="billing",
+                            keywords=["payment", "subscription"]),
+                        SuiteCommandItem("Settings", value="settings",
+                            keywords=["preferences", "config"]),
+                    ),
+                )
+            ))
+            @test occursin("data-suite-command=", html)
+            @test occursin("Type a command or search...", html)
+            @test occursin("No results found.", html)
+            @test occursin("Suggestions", html)
+            @test occursin("Calendar", html)
+            @test occursin("Search Emoji", html)
+            @test occursin("⌘E", html)
+            @test occursin("Settings", html)
+            @test occursin("payment,subscription", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Command)
+            meta = Suite.COMPONENT_REGISTRY[:Command]
+            @test meta.tier == :js_runtime
+            @test :SuiteCommand in meta.exports
+            @test :SuiteCommandInput in meta.exports
+            @test :SuiteCommandList in meta.exports
+            @test :SuiteCommandEmpty in meta.exports
+            @test :SuiteCommandGroup in meta.exports
+            @test :SuiteCommandItem in meta.exports
+            @test :SuiteCommandSeparator in meta.exports
+            @test :SuiteCommandShortcut in meta.exports
+            @test :SuiteCommandDialog in meta.exports
+            @test :Command in meta.js_modules
+        end
+    end
 end

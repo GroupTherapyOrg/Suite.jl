@@ -2050,6 +2050,534 @@
             }
         },
 
+        // --- Select ---------------------------------------------------------------
+        Select: {
+            _initialized: new WeakSet(),
+
+            init() {
+                document.querySelectorAll('[data-suite-select]').forEach(root => {
+                    if (this._initialized.has(root)) return;
+                    this._initialized.add(root);
+
+                    const id = root.getAttribute('data-suite-select');
+                    const trigger = root.querySelector(`[data-suite-select-trigger="${id}"]`) || root.querySelector('[data-suite-select-trigger]');
+                    const content = root.querySelector('[data-suite-select-content]');
+                    if (!trigger || !content) return;
+
+                    let isOpen = false;
+                    let cleanupFloat = null;
+                    let cleanupDismiss = null;
+                    let highlightedItem = null;
+                    let typeaheadSearch = '';
+                    let typeaheadTimer = null;
+
+                    // Get initial value from root
+                    let currentValue = root.getAttribute('data-suite-select-value') || '';
+
+                    // Update display to show initial value
+                    function updateDisplay() {
+                        const displayEl = trigger.querySelector('[data-suite-select-display]');
+                        if (!displayEl) return;
+                        const items = content.querySelectorAll('[data-suite-select-item]');
+                        let found = false;
+                        items.forEach(item => {
+                            const itemVal = item.getAttribute('data-suite-select-item-value') || '';
+                            if (itemVal === currentValue && currentValue !== '') {
+                                // Show item text
+                                const textEl = item.querySelector('[data-suite-select-item-text-content]');
+                                displayEl.textContent = textEl ? textEl.textContent : item.textContent.trim();
+                                displayEl.removeAttribute('data-placeholder');
+                                found = true;
+                                // Show check indicator on this item
+                                item.setAttribute('data-state', 'checked');
+                                item.setAttribute('aria-selected', 'true');
+                                const indicator = item.querySelector('[data-suite-select-item-indicator]');
+                                if (indicator) indicator.style.display = '';
+                            } else {
+                                item.setAttribute('data-state', 'unchecked');
+                                item.setAttribute('aria-selected', 'false');
+                                const indicator = item.querySelector('[data-suite-select-item-indicator]');
+                                if (indicator) indicator.style.display = 'none';
+                            }
+                        });
+                        if (!found && currentValue === '') {
+                            // Keep placeholder
+                        }
+                    }
+
+                    function getItems() {
+                        return Array.from(content.querySelectorAll('[data-suite-select-item]:not([data-disabled])'));
+                    }
+
+                    function highlightItem(item) {
+                        if (highlightedItem) {
+                            highlightedItem.removeAttribute('data-highlighted');
+                            highlightedItem.classList.remove('bg-warm-100', 'dark:bg-warm-800');
+                        }
+                        highlightedItem = item;
+                        if (item) {
+                            item.setAttribute('data-highlighted', '');
+                            item.focus();
+                        }
+                    }
+
+                    function selectItem(item) {
+                        if (!item) return;
+                        currentValue = item.getAttribute('data-suite-select-item-value') || '';
+                        root.setAttribute('data-suite-select-value', currentValue);
+                        updateDisplay();
+                        close();
+                    }
+
+                    function open() {
+                        if (isOpen) return;
+                        if (root.hasAttribute('data-disabled')) return;
+                        isOpen = true;
+
+                        content.style.display = '';
+                        content.setAttribute('data-state', 'open');
+                        trigger.setAttribute('aria-expanded', 'true');
+                        trigger.setAttribute('data-state', 'open');
+
+                        const side = content.getAttribute('data-suite-select-side') || 'bottom';
+                        const sideOffset = parseInt(content.getAttribute('data-suite-select-side-offset') || '4', 10);
+                        const align = content.getAttribute('data-suite-select-align') || 'start';
+
+                        cleanupFloat = Suite.Floating.position(trigger, content, { side, sideOffset, align });
+                        Suite.ScrollLock.lock();
+                        Suite.FocusGuards.install();
+
+                        // Focus the selected item or first item
+                        requestAnimationFrame(() => {
+                            const items = getItems();
+                            const selected = items.find(i => i.getAttribute('data-state') === 'checked');
+                            highlightItem(selected || items[0]);
+                        });
+
+                        cleanupDismiss = Suite.DismissLayer.push({
+                            element: content,
+                            onEscape: () => close(),
+                            onPointerDownOutside: (e) => {
+                                if (!trigger.contains(e.target)) close();
+                            }
+                        });
+                    }
+
+                    function close() {
+                        if (!isOpen) return;
+                        isOpen = false;
+
+                        content.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('aria-expanded', 'false');
+                        trigger.setAttribute('data-state', 'closed');
+
+                        if (highlightedItem) {
+                            highlightedItem.removeAttribute('data-highlighted');
+                            highlightedItem = null;
+                        }
+
+                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
+                        Suite.ScrollLock.unlock();
+                        Suite.FocusGuards.uninstall();
+                        if (cleanupFloat) { cleanupFloat(); cleanupFloat = null; }
+
+                        const animDur = 200;
+                        setTimeout(() => {
+                            if (!isOpen) content.style.display = 'none';
+                        }, animDur);
+
+                        trigger.focus();
+                    }
+
+                    // Typeahead
+                    function handleTypeahead(key) {
+                        clearTimeout(typeaheadTimer);
+                        typeaheadSearch += key.toLowerCase();
+
+                        // Normalize repeated chars: 'aaa' → 'a'
+                        const allSame = typeaheadSearch.split('').every(c => c === typeaheadSearch[0]);
+                        const search = allSame ? typeaheadSearch[0] : typeaheadSearch;
+
+                        const items = getItems();
+                        const currentIdx = highlightedItem ? items.indexOf(highlightedItem) : -1;
+
+                        // Search forward from current position (wrap)
+                        let startIdx = search.length === 1 ? currentIdx + 1 : 0;
+                        for (let i = 0; i < items.length; i++) {
+                            const idx = (startIdx + i) % items.length;
+                            const textEl = items[idx].querySelector('[data-suite-select-item-text-content]');
+                            const text = (textEl ? textEl.textContent : items[idx].textContent).trim().toLowerCase();
+                            if (text.startsWith(search)) {
+                                highlightItem(items[idx]);
+                                break;
+                            }
+                        }
+
+                        typeaheadTimer = setTimeout(() => { typeaheadSearch = ''; }, 1000);
+                    }
+
+                    // Trigger events
+                    trigger.addEventListener('pointerdown', (e) => {
+                        if (e.button !== 0 || (e.ctrlKey && navigator.platform.includes('Mac'))) return;
+                        e.preventDefault();
+                        if (isOpen) close(); else open();
+                    });
+
+                    trigger.addEventListener('keydown', (e) => {
+                        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                            if (typeaheadSearch.length > 0 && e.key === ' ') {
+                                e.preventDefault();
+                                handleTypeahead(' ');
+                                return;
+                            }
+                            handleTypeahead(e.key);
+                            return;
+                        }
+                        if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
+                            e.preventDefault();
+                            open();
+                        }
+                    });
+
+                    // Content keyboard navigation
+                    content.addEventListener('keydown', (e) => {
+                        if (e.key === 'Tab') { e.preventDefault(); return; }
+
+                        const items = getItems();
+                        const currentIdx = highlightedItem ? items.indexOf(highlightedItem) : -1;
+
+                        if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            const next = currentIdx + 1 < items.length ? currentIdx + 1 : 0;
+                            highlightItem(items[next]);
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            const prev = currentIdx - 1 >= 0 ? currentIdx - 1 : items.length - 1;
+                            highlightItem(items[prev]);
+                        } else if (e.key === 'Home') {
+                            e.preventDefault();
+                            highlightItem(items[0]);
+                        } else if (e.key === 'End') {
+                            e.preventDefault();
+                            highlightItem(items[items.length - 1]);
+                        } else if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (highlightedItem) selectItem(highlightedItem);
+                        } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                            if (typeaheadSearch.length > 0 && e.key === ' ') {
+                                e.preventDefault();
+                                handleTypeahead(' ');
+                                return;
+                            }
+                            handleTypeahead(e.key);
+                        }
+                    });
+
+                    // Item click
+                    content.addEventListener('pointerup', (e) => {
+                        const item = e.target.closest('[data-suite-select-item]:not([data-disabled])');
+                        if (item && content.contains(item)) {
+                            selectItem(item);
+                        }
+                    });
+
+                    // Item hover highlighting
+                    content.addEventListener('pointermove', (e) => {
+                        const item = e.target.closest('[data-suite-select-item]:not([data-disabled])');
+                        if (item && content.contains(item)) {
+                            highlightItem(item);
+                        }
+                    });
+
+                    // Scroll buttons
+                    const scrollUp = content.querySelector('[data-suite-select-scroll-up]');
+                    const scrollDown = content.querySelector('[data-suite-select-scroll-down]');
+                    let scrollInterval = null;
+
+                    if (scrollUp) {
+                        scrollUp.addEventListener('pointerdown', () => {
+                            scrollInterval = setInterval(() => { content.scrollTop -= 32; }, 50);
+                        });
+                        scrollUp.addEventListener('pointerup', () => clearInterval(scrollInterval));
+                        scrollUp.addEventListener('pointerleave', () => clearInterval(scrollInterval));
+                    }
+                    if (scrollDown) {
+                        scrollDown.addEventListener('pointerdown', () => {
+                            scrollInterval = setInterval(() => { content.scrollTop += 32; }, 50);
+                        });
+                        scrollDown.addEventListener('pointerup', () => clearInterval(scrollInterval));
+                        scrollDown.addEventListener('pointerleave', () => clearInterval(scrollInterval));
+                    }
+
+                    // Initialize display
+                    updateDisplay();
+                });
+            }
+        },
+
+        // --- Command (cmdk-style) -------------------------------------------------
+        Command: {
+            _initialized: new WeakSet(),
+
+            /**
+             * Fuzzy match scoring — ported from cmdk's command-score.ts
+             * Returns 0-1 score. Higher = better match.
+             */
+            score(string, abbreviation) {
+                if (!abbreviation || !string) return 0;
+                if (abbreviation.length > string.length) return 0;
+                if (abbreviation === string) return 1;
+
+                const lowerString = string.toLowerCase();
+                const lowerAbbreviation = abbreviation.toLowerCase();
+                const memo = {};
+
+                function inner(sIdx, aIdx) {
+                    if (aIdx === abbreviation.length) {
+                        return sIdx === string.length ? 1 : 0.99;
+                    }
+                    const key = sIdx + ',' + aIdx;
+                    if (memo[key] !== undefined) return memo[key];
+
+                    let highScore = 0;
+                    const targetChar = lowerAbbreviation[aIdx];
+
+                    for (let i = sIdx; i < string.length; i++) {
+                        if (lowerString[i] !== targetChar) continue;
+
+                        let score = inner(i + 1, aIdx + 1);
+                        if (score <= 0) continue;
+
+                        if (i === sIdx) {
+                            score *= 1; // continue match
+                        } else if (i > 0) {
+                            const prev = string[i - 1];
+                            if (prev === ' ' || prev === '-') {
+                                score *= 0.9; // space/dash word jump
+                            } else if ('\\/_+.#"@[({&'.includes(prev)) {
+                                score *= 0.8; // separator word jump
+                            } else {
+                                score *= 0.17; // character jump
+                            }
+                        }
+
+                        // Case mismatch penalty
+                        if (string[i] !== abbreviation[aIdx]) {
+                            score *= 0.9999;
+                        }
+
+                        if (score > highScore) highScore = score;
+                    }
+
+                    memo[key] = highScore;
+                    return highScore;
+                }
+
+                return inner(0, 0);
+            },
+
+            init() {
+                document.querySelectorAll('[data-suite-command]').forEach(root => {
+                    if (this._initialized.has(root)) return;
+                    this._initialized.add(root);
+
+                    const shouldFilter = root.getAttribute('data-suite-command-filter') !== 'false';
+                    const loop = root.getAttribute('data-suite-command-loop') !== 'false';
+                    const input = root.querySelector('[data-suite-command-input]');
+                    const list = root.querySelector('[data-suite-command-list]');
+                    const emptyEl = root.querySelector('[data-suite-command-empty]');
+                    let selectedItem = null;
+
+                    function getItems() {
+                        return Array.from(root.querySelectorAll('[data-suite-command-item]:not([data-disabled="true"])'));
+                    }
+
+                    function getVisibleItems() {
+                        return getItems().filter(i => i.style.display !== 'none');
+                    }
+
+                    function highlightItem(item) {
+                        if (selectedItem) {
+                            selectedItem.setAttribute('data-selected', 'false');
+                            selectedItem.setAttribute('aria-selected', 'false');
+                        }
+                        selectedItem = item;
+                        if (item) {
+                            item.setAttribute('data-selected', 'true');
+                            item.setAttribute('aria-selected', 'true');
+                            item.scrollIntoView({ block: 'nearest' });
+                        }
+                    }
+
+                    function filterItems(search) {
+                        if (!shouldFilter || !search) {
+                            // Show all items and groups
+                            root.querySelectorAll('[data-suite-command-item]').forEach(item => {
+                                item.style.display = '';
+                            });
+                            root.querySelectorAll('[data-suite-command-group]').forEach(group => {
+                                group.style.display = '';
+                            });
+                            if (emptyEl) emptyEl.style.display = 'none';
+
+                            // Highlight first visible item
+                            const items = getVisibleItems();
+                            highlightItem(items[0] || null);
+                            return;
+                        }
+
+                        const scores = [];
+                        const items = root.querySelectorAll('[data-suite-command-item]');
+
+                        items.forEach(item => {
+                            const value = item.getAttribute('data-suite-command-item-value') || item.textContent.trim();
+                            const keywords = item.getAttribute('data-suite-command-item-keywords') || '';
+                            const searchText = keywords ? value + ' ' + keywords.replace(/,/g, ' ') : value;
+                            const s = Suite.Command.score(searchText, search);
+
+                            if (s > 0) {
+                                item.style.display = '';
+                                scores.push({ item, score: s });
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+
+                        // Sort by score descending (higher = better match)
+                        scores.sort((a, b) => b.score - a.score);
+
+                        // Reorder DOM elements by score
+                        if (list && scores.length > 0) {
+                            // Group-aware: just let CSS handle order, don't reorder DOM
+                        }
+
+                        // Show/hide groups based on whether they have visible items
+                        root.querySelectorAll('[data-suite-command-group]').forEach(group => {
+                            const hasVisible = group.querySelector('[data-suite-command-item]:not([style*="display: none"])');
+                            group.style.display = hasVisible ? '' : 'none';
+                        });
+
+                        // Show/hide empty state
+                        const visibleItems = getVisibleItems();
+                        if (emptyEl) {
+                            emptyEl.style.display = visibleItems.length === 0 ? '' : 'none';
+                        }
+
+                        // Highlight first visible item
+                        highlightItem(visibleItems[0] || null);
+                    }
+
+                    // Input filtering
+                    if (input) {
+                        input.addEventListener('input', (e) => {
+                            filterItems(e.target.value);
+                        });
+                    }
+
+                    // Keyboard navigation
+                    root.addEventListener('keydown', (e) => {
+                        // Suppress during IME composition
+                        if (e.isComposing) return;
+
+                        const items = getVisibleItems();
+                        const currentIdx = selectedItem ? items.indexOf(selectedItem) : -1;
+
+                        if (e.key === 'ArrowDown' || (e.ctrlKey && (e.key === 'n' || e.key === 'j'))) {
+                            e.preventDefault();
+                            let next = currentIdx + 1;
+                            if (next >= items.length) next = loop ? 0 : items.length - 1;
+                            highlightItem(items[next]);
+                        } else if (e.key === 'ArrowUp' || (e.ctrlKey && (e.key === 'p' || e.key === 'k'))) {
+                            e.preventDefault();
+                            let prev = currentIdx - 1;
+                            if (prev < 0) prev = loop ? items.length - 1 : 0;
+                            highlightItem(items[prev]);
+                        } else if (e.key === 'Home') {
+                            e.preventDefault();
+                            highlightItem(items[0]);
+                        } else if (e.key === 'End') {
+                            e.preventDefault();
+                            highlightItem(items[items.length - 1]);
+                        } else if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (selectedItem) {
+                                selectedItem.click();
+                            }
+                        }
+                    });
+
+                    // Item click
+                    root.addEventListener('click', (e) => {
+                        const item = e.target.closest('[data-suite-command-item]:not([data-disabled="true"])');
+                        if (item && root.contains(item)) {
+                            highlightItem(item);
+                        }
+                    });
+
+                    // Item hover highlighting
+                    root.addEventListener('pointermove', (e) => {
+                        const item = e.target.closest('[data-suite-command-item]:not([data-disabled="true"])');
+                        if (item && root.contains(item)) {
+                            highlightItem(item);
+                        }
+                    });
+
+                    // Initial state
+                    filterItems('');
+                });
+
+                // CommandDialog
+                document.querySelectorAll('[data-suite-command-dialog]').forEach(dialog => {
+                    if (this._initialized.has(dialog)) return;
+                    this._initialized.add(dialog);
+
+                    const id = dialog.getAttribute('data-suite-command-dialog');
+                    const overlay = dialog.querySelector(`[data-suite-command-dialog-overlay="${id}"]`);
+
+                    function openDialog() {
+                        dialog.style.display = '';
+                        dialog.setAttribute('data-state', 'open');
+                        Suite.ScrollLock.lock();
+                        Suite.FocusGuards.install();
+
+                        const input = dialog.querySelector('[data-suite-command-input]');
+                        if (input) requestAnimationFrame(() => input.focus());
+                    }
+
+                    function closeDialog() {
+                        dialog.setAttribute('data-state', 'closed');
+                        Suite.ScrollLock.unlock();
+                        Suite.FocusGuards.uninstall();
+                        setTimeout(() => {
+                            if (dialog.getAttribute('data-state') === 'closed') {
+                                dialog.style.display = 'none';
+                            }
+                        }, 200);
+                    }
+
+                    // Escape to close
+                    dialog.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            closeDialog();
+                        }
+                    });
+
+                    // Click overlay to close
+                    if (overlay) {
+                        overlay.addEventListener('pointerdown', (e) => {
+                            if (e.target === overlay) closeDialog();
+                        });
+                    }
+
+                    // Store open/close functions for external triggering
+                    dialog._suiteOpen = openDialog;
+                    dialog._suiteClose = closeDialog;
+                });
+            }
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
@@ -2069,6 +2597,8 @@
             this.HoverCard.init();
             this.DropdownMenu.init();
             this.ContextMenu.init();
+            this.Select.init();
+            this.Command.init();
         },
 
         // --- Init -----------------------------------------------------------------
