@@ -2,13 +2,6 @@
 #
 # Showcases Pagination navigation bar.
 
-const Pagination = Main.Pagination
-const PaginationContent = Main.PaginationContent
-const PaginationItem = Main.PaginationItem
-const PaginationLink = Main.PaginationLink
-const PaginationPrevious = Main.PaginationPrevious
-const PaginationNext = Main.PaginationNext
-const PaginationEllipsis = Main.PaginationEllipsis
 
 function PaginationPage()
     ComponentsLayout(
@@ -24,14 +17,14 @@ function PaginationPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A pagination bar with previous, next, and page links.",
-            Pagination(
-                PaginationContent(
-                    PaginationItem(PaginationPrevious(href="#")),
-                    PaginationItem(PaginationLink("1", href="#", is_active=true)),
-                    PaginationItem(PaginationLink("2", href="#")),
-                    PaginationItem(PaginationLink("3", href="#")),
-                    PaginationItem(PaginationEllipsis()),
-                    PaginationItem(PaginationNext(href="#"))
+            Main.Pagination(
+                Main.PaginationContent(
+                    Main.PaginationItem(Main.PaginationPrevious(href="#")),
+                    Main.PaginationItem(Main.PaginationLink("1", href="#", is_active=true)),
+                    Main.PaginationItem(Main.PaginationLink("2", href="#")),
+                    Main.PaginationItem(Main.PaginationLink("3", href="#")),
+                    Main.PaginationItem(Main.PaginationEllipsis()),
+                    Main.PaginationItem(Main.PaginationNext(href="#"))
                 )
             )
         ),

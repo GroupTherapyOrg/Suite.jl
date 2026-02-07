@@ -2,7 +2,6 @@
 #
 # Showcases Badge with all variants and usage examples.
 
-const Badge = Main.Badge
 
 function BadgePage()
     ComponentsLayout(
@@ -18,16 +17,16 @@ function BadgePage()
 
         # Default Preview
         ComponentPreview(title="Default", description="The default badge with accent background.",
-            Badge("Badge")
+            Main.Badge("Badge")
         ),
 
         # All Variants
         ComponentPreview(title="Variants", description="All available badge variants.",
             Div(:class => "flex flex-wrap gap-4",
-                Badge(variant="default", "Default"),
-                Badge(variant="secondary", "Secondary"),
-                Badge(variant="outline", "Outline"),
-                Badge(variant="destructive", "Destructive")
+                Main.Badge(variant="default", "Default"),
+                Main.Badge(variant="secondary", "Secondary"),
+                Main.Badge(variant="outline", "Outline"),
+                Main.Badge(variant="destructive", "Destructive")
             )
         ),
 

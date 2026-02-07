@@ -2,12 +2,6 @@
 #
 # Showcases Card with all sub-components and composition patterns.
 
-const Card = Main.Card
-const CardHeader = Main.CardHeader
-const CardTitle = Main.CardTitle
-const CardDescription = Main.CardDescription
-const CardContent = Main.CardContent
-const CardFooter = Main.CardFooter
 
 function CardPage()
     ComponentsLayout(
@@ -23,12 +17,12 @@ function CardPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A simple card with header and content.",
-            Card(class="w-[350px]",
-                CardHeader(
-                    CardTitle("Card Title"),
-                    CardDescription("Card description text goes here.")
+            Main.Card(class="w-[350px]",
+                Main.CardHeader(
+                    Main.CardTitle("Card Title"),
+                    Main.CardDescription("Card description text goes here.")
                 ),
-                CardContent(
+                Main.CardContent(
                     P(:class => "text-sm text-warm-600 dark:text-warm-400", "Your card content here.")
                 )
             )
@@ -36,12 +30,12 @@ function CardPage()
 
         # With Footer
         ComponentPreview(title="With Footer", description="Card with header, content, and footer actions.",
-            Card(class="w-[350px]",
-                CardHeader(
-                    CardTitle("Create project"),
-                    CardDescription("Deploy your new project in one-click.")
+            Main.Card(class="w-[350px]",
+                Main.CardHeader(
+                    Main.CardTitle("Create project"),
+                    Main.CardDescription("Deploy your new project in one-click.")
                 ),
-                CardContent(
+                Main.CardContent(
                     Div(:class => "space-y-4",
                         Div(:class => "space-y-2",
                             Main.Label("Name"),
@@ -53,7 +47,7 @@ function CardPage()
                         )
                     )
                 ),
-                CardFooter(class="flex justify-between",
+                Main.CardFooter(class="flex justify-between",
                     Main.Button(variant="outline", "Cancel"),
                     Main.Button("Deploy")
                 )

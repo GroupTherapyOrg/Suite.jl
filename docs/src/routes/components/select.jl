@@ -2,16 +2,6 @@
 #
 # Showcases Select with basic usage, grouped items, and keyboard nav.
 
-const Select = Main.Select
-const SelectTrigger = Main.SelectTrigger
-const SelectValue = Main.SelectValue
-const SelectContent = Main.SelectContent
-const SelectItem = Main.SelectItem
-const SelectGroup = Main.SelectGroup
-const SelectLabel = Main.SelectLabel
-const SelectSeparator = Main.SelectSeparator
-const SelectScrollUpButton = Main.SelectScrollUpButton
-const SelectScrollDownButton = Main.SelectScrollDownButton
 
 function SelectPage()
     ComponentsLayout(
@@ -28,18 +18,18 @@ function SelectPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="A simple fruit selector with five options.",
             Div(:class => "w-full max-w-xs",
-                Select(
-                    SelectTrigger(
-                        SelectValue(placeholder="Select a fruit"),
+                Main.Select(
+                    Main.SelectTrigger(
+                        Main.SelectValue(placeholder="Select a fruit"),
                     ),
-                    SelectContent(
-                        SelectScrollUpButton(),
-                        SelectItem(value="apple", "Apple"),
-                        SelectItem(value="banana", "Banana"),
-                        SelectItem(value="orange", "Orange"),
-                        SelectItem(value="grape", "Grape"),
-                        SelectItem(value="mango", "Mango"),
-                        SelectScrollDownButton(),
+                    Main.SelectContent(
+                        Main.SelectScrollUpButton(),
+                        Main.SelectItem(value="apple", "Apple"),
+                        Main.SelectItem(value="banana", "Banana"),
+                        Main.SelectItem(value="orange", "Orange"),
+                        Main.SelectItem(value="grape", "Grape"),
+                        Main.SelectItem(value="mango", "Mango"),
+                        Main.SelectScrollDownButton(),
                     ),
                 )
             )
@@ -48,26 +38,26 @@ function SelectPage()
         # With Groups
         ComponentPreview(title="With Groups", description="Items organized into labeled groups with a separator.",
             Div(:class => "w-full max-w-xs",
-                Select(
-                    SelectTrigger(
-                        SelectValue(placeholder="Select an option"),
+                Main.Select(
+                    Main.SelectTrigger(
+                        Main.SelectValue(placeholder="Select an option"),
                     ),
-                    SelectContent(
-                        SelectScrollUpButton(),
-                        SelectGroup(
-                            SelectLabel("Fruits"),
-                            SelectItem(value="apple", "Apple"),
-                            SelectItem(value="banana", "Banana"),
-                            SelectItem(value="orange", "Orange"),
+                    Main.SelectContent(
+                        Main.SelectScrollUpButton(),
+                        Main.SelectGroup(
+                            Main.SelectLabel("Fruits"),
+                            Main.SelectItem(value="apple", "Apple"),
+                            Main.SelectItem(value="banana", "Banana"),
+                            Main.SelectItem(value="orange", "Orange"),
                         ),
-                        SelectSeparator(),
-                        SelectGroup(
-                            SelectLabel("Vegetables"),
-                            SelectItem(value="carrot", "Carrot"),
-                            SelectItem(value="broccoli", "Broccoli"),
-                            SelectItem(value="spinach", "Spinach"),
+                        Main.SelectSeparator(),
+                        Main.SelectGroup(
+                            Main.SelectLabel("Vegetables"),
+                            Main.SelectItem(value="carrot", "Carrot"),
+                            Main.SelectItem(value="broccoli", "Broccoli"),
+                            Main.SelectItem(value="spinach", "Spinach"),
                         ),
-                        SelectScrollDownButton(),
+                        Main.SelectScrollDownButton(),
                     ),
                 )
             )

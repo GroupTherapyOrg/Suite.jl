@@ -2,16 +2,6 @@
 #
 # Showcases Form with validation, error messages, and accessibility.
 
-const FM_Form = Main.Form
-const FM_FormField = Main.FormField
-const FM_FormItem = Main.FormItem
-const FM_FormLabel = Main.FormLabel
-const FM_FormControl = Main.FormControl
-const FM_FormDescription = Main.FormDescription
-const FM_FormMessage = Main.FormMessage
-const FM_Input = Main.Input
-const FM_Textarea = Main.Textarea
-const FM_Button = Main.Button
 
 function FormApiRow(name, type, default, description)
     Tr(:class => "border-b border-warm-200/50 dark:border-warm-700/50",
@@ -36,46 +26,46 @@ function FormPage()
 
         # Basic Form
         ComponentPreview(title="Basic Form", description="A simple contact form with required fields.",
-            FM_Form(action="/api/contact",
-                FM_FormField(name="name",
-                    FM_FormItem(
-                        FM_FormLabel("Name"),
-                        FM_FormControl(
-                            FM_Input(type="text", placeholder="Enter your name"),
+            Main.Form(action="/api/contact",
+                Main.FormField(name="name",
+                    Main.FormItem(
+                        Main.FormLabel("Name"),
+                        Main.FormControl(
+                            Main.Input(type="text", placeholder="Enter your name"),
                         ),
-                        FM_FormDescription("Your full name."),
-                        FM_FormMessage(),
+                        Main.FormDescription("Your full name."),
+                        Main.FormMessage(),
                     ),
                     required=true,
                 ),
-                FM_FormField(name="email",
-                    FM_FormItem(
-                        FM_FormLabel("Email"),
-                        FM_FormControl(
-                            FM_Input(type="email", placeholder="Enter your email"),
+                Main.FormField(name="email",
+                    Main.FormItem(
+                        Main.FormLabel("Email"),
+                        Main.FormControl(
+                            Main.Input(type="email", placeholder="Enter your email"),
                         ),
-                        FM_FormDescription("We'll never share your email."),
-                        FM_FormMessage(),
+                        Main.FormDescription("We'll never share your email."),
+                        Main.FormMessage(),
                     ),
                     required=true,
                     pattern="[^@]+@[^@]+",
                     pattern_message="Please enter a valid email address",
                 ),
-                FM_Button(type="submit", "Submit"),
+                Main.Button(type="submit", "Submit"),
             )
         ),
 
         # With Validation Rules
         ComponentPreview(title="With Validation Rules", description="Form fields with min/max length and pattern validation.",
-            FM_Form(action="/api/register",
-                FM_FormField(name="username",
-                    FM_FormItem(
-                        FM_FormLabel("Username"),
-                        FM_FormControl(
-                            FM_Input(type="text", placeholder="Choose a username"),
+            Main.Form(action="/api/register",
+                Main.FormField(name="username",
+                    Main.FormItem(
+                        Main.FormLabel("Username"),
+                        Main.FormControl(
+                            Main.Input(type="text", placeholder="Choose a username"),
                         ),
-                        FM_FormDescription("Must be 3-20 characters, letters and numbers only."),
-                        FM_FormMessage(),
+                        Main.FormDescription("Must be 3-20 characters, letters and numbers only."),
+                        Main.FormMessage(),
                     ),
                     required=true,
                     min_length=3,
@@ -83,51 +73,51 @@ function FormPage()
                     pattern="^[a-zA-Z0-9]+\$",
                     pattern_message="Only letters and numbers allowed",
                 ),
-                FM_FormField(name="bio",
-                    FM_FormItem(
-                        FM_FormLabel("Bio"),
-                        FM_FormControl(
-                            FM_Textarea(placeholder="Tell us about yourself...", rows="4"),
+                Main.FormField(name="bio",
+                    Main.FormItem(
+                        Main.FormLabel("Bio"),
+                        Main.FormControl(
+                            Main.Textarea(placeholder="Tell us about yourself...", rows="4"),
                         ),
-                        FM_FormDescription("Maximum 500 characters."),
-                        FM_FormMessage(),
+                        Main.FormDescription("Maximum 500 characters."),
+                        Main.FormMessage(),
                     ),
                     max_length=500,
                 ),
-                FM_Button(type="submit", "Register"),
+                Main.Button(type="submit", "Register"),
             )
         ),
 
         # Live Validation
         ComponentPreview(title="Live Validation (onChange)", description="Validates fields as you type.",
-            FM_Form(action="/api/feedback", validate_on="change",
-                FM_FormField(name="rating",
-                    FM_FormItem(
-                        FM_FormLabel("Rating"),
-                        FM_FormControl(
-                            FM_Input(type="number", placeholder="1-5"),
+            Main.Form(action="/api/feedback", validate_on="change",
+                Main.FormField(name="rating",
+                    Main.FormItem(
+                        Main.FormLabel("Rating"),
+                        Main.FormControl(
+                            Main.Input(type="number", placeholder="1-5"),
                         ),
-                        FM_FormDescription("Enter a number between 1 and 5."),
-                        FM_FormMessage(),
+                        Main.FormDescription("Enter a number between 1 and 5."),
+                        Main.FormMessage(),
                     ),
                     required=true,
                     min="1",
                     max="5",
                     custom_message="Rating must be between 1 and 5",
                 ),
-                FM_FormField(name="comment",
-                    FM_FormItem(
-                        FM_FormLabel("Comment"),
-                        FM_FormControl(
-                            FM_Textarea(placeholder="Your feedback...", rows="3"),
+                Main.FormField(name="comment",
+                    Main.FormItem(
+                        Main.FormLabel("Comment"),
+                        Main.FormControl(
+                            Main.Textarea(placeholder="Your feedback...", rows="3"),
                         ),
-                        FM_FormMessage(),
+                        Main.FormMessage(),
                     ),
                     required=true,
                     min_length=10,
                     min_length_message="Please provide at least 10 characters of feedback",
                 ),
-                FM_Button(type="submit", "Send Feedback"),
+                Main.Button(type="submit", "Send Feedback"),
             )
         ),
 

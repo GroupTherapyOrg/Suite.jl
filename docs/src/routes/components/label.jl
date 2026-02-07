@@ -2,7 +2,6 @@
 #
 # Showcases Label for form field labels.
 
-const Label = Main.Label
 
 function LabelPage()
     ComponentsLayout(
@@ -19,7 +18,7 @@ function LabelPage()
         # Default Preview
         ComponentPreview(title="Default", description="A label paired with an input.",
             Div(:class => "grid w-full max-w-sm items-center gap-1.5",
-                Label("Email"),
+                Main.Label("Email"),
                 Main.Input(type="email", placeholder="Email")
             )
         ),

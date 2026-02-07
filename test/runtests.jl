@@ -58,7 +58,7 @@ using Test
     end
 
     @testset "Button" begin
-        using Therapy
+        using Therapy: Therapy, Div, Span, A
         using Suite
 
         @testset "Default variant and size" begin
@@ -3568,7 +3568,7 @@ using Test
     # Theme System Tests
     # =====================================================================
     @testset "Themes" begin
-        using Therapy
+        using Therapy: Therapy, Div, Span, A
         using Suite
 
         @testset "SuiteTheme struct and registry" begin
@@ -4265,7 +4265,7 @@ using Test
     end
 
     @testset "Calendar" begin
-        using Therapy
+        using Therapy: Therapy, Div, Span, A
         using Suite
         using Dates
 
@@ -4454,7 +4454,7 @@ using Test
     end
 
     @testset "DatePicker" begin
-        using Therapy
+        using Therapy: Therapy, Div, Span, A
         using Suite
         using Dates
 
@@ -4568,7 +4568,7 @@ using Test
     end
 
     @testset "DataTable" begin
-        using Therapy
+        using Therapy: Therapy, Div, Span, A
         using Suite
 
         # Sample data for tests
@@ -4862,7 +4862,7 @@ using Test
     end
 
     @testset "Form" begin
-        using Therapy
+        using Therapy: Therapy, Div, Span, A
         using Suite
 
         @testset "Form container" begin
@@ -4933,7 +4933,7 @@ using Test
         end
 
         @testset "FormControl" begin
-            html = Therapy.render_to_string(FormControl(Input(:type => "text")))
+            html = Therapy.render_to_string(FormControl(Input(type="text")))
             @test occursin("data-suite-form-control", html)
             @test occursin("display:contents", html)
             @test occursin("<input", html)
@@ -4964,7 +4964,7 @@ using Test
                         FormItem(
                             FormLabel("Username"),
                             FormControl(
-                                Input(:type => "text", :placeholder => "Enter username"),
+                                Input(type="text", placeholder="Enter username"),
                             ),
                             FormDescription("Your public display name."),
                             FormMessage(),

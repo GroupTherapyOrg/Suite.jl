@@ -2,9 +2,6 @@
 #
 # Showcases Collapsible with open/closed states and trigger.
 
-const Collapsible = Main.Collapsible
-const CollapsibleTrigger = Main.CollapsibleTrigger
-const CollapsibleContent = Main.CollapsibleContent
 
 function CollapsiblePage()
     ComponentsLayout(
@@ -21,11 +18,11 @@ function CollapsiblePage()
         # Default Preview
         ComponentPreview(title="Default", description="Click the trigger to toggle content visibility.",
             Div(:class => "w-full max-w-sm",
-                Collapsible(
-                    CollapsibleTrigger(
+                Main.Collapsible(
+                    Main.CollapsibleTrigger(
                         Main.Button(variant="outline", size="sm", "Toggle content")
                     ),
-                    CollapsibleContent(
+                    Main.CollapsibleContent(
                         Div(:class => "mt-2 rounded-md border border-warm-200 dark:border-warm-700 p-4",
                             P(:class => "text-sm text-warm-600 dark:text-warm-400",
                                 "This content can be shown or hidden by clicking the trigger above."
@@ -39,11 +36,11 @@ function CollapsiblePage()
         # Open by default
         ComponentPreview(title="Open by default", description="Start with the content visible.",
             Div(:class => "w-full max-w-sm",
-                Collapsible(open=true,
-                    CollapsibleTrigger(
+                Main.Collapsible(open=true,
+                    Main.CollapsibleTrigger(
                         Main.Button(variant="outline", size="sm", "Toggle")
                     ),
-                    CollapsibleContent(
+                    Main.CollapsibleContent(
                         Div(:class => "mt-2 rounded-md border border-warm-200 dark:border-warm-700 p-4",
                             P(:class => "text-sm text-warm-600 dark:text-warm-400",
                                 "This content starts visible and can be collapsed."
@@ -57,11 +54,11 @@ function CollapsiblePage()
         # Disabled
         ComponentPreview(title="Disabled", description="A disabled collapsible that cannot be toggled.",
             Div(:class => "w-full max-w-sm",
-                Collapsible(disabled=true,
-                    CollapsibleTrigger(
+                Main.Collapsible(disabled=true,
+                    Main.CollapsibleTrigger(
                         Main.Button(variant="outline", size="sm", :disabled => true, "Cannot toggle")
                     ),
-                    CollapsibleContent(
+                    Main.CollapsibleContent(
                         Div(:class => "mt-2 rounded-md border border-warm-200 dark:border-warm-700 p-4",
                             P(:class => "text-sm text-warm-600 dark:text-warm-400",
                                 "This content is hidden and cannot be revealed."

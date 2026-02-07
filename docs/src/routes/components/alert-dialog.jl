@@ -3,15 +3,6 @@
 # Showcases AlertDialog with basic confirmation and destructive variant.
 # Uses role=alertdialog — cannot be dismissed by Escape or click-outside.
 
-const AlertDialog = Main.AlertDialog
-const AlertDialogTrigger = Main.AlertDialogTrigger
-const AlertDialogContent = Main.AlertDialogContent
-const AlertDialogHeader = Main.AlertDialogHeader
-const AlertDialogFooter = Main.AlertDialogFooter
-const AlertDialogTitle = Main.AlertDialogTitle
-const AlertDialogDescription = Main.AlertDialogDescription
-const AlertDialogAction = Main.AlertDialogAction
-const AlertDialogCancel = Main.AlertDialogCancel
 
 function AlertDialogPage()
     ComponentsLayout(
@@ -28,18 +19,18 @@ function AlertDialogPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="A simple confirmation dialog with Cancel and Continue actions.",
             Div(:class => "w-full max-w-md",
-                AlertDialog(
-                    AlertDialogTrigger(
+                Main.AlertDialog(
+                    Main.AlertDialogTrigger(
                         Main.Button(variant="outline", "Show Alert Dialog")
                     ),
-                    AlertDialogContent(
-                        AlertDialogHeader(
-                            AlertDialogTitle("Are you sure?"),
-                            AlertDialogDescription("This action cannot be undone. This will permanently apply the changes to your account."),
+                    Main.AlertDialogContent(
+                        Main.AlertDialogHeader(
+                            Main.AlertDialogTitle("Are you sure?"),
+                            Main.AlertDialogDescription("This action cannot be undone. This will permanently apply the changes to your account."),
                         ),
-                        AlertDialogFooter(
-                            AlertDialogCancel("Cancel"),
-                            AlertDialogAction("Continue"),
+                        Main.AlertDialogFooter(
+                            Main.AlertDialogCancel("Cancel"),
+                            Main.AlertDialogAction("Continue"),
                         ),
                     ),
                 )
@@ -49,18 +40,18 @@ function AlertDialogPage()
         # Destructive Preview
         ComponentPreview(title="Destructive", description="A destructive confirmation dialog with a styled delete action.",
             Div(:class => "w-full max-w-md",
-                AlertDialog(
-                    AlertDialogTrigger(
+                Main.AlertDialog(
+                    Main.AlertDialogTrigger(
                         Main.Button(variant="destructive", "Delete")
                     ),
-                    AlertDialogContent(
-                        AlertDialogHeader(
-                            AlertDialogTitle("Delete item?"),
-                            AlertDialogDescription("This action cannot be undone. This will permanently delete this item and remove its data from our servers."),
+                    Main.AlertDialogContent(
+                        Main.AlertDialogHeader(
+                            Main.AlertDialogTitle("Delete item?"),
+                            Main.AlertDialogDescription("This action cannot be undone. This will permanently delete this item and remove its data from our servers."),
                         ),
-                        AlertDialogFooter(
-                            AlertDialogCancel("Cancel"),
-                            AlertDialogAction("Delete"),
+                        Main.AlertDialogFooter(
+                            Main.AlertDialogCancel("Cancel"),
+                            Main.AlertDialogAction("Delete"),
                         ),
                     ),
                 )

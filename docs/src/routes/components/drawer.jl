@@ -2,15 +2,6 @@
 #
 # Showcases Drawer with drag-to-dismiss overlay, directional content, and form usage.
 
-const Drawer = Main.Drawer
-const DrawerTrigger = Main.DrawerTrigger
-const DrawerContent = Main.DrawerContent
-const DrawerHeader = Main.DrawerHeader
-const DrawerFooter = Main.DrawerFooter
-const DrawerTitle = Main.DrawerTitle
-const DrawerDescription = Main.DrawerDescription
-const DrawerClose = Main.DrawerClose
-const DrawerHandle = Main.DrawerHandle
 
 function DrawerPage()
     ComponentsLayout(
@@ -27,15 +18,15 @@ function DrawerPage()
         # Default bottom drawer with handle
         ComponentPreview(title="Default", description="Bottom drawer with a visible grab handle.",
             Div(:class => "w-full max-w-md",
-                Drawer(
-                    DrawerTrigger(
+                Main.Drawer(
+                    Main.DrawerTrigger(
                         Main.Button(variant="outline", "Open Drawer")
                     ),
-                    DrawerContent(
-                        DrawerHandle(),
-                        DrawerHeader(
-                            DrawerTitle("Move Goal"),
-                            DrawerDescription("Set your daily activity goal."),
+                    Main.DrawerContent(
+                        Main.DrawerHandle(),
+                        Main.DrawerHeader(
+                            Main.DrawerTitle("Move Goal"),
+                            Main.DrawerDescription("Set your daily activity goal."),
                         ),
                         Div(:class => "p-4 pb-0",
                             Div(:class => "flex items-center justify-center space-x-2",
@@ -45,9 +36,9 @@ function DrawerPage()
                                 )
                             )
                         ),
-                        DrawerFooter(
+                        Main.DrawerFooter(
                             Main.Button("Submit"),
-                            DrawerClose(
+                            Main.DrawerClose(
                                 Main.Button(variant="outline", "Cancel")
                             ),
                         ),
@@ -59,15 +50,15 @@ function DrawerPage()
         # With form content (login form)
         ComponentPreview(title="With Form", description="Drawer containing a login form.",
             Div(:class => "w-full max-w-md",
-                Drawer(
-                    DrawerTrigger(
+                Main.Drawer(
+                    Main.DrawerTrigger(
                         Main.Button(variant="outline", "Open Drawer")
                     ),
-                    DrawerContent(
-                        DrawerHandle(),
-                        DrawerHeader(
-                            DrawerTitle("Login"),
-                            DrawerDescription("Enter your credentials to continue."),
+                    Main.DrawerContent(
+                        Main.DrawerHandle(),
+                        Main.DrawerHeader(
+                            Main.DrawerTitle("Login"),
+                            Main.DrawerDescription("Enter your credentials to continue."),
                         ),
                         Div(:class => "p-4 space-y-4",
                             Div(:class => "space-y-2",
@@ -79,9 +70,9 @@ function DrawerPage()
                                 Main.Input(type="password", placeholder="Enter your password"),
                             ),
                         ),
-                        DrawerFooter(
+                        Main.DrawerFooter(
                             Main.Button("Sign In"),
-                            DrawerClose(
+                            Main.DrawerClose(
                                 Main.Button(variant="outline", "Cancel")
                             ),
                         ),

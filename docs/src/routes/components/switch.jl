@@ -2,7 +2,6 @@
 #
 # Showcases Switch with sizes and states.
 
-const Switch = Main.Switch
 
 function SwitchPage()
     ComponentsLayout(
@@ -19,7 +18,7 @@ function SwitchPage()
         # Default Preview
         ComponentPreview(title="Default", description="Click to toggle the switch on and off.",
             Div(:class => "flex items-center gap-3",
-                Switch(),
+                Main.Switch(),
                 Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Airplane Mode"),
             )
         ),
@@ -27,7 +26,7 @@ function SwitchPage()
         # Checked
         ComponentPreview(title="Checked", description="A switch that starts in the checked state.",
             Div(:class => "flex items-center gap-3",
-                Switch(checked=true),
+                Main.Switch(checked=true),
                 Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Notifications enabled"),
             )
         ),
@@ -36,11 +35,11 @@ function SwitchPage()
         ComponentPreview(title="Sizes", description="Default and small sizes.",
             Div(:class => "flex items-center gap-6",
                 Div(:class => "flex items-center gap-2",
-                    Switch(),
+                    Main.Switch(),
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Default"),
                 ),
                 Div(:class => "flex items-center gap-2",
-                    Switch(size="sm"),
+                    Main.Switch(size="sm"),
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Small"),
                 ),
             )
@@ -50,11 +49,11 @@ function SwitchPage()
         ComponentPreview(title="Disabled", description="Disabled switches cannot be toggled.",
             Div(:class => "flex items-center gap-6",
                 Div(:class => "flex items-center gap-2",
-                    Switch(disabled=true),
+                    Main.Switch(disabled=true),
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Disabled off"),
                 ),
                 Div(:class => "flex items-center gap-2",
-                    Switch(checked=true, disabled=true),
+                    Main.Switch(checked=true, disabled=true),
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "Disabled on"),
                 ),
             )
@@ -63,7 +62,7 @@ function SwitchPage()
         # With label using Label
         ComponentPreview(title="With Label", description="Switch paired with a label.",
             Div(:class => "flex items-center gap-3",
-                Switch(),
+                Main.Switch(),
                 Main.Label("Email notifications"),
             )
         ),

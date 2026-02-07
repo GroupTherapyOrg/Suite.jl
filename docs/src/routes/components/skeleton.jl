@@ -2,7 +2,6 @@
 #
 # Showcases Skeleton loading placeholder patterns.
 
-const Skeleton = Main.Skeleton
 
 function SkeletonPage()
     ComponentsLayout(
@@ -19,19 +18,19 @@ function SkeletonPage()
         # Default Preview
         ComponentPreview(title="Default", description="Basic skeleton shapes.",
             Div(:class => "space-y-4 w-full max-w-sm",
-                Skeleton(class="h-4 w-[250px]"),
-                Skeleton(class="h-4 w-[200px]"),
-                Skeleton(class="h-4 w-[150px]")
+                Main.Skeleton(class="h-4 w-[250px]"),
+                Main.Skeleton(class="h-4 w-[200px]"),
+                Main.Skeleton(class="h-4 w-[150px]")
             )
         ),
 
         # Card Skeleton
         ComponentPreview(title="Card", description="Skeleton mimicking a card layout.",
             Div(:class => "flex items-center space-x-4",
-                Skeleton(class="h-12 w-12 rounded-full"),
+                Main.Skeleton(class="h-12 w-12 rounded-full"),
                 Div(:class => "space-y-2",
-                    Skeleton(class="h-4 w-[250px]"),
-                    Skeleton(class="h-4 w-[200px]")
+                    Main.Skeleton(class="h-4 w-[250px]"),
+                    Main.Skeleton(class="h-4 w-[200px]")
                 )
             )
         ),

@@ -3,7 +3,6 @@
 # Showcases Toaster with default, success, error, warning, and info toast variants.
 # Toasts are triggered from client-side JS; Toaster is placed once in the layout.
 
-const Toaster = Main.Toaster
 
 function ToastPage()
     ComponentsLayout(

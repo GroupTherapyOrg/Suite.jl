@@ -2,21 +2,6 @@
 #
 # Showcases Menubar with File/Edit/View menus, submenus, checkbox items, and keyboard nav.
 
-const Menubar = Main.Menubar
-const MenubarMenu = Main.MenubarMenu
-const MenubarTrigger = Main.MenubarTrigger
-const MenubarContent = Main.MenubarContent
-const MenubarItem = Main.MenubarItem
-const MenubarCheckboxItem = Main.MenubarCheckboxItem
-const MenubarRadioGroup = Main.MenubarRadioGroup
-const MenubarRadioItem = Main.MenubarRadioItem
-const MenubarItemIndicator = Main.MenubarItemIndicator
-const MenubarLabel = Main.MenubarLabel
-const MenubarSeparator = Main.MenubarSeparator
-const MenubarShortcut = Main.MenubarShortcut
-const MenubarSub = Main.MenubarSub
-const MenubarSubTrigger = Main.MenubarSubTrigger
-const MenubarSubContent = Main.MenubarSubContent
 
 function MenubarPage()
     ComponentsLayout(
@@ -33,45 +18,45 @@ function MenubarPage()
         # Default Preview — File / Edit / View
         ComponentPreview(title="Default", description="Classic desktop-style menubar with File, Edit, and View menus.",
             Div(:class => "w-full max-w-lg",
-                Menubar(
+                Main.Menubar(
                     # File menu
-                    MenubarMenu(
-                        MenubarTrigger("File"),
-                        MenubarContent(
-                            MenubarItem("New Tab", MenubarShortcut("Ctrl+T")),
-                            MenubarItem("New Window", MenubarShortcut("Ctrl+N")),
-                            MenubarSeparator(),
-                            MenubarSub(
-                                MenubarSubTrigger("Share"),
-                                MenubarSubContent(
-                                    MenubarItem("Email"),
-                                    MenubarItem("Messages"),
+                    Main.MenubarMenu(
+                        Main.MenubarTrigger("File"),
+                        Main.MenubarContent(
+                            Main.MenubarItem("New Tab", Main.MenubarShortcut("Ctrl+T")),
+                            Main.MenubarItem("New Window", Main.MenubarShortcut("Ctrl+N")),
+                            Main.MenubarSeparator(),
+                            Main.MenubarSub(
+                                Main.MenubarSubTrigger("Share"),
+                                Main.MenubarSubContent(
+                                    Main.MenubarItem("Email"),
+                                    Main.MenubarItem("Messages"),
                                 ),
                             ),
-                            MenubarSeparator(),
-                            MenubarItem("Print", MenubarShortcut("Ctrl+P")),
+                            Main.MenubarSeparator(),
+                            Main.MenubarItem("Print", Main.MenubarShortcut("Ctrl+P")),
                         ),
                     ),
 
                     # Edit menu
-                    MenubarMenu(
-                        MenubarTrigger("Edit"),
-                        MenubarContent(
-                            MenubarItem("Undo", MenubarShortcut("Ctrl+Z")),
-                            MenubarItem("Redo", MenubarShortcut("Ctrl+Shift+Z")),
-                            MenubarSeparator(),
-                            MenubarItem("Cut", MenubarShortcut("Ctrl+X")),
-                            MenubarItem("Copy", MenubarShortcut("Ctrl+C")),
-                            MenubarItem("Paste", MenubarShortcut("Ctrl+V")),
+                    Main.MenubarMenu(
+                        Main.MenubarTrigger("Edit"),
+                        Main.MenubarContent(
+                            Main.MenubarItem("Undo", Main.MenubarShortcut("Ctrl+Z")),
+                            Main.MenubarItem("Redo", Main.MenubarShortcut("Ctrl+Shift+Z")),
+                            Main.MenubarSeparator(),
+                            Main.MenubarItem("Cut", Main.MenubarShortcut("Ctrl+X")),
+                            Main.MenubarItem("Copy", Main.MenubarShortcut("Ctrl+C")),
+                            Main.MenubarItem("Paste", Main.MenubarShortcut("Ctrl+V")),
                         ),
                     ),
 
                     # View menu
-                    MenubarMenu(
-                        MenubarTrigger("View"),
-                        MenubarContent(
-                            MenubarCheckboxItem("Always Show Bookmarks", checked=true),
-                            MenubarCheckboxItem("Always Show Full URLs"),
+                    Main.MenubarMenu(
+                        Main.MenubarTrigger("View"),
+                        Main.MenubarContent(
+                            Main.MenubarCheckboxItem("Always Show Bookmarks", checked=true),
+                            Main.MenubarCheckboxItem("Always Show Full URLs"),
                         ),
                     ),
                 )

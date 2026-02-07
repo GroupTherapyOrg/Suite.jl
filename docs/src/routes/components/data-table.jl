@@ -2,9 +2,6 @@
 #
 # Showcases DataTable with sorting, filtering, pagination, row selection.
 
-const DT_DataTable = Main.DataTable
-const DT_DataTableColumn = Main.DataTableColumn
-const DT_Badge = Main.Badge
 
 # Sample data for demos
 const _DT_DEMO_DATA = [
@@ -23,10 +20,10 @@ const _DT_DEMO_DATA = [
 ]
 
 const _DT_DEMO_COLUMNS = [
-    DT_DataTableColumn("invoice", "Invoice"),
-    DT_DataTableColumn("status", "Status"),
-    DT_DataTableColumn("method", "Method"),
-    DT_DataTableColumn("amount", "Amount", align="right"),
+    Main.DataTableColumn("invoice", "Invoice"),
+    Main.DataTableColumn("status", "Status"),
+    Main.DataTableColumn("method", "Method"),
+    Main.DataTableColumn("amount", "Amount", align="right"),
 ]
 
 function ApiRow(name, type, default, description)
@@ -52,24 +49,24 @@ function DataTablePage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A data table with sortable columns, filtering, and pagination.",
-            DT_DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS, page_size=5)
+            Main.DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS, page_size=5)
         ),
 
         # With Row Selection
         ComponentPreview(title="With Row Selection", description="Enable row selection with checkboxes.",
-            DT_DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
+            Main.DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
                 page_size=5, selectable=true)
         ),
 
         # With Column Visibility
         ComponentPreview(title="Column Visibility", description="Toggle column visibility with the Columns dropdown.",
-            DT_DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
+            Main.DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
                 page_size=5, column_visibility=true)
         ),
 
         # All Features
         ComponentPreview(title="All Features", description="Sorting, filtering, pagination, row selection, and column visibility.",
-            DT_DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
+            Main.DataTable(_DT_DEMO_DATA, _DT_DEMO_COLUMNS,
                 page_size=5, selectable=true, column_visibility=true,
                 filter_placeholder="Search invoices...")
         ),

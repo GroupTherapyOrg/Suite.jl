@@ -3,7 +3,6 @@
 # Showcases Button with all variants, sizes, and usage examples.
 # Mirrors shadcn/ui docs layout: preview, usage, API reference.
 
-const Button = Main.Button
 
 function ButtonPage()
     ComponentsLayout(
@@ -19,28 +18,28 @@ function ButtonPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="The default button with accent background.",
-            Button("Button")
+            Main.Button("Button")
         ),
 
         # All Variants
         ComponentPreview(title="Variants", description="All available button variants.",
             Div(:class => "flex flex-wrap gap-4",
-                Button(variant="default", "Default"),
-                Button(variant="secondary", "Secondary"),
-                Button(variant="outline", "Outline"),
-                Button(variant="ghost", "Ghost"),
-                Button(variant="link", "Link"),
-                Button(variant="destructive", "Destructive")
+                Main.Button(variant="default", "Default"),
+                Main.Button(variant="secondary", "Secondary"),
+                Main.Button(variant="outline", "Outline"),
+                Main.Button(variant="ghost", "Ghost"),
+                Main.Button(variant="link", "Link"),
+                Main.Button(variant="destructive", "Destructive")
             )
         ),
 
         # All Sizes
         ComponentPreview(title="Sizes", description="Available button sizes.",
             Div(:class => "flex flex-wrap items-center gap-4",
-                Button(size="sm", "Small"),
-                Button(size="default", "Default"),
-                Button(size="lg", "Large"),
-                Button(size="icon", "X")
+                Main.Button(size="sm", "Small"),
+                Main.Button(size="default", "Default"),
+                Main.Button(size="lg", "Large"),
+                Main.Button(size="icon", "X")
             )
         ),
 
@@ -48,7 +47,7 @@ function ButtonPage()
         ComponentPreview(title="Disabled", description="Buttons with disabled state.",
             Div(:class => "flex flex-wrap gap-4",
                 Button(:disabled => true, "Disabled"),
-                Button(variant="outline", :disabled => true, "Disabled")
+                Main.Button(variant="outline", :disabled => true, "Disabled")
             )
         ),
 

@@ -2,10 +2,6 @@
 #
 # Showcases Accordion with single/multiple modes, collapsible, and keyboard nav.
 
-const Accordion = Main.Accordion
-const AccordionItem = Main.AccordionItem
-const AccordionTrigger = Main.AccordionTrigger
-const AccordionContent = Main.AccordionContent
 
 function AccordionPage()
     ComponentsLayout(
@@ -22,18 +18,18 @@ function AccordionPage()
         # Default Preview
         ComponentPreview(title="Default", description="Single mode — one item open at a time.",
             Div(:class => "w-full max-w-md",
-                Accordion(default_value="item-1",
-                    AccordionItem(value="item-1",
-                        AccordionTrigger("Is it accessible?"),
-                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It adheres to the WAI-ARIA design pattern.")),
+                Main.Accordion(default_value="item-1",
+                    Main.AccordionItem(value="item-1",
+                        Main.AccordionTrigger("Is it accessible?"),
+                        Main.AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It adheres to the WAI-ARIA design pattern.")),
                     ),
-                    AccordionItem(value="item-2",
-                        AccordionTrigger("Is it styled?"),
-                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It comes with default styles that match the Suite.jl design system.")),
+                    Main.AccordionItem(value="item-2",
+                        Main.AccordionTrigger("Is it styled?"),
+                        Main.AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It comes with default styles that match the Suite.jl design system.")),
                     ),
-                    AccordionItem(value="item-3",
-                        AccordionTrigger("Is it animated?"),
-                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It uses CSS transitions for smooth expand/collapse.")),
+                    Main.AccordionItem(value="item-3",
+                        Main.AccordionTrigger("Is it animated?"),
+                        Main.AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Yes. It uses CSS transitions for smooth expand/collapse.")),
                     ),
                 )
             )
@@ -42,14 +38,14 @@ function AccordionPage()
         # Multiple mode
         ComponentPreview(title="Multiple", description="Multiple items can be open simultaneously.",
             Div(:class => "w-full max-w-md",
-                Accordion(type="multiple",
-                    AccordionItem(value="item-1",
-                        AccordionTrigger("First section"),
-                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Content for the first section.")),
+                Main.Accordion(type="multiple",
+                    Main.AccordionItem(value="item-1",
+                        Main.AccordionTrigger("First section"),
+                        Main.AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Content for the first section.")),
                     ),
-                    AccordionItem(value="item-2",
-                        AccordionTrigger("Second section"),
-                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Content for the second section.")),
+                    Main.AccordionItem(value="item-2",
+                        Main.AccordionTrigger("Second section"),
+                        Main.AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Content for the second section.")),
                     ),
                 )
             )
@@ -58,14 +54,14 @@ function AccordionPage()
         # Collapsible
         ComponentPreview(title="Collapsible", description="Single mode with collapsible — all items can be closed.",
             Div(:class => "w-full max-w-md",
-                Accordion(collapsible=true,
-                    AccordionItem(value="item-1",
-                        AccordionTrigger("Click to expand"),
-                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Click the trigger again to collapse.")),
+                Main.Accordion(collapsible=true,
+                    Main.AccordionItem(value="item-1",
+                        Main.AccordionTrigger("Click to expand"),
+                        Main.AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Click the trigger again to collapse.")),
                     ),
-                    AccordionItem(value="item-2",
-                        AccordionTrigger("Another item"),
-                        AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Both items can be closed simultaneously.")),
+                    Main.AccordionItem(value="item-2",
+                        Main.AccordionTrigger("Another item"),
+                        Main.AccordionContent(P(:class => "text-sm text-warm-600 dark:text-warm-400 pb-4", "Both items can be closed simultaneously.")),
                     ),
                 )
             )

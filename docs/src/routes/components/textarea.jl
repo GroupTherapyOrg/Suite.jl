@@ -2,7 +2,6 @@
 #
 # Showcases Textarea for multi-line text input.
 
-const Textarea = Main.Textarea
 
 function TextareaPage()
     ComponentsLayout(
@@ -18,20 +17,20 @@ function TextareaPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A default textarea.",
-            Textarea(placeholder="Type your message here.", class="max-w-sm")
+            Main.Textarea(placeholder="Type your message here.", class="max-w-sm")
         ),
 
         # With Label
         ComponentPreview(title="With Label", description="Textarea paired with a label.",
             Div(:class => "grid w-full max-w-sm gap-1.5",
                 Main.Label("Your message"),
-                Textarea(placeholder="Type your message here.")
+                Main.Textarea(placeholder="Type your message here.")
             )
         ),
 
         # Disabled
         ComponentPreview(title="Disabled", description="Textarea in disabled state.",
-            Textarea(disabled=true, placeholder="Disabled", class="max-w-sm")
+            Main.Textarea(disabled=true, placeholder="Disabled", class="max-w-sm")
         ),
 
         # Usage

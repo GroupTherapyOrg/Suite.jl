@@ -2,9 +2,6 @@
 #
 # Showcases Alert with all variants and sub-components.
 
-const Alert = Main.Alert
-const AlertTitle = Main.AlertTitle
-const AlertDescription = Main.AlertDescription
 
 function AlertPage()
     ComponentsLayout(
@@ -20,17 +17,17 @@ function AlertPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="The default alert with neutral styling.",
-            Alert(
-                AlertTitle("Heads up!"),
-                AlertDescription("You can add components to your app using the CLI.")
+            Main.Alert(
+                Main.AlertTitle("Heads up!"),
+                Main.AlertDescription("You can add components to your app using the CLI.")
             )
         ),
 
         # Destructive
         ComponentPreview(title="Destructive", description="Alert with destructive/error styling.",
-            Alert(variant="destructive",
-                AlertTitle("Error"),
-                AlertDescription("Your session has expired. Please log in again.")
+            Main.Alert(variant="destructive",
+                Main.AlertTitle("Error"),
+                Main.AlertDescription("Your session has expired. Please log in again.")
             )
         ),
 

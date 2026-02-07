@@ -2,7 +2,6 @@
 #
 # Showcases ScrollArea for scrollable containers.
 
-const ScrollArea = Main.ScrollArea
 
 function ScrollAreaPage()
     ComponentsLayout(
@@ -18,7 +17,7 @@ function ScrollAreaPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A scrollable area with a fixed height.",
-            ScrollArea(class="h-[200px] w-[350px] rounded-md border border-warm-200 dark:border-warm-700 p-4",
+            Main.ScrollArea(class="h-[200px] w-[350px] rounded-md border border-warm-200 dark:border-warm-700 p-4",
                 Div(:class => "space-y-4",
                     map(1:20) do i
                         Fragment(

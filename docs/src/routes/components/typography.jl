@@ -2,17 +2,6 @@
 #
 # Showcases all typography components: headings, paragraphs, blockquote, code, etc.
 
-const H1 = Main.H1
-const H2 = Main.H2
-const H3 = Main.H3
-const H4 = Main.H4
-const P = Main.P
-const Blockquote = Main.Blockquote
-const InlineCode = Main.InlineCode
-const Lead = Main.Lead
-const Large = Main.Large
-const Small = Main.Small
-const Muted = Main.Muted
 
 function TypographyPage()
     ComponentsLayout(
@@ -29,49 +18,49 @@ function TypographyPage()
         # Headings
         ComponentPreview(title="Headings", description="Heading levels H1 through H4.",
             Div(:class => "space-y-4 w-full",
-                H1("This is H1"),
-                H2("This is H2"),
-                H3("This is H3"),
-                H4("This is H4")
+                Main.H1("This is H1"),
+                Main.H2("This is H2"),
+                Main.H3("This is H3"),
+                Main.H4("This is H4")
             )
         ),
 
         # Paragraph
         ComponentPreview(title="Paragraph", description="Body text with proper leading.",
             Div(:class => "max-w-lg",
-                P("The king, seeing how much happier his subjects were, realized the error of his ways and declared a holiday."),
-                P("The people celebrated with feasts and festivities, and the kingdom prospered like never before.")
+                Main.P("The king, seeing how much happier his subjects were, realized the error of his ways and declared a holiday."),
+                Main.P("The people celebrated with feasts and festivities, and the kingdom prospered like never before.")
             )
         ),
 
         # Lead
         ComponentPreview(title="Lead", description="Larger introductory paragraph text.",
-            Lead("A component library for Julia. Beautifully designed. Copy and paste into your apps. Open Source.")
+            Main.Lead("A component library for Julia. Beautifully designed. Copy and paste into your apps. Open Source.")
         ),
 
         # Blockquote
         ComponentPreview(title="Blockquote", description="Styled blockquote with left border.",
-            Blockquote("After all, everyone enjoys a good component library.")
+            Main.Blockquote("After all, everyone enjoys a good component library.")
         ),
 
         # Inline Code
         ComponentPreview(title="Inline Code", description="Inline code snippet.",
-            P("Use the ", InlineCode("Button"), " component for interactive actions.")
+            P("Use the ", Main.InlineCode("Button"), " component for interactive actions.")
         ),
 
         # Large
         ComponentPreview(title="Large", description="Emphasized large text.",
-            Large("Are you absolutely sure?")
+            Main.Large("Are you absolutely sure?")
         ),
 
         # Small
         ComponentPreview(title="Small", description="Small text with medium weight.",
-            Small("Email address")
+            Main.Small("Email address")
         ),
 
         # Muted
         ComponentPreview(title="Muted", description="Muted secondary text.",
-            Muted("Enter your email address.")
+            Main.Muted("Enter your email address.")
         ),
 
         # Usage

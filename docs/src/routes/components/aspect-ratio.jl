@@ -2,7 +2,6 @@
 #
 # Showcases AspectRatio for fixed-ratio containers.
 
-const AspectRatio = Main.AspectRatio
 
 function AspectRatioPage()
     ComponentsLayout(
@@ -19,7 +18,7 @@ function AspectRatioPage()
         # 16:9 Preview
         ComponentPreview(title="16:9", description="The default 16:9 aspect ratio.",
             Div(:class => "w-[450px]",
-                AspectRatio(ratio=16/9,
+                Main.AspectRatio(ratio=16/9,
                     Div(:class => "flex size-full items-center justify-center rounded-md bg-warm-200 dark:bg-warm-800 text-warm-600 dark:text-warm-400 text-sm",
                         "16:9"
                     )
@@ -30,7 +29,7 @@ function AspectRatioPage()
         # 1:1 Preview
         ComponentPreview(title="1:1 (Square)", description="Square aspect ratio.",
             Div(:class => "w-[200px]",
-                AspectRatio(ratio=1/1,
+                Main.AspectRatio(ratio=1/1,
                     Div(:class => "flex size-full items-center justify-center rounded-md bg-warm-200 dark:bg-warm-800 text-warm-600 dark:text-warm-400 text-sm",
                         "1:1"
                     )
@@ -41,7 +40,7 @@ function AspectRatioPage()
         # 4:3 Preview
         ComponentPreview(title="4:3", description="Classic 4:3 ratio.",
             Div(:class => "w-[300px]",
-                AspectRatio(ratio=4/3,
+                Main.AspectRatio(ratio=4/3,
                     Div(:class => "flex size-full items-center justify-center rounded-md bg-warm-200 dark:bg-warm-800 text-warm-600 dark:text-warm-400 text-sm",
                         "4:3"
                     )

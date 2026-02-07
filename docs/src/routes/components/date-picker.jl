@@ -3,7 +3,6 @@
 # Showcases DatePicker — a Calendar inside a Popover dropdown,
 # with single, range, and multiple selection modes.
 
-const DatePicker_ = Main.DatePicker
 
 function DatePickerPage()
     ComponentsLayout(
@@ -20,21 +19,21 @@ function DatePickerPage()
         # Basic Preview
         ComponentPreview(title="Single Date", description="Click the button to open a calendar. Select a date to populate the field.",
             Div(:class => "flex justify-center",
-                DatePicker_(month=2, year=2026)
+                Main.DatePicker(month=2, year=2026)
             )
         ),
 
         # Range Date Picker
         ComponentPreview(title="Date Range", description="Select a start and end date. Shows two months side by side.",
             Div(:class => "flex justify-center",
-                DatePicker_(mode="range", number_of_months=2, month=1, year=2026, placeholder="Select date range")
+                Main.DatePicker(mode="range", number_of_months=2, month=1, year=2026, placeholder="Select date range")
             )
         ),
 
         # Pre-selected
         ComponentPreview(title="Pre-selected Date", description="A date picker with a date already selected.",
             Div(:class => "flex justify-center",
-                DatePicker_(selected="2026-02-14", month=2, year=2026)
+                Main.DatePicker(selected="2026-02-14", month=2, year=2026)
             )
         ),
 

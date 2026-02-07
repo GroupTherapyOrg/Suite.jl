@@ -2,14 +2,6 @@
 #
 # Showcases Sheet with side variants (right, left, bottom, top) and keyboard dismiss.
 
-const Sheet = Main.Sheet
-const SheetTrigger = Main.SheetTrigger
-const SheetContent = Main.SheetContent
-const SheetHeader = Main.SheetHeader
-const SheetFooter = Main.SheetFooter
-const SheetTitle = Main.SheetTitle
-const SheetDescription = Main.SheetDescription
-const SheetClose = Main.SheetClose
 
 function SheetPage()
     ComponentsLayout(
@@ -26,14 +18,14 @@ function SheetPage()
         # Default (right side) — Settings panel
         ComponentPreview(title="Default (Right)", description="A settings panel sliding in from the right side.",
             Div(:class => "w-full max-w-md",
-                Sheet(
-                    SheetTrigger(
+                Main.Sheet(
+                    Main.SheetTrigger(
                         Main.Button(variant="outline", "Open Settings")
                     ),
-                    SheetContent(
-                        SheetHeader(
-                            SheetTitle("Settings"),
-                            SheetDescription("Adjust your preferences below.")
+                    Main.SheetContent(
+                        Main.SheetHeader(
+                            Main.SheetTitle("Settings"),
+                            Main.SheetDescription("Adjust your preferences below.")
                         ),
                         Div(:class => "py-4 space-y-4",
                             Div(:class => "space-y-2",
@@ -45,8 +37,8 @@ function SheetPage()
                                 Main.Input(placeholder="you@example.com")
                             ),
                         ),
-                        SheetFooter(
-                            SheetClose(
+                        Main.SheetFooter(
+                            Main.SheetClose(
                                 Main.Button(variant="outline", "Cancel")
                             ),
                             Main.Button("Save changes")
@@ -59,14 +51,14 @@ function SheetPage()
         # Left side — Navigation panel
         ComponentPreview(title="Left Side", description="A navigation panel sliding in from the left.",
             Div(:class => "w-full max-w-md",
-                Sheet(
-                    SheetTrigger(
+                Main.Sheet(
+                    Main.SheetTrigger(
                         Main.Button(variant="outline", "Open Navigation")
                     ),
-                    SheetContent(side="left",
-                        SheetHeader(
-                            SheetTitle("Navigation"),
-                            SheetDescription("Browse sections of the application.")
+                    Main.SheetContent(side="left",
+                        Main.SheetHeader(
+                            Main.SheetTitle("Navigation"),
+                            Main.SheetDescription("Browse sections of the application.")
                         ),
                         Div(:class => "py-4 space-y-1",
                             Div(:class => "px-3 py-2 rounded-md text-sm font-medium text-accent-600 dark:text-accent-400 bg-accent-50 dark:bg-accent-950", "Dashboard"),
@@ -74,8 +66,8 @@ function SheetPage()
                             Div(:class => "px-3 py-2 rounded-md text-sm text-warm-600 dark:text-warm-400 hover:bg-warm-100 dark:hover:bg-warm-800 cursor-pointer", "Team"),
                             Div(:class => "px-3 py-2 rounded-md text-sm text-warm-600 dark:text-warm-400 hover:bg-warm-100 dark:hover:bg-warm-800 cursor-pointer", "Settings"),
                         ),
-                        SheetFooter(
-                            SheetClose(
+                        Main.SheetFooter(
+                            Main.SheetClose(
                                 Main.Button(variant="outline", "Close")
                             )
                         )
@@ -87,14 +79,14 @@ function SheetPage()
         # Bottom side — Notification panel
         ComponentPreview(title="Bottom Side", description="A notification panel sliding up from the bottom.",
             Div(:class => "w-full max-w-md",
-                Sheet(
-                    SheetTrigger(
+                Main.Sheet(
+                    Main.SheetTrigger(
                         Main.Button(variant="outline", "Open Notifications")
                     ),
-                    SheetContent(side="bottom",
-                        SheetHeader(
-                            SheetTitle("Notifications"),
-                            SheetDescription("You have 3 unread notifications.")
+                    Main.SheetContent(side="bottom",
+                        Main.SheetHeader(
+                            Main.SheetTitle("Notifications"),
+                            Main.SheetDescription("You have 3 unread notifications.")
                         ),
                         Div(:class => "py-4 space-y-3",
                             Div(:class => "flex items-start gap-3 p-3 rounded-md bg-warm-50 dark:bg-warm-900",
@@ -119,8 +111,8 @@ function SheetPage()
                                 )
                             ),
                         ),
-                        SheetFooter(
-                            SheetClose(
+                        Main.SheetFooter(
+                            Main.SheetClose(
                                 Main.Button(variant="outline", "Dismiss All")
                             )
                         )

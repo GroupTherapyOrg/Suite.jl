@@ -2,10 +2,6 @@
 #
 # Showcases Tabs with roving tabindex and activation modes.
 
-const Tabs = Main.Tabs
-const TabsList = Main.TabsList
-const TabsTrigger = Main.TabsTrigger
-const TabsContent = Main.TabsContent
 
 function TabsPage()
     ComponentsLayout(
@@ -22,18 +18,18 @@ function TabsPage()
         # Default Preview
         ComponentPreview(title="Default", description="Click tabs to switch between panels.",
             Div(:class => "w-full max-w-md",
-                Tabs(default_value="account",
-                    TabsList(
-                        TabsTrigger("Account", value="account"),
-                        TabsTrigger("Password", value="password"),
+                Main.Tabs(default_value="account",
+                    Main.TabsList(
+                        Main.TabsTrigger("Account", value="account"),
+                        Main.TabsTrigger("Password", value="password"),
                     ),
-                    TabsContent(value="account",
+                    Main.TabsContent(value="account",
                         Div(:class => "p-4 space-y-2",
                             P(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", "Account settings"),
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Make changes to your account here."),
                         )
                     ),
-                    TabsContent(value="password",
+                    Main.TabsContent(value="password",
                         Div(:class => "p-4 space-y-2",
                             P(:class => "text-sm font-medium text-warm-800 dark:text-warm-200", "Password settings"),
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Change your password here."),
@@ -46,23 +42,23 @@ function TabsPage()
         # Three tabs
         ComponentPreview(title="Multiple tabs", description="Tabs with three panels.",
             Div(:class => "w-full max-w-lg",
-                Tabs(default_value="overview",
-                    TabsList(
-                        TabsTrigger("Overview", value="overview"),
-                        TabsTrigger("Analytics", value="analytics"),
-                        TabsTrigger("Reports", value="reports"),
+                Main.Tabs(default_value="overview",
+                    Main.TabsList(
+                        Main.TabsTrigger("Overview", value="overview"),
+                        Main.TabsTrigger("Analytics", value="analytics"),
+                        Main.TabsTrigger("Reports", value="reports"),
                     ),
-                    TabsContent(value="overview",
+                    Main.TabsContent(value="overview",
                         Div(:class => "p-4",
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Overview of your project metrics and recent activity.")
                         )
                     ),
-                    TabsContent(value="analytics",
+                    Main.TabsContent(value="analytics",
                         Div(:class => "p-4",
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Detailed analytics and performance data.")
                         )
                     ),
-                    TabsContent(value="reports",
+                    Main.TabsContent(value="reports",
                         Div(:class => "p-4",
                             P(:class => "text-sm text-warm-600 dark:text-warm-400", "Generated reports and exportable summaries.")
                         )

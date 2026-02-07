@@ -3,21 +3,6 @@
 # Showcases DropdownMenu with basic items, checkboxes, radio groups,
 # submenus, keyboard shortcuts, and full keyboard navigation.
 
-const DropdownMenu = Main.DropdownMenu
-const DropdownMenuTrigger = Main.DropdownMenuTrigger
-const DropdownMenuContent = Main.DropdownMenuContent
-const DropdownMenuGroup = Main.DropdownMenuGroup
-const DropdownMenuLabel = Main.DropdownMenuLabel
-const DropdownMenuItem = Main.DropdownMenuItem
-const DropdownMenuCheckboxItem = Main.DropdownMenuCheckboxItem
-const DropdownMenuRadioGroup = Main.DropdownMenuRadioGroup
-const DropdownMenuRadioItem = Main.DropdownMenuRadioItem
-const DropdownMenuItemIndicator = Main.DropdownMenuItemIndicator
-const DropdownMenuSeparator = Main.DropdownMenuSeparator
-const DropdownMenuShortcut = Main.DropdownMenuShortcut
-const DropdownMenuSub = Main.DropdownMenuSub
-const DropdownMenuSubTrigger = Main.DropdownMenuSubTrigger
-const DropdownMenuSubContent = Main.DropdownMenuSubContent
 
 function DropdownMenuPage()
     ComponentsLayout(
@@ -34,29 +19,29 @@ function DropdownMenuPage()
         # Basic dropdown preview
         ComponentPreview(title="Basic", description="A simple \"My Account\" dropdown with items and keyboard shortcuts.",
             Div(:class => "w-full max-w-md flex justify-center",
-                DropdownMenu(
-                    DropdownMenuTrigger(
-                        Button(variant="outline", "My Account")
+                Main.DropdownMenu(
+                    Main.DropdownMenuTrigger(
+                        Main.Button(variant="outline", "My Account")
                     ),
-                    DropdownMenuContent(
-                        DropdownMenuLabel("My Account"),
-                        DropdownMenuSeparator(),
-                        DropdownMenuGroup(
-                            DropdownMenuItem(
+                    Main.DropdownMenuContent(
+                        Main.DropdownMenuLabel("My Account"),
+                        Main.DropdownMenuSeparator(),
+                        Main.DropdownMenuGroup(
+                            Main.DropdownMenuItem(
                                 "Profile",
-                                DropdownMenuShortcut("Shift+Cmd+P")
+                                Main.DropdownMenuShortcut("Shift+Cmd+P")
                             ),
-                            DropdownMenuItem(
+                            Main.DropdownMenuItem(
                                 "Billing",
-                                DropdownMenuShortcut("Cmd+B")
+                                Main.DropdownMenuShortcut("Cmd+B")
                             ),
-                            DropdownMenuItem(
+                            Main.DropdownMenuItem(
                                 "Settings",
-                                DropdownMenuShortcut("Cmd+,")
+                                Main.DropdownMenuShortcut("Cmd+,")
                             ),
                         ),
-                        DropdownMenuSeparator(),
-                        DropdownMenuItem("Log out", DropdownMenuShortcut("Shift+Cmd+Q")),
+                        Main.DropdownMenuSeparator(),
+                        Main.DropdownMenuItem("Log out", Main.DropdownMenuShortcut("Shift+Cmd+Q")),
                     )
                 )
             )
@@ -65,34 +50,34 @@ function DropdownMenuPage()
         # Checkboxes and Radio groups
         ComponentPreview(title="With Checkboxes & Radio", description="Checkbox items for toggles and radio groups for single-select options.",
             Div(:class => "w-full max-w-md flex justify-center",
-                DropdownMenu(
-                    DropdownMenuTrigger(
-                        Button(variant="outline", "Options")
+                Main.DropdownMenu(
+                    Main.DropdownMenuTrigger(
+                        Main.Button(variant="outline", "Options")
                     ),
-                    DropdownMenuContent(
-                        DropdownMenuLabel("Appearance"),
-                        DropdownMenuSeparator(),
-                        DropdownMenuCheckboxItem(checked=true,
-                            DropdownMenuItemIndicator(),
+                    Main.DropdownMenuContent(
+                        Main.DropdownMenuLabel("Appearance"),
+                        Main.DropdownMenuSeparator(),
+                        Main.DropdownMenuCheckboxItem(checked=true,
+                            Main.DropdownMenuItemIndicator(),
                             "Status Bar"
                         ),
-                        DropdownMenuCheckboxItem(checked=false,
-                            DropdownMenuItemIndicator(),
+                        Main.DropdownMenuCheckboxItem(checked=false,
+                            Main.DropdownMenuItemIndicator(),
                             "Activity Bar"
                         ),
-                        DropdownMenuSeparator(),
-                        DropdownMenuLabel("Theme"),
-                        DropdownMenuRadioGroup(value="system",
-                            DropdownMenuRadioItem(value="system",
-                                DropdownMenuItemIndicator(),
+                        Main.DropdownMenuSeparator(),
+                        Main.DropdownMenuLabel("Theme"),
+                        Main.DropdownMenuRadioGroup(value="system",
+                            Main.DropdownMenuRadioItem(value="system",
+                                Main.DropdownMenuItemIndicator(),
                                 "System"
                             ),
-                            DropdownMenuRadioItem(value="light",
-                                DropdownMenuItemIndicator(),
+                            Main.DropdownMenuRadioItem(value="light",
+                                Main.DropdownMenuItemIndicator(),
                                 "Light"
                             ),
-                            DropdownMenuRadioItem(value="dark",
-                                DropdownMenuItemIndicator(),
+                            Main.DropdownMenuRadioItem(value="dark",
+                                Main.DropdownMenuItemIndicator(),
                                 "Dark"
                             ),
                         ),

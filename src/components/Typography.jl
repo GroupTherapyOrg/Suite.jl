@@ -26,7 +26,7 @@ Large heading (h1). For page titles.
 """
 function H1(children...; class::String="", kwargs...)
     classes = cn("scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl", class)
-    H1(:class => classes, kwargs..., children...)
+    Therapy.H1(:class => classes, kwargs..., children...)
 end
 
 """
@@ -37,7 +37,7 @@ Section heading (h2) with bottom border.
 function H2(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("scroll-m-20 border-b border-warm-200 dark:border-warm-700 pb-2 text-3xl font-semibold tracking-tight first:mt-0", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
-    H2(:class => classes, kwargs..., children...)
+    Therapy.H2(:class => classes, kwargs..., children...)
 end
 
 """
@@ -47,7 +47,7 @@ Sub-section heading (h3).
 """
 function H3(children...; class::String="", kwargs...)
     classes = cn("scroll-m-20 text-2xl font-semibold tracking-tight", class)
-    H3(:class => classes, kwargs..., children...)
+    Therapy.H3(:class => classes, kwargs..., children...)
 end
 
 """
@@ -57,7 +57,7 @@ Minor heading (h4).
 """
 function H4(children...; class::String="", kwargs...)
     classes = cn("scroll-m-20 text-xl font-semibold tracking-tight", class)
-    H4(:class => classes, kwargs..., children...)
+    Therapy.H4(:class => classes, kwargs..., children...)
 end
 
 """
@@ -67,7 +67,7 @@ Paragraph text with spacing.
 """
 function P(children...; class::String="", kwargs...)
     classes = cn("leading-7 [&:not(:first-child)]:mt-6", class)
-    P(:class => classes, kwargs..., children...)
+    Therapy.P(:class => classes, kwargs..., children...)
 end
 
 """
@@ -78,7 +78,7 @@ Styled blockquote with left border.
 function Blockquote(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("mt-6 border-l-2 border-warm-200 dark:border-warm-700 pl-6 italic text-warm-600 dark:text-warm-500", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
-    Blockquote(:class => classes, kwargs..., children...)
+    Therapy.Blockquote(:class => classes, kwargs..., children...)
 end
 
 """
@@ -100,7 +100,7 @@ Lead paragraph — larger, muted text for introductions.
 function Lead(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-xl text-warm-600 dark:text-warm-500", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
-    P(:class => classes, kwargs..., children...)
+    Therapy.P(:class => classes, kwargs..., children...)
 end
 
 """
@@ -131,7 +131,7 @@ Muted secondary text.
 function Muted(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-sm text-warm-600 dark:text-warm-500", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
-    P(:class => classes, kwargs..., children...)
+    Therapy.P(:class => classes, kwargs..., children...)
 end
 
 # --- Registry ---

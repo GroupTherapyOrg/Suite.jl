@@ -2,14 +2,6 @@
 #
 # Showcases NavigationMenu with trigger panels, content links, and direct link items.
 
-const NavigationMenu = Main.NavigationMenu
-const NavigationMenuList = Main.NavigationMenuList
-const NavigationMenuItem = Main.NavigationMenuItem
-const NavigationMenuTrigger = Main.NavigationMenuTrigger
-const NavigationMenuContent = Main.NavigationMenuContent
-const NavigationMenuLink = Main.NavigationMenuLink
-const NavigationMenuViewport = Main.NavigationMenuViewport
-const NavigationMenuIndicator = Main.NavigationMenuIndicator
 
 function NavigationMenuPage()
     ComponentsLayout(
@@ -26,48 +18,48 @@ function NavigationMenuPage()
         # Default Preview
         ComponentPreview(title="Default", description="Site navigation with trigger panels and a direct link.",
             Div(:class => "w-full max-w-2xl",
-                NavigationMenu(
-                    NavigationMenuList(
+                Main.NavigationMenu(
+                    Main.NavigationMenuList(
                         # Getting Started
-                        NavigationMenuItem(
-                            NavigationMenuTrigger("Getting Started"),
-                            NavigationMenuContent(
-                                NavigationMenuLink(href="/docs/introduction", title="Introduction",
+                        Main.NavigationMenuItem(
+                            Main.NavigationMenuTrigger("Getting Started"),
+                            Main.NavigationMenuContent(
+                                Main.NavigationMenuLink(href="/docs/introduction", title="Introduction",
                                     "Re-usable components built with Therapy.jl and Tailwind CSS."
                                 ),
-                                NavigationMenuLink(href="/docs/installation", title="Installation",
+                                Main.NavigationMenuLink(href="/docs/installation", title="Installation",
                                     "How to install dependencies and structure your app."
                                 ),
-                                NavigationMenuLink(href="/docs/typography", title="Typography",
+                                Main.NavigationMenuLink(href="/docs/typography", title="Typography",
                                     "Styles for headings, paragraphs, lists, and inline code."
                                 ),
                             ),
                         ),
 
                         # Components
-                        NavigationMenuItem(
-                            NavigationMenuTrigger("Components"),
-                            NavigationMenuContent(
-                                NavigationMenuLink(href="/docs/components/button", title="Button",
+                        Main.NavigationMenuItem(
+                            Main.NavigationMenuTrigger("Components"),
+                            Main.NavigationMenuContent(
+                                Main.NavigationMenuLink(href="/docs/components/button", title="Button",
                                     "Displays a button or a component that looks like a button."
                                 ),
-                                NavigationMenuLink(href="/docs/components/dialog", title="Dialog",
+                                Main.NavigationMenuLink(href="/docs/components/dialog", title="Dialog",
                                     "A window overlaid on the primary content."
                                 ),
-                                NavigationMenuLink(href="/docs/components/tabs", title="Tabs",
+                                Main.NavigationMenuLink(href="/docs/components/tabs", title="Tabs",
                                     "A set of layered sections of content, known as tab panels."
                                 ),
                             ),
                         ),
 
                         # Direct link
-                        NavigationMenuItem(
-                            NavigationMenuLink(href="/docs", title="Documentation",
+                        Main.NavigationMenuItem(
+                            Main.NavigationMenuLink(href="/docs", title="Documentation",
                                 "Browse the full documentation."
                             ),
                         ),
                     ),
-                    NavigationMenuViewport(),
+                    Main.NavigationMenuViewport(),
                 )
             )
         ),

@@ -2,7 +2,6 @@
 #
 # Showcases Separator with horizontal/vertical orientations.
 
-const Separator = Main.Separator
 
 function SeparatorPage()
     ComponentsLayout(
@@ -23,12 +22,12 @@ function SeparatorPage()
                     H4(:class => "text-sm font-medium leading-none text-warm-800 dark:text-warm-300", "Suite.jl"),
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mt-1", "A component library for Julia.")
                 ),
-                Separator(),
+                Main.Separator(),
                 Div(:class => "flex h-5 items-center space-x-4 text-sm",
                     Span(:class => "text-warm-800 dark:text-warm-300", "Blog"),
-                    Separator(orientation="vertical"),
+                    Main.Separator(orientation="vertical"),
                     Span(:class => "text-warm-800 dark:text-warm-300", "Docs"),
-                    Separator(orientation="vertical"),
+                    Main.Separator(orientation="vertical"),
                     Span(:class => "text-warm-800 dark:text-warm-300", "Source")
                 )
             )

@@ -2,9 +2,6 @@
 #
 # Showcases Avatar with image, fallback, and sizes.
 
-const Avatar = Main.Avatar
-const AvatarImage = Main.AvatarImage
-const AvatarFallback = Main.AvatarFallback
 
 function AvatarPage()
     ComponentsLayout(
@@ -21,18 +18,18 @@ function AvatarPage()
         # Default Preview
         ComponentPreview(title="With Fallback", description="Avatar showing initials when no image is available.",
             Div(:class => "flex items-center gap-4",
-                Avatar(AvatarFallback("JD")),
-                Avatar(AvatarFallback("AB")),
-                Avatar(AvatarFallback("CN"))
+                Main.Avatar(Main.AvatarFallback("JD")),
+                Main.Avatar(Main.AvatarFallback("AB")),
+                Main.Avatar(Main.AvatarFallback("CN"))
             )
         ),
 
         # Sizes
         ComponentPreview(title="Sizes", description="Available avatar sizes.",
             Div(:class => "flex items-center gap-4",
-                Avatar(size="sm", AvatarFallback("S")),
-                Avatar(AvatarFallback("M")),
-                Avatar(size="lg", AvatarFallback("L"))
+                Main.Avatar(size="sm", Main.AvatarFallback("S")),
+                Main.Avatar(Main.AvatarFallback("M")),
+                Main.Avatar(size="lg", Main.AvatarFallback("L"))
             )
         ),
 

@@ -3,7 +3,6 @@
 # Showcases Calendar with single/multiple/range selection modes,
 # keyboard navigation, and customization options.
 
-const Calendar_ = Main.Calendar
 
 function CalendarPage()
     ComponentsLayout(
@@ -20,28 +19,28 @@ function CalendarPage()
         # Basic Preview
         ComponentPreview(title="Single Date", description="Click a date to select it. Click again to deselect.",
             Div(:class => "flex justify-center",
-                Calendar_(month=2, year=2026)
+                Main.Calendar(month=2, year=2026)
             )
         ),
 
         # Range Selection
         ComponentPreview(title="Date Range", description="Select a start and end date to create a range.",
             Div(:class => "flex justify-center",
-                Calendar_(mode="range", month=2, year=2026)
+                Main.Calendar(mode="range", month=2, year=2026)
             )
         ),
 
         # Multiple Selection
         ComponentPreview(title="Multiple Dates", description="Click multiple dates to select them individually.",
             Div(:class => "flex justify-center",
-                Calendar_(mode="multiple", month=2, year=2026)
+                Main.Calendar(mode="multiple", month=2, year=2026)
             )
         ),
 
         # Two Months
         ComponentPreview(title="Two Months", description="Display two months side by side for range selection.",
             Div(:class => "flex justify-center",
-                Calendar_(mode="range", number_of_months=2, month=1, year=2026)
+                Main.Calendar(mode="range", number_of_months=2, month=1, year=2026)
             )
         ),
 

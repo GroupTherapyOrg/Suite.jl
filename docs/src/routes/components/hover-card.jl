@@ -3,9 +3,6 @@
 # Showcases HoverCard with hover-triggered content preview.
 # 700ms open delay, 300ms close delay. Touch excluded. No focus trap.
 
-const HoverCard = Main.HoverCard
-const HoverCardTrigger = Main.HoverCardTrigger
-const HoverCardContent = Main.HoverCardContent
 
 function HoverCardPage()
     ComponentsLayout(
@@ -22,11 +19,11 @@ function HoverCardPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="Hover over the link to see a user profile card preview.",
             Div(:class => "w-full max-w-md",
-                HoverCard(
-                    HoverCardTrigger(
+                Main.HoverCard(
+                    Main.HoverCardTrigger(
                         Span(:class => "text-accent-600 dark:text-accent-400 underline decoration-dotted underline-offset-4 cursor-pointer font-medium", "@julialang")
                     ),
-                    HoverCardContent(
+                    Main.HoverCardContent(
                         Div(:class => "flex gap-4",
                             Div(:class => "shrink-0",
                                 Img(:src => "https://avatars.githubusercontent.com/u/743164?s=64", :alt => "Julia", :class => "h-12 w-12 rounded-full")

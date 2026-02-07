@@ -1,6 +1,25 @@
 module Suite
 
-using Therapy
+# Import Therapy module for qualified access (Therapy.Button, Therapy.Input, etc.)
+# BUT don't bring conflicting HTML element names into scope, so that Suite's
+# own Button/Input/etc. are NEW functions rather than method extensions.
+import Therapy
+
+# Import non-conflicting Therapy exports that Suite components use directly
+using Therapy: VNode, Fragment, Show, For, ForNode, RawHtml
+using Therapy: Div, Span, A, Br, Hr
+using Therapy: H5, H6, Strong, Em, Code, Pre
+using Therapy: Ul, Ol, Li, Dl, Dt, Dd
+using Therapy: Thead, Tbody, Tfoot, Tr, Th, Td, Caption
+using Therapy: Img, Video, Audio, Source, Iframe
+using Therapy: Header, Footer, Nav, MainEl, Section, Article, Aside
+using Therapy: Details, Summary, Figure, Figcaption
+using Therapy: Option, Fieldset, Legend
+using Therapy: Script, Style, Meta
+using Therapy: Svg, Path, Circle, Rect, Line, Polygon, Polyline, Text, G, Defs, Use
+using Therapy: render_to_string, render_page
+using Therapy: @island, island, IslandDef, get_islands, clear_islands!
+
 using Dates
 
 # --- Utility ---

@@ -2,7 +2,6 @@
 #
 # Showcases Progress bar with different values.
 
-const Progress = Main.Progress
 
 function ProgressPage()
     ComponentsLayout(
@@ -18,7 +17,7 @@ function ProgressPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="Progress bar at 33%.",
-            Progress(value=33, class="w-[60%]")
+            Main.Progress(value=33, class="w-[60%]")
         ),
 
         # Multiple Values
@@ -26,23 +25,23 @@ function ProgressPage()
             Div(:class => "space-y-4 w-[60%]",
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "0%"),
-                    Progress(value=0)
+                    Main.Progress(value=0)
                 ),
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "25%"),
-                    Progress(value=25)
+                    Main.Progress(value=25)
                 ),
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "50%"),
-                    Progress(value=50)
+                    Main.Progress(value=50)
                 ),
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "75%"),
-                    Progress(value=75)
+                    Main.Progress(value=75)
                 ),
                 Div(:class => "space-y-1",
                     Span(:class => "text-sm text-warm-600 dark:text-warm-400", "100%"),
-                    Progress(value=100)
+                    Main.Progress(value=100)
                 )
             )
         ),

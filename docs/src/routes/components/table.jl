@@ -2,14 +2,6 @@
 #
 # Showcases Table with all sub-components.
 
-const Table = Main.Table
-const TableHeader = Main.TableHeader
-const TableBody = Main.TableBody
-const TableFooter = Main.TableFooter
-const TableRow = Main.TableRow
-const TableHead = Main.TableHead
-const TableCell = Main.TableCell
-const TableCaption = Main.TableCaption
 
 function TablePage()
     ComponentsLayout(
@@ -25,46 +17,46 @@ function TablePage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A table with header, body, footer, and caption.",
-            Table(
-                TableCaption("A list of your recent invoices."),
-                TableHeader(
-                    TableRow(
-                        TableHead("Invoice"),
-                        TableHead("Status"),
-                        TableHead("Method"),
-                        TableHead(class="text-right", "Amount")
+            Main.Table(
+                Main.TableCaption("A list of your recent invoices."),
+                Main.TableHeader(
+                    Main.TableRow(
+                        Main.TableHead("Invoice"),
+                        Main.TableHead("Status"),
+                        Main.TableHead("Method"),
+                        Main.TableHead(class="text-right", "Amount")
                     )
                 ),
-                TableBody(
-                    TableRow(
-                        TableCell(class="font-medium", "INV001"),
-                        TableCell("Paid"),
-                        TableCell("Credit Card"),
-                        TableCell(class="text-right", "\$250.00")
+                Main.TableBody(
+                    Main.TableRow(
+                        Main.TableCell(class="font-medium", "INV001"),
+                        Main.TableCell("Paid"),
+                        Main.TableCell("Credit Card"),
+                        Main.TableCell(class="text-right", "\$250.00")
                     ),
-                    TableRow(
-                        TableCell(class="font-medium", "INV002"),
-                        TableCell("Pending"),
-                        TableCell("PayPal"),
-                        TableCell(class="text-right", "\$150.00")
+                    Main.TableRow(
+                        Main.TableCell(class="font-medium", "INV002"),
+                        Main.TableCell("Pending"),
+                        Main.TableCell("PayPal"),
+                        Main.TableCell(class="text-right", "\$150.00")
                     ),
-                    TableRow(
-                        TableCell(class="font-medium", "INV003"),
-                        TableCell("Unpaid"),
-                        TableCell("Bank Transfer"),
-                        TableCell(class="text-right", "\$350.00")
+                    Main.TableRow(
+                        Main.TableCell(class="font-medium", "INV003"),
+                        Main.TableCell("Unpaid"),
+                        Main.TableCell("Bank Transfer"),
+                        Main.TableCell(class="text-right", "\$350.00")
                     ),
-                    TableRow(
-                        TableCell(class="font-medium", "INV004"),
-                        TableCell("Paid"),
-                        TableCell("Credit Card"),
-                        TableCell(class="text-right", "\$450.00")
+                    Main.TableRow(
+                        Main.TableCell(class="font-medium", "INV004"),
+                        Main.TableCell("Paid"),
+                        Main.TableCell("Credit Card"),
+                        Main.TableCell(class="text-right", "\$450.00")
                     )
                 ),
-                TableFooter(
-                    TableRow(
-                        TableCell(:colspan => "3", "Total"),
-                        TableCell(class="text-right", "\$1,200.00")
+                Main.TableFooter(
+                    Main.TableRow(
+                        Main.TableCell(:colspan => "3", "Total"),
+                        Main.TableCell(class="text-right", "\$1,200.00")
                     )
                 )
             )

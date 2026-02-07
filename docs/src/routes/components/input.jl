@@ -2,7 +2,6 @@
 #
 # Showcases Input with types, states, and form patterns.
 
-const Input = Main.Input
 
 function InputPage()
     ComponentsLayout(
@@ -18,14 +17,14 @@ function InputPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A default text input.",
-            Input(placeholder="Email", class="max-w-sm")
+            Main.Input(placeholder="Email", class="max-w-sm")
         ),
 
         # With Label
         ComponentPreview(title="With Label", description="Input paired with a label.",
             Div(:class => "grid w-full max-w-sm items-center gap-1.5",
                 Main.Label("Email"),
-                Input(type="email", placeholder="Email")
+                Main.Input(type="email", placeholder="Email")
             )
         ),
 
@@ -33,13 +32,13 @@ function InputPage()
         ComponentPreview(title="File", description="Input for file uploads.",
             Div(:class => "grid w-full max-w-sm items-center gap-1.5",
                 Main.Label("Picture"),
-                Input(type="file")
+                Main.Input(type="file")
             )
         ),
 
         # Disabled
         ComponentPreview(title="Disabled", description="Input in disabled state.",
-            Input(disabled=true, placeholder="Disabled", class="max-w-sm")
+            Main.Input(disabled=true, placeholder="Disabled", class="max-w-sm")
         ),
 
         # Usage

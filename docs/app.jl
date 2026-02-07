@@ -17,6 +17,12 @@ push!(LOAD_PATH, dirname(@__DIR__))
 using Therapy
 using Suite
 
+# Resolve name conflicts: Suite components take precedence over Therapy HTML elements.
+# These Suite.jl names shadow Therapy.jl's raw HTML element functions of the same name.
+# Users who need the raw HTML element can use Therapy.Button, Therapy.Input, etc.
+import Suite: Button, Input, Form, Label, P, H1, H2, H3, H4,
+              Blockquote, Table, Textarea, Select
+
 # Change to docs directory for relative paths
 cd(@__DIR__)
 

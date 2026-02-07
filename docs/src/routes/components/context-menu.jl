@@ -2,21 +2,6 @@
 #
 # Showcases ContextMenu with basic items, checkboxes, radio groups, and keyboard nav.
 
-const ContextMenu = Main.ContextMenu
-const ContextMenuTrigger = Main.ContextMenuTrigger
-const ContextMenuContent = Main.ContextMenuContent
-const ContextMenuGroup = Main.ContextMenuGroup
-const ContextMenuLabel = Main.ContextMenuLabel
-const ContextMenuItem = Main.ContextMenuItem
-const ContextMenuCheckboxItem = Main.ContextMenuCheckboxItem
-const ContextMenuRadioGroup = Main.ContextMenuRadioGroup
-const ContextMenuRadioItem = Main.ContextMenuRadioItem
-const ContextMenuItemIndicator = Main.ContextMenuItemIndicator
-const ContextMenuSeparator = Main.ContextMenuSeparator
-const ContextMenuShortcut = Main.ContextMenuShortcut
-const ContextMenuSub = Main.ContextMenuSub
-const ContextMenuSubTrigger = Main.ContextMenuSubTrigger
-const ContextMenuSubContent = Main.ContextMenuSubContent
 
 function ContextMenuPage()
     ComponentsLayout(
@@ -33,25 +18,25 @@ function ContextMenuPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="Right-click the area to open a context menu with navigation items.",
             Div(:class => "w-full max-w-md",
-                ContextMenu(
-                    ContextMenuTrigger(
+                Main.ContextMenu(
+                    Main.ContextMenuTrigger(
                         Div(:class => "flex h-36 w-full items-center justify-center rounded-md border border-dashed border-warm-300 dark:border-warm-600 text-sm text-warm-600 dark:text-warm-400",
                             "Right click here"
                         )
                     ),
-                    ContextMenuContent(
-                        ContextMenuItem("Back",
-                            ContextMenuShortcut("Ctrl+[")
+                    Main.ContextMenuContent(
+                        Main.ContextMenuItem("Back",
+                            Main.ContextMenuShortcut("Ctrl+[")
                         ),
-                        ContextMenuItem("Forward",
-                            ContextMenuShortcut("Ctrl+]")
+                        Main.ContextMenuItem("Forward",
+                            Main.ContextMenuShortcut("Ctrl+]")
                         ),
-                        ContextMenuItem("Reload",
-                            ContextMenuShortcut("Ctrl+R")
+                        Main.ContextMenuItem("Reload",
+                            Main.ContextMenuShortcut("Ctrl+R")
                         ),
-                        ContextMenuSeparator(),
-                        ContextMenuItem("Bookmark",
-                            ContextMenuShortcut("Ctrl+D")
+                        Main.ContextMenuSeparator(),
+                        Main.ContextMenuItem("Bookmark",
+                            Main.ContextMenuShortcut("Ctrl+D")
                         ),
                     )
                 )
@@ -61,30 +46,30 @@ function ContextMenuPage()
         # With Checkboxes & Radio Group
         ComponentPreview(title="With Checkboxes", description="Context menu with checkbox items and a radio group.",
             Div(:class => "w-full max-w-md",
-                ContextMenu(
-                    ContextMenuTrigger(
+                Main.ContextMenu(
+                    Main.ContextMenuTrigger(
                         Div(:class => "flex h-36 w-full items-center justify-center rounded-md border border-dashed border-warm-300 dark:border-warm-600 text-sm text-warm-600 dark:text-warm-400",
                             "Right click here"
                         )
                     ),
-                    ContextMenuContent(
-                        ContextMenuCheckboxItem(checked=true,
-                            ContextMenuItemIndicator(),
+                    Main.ContextMenuContent(
+                        Main.ContextMenuCheckboxItem(checked=true,
+                            Main.ContextMenuItemIndicator(),
                             "Show Toolbar"
                         ),
-                        ContextMenuSeparator(),
-                        ContextMenuLabel("People"),
-                        ContextMenuRadioGroup(value="alice",
-                            ContextMenuRadioItem(value="alice",
-                                ContextMenuItemIndicator(),
+                        Main.ContextMenuSeparator(),
+                        Main.ContextMenuLabel("People"),
+                        Main.ContextMenuRadioGroup(value="alice",
+                            Main.ContextMenuRadioItem(value="alice",
+                                Main.ContextMenuItemIndicator(),
                                 "Alice"
                             ),
-                            ContextMenuRadioItem(value="bob",
-                                ContextMenuItemIndicator(),
+                            Main.ContextMenuRadioItem(value="bob",
+                                Main.ContextMenuItemIndicator(),
                                 "Bob"
                             ),
-                            ContextMenuRadioItem(value="charlie",
-                                ContextMenuItemIndicator(),
+                            Main.ContextMenuRadioItem(value="charlie",
+                                Main.ContextMenuItemIndicator(),
                                 "Charlie"
                             ),
                         )

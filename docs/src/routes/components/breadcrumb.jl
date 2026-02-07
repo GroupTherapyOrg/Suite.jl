@@ -2,15 +2,8 @@
 #
 # Showcases Breadcrumb navigation trail.
 
-const Breadcrumb = Main.Breadcrumb
-const BreadcrumbList = Main.BreadcrumbList
-const BreadcrumbItem = Main.BreadcrumbItem
-const BreadcrumbLink = Main.BreadcrumbLink
-const BreadcrumbPage = Main.BreadcrumbPage
-const BreadcrumbSeparator = Main.BreadcrumbSeparator
-const BreadcrumbEllipsis = Main.BreadcrumbEllipsis
 
-function BreadcrumbPage()
+function BreadcrumbDocsPage()
     ComponentsLayout(
         # Header
         Div(:class => "py-8 border-b border-warm-200 dark:border-warm-700 mb-10",
@@ -24,28 +17,28 @@ function BreadcrumbPage()
 
         # Default Preview
         ComponentPreview(title="Default", description="A basic breadcrumb trail.",
-            Breadcrumb(
-                BreadcrumbList(
-                    BreadcrumbItem(BreadcrumbLink("Home", href="#")),
-                    BreadcrumbSeparator(),
-                    BreadcrumbItem(BreadcrumbLink("Components", href="#")),
-                    BreadcrumbSeparator(),
-                    BreadcrumbItem(BreadcrumbPage("Breadcrumb"))
+            Main.Breadcrumb(
+                Main.BreadcrumbList(
+                    Main.BreadcrumbItem(Main.BreadcrumbLink("Home", href="#")),
+                    Main.BreadcrumbSeparator(),
+                    Main.BreadcrumbItem(Main.BreadcrumbLink("Components", href="#")),
+                    Main.BreadcrumbSeparator(),
+                    Main.BreadcrumbItem(Main.BreadcrumbPage("Breadcrumb"))
                 )
             )
         ),
 
         # With Ellipsis
         ComponentPreview(title="With Ellipsis", description="Breadcrumb with collapsed items.",
-            Breadcrumb(
-                BreadcrumbList(
-                    BreadcrumbItem(BreadcrumbLink("Home", href="#")),
-                    BreadcrumbSeparator(),
-                    BreadcrumbItem(BreadcrumbEllipsis()),
-                    BreadcrumbSeparator(),
-                    BreadcrumbItem(BreadcrumbLink("Components", href="#")),
-                    BreadcrumbSeparator(),
-                    BreadcrumbItem(BreadcrumbPage("Breadcrumb"))
+            Main.Breadcrumb(
+                Main.BreadcrumbList(
+                    Main.BreadcrumbItem(Main.BreadcrumbLink("Home", href="#")),
+                    Main.BreadcrumbSeparator(),
+                    Main.BreadcrumbItem(Main.BreadcrumbEllipsis()),
+                    Main.BreadcrumbSeparator(),
+                    Main.BreadcrumbItem(Main.BreadcrumbLink("Components", href="#")),
+                    Main.BreadcrumbSeparator(),
+                    Main.BreadcrumbItem(Main.BreadcrumbPage("Breadcrumb"))
                 )
             )
         ),
@@ -131,4 +124,4 @@ function ApiRow(prop, type, default, description)
     )
 end
 
-BreadcrumbPage
+BreadcrumbDocsPage

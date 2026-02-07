@@ -2,8 +2,6 @@
 #
 # Showcases ToggleGroup with single/multiple modes and variants.
 
-const ToggleGroup = Main.ToggleGroup
-const ToggleGroupItem = Main.ToggleGroupItem
 
 function ToggleGroupPage()
     ComponentsLayout(
@@ -19,54 +17,54 @@ function ToggleGroupPage()
 
         # Single selection
         ComponentPreview(title="Single selection", description="Only one item can be active at a time.",
-            ToggleGroup(type="single", default_value="center",
-                ToggleGroupItem(value="left", "Left"),
-                ToggleGroupItem(value="center", "Center"),
-                ToggleGroupItem(value="right", "Right"),
+            Main.ToggleGroup(type="single", default_value="center",
+                Main.ToggleGroupItem(value="left", "Left"),
+                Main.ToggleGroupItem(value="center", "Center"),
+                Main.ToggleGroupItem(value="right", "Right"),
             )
         ),
 
         # Multiple selection
         ComponentPreview(title="Multiple selection", description="Any combination of items can be active.",
-            ToggleGroup(type="multiple", default_value=["bold", "italic"],
-                ToggleGroupItem(value="bold", "B"),
-                ToggleGroupItem(value="italic", "I"),
-                ToggleGroupItem(value="underline", "U"),
+            Main.ToggleGroup(type="multiple", default_value=["bold", "italic"],
+                Main.ToggleGroupItem(value="bold", "B"),
+                Main.ToggleGroupItem(value="italic", "I"),
+                Main.ToggleGroupItem(value="underline", "U"),
             )
         ),
 
         # Outline variant
         ComponentPreview(title="Outline variant", description="Toggle group with outlined items.",
-            ToggleGroup(type="single", variant="outline",
-                ToggleGroupItem(value="a", "A"),
-                ToggleGroupItem(value="b", "B"),
-                ToggleGroupItem(value="c", "C"),
+            Main.ToggleGroup(type="single", variant="outline",
+                Main.ToggleGroupItem(value="a", "A"),
+                Main.ToggleGroupItem(value="b", "B"),
+                Main.ToggleGroupItem(value="c", "C"),
             )
         ),
 
         # Sizes
         ComponentPreview(title="Sizes", description="Small, default, and large sizes.",
             Div(:class => "flex flex-col gap-4",
-                ToggleGroup(type="single", size="sm",
-                    ToggleGroupItem(value="1", "Sm"),
-                    ToggleGroupItem(value="2", "Sm"),
+                Main.ToggleGroup(type="single", size="sm",
+                    Main.ToggleGroupItem(value="1", "Sm"),
+                    Main.ToggleGroupItem(value="2", "Sm"),
                 ),
-                ToggleGroup(type="single",
-                    ToggleGroupItem(value="1", "Default"),
-                    ToggleGroupItem(value="2", "Default"),
+                Main.ToggleGroup(type="single",
+                    Main.ToggleGroupItem(value="1", "Default"),
+                    Main.ToggleGroupItem(value="2", "Default"),
                 ),
-                ToggleGroup(type="single", size="lg",
-                    ToggleGroupItem(value="1", "Lg"),
-                    ToggleGroupItem(value="2", "Lg"),
+                Main.ToggleGroup(type="single", size="lg",
+                    Main.ToggleGroupItem(value="1", "Lg"),
+                    Main.ToggleGroupItem(value="2", "Lg"),
                 ),
             )
         ),
 
         # Disabled
         ComponentPreview(title="Disabled", description="A disabled toggle group.",
-            ToggleGroup(type="single", disabled=true,
-                ToggleGroupItem(value="a", "A"),
-                ToggleGroupItem(value="b", "B"),
+            Main.ToggleGroup(type="single", disabled=true,
+                Main.ToggleGroupItem(value="a", "A"),
+                Main.ToggleGroupItem(value="b", "B"),
             )
         ),
 

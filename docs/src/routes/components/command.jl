@@ -2,15 +2,6 @@
 #
 # Showcases Command with grouped items, fuzzy search, and dialog variant.
 
-const Command = Main.Command
-const CommandInput = Main.CommandInput
-const CommandList = Main.CommandList
-const CommandEmpty = Main.CommandEmpty
-const CommandGroup = Main.CommandGroup
-const CommandItem = Main.CommandItem
-const CommandSeparator = Main.CommandSeparator
-const CommandShortcut = Main.CommandShortcut
-const CommandDialog = Main.CommandDialog
 
 function CommandPage()
     ComponentsLayout(
@@ -27,20 +18,20 @@ function CommandPage()
         # Basic Preview
         ComponentPreview(title="Basic", description="Command palette with suggestion and settings groups.",
             Div(:class => "w-full max-w-md",
-                Command(
-                    CommandInput(placeholder="Type a command or search..."),
-                    CommandList(
-                        CommandEmpty("No results found."),
-                        CommandGroup(heading="Suggestions",
-                            CommandItem(value="calendar", "Calendar"),
-                            CommandItem(value="search", "Search"),
-                            CommandItem(value="emoji", "Emoji"),
+                Main.Command(
+                    Main.CommandInput(placeholder="Type a command or search..."),
+                    Main.CommandList(
+                        Main.CommandEmpty("No results found."),
+                        Main.CommandGroup(heading="Suggestions",
+                            Main.CommandItem(value="calendar", "Calendar"),
+                            Main.CommandItem(value="search", "Search"),
+                            Main.CommandItem(value="emoji", "Emoji"),
                         ),
-                        CommandSeparator(),
-                        CommandGroup(heading="Settings",
-                            CommandItem(value="profile", "Profile", CommandShortcut("⌘P")),
-                            CommandItem(value="billing", "Billing", CommandShortcut("⌘B")),
-                            CommandItem(value="settings", "Settings", CommandShortcut("⌘,")),
+                        Main.CommandSeparator(),
+                        Main.CommandGroup(heading="Settings",
+                            Main.CommandItem(value="profile", "Profile", Main.CommandShortcut("⌘P")),
+                            Main.CommandItem(value="billing", "Billing", Main.CommandShortcut("⌘B")),
+                            Main.CommandItem(value="settings", "Settings", Main.CommandShortcut("⌘,")),
                         ),
                     ),
                 )
@@ -50,20 +41,20 @@ function CommandPage()
         # Dialog variant
         ComponentPreview(title="Dialog", description="Command palette rendered inside a dialog overlay.",
             Div(:class => "w-full max-w-md",
-                CommandDialog(
-                    CommandInput(placeholder="Type a command or search..."),
-                    CommandList(
-                        CommandEmpty("No results found."),
-                        CommandGroup(heading="Suggestions",
-                            CommandItem(value="calendar", "Calendar"),
-                            CommandItem(value="search", "Search"),
-                            CommandItem(value="emoji", "Emoji"),
+                Main.CommandDialog(
+                    Main.CommandInput(placeholder="Type a command or search..."),
+                    Main.CommandList(
+                        Main.CommandEmpty("No results found."),
+                        Main.CommandGroup(heading="Suggestions",
+                            Main.CommandItem(value="calendar", "Calendar"),
+                            Main.CommandItem(value="search", "Search"),
+                            Main.CommandItem(value="emoji", "Emoji"),
                         ),
-                        CommandSeparator(),
-                        CommandGroup(heading="Settings",
-                            CommandItem(value="profile", "Profile", CommandShortcut("⌘P")),
-                            CommandItem(value="billing", "Billing", CommandShortcut("⌘B")),
-                            CommandItem(value="settings", "Settings", CommandShortcut("⌘,")),
+                        Main.CommandSeparator(),
+                        Main.CommandGroup(heading="Settings",
+                            Main.CommandItem(value="profile", "Profile", Main.CommandShortcut("⌘P")),
+                            Main.CommandItem(value="billing", "Billing", Main.CommandShortcut("⌘B")),
+                            Main.CommandItem(value="settings", "Settings", Main.CommandShortcut("⌘,")),
                         ),
                     ),
                 )
