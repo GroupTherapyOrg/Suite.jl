@@ -7,12 +7,13 @@
 # Set `implemented = true` once the component exists in Suite.jl.
 const SUITE_COMPONENTS = [
     # --- Getting Started ---
-    (section = "Getting Started", items = [
-        (slug = "introduction",     title = "Introduction",     implemented = false),
-        (slug = "installation",     title = "Installation",     implemented = false),
+    (section = "Getting Started", base_path = "getting-started", items = [
+        (slug = "index",            title = "Introduction",     implemented = true),
+        (slug = "installation",     title = "Installation",     implemented = true),
+        (slug = "theming",          title = "Theming",          implemented = true),
     ]),
     # --- Components (alphabetical) ---
-    (section = "Components", items = [
+    (section = "Components", base_path = "components", items = [
         (slug = "accordion",        title = "Accordion",        implemented = true),
         (slug = "alert",            title = "Alert",            implemented = true),
         (slug = "alert-dialog",     title = "Alert Dialog",     implemented = true),
@@ -70,10 +71,12 @@ const SUITE_COMPONENTS = [
 ]
 
 """
-Sidebar link for an implemented component — clickable with active state.
+Sidebar link for an implemented item — clickable with active state.
 """
-function ComponentSidebarLink(slug, title)
-    NavLink("./components/$(slug)/", title;
+function ComponentSidebarLink(slug, title; base_path="components")
+    # "index" slug links to the section root, all others to slug subdirectory
+    href = slug == "index" ? "./$(base_path)/" : "./$(base_path)/$(slug)/"
+    NavLink(href, title;
         class = "block px-3 py-1.5 text-sm text-warm-600 dark:text-warm-400 hover:text-warm-800 dark:hover:text-white hover:bg-warm-50 dark:hover:bg-warm-900 rounded transition-colors",
         active_class = "text-accent-700 dark:text-accent-400 bg-warm-100 dark:bg-warm-900 border-l-2 border-accent-600 -ml-0.5 pl-[calc(0.75rem+2px)]",
         exact = true
@@ -93,6 +96,7 @@ Render the full components sidebar.
 function ComponentsSidebar()
     Nav(:class => "py-4 px-2",
         map(SUITE_COMPONENTS) do section
+            bp = section.base_path
             Fragment(
                 H4(:class => "px-3 mb-2 mt-4 first:mt-0 text-xs font-semibold tracking-wider uppercase text-warm-600 dark:text-warm-400",
                     section.section
@@ -100,7 +104,7 @@ function ComponentsSidebar()
                 Div(:class => "space-y-0.5 mb-2",
                     map(section.items) do item
                         if item.implemented
-                            ComponentSidebarLink(item.slug, item.title)
+                            ComponentSidebarLink(item.slug, item.title; base_path=bp)
                         else
                             ComponentSidebarMuted(item.title)
                         end

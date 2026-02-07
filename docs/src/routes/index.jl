@@ -29,10 +29,10 @@ function Index()
                 ),
                 Div(:class => "mt-10 flex flex-col sm:flex-row justify-center gap-4",
                     Main.Button(variant="default", class="h-12 px-8 text-base",
-                        A(:href => "./components/", :class => "text-white no-underline", "Browse Components")
+                        A(:href => "./getting-started/", :class => "text-white no-underline", "Get Started")
                     ),
                     Main.Button(variant="outline", class="h-12 px-8 text-base",
-                        A(:href => "https://github.com/TherapeuticJulia/Suite.jl", :target => "_blank", :class => "no-underline text-warm-800 dark:text-warm-300", "View on GitHub")
+                        A(:href => "./components/", :class => "no-underline text-warm-800 dark:text-warm-300", "Browse Components")
                     )
                 )
             )
