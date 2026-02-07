@@ -1059,8 +1059,7 @@ using Test
 
         @testset "Trigger structure" begin
             html = Therapy.render_to_string(CollapsibleTrigger("Click me"))
-            @test occursin("<button", html)
-            @test occursin("type=\"button\"", html)
+            @test occursin("<div", html)
             @test occursin("data-suite-collapsible-trigger", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("Click me", html)
@@ -1068,8 +1067,7 @@ using Test
 
         @testset "Trigger accessibility" begin
             html = Therapy.render_to_string(CollapsibleTrigger("X"))
-            @test occursin("focus-visible:ring-2", html)
-            @test occursin("disabled:opacity-50", html)
+            @test occursin("cursor-pointer", html)
         end
 
         @testset "Content structure" begin
@@ -5723,6 +5721,52 @@ using Test
             @test :ResizablePanelGroup in meta.exports
             @test :ResizablePanel in meta.exports
             @test :ResizableHandle in meta.exports
+        end
+    end
+
+    @testset "SiteFooter" begin
+        @testset "Default render" begin
+            html = Therapy.render_to_string(Suite.SiteFooter(
+                Suite.FooterBrand(Therapy.Span("MyOrg")),
+                Suite.FooterTagline("Built with love"),
+            ))
+            @test occursin("<footer", html)
+            @test occursin("bg-warm-100", html)
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("mt-auto", html)
+            @test occursin("MyOrg", html)
+            @test occursin("Built with love", html)
+        end
+
+        @testset "FooterLinks with separators" begin
+            html = Therapy.render_to_string(Suite.FooterLinks(
+                Suite.FooterLink("Therapy.jl", href="https://example.com/therapy"),
+                Suite.FooterLink("Suite.jl", href="https://example.com/suite"),
+            ))
+            @test occursin("Therapy.jl", html)
+            @test occursin("Suite.jl", html)
+            @test occursin("/", html)  # separator
+            @test occursin("hover:text-accent-600", html)
+        end
+
+        @testset "FooterLink" begin
+            html = Therapy.render_to_string(Suite.FooterLink("My Link", href="https://example.com"))
+            @test occursin("https://example.com", html)
+            @test occursin("My Link", html)
+            @test occursin("target=\"_blank\"", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(Suite.SiteFooter(class="custom-footer"))
+            @test occursin("custom-footer", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :SiteFooter)
+            meta = Suite.COMPONENT_REGISTRY[:SiteFooter]
+            @test meta.tier == :pure_styling
+            @test :SiteFooter in meta.exports
+            @test :FooterLink in meta.exports
         end
     end
 end

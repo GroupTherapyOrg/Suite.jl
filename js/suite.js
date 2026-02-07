@@ -446,6 +446,13 @@
                     const content = root.querySelector('[data-suite-collapsible-content]');
                     if (!trigger || !content) return;
 
+                    // Sync initial state from root
+                    const initialState = root.getAttribute('data-state') || 'closed';
+                    trigger.setAttribute('data-state', initialState);
+                    trigger.setAttribute('aria-expanded', String(initialState === 'open'));
+                    content.setAttribute('data-state', initialState);
+                    content.hidden = initialState !== 'open';
+
                     trigger.addEventListener('click', () => {
                         if (root.hasAttribute('data-disabled')) return;
                         const isOpen = root.getAttribute('data-state') === 'open';

@@ -89,6 +89,9 @@ include("components/Form.jl")
 include("components/Carousel.jl")
 include("components/Resizable.jl")
 
+# --- Composite Components ---
+include("components/Footer.jl")
+
 # --- Sessions.jl Components (SUITE-0904) ---
 include("components/Kbd.jl")
 include("components/Spinner.jl")

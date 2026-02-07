@@ -370,7 +370,7 @@ function DatePicker(; mode::String="single",
 
     # Trigger button classes (outline button style)
     trigger_classes = cn(
-        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium",
+        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium cursor-pointer",
         "border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-950",
         "hover:bg-warm-100 dark:hover:bg-warm-900 text-warm-800 dark:text-warm-300",
         "h-10 px-4 py-2 w-[280px] text-left",
