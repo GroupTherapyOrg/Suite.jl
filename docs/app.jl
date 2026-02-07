@@ -21,7 +21,11 @@ using Suite
 # These Suite.jl names shadow Therapy.jl's raw HTML element functions of the same name.
 # Users who need the raw HTML element can use Therapy.Button, Therapy.Input, etc.
 import Suite: Button, Input, Form, Label, P, H1, H2, H3, H4,
-              Blockquote, Table, Textarea, Select
+              Blockquote, Table, Textarea, Select,
+              Kbd, Spinner, Empty, EmptyIcon, EmptyTitle, EmptyDescription, EmptyAction,
+              CodeBlock, Toolbar, ToolbarGroup, ToolbarSeparator,
+              StatusBar, StatusBarSection, StatusBarItem,
+              TreeView, TreeViewItem
 
 # Change to docs directory for relative paths
 cd(@__DIR__)
