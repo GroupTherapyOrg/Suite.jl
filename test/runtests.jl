@@ -1911,4 +1911,333 @@ using Test
             @test :FocusTrap in meta.js_modules
         end
     end
+
+    @testset "SuiteSheet" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteSheet(
+                SuiteSheetTrigger("Open"),
+                SuiteSheetContent(side="right",
+                    SuiteSheetHeader(
+                        SuiteSheetTitle("Title"),
+                        SuiteSheetDescription("Description")
+                    ),
+                    SuiteSheetFooter(
+                        SuiteSheetClose("Cancel"),
+                        "Save"
+                    )
+                )
+            ))
+            @test occursin("data-suite-sheet", html)
+            @test occursin("Title", html)
+            @test occursin("Description", html)
+            @test occursin("Cancel", html)
+            @test occursin("Save", html)
+        end
+
+        @testset "Trigger wiring" begin
+            html = Therapy.render_to_string(SuiteSheet(
+                SuiteSheetTrigger("Open"),
+                SuiteSheetContent(SuiteSheetTitle("T"))
+            ))
+            @test occursin("data-suite-sheet-trigger", html)
+            @test occursin("aria-haspopup=\"dialog\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("data-state=\"closed\"", html)
+        end
+
+        @testset "Trigger is a button" begin
+            html = Therapy.render_to_string(SuiteSheetTrigger("Click"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+        end
+
+        @testset "Content — right side (default)" begin
+            html = Therapy.render_to_string(SuiteSheetContent(
+                SuiteSheetTitle("T")
+            ))
+            @test occursin("data-suite-sheet-content", html)
+            @test occursin("role=\"dialog\"", html)
+            @test occursin("aria-modal=\"true\"", html)
+            @test occursin("inset-y-0", html)
+            @test occursin("right-0", html)
+            @test occursin("slide-in-from-right", html)
+            @test occursin("slide-out-to-right", html)
+            @test occursin("sm:max-w-sm", html)
+            @test occursin("border-l", html)
+        end
+
+        @testset "Content — left side" begin
+            html = Therapy.render_to_string(SuiteSheetContent(side="left",
+                SuiteSheetTitle("T")
+            ))
+            @test occursin("left-0", html)
+            @test occursin("slide-in-from-left", html)
+            @test occursin("slide-out-to-left", html)
+            @test occursin("border-r", html)
+        end
+
+        @testset "Content — top side" begin
+            html = Therapy.render_to_string(SuiteSheetContent(side="top",
+                SuiteSheetTitle("T")
+            ))
+            @test occursin("inset-x-0", html)
+            @test occursin("top-0", html)
+            @test occursin("slide-in-from-top", html)
+            @test occursin("slide-out-to-top", html)
+            @test occursin("border-b", html)
+        end
+
+        @testset "Content — bottom side" begin
+            html = Therapy.render_to_string(SuiteSheetContent(side="bottom",
+                SuiteSheetTitle("T")
+            ))
+            @test occursin("inset-x-0", html)
+            @test occursin("bottom-0", html)
+            @test occursin("slide-in-from-bottom", html)
+            @test occursin("slide-out-to-bottom", html)
+            @test occursin("border-t", html)
+        end
+
+        @testset "Overlay" begin
+            html = Therapy.render_to_string(SuiteSheetContent(
+                SuiteSheetTitle("T")
+            ))
+            @test occursin("data-suite-sheet-overlay", html)
+            @test occursin("bg-warm-950/80", html)
+        end
+
+        @testset "Default close button" begin
+            html = Therapy.render_to_string(SuiteSheetContent(
+                SuiteSheetTitle("T")
+            ))
+            @test occursin("data-suite-sheet-close", html)
+            @test occursin("aria-label=\"Close\"", html)
+        end
+
+        @testset "Animation classes" begin
+            html = Therapy.render_to_string(SuiteSheetContent(
+                SuiteSheetTitle("T")
+            ))
+            @test occursin("data-[state=open]:animate-in", html)
+            @test occursin("data-[state=closed]:animate-out", html)
+            @test occursin("data-[state=closed]:duration-300", html)
+            @test occursin("data-[state=open]:duration-500", html)
+        end
+
+        @testset "Header" begin
+            html = Therapy.render_to_string(SuiteSheetHeader(
+                SuiteSheetTitle("T"),
+                SuiteSheetDescription("D")
+            ))
+            @test occursin("flex flex-col", html)
+        end
+
+        @testset "Footer" begin
+            html = Therapy.render_to_string(SuiteSheetFooter("Save"))
+            @test occursin("flex-col-reverse", html)
+            @test occursin("sm:flex-row sm:justify-end", html)
+        end
+
+        @testset "Title" begin
+            html = Therapy.render_to_string(SuiteSheetTitle("My Title"))
+            @test occursin("<h2", html)
+            @test occursin("font-semibold", html)
+            @test occursin("My Title", html)
+        end
+
+        @testset "Description" begin
+            html = Therapy.render_to_string(SuiteSheetDescription("My Desc"))
+            @test occursin("<p", html)
+            @test occursin("text-warm-600", html)
+            @test occursin("My Desc", html)
+        end
+
+        @testset "Close wrapper" begin
+            html = Therapy.render_to_string(SuiteSheetClose("Cancel"))
+            @test occursin("data-suite-sheet-close", html)
+            @test occursin("display:contents", html)
+            @test occursin("Cancel", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteSheet(class="w-full",
+                SuiteSheetTrigger("X"),
+                SuiteSheetContent(SuiteSheetTitle("T"))
+            ))
+            @test occursin("w-full", html)
+
+            html2 = Therapy.render_to_string(SuiteSheetContent(class="max-w-xl",
+                SuiteSheetTitle("T")
+            ))
+            @test occursin("max-w-xl", html2)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Sheet)
+            meta = Suite.COMPONENT_REGISTRY[:Sheet]
+            @test meta.tier == :js_runtime
+            @test :SuiteSheet in meta.exports
+            @test :SuiteSheetTrigger in meta.exports
+            @test :SuiteSheetContent in meta.exports
+            @test :SuiteSheetClose in meta.exports
+            @test :Sheet in meta.js_modules
+            @test :FocusTrap in meta.js_modules
+            @test :DismissLayer in meta.js_modules
+            @test :ScrollLock in meta.js_modules
+        end
+    end
+
+    @testset "SuiteDrawer" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteDrawer(
+                SuiteDrawerTrigger("Open"),
+                SuiteDrawerContent(
+                    SuiteDrawerHandle(),
+                    SuiteDrawerHeader(
+                        SuiteDrawerTitle("Goal"),
+                        SuiteDrawerDescription("Set your goal.")
+                    ),
+                    SuiteDrawerFooter(
+                        SuiteDrawerClose("Cancel"),
+                        "Submit"
+                    )
+                )
+            ))
+            @test occursin("data-suite-drawer", html)
+            @test occursin("Goal", html)
+            @test occursin("Set your goal.", html)
+            @test occursin("Cancel", html)
+            @test occursin("Submit", html)
+        end
+
+        @testset "Trigger wiring" begin
+            html = Therapy.render_to_string(SuiteDrawer(
+                SuiteDrawerTrigger("Open"),
+                SuiteDrawerContent(SuiteDrawerTitle("T"))
+            ))
+            @test occursin("data-suite-drawer-trigger", html)
+            @test occursin("aria-haspopup=\"dialog\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("data-state=\"closed\"", html)
+        end
+
+        @testset "Trigger is a button" begin
+            html = Therapy.render_to_string(SuiteDrawerTrigger("Click"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+        end
+
+        @testset "Content — bottom (default)" begin
+            html = Therapy.render_to_string(SuiteDrawerContent(
+                SuiteDrawerTitle("T")
+            ))
+            @test occursin("data-suite-drawer-content", html)
+            @test occursin("data-suite-drawer-direction=\"bottom\"", html)
+            @test occursin("role=\"dialog\"", html)
+            @test occursin("aria-modal=\"true\"", html)
+            @test occursin("inset-x-0", html)
+            @test occursin("bottom-0", html)
+            @test occursin("rounded-t-[10px]", html)
+            @test occursin("touch-action:none", html)
+        end
+
+        @testset "Content — top" begin
+            html = Therapy.render_to_string(SuiteDrawerContent(direction="top",
+                SuiteDrawerTitle("T")
+            ))
+            @test occursin("data-suite-drawer-direction=\"top\"", html)
+            @test occursin("top-0", html)
+            @test occursin("rounded-b-[10px]", html)
+        end
+
+        @testset "Content — left" begin
+            html = Therapy.render_to_string(SuiteDrawerContent(direction="left",
+                SuiteDrawerTitle("T")
+            ))
+            @test occursin("data-suite-drawer-direction=\"left\"", html)
+            @test occursin("left-0", html)
+            @test occursin("rounded-r-[10px]", html)
+        end
+
+        @testset "Content — right" begin
+            html = Therapy.render_to_string(SuiteDrawerContent(direction="right",
+                SuiteDrawerTitle("T")
+            ))
+            @test occursin("data-suite-drawer-direction=\"right\"", html)
+            @test occursin("right-0", html)
+            @test occursin("rounded-l-[10px]", html)
+        end
+
+        @testset "Handle" begin
+            html = Therapy.render_to_string(SuiteDrawerHandle())
+            @test occursin("h-2", html)
+            @test occursin("w-[100px]", html)
+            @test occursin("rounded-full", html)
+            @test occursin("bg-warm-200", html)
+        end
+
+        @testset "Overlay" begin
+            html = Therapy.render_to_string(SuiteDrawerContent(
+                SuiteDrawerTitle("T")
+            ))
+            @test occursin("data-suite-drawer-overlay", html)
+            @test occursin("bg-warm-950/80", html)
+        end
+
+        @testset "Header" begin
+            html = Therapy.render_to_string(SuiteDrawerHeader(
+                SuiteDrawerTitle("T")
+            ))
+            @test occursin("flex flex-col", html)
+            @test occursin("p-4", html)
+        end
+
+        @testset "Footer" begin
+            html = Therapy.render_to_string(SuiteDrawerFooter("X"))
+            @test occursin("flex flex-col", html)
+            @test occursin("p-4", html)
+        end
+
+        @testset "Title" begin
+            html = Therapy.render_to_string(SuiteDrawerTitle("My Title"))
+            @test occursin("<h2", html)
+            @test occursin("font-semibold", html)
+            @test occursin("My Title", html)
+        end
+
+        @testset "Description" begin
+            html = Therapy.render_to_string(SuiteDrawerDescription("My Desc"))
+            @test occursin("<p", html)
+            @test occursin("text-warm-600", html)
+            @test occursin("My Desc", html)
+        end
+
+        @testset "Close wrapper" begin
+            html = Therapy.render_to_string(SuiteDrawerClose("Cancel"))
+            @test occursin("data-suite-drawer-close", html)
+            @test occursin("display:contents", html)
+            @test occursin("Cancel", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteDrawer(class="my-drawer",
+                SuiteDrawerTrigger("X"),
+                SuiteDrawerContent(SuiteDrawerTitle("T"))
+            ))
+            @test occursin("my-drawer", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Drawer)
+            meta = Suite.COMPONENT_REGISTRY[:Drawer]
+            @test meta.tier == :js_runtime
+            @test :SuiteDrawer in meta.exports
+            @test :SuiteDrawerTrigger in meta.exports
+            @test :SuiteDrawerContent in meta.exports
+            @test :SuiteDrawerClose in meta.exports
+            @test :SuiteDrawerHandle in meta.exports
+            @test :Drawer in meta.js_modules
+            @test :FocusTrap in meta.js_modules
+        end
+    end
 end
