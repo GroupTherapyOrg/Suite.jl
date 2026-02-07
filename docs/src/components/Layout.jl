@@ -4,7 +4,7 @@
 # Uses Suite.jl accent colors (Purple primary, Red secondary).
 
 function Layout(children...; title="Suite.jl")
-    Div(:class => "min-h-screen bg-warm-50 dark:bg-warm-950 transition-colors duration-200",
+    Div(:class => "min-h-screen flex flex-col bg-warm-50 dark:bg-warm-950 transition-colors duration-200",
         # Navigation
         Nav(:class => "bg-warm-100 dark:bg-warm-900 border-b border-warm-200 dark:border-warm-700 transition-colors duration-200",
             Div(:class => "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
@@ -54,7 +54,7 @@ function Layout(children...; title="Suite.jl")
         ),
 
         # Main Content
-        MainEl(:id => "page-content", :class => "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8",
+        MainEl(:id => "page-content", :class => "flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8",
             children...
         ),
 
