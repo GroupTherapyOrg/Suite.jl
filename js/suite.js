@@ -4738,6 +4738,189 @@
             },
         },
 
+        // --- Resizable (drag-to-resize panels) ------------------------------------
+        Resizable: {
+            _initialized: new Set(),
+            _cursorSheet: null,
+
+            init() {
+                document.querySelectorAll('[data-suite-resizable-group]').forEach(group => {
+                    if (this._initialized.has(group)) return;
+                    this._initialized.add(group);
+                    this._setup(group);
+                });
+            },
+
+            _setup(group) {
+                const direction = group.getAttribute('data-suite-resizable-direction') || 'horizontal';
+                const handles = Array.from(group.querySelectorAll(':scope > [data-suite-resizable-handle]'));
+                const panels = Array.from(group.querySelectorAll(':scope > [data-suite-resizable-panel]'));
+
+                // Set correct direction data attribute on handles + aria-orientation
+                handles.forEach(handle => {
+                    handle.setAttribute('data-suite-resizable-direction', direction);
+                    // ARIA: separator orientation is inverse of group direction
+                    handle.setAttribute('aria-orientation', direction === 'horizontal' ? 'vertical' : 'horizontal');
+                });
+
+                // Auto-distribute sizes for panels with default_size=0
+                const explicitTotal = panels.reduce((sum, p) => {
+                    const s = parseInt(p.getAttribute('data-suite-resizable-default-size') || '0', 10);
+                    return sum + s;
+                }, 0);
+                const unsized = panels.filter(p => parseInt(p.getAttribute('data-suite-resizable-default-size') || '0', 10) === 0);
+                if (unsized.length > 0) {
+                    const each = (100 - explicitTotal) / unsized.length;
+                    unsized.forEach(p => {
+                        p.style.flexGrow = each;
+                        p.setAttribute('data-suite-resizable-default-size', String(Math.round(each)));
+                    });
+                }
+
+                // Get current sizes as percentages
+                const getSizes = () => {
+                    const total = panels.reduce((s, p) => s + parseFloat(p.style.flexGrow || 1), 0);
+                    return panels.map(p => (parseFloat(p.style.flexGrow || 1) / total) * 100);
+                };
+
+                // Set sizes from percentage array
+                const setSizes = (sizes) => {
+                    panels.forEach((p, i) => {
+                        p.style.flexGrow = sizes[i];
+                    });
+                    // Update ARIA on handles
+                    handles.forEach((h, i) => {
+                        if (panels[i]) {
+                            h.setAttribute('aria-valuenow', Math.round(getSizes()[i]));
+                        }
+                    });
+                };
+
+                // Resize by delta percentage on a handle
+                const resize = (handleIdx, deltaPct) => {
+                    const sizes = getSizes();
+                    const beforeIdx = handleIdx;
+                    const afterIdx = handleIdx + 1;
+                    if (beforeIdx >= panels.length || afterIdx >= panels.length) return;
+
+                    const beforeMin = parseInt(panels[beforeIdx].getAttribute('data-suite-resizable-min-size') || '10', 10);
+                    const beforeMax = parseInt(panels[beforeIdx].getAttribute('data-suite-resizable-max-size') || '100', 10);
+                    const afterMin = parseInt(panels[afterIdx].getAttribute('data-suite-resizable-min-size') || '10', 10);
+                    const afterMax = parseInt(panels[afterIdx].getAttribute('data-suite-resizable-max-size') || '100', 10);
+
+                    let newBefore = sizes[beforeIdx] + deltaPct;
+                    let newAfter = sizes[afterIdx] - deltaPct;
+
+                    // Clamp
+                    if (newBefore < beforeMin) { newAfter += (newBefore - beforeMin); newBefore = beforeMin; }
+                    if (newBefore > beforeMax) { newAfter += (newBefore - beforeMax); newBefore = beforeMax; }
+                    if (newAfter < afterMin) { newBefore += (newAfter - afterMin); newAfter = afterMin; }
+                    if (newAfter > afterMax) { newBefore += (newAfter - afterMax); newAfter = afterMax; }
+
+                    // Final clamp
+                    newBefore = Math.max(beforeMin, Math.min(beforeMax, newBefore));
+                    newAfter = Math.max(afterMin, Math.min(afterMax, newAfter));
+
+                    sizes[beforeIdx] = newBefore;
+                    sizes[afterIdx] = newAfter;
+                    setSizes(sizes);
+                };
+
+                // Pointer drag
+                handles.forEach((handle, hIdx) => {
+                    let dragging = false;
+                    let startPos = 0;
+                    let groupSize = 0;
+
+                    const onPointerDown = (e) => {
+                        e.preventDefault();
+                        dragging = true;
+                        handle.setAttribute('data-suite-resizable-handle', 'active');
+                        startPos = direction === 'horizontal' ? e.clientX : e.clientY;
+                        const rect = group.getBoundingClientRect();
+                        groupSize = direction === 'horizontal' ? rect.width : rect.height;
+                        handle.setPointerCapture(e.pointerId);
+
+                        // Set cursor globally
+                        const cursor = direction === 'horizontal' ? 'col-resize' : 'row-resize';
+                        if (!this._cursorSheet) {
+                            this._cursorSheet = new CSSStyleSheet();
+                            document.adoptedStyleSheets = [...document.adoptedStyleSheets, this._cursorSheet];
+                        }
+                        this._cursorSheet.replaceSync(`*, *:hover { cursor: ${cursor} !important; }`);
+
+                        // Disable pointer events on panels (iframes etc)
+                        panels.forEach(p => p.style.pointerEvents = 'none');
+                    };
+
+                    const onPointerMove = (e) => {
+                        if (!dragging) return;
+                        const currentPos = direction === 'horizontal' ? e.clientX : e.clientY;
+                        const deltaPx = currentPos - startPos;
+                        const deltaPct = (deltaPx / groupSize) * 100;
+                        startPos = currentPos;
+                        resize(hIdx, deltaPct);
+                    };
+
+                    const onPointerUp = (e) => {
+                        if (!dragging) return;
+                        dragging = false;
+                        handle.setAttribute('data-suite-resizable-handle', 'inactive');
+                        handle.releasePointerCapture(e.pointerId);
+
+                        // Remove cursor override
+                        if (this._cursorSheet) {
+                            document.adoptedStyleSheets = document.adoptedStyleSheets.filter(s => s !== this._cursorSheet);
+                            this._cursorSheet = null;
+                        }
+
+                        // Restore pointer events
+                        panels.forEach(p => p.style.pointerEvents = '');
+                    };
+
+                    handle.addEventListener('pointerdown', onPointerDown);
+                    handle.addEventListener('pointermove', onPointerMove);
+                    handle.addEventListener('pointerup', onPointerUp);
+                    handle.addEventListener('pointercancel', onPointerUp);
+
+                    // Hover state
+                    handle.addEventListener('pointerenter', () => {
+                        if (!dragging) handle.setAttribute('data-suite-resizable-handle', 'hover');
+                    });
+                    handle.addEventListener('pointerleave', () => {
+                        if (!dragging) handle.setAttribute('data-suite-resizable-handle', 'inactive');
+                    });
+
+                    // Keyboard
+                    handle.addEventListener('keydown', (e) => {
+                        const step = 5; // 5% per keystroke
+                        const rect = group.getBoundingClientRect();
+                        const gs = direction === 'horizontal' ? rect.width : rect.height;
+
+                        if (direction === 'horizontal') {
+                            if (e.key === 'ArrowLeft') { e.preventDefault(); resize(hIdx, -step); }
+                            if (e.key === 'ArrowRight') { e.preventDefault(); resize(hIdx, step); }
+                        } else {
+                            if (e.key === 'ArrowUp') { e.preventDefault(); resize(hIdx, -step); }
+                            if (e.key === 'ArrowDown') { e.preventDefault(); resize(hIdx, step); }
+                        }
+                        if (e.key === 'Home') { e.preventDefault(); resize(hIdx, -100); }
+                        if (e.key === 'End') { e.preventDefault(); resize(hIdx, 100); }
+                    });
+                });
+
+                // Initial ARIA
+                handles.forEach((h, i) => {
+                    const sizes = getSizes();
+                    if (panels[i]) {
+                        h.setAttribute('aria-valuenow', Math.round(sizes[i]));
+                        h.setAttribute('aria-valuemin', panels[i].getAttribute('data-suite-resizable-min-size') || '10');
+                        h.setAttribute('aria-valuemax', panels[i].getAttribute('data-suite-resizable-max-size') || '100');
+                    }
+                });
+            },
+        },
+
         // --- Carousel (scroll-snap navigation + autoplay) --------------------------
         Carousel: {
             _initialized: new Set(),
@@ -4886,6 +5069,7 @@
             this.CodeBlock.init();
             this.TreeView.init();
             this.Carousel.init();
+            this.Resizable.init();
         },
 
         // --- Init -----------------------------------------------------------------

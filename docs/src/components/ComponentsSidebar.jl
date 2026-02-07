@@ -46,7 +46,7 @@ const SUITE_COMPONENTS = [
         (slug = "popover",          title = "Popover",          implemented = true),
         (slug = "progress",         title = "Progress",         implemented = true),
         (slug = "radio-group",      title = "Radio Group",      implemented = false),
-        (slug = "resizable",        title = "Resizable",        implemented = false),
+        (slug = "resizable",        title = "Resizable",        implemented = true),
         (slug = "scroll-area",      title = "Scroll Area",      implemented = true),
         (slug = "select",           title = "Select",           implemented = true),
         (slug = "separator",        title = "Separator",        implemented = true),

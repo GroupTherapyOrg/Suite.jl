@@ -87,7 +87,7 @@ include("components/Calendar.jl")
 include("components/DataTable.jl")
 include("components/Form.jl")
 include("components/Carousel.jl")
-# include("components/Resizable.jl")
+include("components/Resizable.jl")
 
 # --- Sessions.jl Components (SUITE-0904) ---
 include("components/Kbd.jl")

@@ -5627,4 +5627,102 @@ using Test
             @test :CarouselNext in meta.exports
         end
     end
+
+    @testset "Resizable" begin
+        @testset "PanelGroup rendering" begin
+            html = Therapy.render_to_string(Suite.ResizablePanelGroup(
+                Suite.ResizablePanel(Div("Left")),
+                Suite.ResizableHandle(),
+                Suite.ResizablePanel(Div("Right")),
+            ))
+            @test occursin("data-suite-resizable-group", html)
+            @test occursin("data-suite-resizable-direction=\"horizontal\"", html)
+            @test occursin("flex", html)
+        end
+
+        @testset "Vertical direction" begin
+            html = Therapy.render_to_string(Suite.ResizablePanelGroup(direction="vertical"))
+            @test occursin("data-suite-resizable-direction=\"vertical\"", html)
+            @test occursin("flex-col", html)
+        end
+
+        @testset "Panel with sizes" begin
+            html = Therapy.render_to_string(Suite.ResizablePanel(
+                default_size=30, min_size=20, max_size=80,
+                Div("Content")
+            ))
+            @test occursin("data-suite-resizable-panel", html)
+            @test occursin("data-suite-resizable-default-size=\"30\"", html)
+            @test occursin("data-suite-resizable-min-size=\"20\"", html)
+            @test occursin("data-suite-resizable-max-size=\"80\"", html)
+            @test occursin("flex-grow:30", html)
+            @test occursin("Content", html)
+        end
+
+        @testset "Panel auto-size" begin
+            html = Therapy.render_to_string(Suite.ResizablePanel(Div("Auto")))
+            @test occursin("data-suite-resizable-default-size=\"0\"", html)
+            @test occursin("flex-grow:1", html)
+        end
+
+        @testset "Handle rendering" begin
+            html = Therapy.render_to_string(Suite.ResizableHandle())
+            @test occursin("data-suite-resizable-handle", html)
+            @test occursin("role=\"separator\"", html)
+            @test occursin("tabindex=\"0\"", html)
+            @test occursin("aria-orientation=\"vertical\"", html)
+            @test occursin("select-none", html)
+        end
+
+        @testset "Handle with grip" begin
+            html = Therapy.render_to_string(Suite.ResizableHandle(with_handle=true))
+            @test occursin("<svg", html)
+            @test occursin("rounded-sm", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(Suite.ResizableHandle())
+            @test occursin("dark:bg-warm-700", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(Suite.ResizablePanelGroup(class="h-64", direction="horizontal"))
+            @test occursin("h-64", html)
+        end
+
+        @testset "Full composition" begin
+            html = Therapy.render_to_string(Suite.ResizablePanelGroup(direction="horizontal",
+                Suite.ResizablePanel(default_size=30, Div("Left")),
+                Suite.ResizableHandle(),
+                Suite.ResizablePanel(default_size=70, Div("Right")),
+            ))
+            @test occursin("Left", html)
+            @test occursin("Right", html)
+            @test occursin("data-suite-resizable-group", html)
+            @test occursin("data-suite-resizable-handle", html)
+            @test occursin("flex-grow:30", html)
+            @test occursin("flex-grow:70", html)
+        end
+
+        @testset "Three panels" begin
+            html = Therapy.render_to_string(Suite.ResizablePanelGroup(
+                Suite.ResizablePanel(default_size=25, Div("A")),
+                Suite.ResizableHandle(),
+                Suite.ResizablePanel(default_size=50, Div("B")),
+                Suite.ResizableHandle(),
+                Suite.ResizablePanel(default_size=25, Div("C")),
+            ))
+            @test occursin("flex-grow:25", html)
+            @test occursin("flex-grow:50", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Resizable)
+            meta = Suite.COMPONENT_REGISTRY[:Resizable]
+            @test meta.tier == :js_runtime
+            @test :ResizablePanelGroup in meta.exports
+            @test :ResizablePanel in meta.exports
+            @test :ResizableHandle in meta.exports
+        end
+    end
 end
