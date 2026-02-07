@@ -1,54 +1,188 @@
 # Layout.jl - Suite.jl documentation layout
 #
-# Mirrors shadcn/ui docs: top navbar, left sidebar, main content area.
+# Dogfoods Suite.jl components: NavigationMenu (desktop), Sheet (mobile),
+# SiteFooter, Separator, ThemeToggle, Toaster.
 # Uses Suite.jl accent colors (Purple primary, Red secondary).
+
+# --- Shared SVGs ---
+
+const _GITHUB_SVG = Svg(:class => "h-5 w-5", :fill => "currentColor", :viewBox => "0 0 24 24",
+    Path(:d => "M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z")
+)
+
+const _HAMBURGER_SVG = Svg(:class => "h-5 w-5", :fill => "none", :viewBox => "0 0 24 24",
+    :stroke => "currentColor", :stroke_width => "2",
+    Path(:stroke_linecap => "round", :stroke_linejoin => "round",
+         :d => "M4 6h16M4 12h16M4 18h16")
+)
+
+# --- Logo ---
+
+function SuiteLogo()
+    A(:href => "./", :class => "flex items-center",
+        Span(:class => "text-2xl font-bold text-warm-800 dark:text-warm-300", "Suite"),
+        Span(:class => "text-2xl font-light",
+            Span(:class => "text-[#4063d8]/30 dark:text-[#4063d8]/40", "."),
+            Span(:class => "text-[#389826]/30 dark:text-[#389826]/40", "j"),
+            Span(:class => "text-[#cb3c33]/30 dark:text-[#cb3c33]/40", "l")
+        )
+    )
+end
+
+# --- Desktop NavigationMenu ---
+
+function DesktopNav()
+    Main.NavigationMenu(
+        Main.NavigationMenuList(
+            # Getting Started — trigger with dropdown
+            Main.NavigationMenuItem(
+                Main.NavigationMenuTrigger("Getting Started"),
+                Main.NavigationMenuContent(
+                    Main.NavigationMenuLink(
+                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Introduction"),
+                        href="./getting-started/",
+                        description="Overview of Suite.jl component library"
+                    ),
+                    Main.NavigationMenuLink(
+                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Installation"),
+                        href="./getting-started/installation/",
+                        description="How to add Suite.jl to your project"
+                    ),
+                    Main.NavigationMenuLink(
+                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Theming"),
+                        href="./getting-started/theming/",
+                        description="Customize colors, fonts, and dark mode"
+                    ),
+                ),
+            ),
+
+            # Components — trigger with dropdown
+            Main.NavigationMenuItem(
+                Main.NavigationMenuTrigger("Components"),
+                Main.NavigationMenuContent(
+                    Main.NavigationMenuLink(
+                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "All Components"),
+                        href="./components/",
+                        description="Browse the full component catalog"
+                    ),
+                    Main.NavigationMenuLink(
+                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Button"),
+                        href="./components/button/",
+                        description="Primary interactive element"
+                    ),
+                    Main.NavigationMenuLink(
+                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Dialog"),
+                        href="./components/dialog/",
+                        description="Modal overlay for content and actions"
+                    ),
+                    Main.NavigationMenuLink(
+                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Card"),
+                        href="./components/card/",
+                        description="Container for grouped content"
+                    ),
+                ),
+            ),
+
+            # Examples — direct link
+            Main.NavigationMenuItem(
+                Main.NavigationMenuLink(
+                    Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Examples"),
+                    href="./examples/",
+                ),
+            ),
+        ),
+        Main.NavigationMenuViewport(),
+    )
+end
+
+# --- Mobile Sheet ---
+
+function MobileNav()
+    Main.Sheet(
+        Main.SheetTrigger(
+            :class => "text-warm-600 dark:text-warm-400 hover:text-warm-800 dark:hover:text-warm-200",
+            :aria_label => "Open menu",
+            _HAMBURGER_SVG
+        ),
+        Main.SheetContent(side="left",
+            Main.SheetHeader(
+                Main.SheetTitle("Suite.jl"),
+                Main.SheetDescription("Navigation"),
+            ),
+            # Mobile nav links
+            Nav(:class => "flex flex-col gap-2 mt-4",
+                _MobileLink("Home", "./"),
+                Div(:class => "mt-2",
+                    Span(:class => "text-xs font-semibold text-warm-500 dark:text-warm-500 uppercase tracking-wider", "Getting Started"),
+                ),
+                _MobileLink("Introduction", "./getting-started/"),
+                _MobileLink("Installation", "./getting-started/installation/"),
+                _MobileLink("Theming", "./getting-started/theming/"),
+                Div(:class => "mt-2",
+                    Span(:class => "text-xs font-semibold text-warm-500 dark:text-warm-500 uppercase tracking-wider", "Components"),
+                ),
+                _MobileLink("All Components", "./components/"),
+                _MobileLink("Button", "./components/button/"),
+                _MobileLink("Dialog", "./components/dialog/"),
+                _MobileLink("Card", "./components/card/"),
+                Div(:class => "mt-2",
+                    Span(:class => "text-xs font-semibold text-warm-500 dark:text-warm-500 uppercase tracking-wider", "Examples"),
+                ),
+                _MobileLink("Examples", "./examples/"),
+                _MobileLink("Cards", "./examples/cards/"),
+                _MobileLink("Dashboard", "./examples/dashboard/"),
+                # Separator + utilities
+                Main.Separator(class="my-4"),
+                Div(:class => "flex items-center gap-4",
+                    A(:href => "https://github.com/GroupTherapyOrg/Suite.jl",
+                      :class => "text-warm-600 hover:text-warm-800 dark:text-warm-400 dark:hover:text-warm-200 transition-colors",
+                      :target => "_blank",
+                      _GITHUB_SVG
+                    ),
+                    Main.ThemeToggle(),
+                ),
+            ),
+        ),
+    )
+end
+
+function _MobileLink(text, href)
+    A(:href => href,
+      :class => "text-sm text-warm-700 dark:text-warm-300 hover:text-accent-600 dark:hover:text-accent-400 py-1.5 px-2 rounded-md hover:bg-warm-100 dark:hover:bg-warm-800 transition-colors",
+      text)
+end
+
+# --- Main Layout ---
 
 function Layout(children...; title="Suite.jl")
     Div(:class => "min-h-screen flex flex-col bg-warm-50 dark:bg-warm-950 transition-colors duration-200",
-        # Navigation
-        Nav(:class => "bg-warm-100 dark:bg-warm-900 border-b border-warm-200 dark:border-warm-700 transition-colors duration-200",
+        # Navigation bar
+        Header(:class => "bg-warm-100 dark:bg-warm-900 border-b border-warm-200 dark:border-warm-700 transition-colors duration-200",
             Div(:class => "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
-                Div(:class => "flex justify-between h-16",
+                Div(:class => "flex items-center justify-between h-16",
                     # Logo
                     Div(:class => "flex items-center",
-                        A(:href => "./", :class => "flex items-center",
-                            Span(:class => "text-2xl font-bold text-warm-800 dark:text-warm-300", "Suite"),
-                            Span(:class => "text-2xl font-light",
-                                Span(:class => "text-[#4063d8]/30 dark:text-[#4063d8]/40", "."),
-                                Span(:class => "text-[#389826]/30 dark:text-[#389826]/40", "j"),
-                                Span(:class => "text-[#cb3c33]/30 dark:text-[#cb3c33]/40", "l")
-                            )
-                        )
+                        SuiteLogo(),
                     ),
-                    # Navigation Links
-                    Div(:class => "hidden sm:flex sm:items-center sm:space-x-6",
-                        NavLink("./", "Home";
-                            class = "text-warm-800 dark:text-warm-300 hover:text-warm-800 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors",
-                            active_class = "text-accent-600 dark:text-accent-400"
+
+                    # Desktop: NavigationMenu + utilities
+                    Div(:class => "hidden md:flex md:items-center md:gap-2",
+                        DesktopNav(),
+                        # GitHub + Theme toggle
+                        Div(:class => "flex items-center gap-2 ml-4",
+                            A(:href => "https://github.com/GroupTherapyOrg/Suite.jl",
+                              :class => "text-warm-600 hover:text-warm-800 dark:text-warm-400 dark:hover:text-warm-200 transition-colors",
+                              :target => "_blank",
+                              _GITHUB_SVG
+                            ),
+                            Main.ThemeToggle(),
                         ),
-                        NavLink("./getting-started/", "Getting Started";
-                            class = "text-warm-800 dark:text-warm-300 hover:text-warm-800 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors",
-                            active_class = "text-accent-600 dark:text-accent-400"
-                        ),
-                        NavLink("./components/", "Components";
-                            class = "text-warm-800 dark:text-warm-300 hover:text-warm-800 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors",
-                            active_class = "text-accent-600 dark:text-accent-400"
-                        ),
-                        NavLink("./examples/", "Examples";
-                            class = "text-warm-800 dark:text-warm-300 hover:text-warm-800 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors",
-                            active_class = "text-accent-600 dark:text-accent-400"
-                        ),
-                        # GitHub link
-                        A(:href => "https://github.com/GroupTherapyOrg/Suite.jl",
-                          :class => "text-warm-600 hover:text-warm-800 dark:text-warm-400 dark:hover:text-warm-200 transition-colors",
-                          :target => "_blank",
-                            Svg(:class => "h-5 w-5", :fill => "currentColor", :viewBox => "0 0 24 24",
-                                Path(:d => "M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z")
-                            )
-                        ),
-                        # Theme toggle
-                        Main.ThemeToggle()
-                    )
+                    ),
+
+                    # Mobile: Hamburger Sheet
+                    Div(:class => "flex items-center md:hidden",
+                        MobileNav(),
+                    ),
                 )
             )
         ),
