@@ -142,7 +142,8 @@ The content panel that appears when a trigger is hovered/clicked.
 """
 function NavigationMenuContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
-        "top-0 left-0 w-full p-4 md:absolute md:w-auto",
+        "top-0 left-0 w-full p-4 md:absolute md:w-[400px] lg:w-[500px]",
+        "grid gap-3 md:grid-cols-2",
         "data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out",
         "data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out",
         "data-[motion=from-end]:slide-in-from-right-52",
@@ -199,7 +200,7 @@ Dynamic sizing viewport container for navigation menu content panels.
 """
 function NavigationMenuViewport(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
-        "origin-top-center mt-1.5 overflow-hidden rounded-md shadow",
+        "origin-top-center mt-1.5 overflow-hidden rounded-md shadow transition-[width,height] duration-200",
         "bg-warm-50 dark:bg-warm-900",
         "border border-warm-200 dark:border-warm-700",
         "text-warm-800 dark:text-warm-300",
