@@ -15,7 +15,7 @@ function ComponentPreview(children...; title="", description="", class="")
             Div(
                 H3(:class => "text-lg font-semibold text-warm-800 dark:text-warm-300", title),
                 if !isempty(description)
-                    P(:class => "text-sm text-warm-600 dark:text-warm-500", description)
+                    P(:class => "text-sm text-warm-600 dark:text-warm-400", description)
                 else
                     Fragment()
                 end

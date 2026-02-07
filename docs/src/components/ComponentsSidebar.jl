@@ -77,7 +77,7 @@ end
 Muted text for an unimplemented component — not clickable.
 """
 function ComponentSidebarMuted(title)
-    Span(:class => "block px-3 py-1.5 text-sm text-warm-400 dark:text-warm-600 cursor-default", title)
+    Span(:class => "block px-3 py-1.5 text-sm text-warm-500 dark:text-warm-500 cursor-default", title)
 end
 
 """
@@ -87,7 +87,7 @@ function ComponentsSidebar()
     Nav(:class => "py-4 px-2",
         map(SUITE_COMPONENTS) do section
             Fragment(
-                H4(:class => "px-3 mb-2 mt-4 first:mt-0 text-xs font-semibold tracking-wider uppercase text-warm-500 dark:text-warm-500",
+                H4(:class => "px-3 mb-2 mt-4 first:mt-0 text-xs font-semibold tracking-wider uppercase text-warm-600 dark:text-warm-400",
                     section.section
                 ),
                 Div(:class => "space-y-0.5 mb-2",
