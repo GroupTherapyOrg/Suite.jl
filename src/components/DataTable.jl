@@ -301,7 +301,7 @@ function _dt_table(id, data, columns, selectable, sortable, caption, theme)
         theme !== :default && (head_classes = apply_theme(head_classes, get_theme(theme)))
 
         if sortable && col.sortable
-            btn_classes = cn("inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors hover:text-warm-800 dark:hover:text-warm-300 -ml-1 h-8 px-1")
+            btn_classes = cn("inline-flex items-center justify-center cursor-pointer whitespace-nowrap font-medium transition-colors hover:text-warm-800 dark:hover:text-warm-300 -ml-1 h-8 px-1")
             push!(header_cells,
                 Th(:class => head_classes,
                     Symbol("data-suite-datatable-col") => col.key,
@@ -396,7 +396,7 @@ function _dt_pagination(id, total_rows, total_pages, page_size, selectable, them
     info_classes = cn("flex-1 text-sm text-warm-600 dark:text-warm-500")
     nav_classes = cn("flex items-center gap-2")
 
-    btn_base = cn("inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-9 px-3 border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300 hover:bg-warm-100 dark:hover:bg-warm-900 transition-colors disabled:pointer-events-none disabled:opacity-50")
+    btn_base = cn("inline-flex items-center justify-center cursor-pointer whitespace-nowrap rounded-md text-sm font-medium h-9 px-3 border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300 hover:bg-warm-100 dark:hover:bg-warm-900 transition-colors disabled:pointer-events-none disabled:opacity-50")
     theme !== :default && (btn_base = apply_theme(btn_base, get_theme(theme)))
 
     pagination_classes = cn("flex items-center justify-between px-2 py-4")

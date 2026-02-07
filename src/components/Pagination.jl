@@ -22,7 +22,7 @@ export SuitePagination, SuitePaginationContent, SuitePaginationItem,
 # Button variant classes reused for pagination links
 const _PAGINATION_OUTLINE = "border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-950 hover:bg-warm-100 dark:hover:bg-warm-900 text-warm-800 dark:text-warm-300"
 const _PAGINATION_GHOST = "hover:bg-warm-100 dark:hover:bg-warm-900 text-warm-800 dark:text-warm-300"
-const _PAGINATION_BTN_BASE = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600"
+const _PAGINATION_BTN_BASE = "inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600"
 
 """
     SuitePagination(children...; class, kwargs...) -> VNode

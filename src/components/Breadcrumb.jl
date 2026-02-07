@@ -69,7 +69,7 @@ end
 Clickable breadcrumb link.
 """
 function SuiteBreadcrumbLink(children...; href::String="#", class::String="", theme::Symbol=:default, kwargs...)
-    classes = cn("hover:text-warm-800 dark:hover:text-warm-300 transition-colors", class)
+    classes = cn("cursor-pointer hover:text-warm-800 dark:hover:text-warm-300 transition-colors", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     A(:href => href, :class => classes, kwargs..., children...)
 end

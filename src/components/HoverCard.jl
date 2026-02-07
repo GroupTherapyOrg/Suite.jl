@@ -94,7 +94,7 @@ Typically wraps a link or anchor element.
 function SuiteHoverCardTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-hover-card-trigger-wrapper") => "",
         :style => "display:contents",
-        Span(:class => cn(class),
+        Span(:class => cn("cursor-pointer", class),
              kwargs...,
              children...))
 end

@@ -73,7 +73,7 @@ Must be a direct child of `SuiteCollapsible`.
 """
 function SuiteCollapsibleTrigger(children...; theme::Symbol=:default,
                                 class::String="", kwargs...)
-    base = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+    base = "inline-flex items-center justify-center cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
     classes = cn(base, class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 

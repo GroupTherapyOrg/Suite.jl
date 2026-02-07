@@ -92,7 +92,7 @@ function SuiteAlertDialogTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-alert-dialog-trigger-wrapper") => "",
         :style => "display:contents",
         Button(:type => "button",
-               :class => cn(class),
+               :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end

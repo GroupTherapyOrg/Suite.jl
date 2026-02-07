@@ -112,7 +112,7 @@ The trigger button that opens a navigation menu content panel.
 """
 function SuiteNavigationMenuTrigger(children...; disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
-        "group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2",
+        "group inline-flex h-9 w-max items-center justify-center cursor-pointer rounded-md px-4 py-2",
         "text-sm font-medium transition-[color,box-shadow]",
         "bg-warm-50 dark:bg-warm-950",
         "hover:bg-warm-100 hover:dark:bg-warm-800",
@@ -169,7 +169,7 @@ A link item within the navigation menu content. Can include a description.
 """
 function SuiteNavigationMenuLink(children...; href::String="#", active::Bool=false, description::String="", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
-        "flex flex-col gap-1 rounded-sm p-2 text-sm transition-all outline-none",
+        "flex flex-col gap-1 rounded-sm p-2 text-sm cursor-pointer transition-all outline-none",
         "hover:bg-warm-100 hover:dark:bg-warm-800",
         "focus:bg-warm-100 focus:dark:bg-warm-800",
         "focus-visible:ring-[3px] focus-visible:ring-accent-600/50 focus-visible:outline-1",

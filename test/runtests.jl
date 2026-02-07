@@ -2640,7 +2640,7 @@ using Test
             @test occursin("role=\"menuitem\"", html)
             @test occursin("tabindex=\"-1\"", html)
             @test occursin("Profile", html)
-            @test occursin("cursor-default", html)
+            @test occursin("cursor-pointer", html)
             @test occursin("data-[highlighted]", html)
         end
 
@@ -3440,7 +3440,7 @@ using Test
             @test occursin("aria-selected=\"false\"", html)
             @test occursin("Calendar", html)
             @test occursin("rounded-sm", html)
-            @test occursin("cursor-default", html)
+            @test occursin("cursor-pointer", html)
             @test occursin("data-[selected=true]:bg-warm-100", html)
         end
 

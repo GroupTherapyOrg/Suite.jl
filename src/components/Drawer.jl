@@ -95,7 +95,7 @@ function SuiteDrawerTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-drawer-trigger-wrapper") => "",
         :style => "display:contents",
         Button(:type => "button",
-               :class => cn(class),
+               :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end

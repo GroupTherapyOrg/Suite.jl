@@ -100,7 +100,7 @@ function SuiteTooltipTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-tooltip-trigger-wrapper") => "",
         :style => "display:contents",
         Button(:type => "button",
-               :class => cn(class),
+               :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end

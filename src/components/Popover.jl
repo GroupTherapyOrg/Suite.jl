@@ -82,7 +82,7 @@ function SuitePopoverTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-popover-trigger-wrapper") => "",
         :style => "display:contents",
         Button(:type => "button",
-               :class => cn(class),
+               :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end

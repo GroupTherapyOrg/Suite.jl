@@ -196,7 +196,7 @@ function SuiteCommandItem(children...; value::String="", disabled::Bool=false,
     classes = cn(
         "data-[selected=true]:bg-warm-100 dark:data-[selected=true]:bg-warm-800",
         "data-[selected=true]:text-warm-800 dark:data-[selected=true]:text-warm-300",
-        "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
+        "relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
         "outline-hidden select-none",
         "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
         class

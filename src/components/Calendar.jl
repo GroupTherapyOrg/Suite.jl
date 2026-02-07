@@ -183,7 +183,7 @@ function SuiteCalendar(; mode::String="single",
 end
 
 function _nav_button_classes(theme::Symbol=:default)
-    classes = "inline-flex items-center justify-center rounded-md h-7 w-7 bg-transparent hover:bg-warm-100 dark:hover:bg-warm-900 text-warm-800 dark:text-warm-300 border border-warm-200 dark:border-warm-700 p-0 opacity-75 hover:opacity-100 transition-opacity"
+    classes = "inline-flex items-center justify-center cursor-pointer rounded-md h-7 w-7 bg-transparent hover:bg-warm-100 dark:hover:bg-warm-900 text-warm-800 dark:text-warm-300 border border-warm-200 dark:border-warm-700 p-0 opacity-75 hover:opacity-100 transition-opacity"
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     classes
 end
@@ -286,7 +286,7 @@ function _calendar_day_cell(cal_id, day, show_outside_days, mode, theme)
 
     # Day button classes
     btn_parts = [
-        "relative flex items-center justify-center w-9 h-9 rounded-md",
+        "relative flex items-center justify-center cursor-pointer w-9 h-9 rounded-md",
         "text-sm font-normal p-0 border-0",
         "hover:bg-warm-100 dark:hover:bg-warm-900",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600",

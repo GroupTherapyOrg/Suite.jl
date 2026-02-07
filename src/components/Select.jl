@@ -214,7 +214,7 @@ function SuiteSelectItem(children...; value::String="", disabled::Bool=false,
     classes = cn(
         "focus:bg-warm-100 dark:focus:bg-warm-800",
         "focus:text-warm-800 dark:focus:text-warm-300",
-        "relative flex w-full cursor-default items-center gap-2",
+        "relative flex w-full cursor-pointer items-center gap-2",
         "rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden",
         "select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         class
@@ -293,7 +293,7 @@ A button at the top of the select content that scrolls items upward.
 function SuiteSelectScrollUpButton(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-select-scroll-up") => "",
         Symbol("aria-hidden") => "true",
-        :class => cn("flex cursor-default items-center justify-center py-1", class),
+        :class => cn("flex cursor-pointer items-center justify-center py-1", class),
         kwargs...,
         (isempty(children) ? (Therapy.RawHtml(_SELECT_SCROLL_UP_SVG),) : children)...)
 end
@@ -306,7 +306,7 @@ A button at the bottom of the select content that scrolls items downward.
 function SuiteSelectScrollDownButton(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-select-scroll-down") => "",
         Symbol("aria-hidden") => "true",
-        :class => cn("flex cursor-default items-center justify-center py-1", class),
+        :class => cn("flex cursor-pointer items-center justify-center py-1", class),
         kwargs...,
         (isempty(children) ? (Therapy.RawHtml(_SELECT_SCROLL_DOWN_SVG),) : children)...)
 end

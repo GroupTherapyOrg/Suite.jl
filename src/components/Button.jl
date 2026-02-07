@@ -47,7 +47,7 @@ SuiteButton(variant="icon", size="icon", "✕")
 """
 function SuiteButton(children...; variant::String="default", size::String="default",
                      class::String="", theme::Symbol=:default, kwargs...)
-    base = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+    base = "inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
 
     variant_classes = Dict(
         "default"     => "bg-accent-600 text-white hover:bg-accent-700",

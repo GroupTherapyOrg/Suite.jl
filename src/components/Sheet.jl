@@ -99,7 +99,7 @@ function SuiteSheetTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-suite-sheet-trigger-wrapper") => "",
         :style => "display:contents",
         Button(:type => "button",
-               :class => cn(class),
+               :class => cn("cursor-pointer", class),
                kwargs...,
                children...))
 end
@@ -145,7 +145,7 @@ function SuiteSheetContent(children...; side::String="right", theme::Symbol=:def
             # Default close button (X in top-right)
             Button(:type => "button",
                    Symbol("data-suite-sheet-close") => "",
-                   :class => "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-warm-50 dark:ring-offset-warm-950 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2 disabled:pointer-events-none",
+                   :class => "absolute right-4 top-4 rounded-sm opacity-70 cursor-pointer ring-offset-warm-50 dark:ring-offset-warm-950 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2 disabled:pointer-events-none",
                    :aria_label => "Close",
                    Svg(:class => "h-4 w-4", :fill => "none", :viewBox => "0 0 24 24",
                        :stroke => "currentColor", :stroke_width => "2",

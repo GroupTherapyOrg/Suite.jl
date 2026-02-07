@@ -138,7 +138,7 @@ Includes a chevron indicator that rotates on open.
 """
 function SuiteAccordionTrigger(children...; theme::Symbol=:default,
                                class::String="", kwargs...)
-    base = "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180"
+    base = "flex flex-1 items-center justify-between py-4 cursor-pointer text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180"
     classes = cn(base, class)
     chevron_classes = "h-4 w-4 shrink-0 text-warm-600 dark:text-warm-500 transition-transform duration-200"
     if theme !== :default

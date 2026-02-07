@@ -178,7 +178,7 @@ function SuiteContextMenuItem(children...; shortcut::String="", disabled::Bool=f
     end
 
     classes = cn(
-        "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5",
+        "relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5",
         "text-sm outline-hidden select-none",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
@@ -205,7 +205,7 @@ function SuiteContextMenuCheckboxItem(children...; checked::Bool=false, disabled
     state = checked ? "checked" : "unchecked"
 
     classes = cn(
-        "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
+        "relative flex cursor-pointer items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
         "text-sm outline-hidden select-none",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
@@ -252,7 +252,7 @@ function SuiteContextMenuRadioItem(children...; value::String="", checked::Bool=
     state = checked ? "checked" : "unchecked"
 
     classes = cn(
-        "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
+        "relative flex cursor-pointer items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
         "text-sm outline-hidden select-none",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
@@ -338,7 +338,7 @@ The item that opens a sub-menu.
 """
 function SuiteContextMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
-        "flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
+        "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
         "outline-hidden select-none",
         "data-[state=open]:bg-warm-100 data-[state=open]:dark:bg-warm-800",
         "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",

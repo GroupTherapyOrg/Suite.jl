@@ -102,7 +102,7 @@ A single item within a toggle group.
 function SuiteToggleGroupItem(children...; value::String="", variant::String="default",
                               size::String="default", disabled::Bool=false,
                               theme::Symbol=:default, class::String="", kwargs...)
-    base = "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors hover:bg-warm-100 dark:hover:bg-warm-900 hover:text-warm-600 dark:hover:text-warm-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-warm-100 dark:data-[state=on]:bg-warm-900 data-[state=on]:text-warm-800 dark:data-[state=on]:text-warm-300"
+    base = "inline-flex items-center justify-center gap-2 cursor-pointer rounded-md text-sm font-medium transition-colors hover:bg-warm-100 dark:hover:bg-warm-900 hover:text-warm-600 dark:hover:text-warm-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-warm-100 dark:data-[state=on]:bg-warm-900 data-[state=on]:text-warm-800 dark:data-[state=on]:text-warm-300"
 
     variant_classes = Dict(
         "default" => "bg-transparent",
