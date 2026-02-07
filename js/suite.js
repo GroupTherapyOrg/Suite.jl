@@ -3047,6 +3047,371 @@
             }
         },
 
+        // =====================================================================
+        // Toast — Sonner-style notification system
+        // =====================================================================
+        Toast: {
+            _container: null,
+            _toasts: [],
+            _counter: 0,
+            _defaults: {
+                duration: 4000,
+                position: 'bottom-right',
+                visibleToasts: 3,
+                gap: 14,
+                swipeThreshold: 45
+            },
+
+            init() {
+                // Find or create toaster container
+                const el = document.querySelector('[data-suite-toaster]');
+                if (el && !el._suiteToastInit) {
+                    el._suiteToastInit = true;
+                    this._container = el;
+                    // Read config from data attributes
+                    if (el.dataset.position) this._defaults.position = el.dataset.position;
+                    if (el.dataset.duration) this._defaults.duration = parseInt(el.dataset.duration, 10);
+                    if (el.dataset.visibleToasts) this._defaults.visibleToasts = parseInt(el.dataset.visibleToasts, 10);
+                }
+            },
+
+            _ensureContainer() {
+                if (this._container) return;
+                // Auto-create container if not found in DOM
+                const c = document.createElement('section');
+                c.setAttribute('aria-label', 'Notifications');
+                c.setAttribute('data-suite-toaster', '');
+                c.setAttribute('tabindex', '-1');
+                document.body.appendChild(c);
+                this._container = c;
+                c._suiteToastInit = true;
+            },
+
+            _getPositionClasses(pos) {
+                const map = {
+                    'top-left':      { y: 'top',    x: 'left',   style: 'top: var(--offset-y, 24px); left: var(--offset-x, 24px);' },
+                    'top-center':    { y: 'top',    x: 'center', style: 'top: var(--offset-y, 24px); left: 50%; transform: translateX(-50%);' },
+                    'top-right':     { y: 'top',    x: 'right',  style: 'top: var(--offset-y, 24px); right: var(--offset-x, 24px);' },
+                    'bottom-left':   { y: 'bottom', x: 'left',   style: 'bottom: var(--offset-y, 24px); left: var(--offset-x, 24px);' },
+                    'bottom-center': { y: 'bottom', x: 'center', style: 'bottom: var(--offset-y, 24px); left: 50%; transform: translateX(-50%);' },
+                    'bottom-right':  { y: 'bottom', x: 'right',  style: 'bottom: var(--offset-y, 24px); right: var(--offset-x, 24px);' }
+                };
+                return map[pos] || map['bottom-right'];
+            },
+
+            _iconSvg(type) {
+                const icons = {
+                    success: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+                    error: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+                    warning: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+                    info: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+                };
+                return icons[type] || '';
+            },
+
+            _typeColors(type) {
+                const colors = {
+                    default: '',
+                    success: 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200',
+                    error: 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200',
+                    warning: 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 text-amber-800 dark:text-amber-200',
+                    info: 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 text-blue-800 dark:text-blue-200'
+                };
+                return colors[type] || colors['default'];
+            },
+
+            _createToastEl(toast) {
+                const li = document.createElement('li');
+                li.setAttribute('role', 'status');
+                li.setAttribute('aria-live', toast.type === 'error' ? 'assertive' : 'polite');
+                li.setAttribute('aria-atomic', 'true');
+                li.setAttribute('data-suite-toast', toast.id);
+                li.setAttribute('data-type', toast.type);
+                li.setAttribute('data-mounted', 'false');
+                li.setAttribute('data-dismissed', 'false');
+                li.setAttribute('tabindex', '0');
+
+                const typeColors = this._typeColors(toast.type);
+                const baseClasses = 'pointer-events-auto relative flex items-start gap-3 w-[356px] max-w-[calc(100vw-48px)] rounded-md border p-4 shadow-lg transition-all duration-300';
+                const defaultColors = 'border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300';
+                li.className = baseClasses + ' ' + (typeColors || defaultColors);
+
+                // Icon
+                const icon = this._iconSvg(toast.type);
+                let iconHtml = '';
+                if (icon) {
+                    const iconColorMap = {
+                        success: 'text-green-600 dark:text-green-400',
+                        error: 'text-red-600 dark:text-red-400',
+                        warning: 'text-amber-600 dark:text-amber-400',
+                        info: 'text-blue-600 dark:text-blue-400'
+                    };
+                    iconHtml = '<div class="flex-shrink-0 ' + (iconColorMap[toast.type] || '') + '">' + icon + '</div>';
+                }
+
+                // Content
+                let contentHtml = '<div class="flex-1 min-w-0">';
+                if (toast.title) {
+                    contentHtml += '<div class="text-sm font-semibold">' + this._escapeHtml(toast.title) + '</div>';
+                }
+                if (toast.description) {
+                    contentHtml += '<div class="text-sm opacity-80 mt-0.5">' + this._escapeHtml(toast.description) + '</div>';
+                }
+                contentHtml += '</div>';
+
+                // Close button
+                let closeHtml = '';
+                if (toast.dismissible !== false) {
+                    closeHtml = '<button type="button" aria-label="Dismiss" class="flex-shrink-0 rounded-md p-0.5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-600">' +
+                        '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                        '</button>';
+                }
+
+                // Action button
+                let actionHtml = '';
+                if (toast.action) {
+                    actionHtml = '<button type="button" data-suite-toast-action class="flex-shrink-0 text-sm font-medium px-3 py-1 rounded-md bg-accent-600 text-white hover:bg-accent-700 transition-colors cursor-pointer">' +
+                        this._escapeHtml(toast.action.label) + '</button>';
+                }
+
+                li.innerHTML = iconHtml + contentHtml + actionHtml + closeHtml;
+
+                // Wire close button
+                const closeBtn = li.querySelector('button[aria-label="Dismiss"]');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => this.dismiss(toast.id));
+                }
+
+                // Wire action button
+                const actionBtn = li.querySelector('[data-suite-toast-action]');
+                if (actionBtn && toast.action && toast.action.onClick) {
+                    actionBtn.addEventListener('click', (e) => {
+                        toast.action.onClick(e);
+                        this.dismiss(toast.id);
+                    });
+                }
+
+                // Swipe to dismiss
+                this._setupSwipe(li, toast);
+
+                return li;
+            },
+
+            _escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            },
+
+            _setupSwipe(el, toast) {
+                if (toast.dismissible === false) return;
+
+                let startX = 0, startY = 0, startTime = 0, swiping = false;
+
+                el.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0) return;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startTime = Date.now();
+                    swiping = true;
+                    el.setPointerCapture(e.pointerId);
+                    el.style.transition = 'none';
+                    el.setAttribute('data-swiping', 'true');
+                });
+
+                el.addEventListener('pointermove', (e) => {
+                    if (!swiping) return;
+                    const dx = e.clientX - startX;
+                    // Only allow right swipe (positive direction)
+                    if (dx > 0) {
+                        el.style.transform = 'translateX(' + dx + 'px)';
+                        el.style.opacity = Math.max(0, 1 - dx / 150);
+                    }
+                });
+
+                el.addEventListener('pointerup', (e) => {
+                    if (!swiping) return;
+                    swiping = false;
+                    el.removeAttribute('data-swiping');
+                    el.style.transition = '';
+
+                    const dx = e.clientX - startX;
+                    const timeTaken = Date.now() - startTime;
+                    const velocity = Math.abs(dx) / timeTaken;
+
+                    if (dx >= this._defaults.swipeThreshold || velocity > 0.11) {
+                        // Swipe out
+                        el.style.transition = 'transform 200ms ease-out, opacity 200ms ease-out';
+                        el.style.transform = 'translateX(100%)';
+                        el.style.opacity = '0';
+                        setTimeout(() => this.dismiss(toast.id), 200);
+                    } else {
+                        // Snap back
+                        el.style.transform = '';
+                        el.style.opacity = '';
+                    }
+                });
+            },
+
+            _updatePositions() {
+                const visible = this._toasts.filter(t => !t.dismissed);
+                const gap = this._defaults.gap;
+
+                visible.forEach((toast, index) => {
+                    const el = toast.el;
+                    if (!el) return;
+
+                    const isVisible = index < this._defaults.visibleToasts;
+                    el.style.zIndex = String(visible.length - index);
+
+                    if (isVisible) {
+                        el.style.opacity = '';
+                        el.style.pointerEvents = '';
+                        // Stack offset: each toast offsets by its predecessors' heights + gap
+                        let offset = 0;
+                        for (let i = 0; i < index; i++) {
+                            offset += (visible[i].height || 0) + gap;
+                        }
+                        const pos = this._getPositionClasses(this._defaults.position);
+                        const dir = pos.y === 'bottom' ? -1 : 1;
+                        el.style.transform = 'translateY(' + (dir * offset) + 'px)';
+                    } else {
+                        // Hidden behind stack
+                        el.style.opacity = '0';
+                        el.style.pointerEvents = 'none';
+                        el.style.transform = 'translateY(0) scale(0.95)';
+                    }
+                });
+            },
+
+            _startTimer(toast) {
+                if (toast.duration === Infinity) return;
+                const dur = toast.duration || this._defaults.duration;
+                toast._remaining = dur;
+                toast._timerStart = Date.now();
+                toast._timer = setTimeout(() => this.dismiss(toast.id), dur);
+            },
+
+            _pauseTimer(toast) {
+                if (toast._timer) {
+                    clearTimeout(toast._timer);
+                    toast._remaining -= (Date.now() - toast._timerStart);
+                }
+            },
+
+            _resumeTimer(toast) {
+                if (toast._remaining > 0 && toast.duration !== Infinity) {
+                    toast._timerStart = Date.now();
+                    toast._timer = setTimeout(() => this.dismiss(toast.id), toast._remaining);
+                }
+            },
+
+            /**
+             * Show a toast notification.
+             * @param {string} title - Toast title
+             * @param {Object} opts - Options: type, description, duration, action, dismissible
+             * @returns {number} Toast ID
+             */
+            show(title, opts = {}) {
+                this._ensureContainer();
+
+                const id = ++this._counter;
+                const toast = {
+                    id,
+                    title,
+                    description: opts.description || '',
+                    type: opts.type || 'default',
+                    duration: opts.duration,
+                    dismissible: opts.dismissible,
+                    action: opts.action,
+                    dismissed: false,
+                    el: null,
+                    height: 0,
+                    _timer: null,
+                    _remaining: 0,
+                    _timerStart: 0
+                };
+
+                // Create DOM element
+                toast.el = this._createToastEl(toast);
+
+                // Find or create the list container for this position
+                let list = this._container.querySelector('ol[data-suite-toast-list]');
+                if (!list) {
+                    list = document.createElement('ol');
+                    list.setAttribute('data-suite-toast-list', '');
+                    const pos = this._getPositionClasses(this._defaults.position);
+                    list.style.cssText = 'position: fixed; ' + pos.style + ' z-index: 999999; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; pointer-events: none;';
+                    this._container.appendChild(list);
+                }
+
+                // Prepend (newest on top for bottom, append for top)
+                const posInfo = this._getPositionClasses(this._defaults.position);
+                if (posInfo.y === 'bottom') {
+                    list.prepend(toast.el);
+                } else {
+                    list.appendChild(toast.el);
+                }
+
+                // Add to tracking array (newest first)
+                this._toasts.unshift(toast);
+
+                // Measure height after render
+                requestAnimationFrame(() => {
+                    toast.height = toast.el.getBoundingClientRect().height;
+                    toast.el.setAttribute('data-mounted', 'true');
+                    this._updatePositions();
+                });
+
+                // Pause timer on hover
+                toast.el.addEventListener('mouseenter', () => this._pauseTimer(toast));
+                toast.el.addEventListener('mouseleave', () => this._resumeTimer(toast));
+
+                // Start auto-dismiss timer
+                this._startTimer(toast);
+
+                return id;
+            },
+
+            dismiss(id) {
+                const idx = this._toasts.findIndex(t => t.id === id);
+                if (idx === -1) return;
+
+                const toast = this._toasts[idx];
+                if (toast.dismissed) return;
+                toast.dismissed = true;
+
+                if (toast._timer) clearTimeout(toast._timer);
+
+                // Animate out
+                if (toast.el) {
+                    toast.el.setAttribute('data-dismissed', 'true');
+                    toast.el.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
+                    toast.el.style.opacity = '0';
+                    toast.el.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (toast.el && toast.el.parentNode) {
+                            toast.el.parentNode.removeChild(toast.el);
+                        }
+                        this._toasts = this._toasts.filter(t => t.id !== id);
+                        this._updatePositions();
+                    }, 300);
+                }
+
+                this._updatePositions();
+            },
+
+            dismissAll() {
+                [...this._toasts].forEach(t => this.dismiss(t.id));
+            },
+
+            // Convenience methods
+            success(title, opts = {}) { return this.show(title, { ...opts, type: 'success' }); },
+            error(title, opts = {})   { return this.show(title, { ...opts, type: 'error' }); },
+            warning(title, opts = {}) { return this.show(title, { ...opts, type: 'warning' }); },
+            info(title, opts = {})    { return this.show(title, { ...opts, type: 'info' }); }
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
@@ -3070,6 +3435,7 @@
             this.NavigationMenu.init();
             this.Select.init();
             this.Command.init();
+            this.Toast.init();
         },
 
         // --- Init -----------------------------------------------------------------
@@ -3085,5 +3451,16 @@
     };
 
     window.Suite = Suite;
+
+    // Convenience: Suite.toast("Hello") shorthand for Suite.Toast.show()
+    // Also: Suite.toast.success(), Suite.toast.error(), etc.
+    window.Suite.toast = function(title, opts) { return Suite.Toast.show(title, opts); };
+    window.Suite.toast.success = function(title, opts) { return Suite.Toast.success(title, opts); };
+    window.Suite.toast.error = function(title, opts) { return Suite.Toast.error(title, opts); };
+    window.Suite.toast.warning = function(title, opts) { return Suite.Toast.warning(title, opts); };
+    window.Suite.toast.info = function(title, opts) { return Suite.Toast.info(title, opts); };
+    window.Suite.toast.dismiss = function(id) { return Suite.Toast.dismiss(id); };
+    window.Suite.toast.dismissAll = function() { return Suite.Toast.dismissAll(); };
+
     Suite.init();
 })();

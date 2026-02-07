@@ -74,7 +74,10 @@ function Layout(children...; title="Suite.jl")
             )
         ),
 
-        # Suite.jl JS Runtime (theme toggle + future components)
+        # Toast notification container (Sonner-style)
+        Main.SuiteToaster(),
+
+        # Suite.jl JS Runtime (theme toggle + all interactive components)
         Main.suite_script()
     )
 end

@@ -4131,4 +4131,136 @@ using Test
             @test :NavigationMenu in meta.js_modules
         end
     end
+
+    # ===================================================================
+    # Toast (Sonner-style notification system)
+    # ===================================================================
+    @testset "SuiteToaster" begin
+        @testset "Default rendering" begin
+            html = Therapy.render_to_string(SuiteToaster())
+            @test occursin("data-suite-toaster", html)
+            @test occursin("aria-label=\"Notifications\"", html)
+            @test occursin("tabindex=\"-1\"", html)
+            @test occursin("<section", html)
+        end
+
+        @testset "Default position" begin
+            html = Therapy.render_to_string(SuiteToaster())
+            @test occursin("data-position=\"bottom-right\"", html)
+        end
+
+        @testset "Custom position" begin
+            html = Therapy.render_to_string(SuiteToaster(position="top-center"))
+            @test occursin("data-position=\"top-center\"", html)
+        end
+
+        @testset "All positions" begin
+            for pos in ["top-left", "top-center", "top-right", "bottom-left", "bottom-center", "bottom-right"]
+                html = Therapy.render_to_string(SuiteToaster(position=pos))
+                @test occursin("data-position=\"$pos\"", html)
+            end
+        end
+
+        @testset "Custom duration" begin
+            html = Therapy.render_to_string(SuiteToaster(duration=8000))
+            @test occursin("data-duration=\"8000\"", html)
+        end
+
+        @testset "Default duration" begin
+            html = Therapy.render_to_string(SuiteToaster())
+            @test occursin("data-duration=\"4000\"", html)
+        end
+
+        @testset "Custom visible toasts" begin
+            html = Therapy.render_to_string(SuiteToaster(visible_toasts=5))
+            @test occursin("data-visible-toasts=\"5\"", html)
+        end
+
+        @testset "Default visible toasts" begin
+            html = Therapy.render_to_string(SuiteToaster())
+            @test occursin("data-visible-toasts=\"3\"", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteToaster(class="my-custom"))
+            @test occursin("my-custom", html)
+        end
+
+        @testset "Theme support" begin
+            html_default = Therapy.render_to_string(SuiteToaster())
+            html_ocean = Therapy.render_to_string(SuiteToaster(theme=:ocean))
+            # Both should render the container
+            @test occursin("data-suite-toaster", html_default)
+            @test occursin("data-suite-toaster", html_ocean)
+        end
+
+        @testset "Exported from Suite" begin
+            @test isdefined(Suite, :SuiteToaster)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Toast)
+            meta = Suite.COMPONENT_REGISTRY[:Toast]
+            @test meta.tier == :js_runtime
+            @test :SuiteToaster in meta.exports
+            @test :Toast in meta.js_modules
+        end
+
+        @testset "JS runtime includes Toast module" begin
+            js = Suite.suite_js_source()
+            @test occursin("Toast:", js)
+            @test occursin("Suite.toast", js)
+            @test occursin("data-suite-toaster", js)
+            @test occursin("Suite.Toast.show", js)
+            @test occursin("Suite.Toast.success", js)
+            @test occursin("Suite.Toast.error", js)
+            @test occursin("Suite.Toast.warning", js)
+            @test occursin("Suite.Toast.info", js)
+            @test occursin("Suite.Toast.dismiss", js)
+            @test occursin("Suite.Toast.dismissAll", js)
+        end
+
+        @testset "JS toast variants have icons" begin
+            js = Suite.suite_js_source()
+            # Success icon (checkmark)
+            @test occursin("success:", js)
+            # Error icon (X circle)
+            @test occursin("error:", js)
+            # Warning icon (triangle)
+            @test occursin("warning:", js)
+            # Info icon (info circle)
+            @test occursin("info:", js)
+        end
+
+        @testset "JS swipe-to-dismiss" begin
+            js = Suite.suite_js_source()
+            @test occursin("_setupSwipe", js)
+            @test occursin("pointerdown", js)
+            @test occursin("pointermove", js)
+            @test occursin("pointerup", js)
+            @test occursin("swipeThreshold", js)
+        end
+
+        @testset "JS auto-dismiss timer" begin
+            js = Suite.suite_js_source()
+            @test occursin("_startTimer", js)
+            @test occursin("_pauseTimer", js)
+            @test occursin("_resumeTimer", js)
+            @test occursin("duration: 4000", js)
+        end
+
+        @testset "JS stacking" begin
+            js = Suite.suite_js_source()
+            @test occursin("_updatePositions", js)
+            @test occursin("visibleToasts", js)
+            @test occursin("gap: 14", js)
+        end
+
+        @testset "ARIA attributes" begin
+            js = Suite.suite_js_source()
+            @test occursin("role", js)
+            @test occursin("aria-live", js)
+            @test occursin("aria-atomic", js)
+        end
+    end
 end

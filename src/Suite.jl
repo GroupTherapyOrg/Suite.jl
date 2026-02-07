@@ -60,7 +60,7 @@ include("components/ContextMenu.jl")
 include("components/NavigationMenu.jl")
 include("components/HoverCard.jl")
 include("components/Menubar.jl")
-# include("components/Toast.jl")
+include("components/Toast.jl")
 
 # --- Phase 4: Complex Components ---
 # include("components/Calendar.jl")

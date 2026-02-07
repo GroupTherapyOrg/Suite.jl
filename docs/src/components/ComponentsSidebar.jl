@@ -54,7 +54,7 @@ const SUITE_COMPONENTS = [
         (slug = "table",            title = "Table",            implemented = true),
         (slug = "tabs",             title = "Tabs",             implemented = true),
         (slug = "textarea",         title = "Textarea",         implemented = true),
-        (slug = "toast",            title = "Toast",            implemented = false),
+        (slug = "toast",            title = "Toast",            implemented = true),
         (slug = "toggle",           title = "Toggle",           implemented = true),
         (slug = "toggle-group",     title = "Toggle Group",     implemented = true),
         (slug = "tooltip",          title = "Tooltip",          implemented = true),
