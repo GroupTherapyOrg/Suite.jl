@@ -211,6 +211,12 @@
                 const onPointerDown = (e) => {
                     if (isPointerInside) { isPointerInside = false; return; }
                     if (container.contains(e.target)) return;
+                    // Check excludeElements — e.g., menubar triggers shouldn't dismiss
+                    if (options.excludeElements) {
+                        const excluded = typeof options.excludeElements === 'function'
+                            ? options.excludeElements() : options.excludeElements;
+                        if (excluded && excluded.some(el => el && el.contains(e.target))) return;
+                    }
                     if (options.onPointerDownOutside) {
                         options.onPointerDownOutside(e);
                         if (e.defaultPrevented) return;
@@ -1525,6 +1531,8 @@
             activate(content, options = {}) {
                 const onClose = options.onClose || (() => {});
                 const isSubmenu = options.isSubmenu || false;
+                const onNavigateLeft = options.onNavigateLeft || null;
+                const onNavigateRight = options.onNavigateRight || null;
 
                 // Typeahead state
                 let searchBuffer = '';
@@ -1744,18 +1752,34 @@
                         return;
                     }
 
-                    // ArrowRight — open sub-menu
-                    if (e.key === 'ArrowRight' && currentItem && currentItem.hasAttribute('data-suite-menu-sub-trigger')) {
-                        e.preventDefault();
-                        openSubmenu(currentItem);
-                        return;
+                    // ArrowRight — open sub-menu or navigate menubar right
+                    if (e.key === 'ArrowRight') {
+                        if (currentItem && currentItem.hasAttribute('data-suite-menu-sub-trigger')) {
+                            e.preventDefault();
+                            openSubmenu(currentItem);
+                            return;
+                        }
+                        // Menubar inter-menu navigation
+                        if (onNavigateRight) {
+                            e.preventDefault();
+                            onNavigateRight();
+                            return;
+                        }
                     }
 
-                    // ArrowLeft — close sub-menu (return to parent)
-                    if (e.key === 'ArrowLeft' && isSubmenu) {
-                        e.preventDefault();
-                        onClose();
-                        return;
+                    // ArrowLeft — close sub-menu (return to parent) or navigate menubar left
+                    if (e.key === 'ArrowLeft') {
+                        if (isSubmenu) {
+                            e.preventDefault();
+                            onClose();
+                            return;
+                        }
+                        // Menubar inter-menu navigation
+                        if (onNavigateLeft) {
+                            e.preventDefault();
+                            onNavigateLeft();
+                            return;
+                        }
                     }
 
                     // Enter/Space — select item
@@ -2578,6 +2602,451 @@
             }
         },
 
+        // --- Menubar --------------------------------------------------------------
+        Menubar: {
+            init() {
+                const bars = document.querySelectorAll('[data-suite-menubar]');
+                bars.forEach(bar => {
+                    if (bar._suiteMenubar) return;
+                    bar._suiteMenubar = true;
+
+                    const loop = bar.getAttribute('data-loop') !== 'false';
+                    const menus = Array.from(bar.querySelectorAll('[data-suite-menubar-menu]'));
+                    if (menus.length === 0) return;
+
+                    let openMenuId = null; // Which menu is currently open
+                    let cleanups = {}; // Per-menu cleanup functions
+
+                    // Get all triggers in DOM order
+                    function getTriggers() {
+                        return Array.from(bar.querySelectorAll('[data-suite-menubar-trigger]'))
+                            .filter(t => !t.hasAttribute('data-disabled'));
+                    }
+
+                    // Roving tabindex: only active trigger gets tabindex=0
+                    function setRovingFocus(trigger) {
+                        getTriggers().forEach(t => t.setAttribute('tabindex', '-1'));
+                        trigger.setAttribute('tabindex', '0');
+                        trigger.focus({ preventScroll: true });
+                    }
+
+                    // Initialize roving tabindex — first trigger gets 0
+                    const allTriggers = getTriggers();
+                    if (allTriggers.length > 0) {
+                        allTriggers.forEach(t => t.setAttribute('tabindex', '-1'));
+                        allTriggers[0].setAttribute('tabindex', '0');
+                    }
+
+                    function openMenu(menuId, focusFirst) {
+                        if (openMenuId === menuId) return;
+                        if (openMenuId) closeMenu(openMenuId);
+
+                        const menuEl = bar.querySelector(`[data-suite-menubar-menu="${menuId}"]`);
+                        if (!menuEl) return;
+                        const trigger = menuEl.querySelector('[data-suite-menubar-trigger]');
+                        const content = menuEl.querySelector('[data-suite-menubar-content]');
+                        if (!trigger || !content) return;
+
+                        openMenuId = menuId;
+                        const side = content.getAttribute('data-side-preference') || 'bottom';
+                        const sideOffset = parseInt(content.getAttribute('data-side-offset') || '4', 10);
+                        const align = content.getAttribute('data-align-preference') || 'start';
+
+                        content.style.display = '';
+                        content.setAttribute('data-state', 'open');
+                        trigger.setAttribute('data-state', 'open');
+                        trigger.setAttribute('aria-expanded', 'true');
+
+                        const cleanupFloat = Suite.Floating.position(trigger, content, {
+                            side, sideOffset, align
+                        });
+
+                        Suite.ScrollLock.lock();
+                        Suite.FocusGuards.install();
+
+                        const cleanupMenu = Suite.Menu.activate(content, {
+                            onClose: () => closeMenu(menuId),
+                            onNavigateLeft: () => navigateMenubar(menuId, -1),
+                            onNavigateRight: () => navigateMenubar(menuId, 1),
+                        });
+
+                        const cleanupDismiss = Suite.DismissLayer.activate(content, {
+                            disableOutsidePointerEvents: true,
+                            onDismiss: () => closeMenu(menuId),
+                            excludeElements: () => getTriggers(),
+                        });
+
+                        cleanups[menuId] = { cleanupFloat, cleanupMenu, cleanupDismiss };
+
+                        if (focusFirst) {
+                            requestAnimationFrame(() => {
+                                const items = Array.from(content.querySelectorAll(
+                                    '[data-suite-menu-item], [data-suite-menu-checkbox-item], [data-suite-menu-radio-item], [data-suite-menu-sub-trigger]'
+                                )).filter(el => !el.hasAttribute('data-disabled') && !el.closest('[data-suite-menu-sub-content]'));
+                                if (items.length > 0) {
+                                    items[0].setAttribute('data-highlighted', '');
+                                    items[0].focus({ preventScroll: true });
+                                }
+                            });
+                        }
+                    }
+
+                    function closeMenu(menuId) {
+                        if (openMenuId !== menuId) return;
+                        openMenuId = null;
+
+                        const menuEl = bar.querySelector(`[data-suite-menubar-menu="${menuId}"]`);
+                        if (!menuEl) return;
+                        const trigger = menuEl.querySelector('[data-suite-menubar-trigger]');
+                        const content = menuEl.querySelector('[data-suite-menubar-content]');
+
+                        if (cleanups[menuId]) {
+                            const c = cleanups[menuId];
+                            if (c.cleanupMenu) c.cleanupMenu();
+                            if (c.cleanupDismiss) c.cleanupDismiss();
+                            if (c.cleanupFloat) c.cleanupFloat();
+                            delete cleanups[menuId];
+                        }
+
+                        if (content) {
+                            content.setAttribute('data-state', 'closed');
+                            content.querySelectorAll('[data-highlighted]').forEach(el => el.removeAttribute('data-highlighted'));
+                            const hide = () => { if (content.getAttribute('data-state') === 'closed') content.style.display = 'none'; };
+                            content.addEventListener('animationend', hide, { once: true });
+                            setTimeout(hide, 250);
+                        }
+                        if (trigger) {
+                            trigger.setAttribute('data-state', 'closed');
+                            trigger.setAttribute('aria-expanded', 'false');
+                        }
+
+                        Suite.ScrollLock.unlock();
+                        Suite.FocusGuards.uninstall();
+                    }
+
+                    // Navigate between menus from within content (ArrowLeft/Right)
+                    function navigateMenubar(currentMenuId, direction) {
+                        const triggers = getTriggers();
+                        const currentTrigger = bar.querySelector(`[data-suite-menubar-menu="${currentMenuId}"] [data-suite-menubar-trigger]`);
+                        let idx = triggers.indexOf(currentTrigger);
+                        if (idx < 0) return;
+
+                        closeMenu(currentMenuId);
+
+                        let nextIdx = idx + direction;
+                        if (loop) {
+                            nextIdx = (nextIdx + triggers.length) % triggers.length;
+                        } else {
+                            nextIdx = Math.max(0, Math.min(triggers.length - 1, nextIdx));
+                        }
+
+                        const nextTrigger = triggers[nextIdx];
+                        setRovingFocus(nextTrigger);
+
+                        // Open the next menu and focus first item
+                        const nextMenuEl = nextTrigger.closest('[data-suite-menubar-menu]');
+                        if (nextMenuEl) {
+                            const nextMenuId = nextMenuEl.getAttribute('data-suite-menubar-menu');
+                            openMenu(nextMenuId, true);
+                        }
+                    }
+
+                    // Set up trigger event handlers
+                    menus.forEach(menuEl => {
+                        const menuId = menuEl.getAttribute('data-suite-menubar-menu');
+                        const trigger = menuEl.querySelector('[data-suite-menubar-trigger]');
+                        if (!trigger) return;
+
+                        // Click to toggle
+                        trigger.addEventListener('pointerdown', (e) => {
+                            if (e.button !== 0) return;
+                            if (e.ctrlKey && navigator.platform.match(/Mac/)) return;
+                            e.preventDefault();
+                            setRovingFocus(trigger);
+                            if (openMenuId === menuId) {
+                                closeMenu(menuId);
+                            } else {
+                                openMenu(menuId, false);
+                            }
+                        });
+
+                        // Pointer-enter rapid switching
+                        trigger.addEventListener('pointerenter', () => {
+                            if (openMenuId && openMenuId !== menuId) {
+                                closeMenu(openMenuId);
+                                setRovingFocus(trigger);
+                                openMenu(menuId, false);
+                            }
+                        });
+
+                        // Keyboard on trigger
+                        trigger.addEventListener('keydown', (e) => {
+                            const triggers = getTriggers();
+                            const idx = triggers.indexOf(trigger);
+
+                            if (e.key === 'ArrowDown') {
+                                e.preventDefault();
+                                openMenu(menuId, true);
+                            } else if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                if (openMenuId === menuId) {
+                                    closeMenu(menuId);
+                                } else {
+                                    openMenu(menuId, true);
+                                }
+                            } else if (e.key === 'ArrowRight') {
+                                e.preventDefault();
+                                let next = idx + 1;
+                                if (loop) next = next % triggers.length;
+                                else next = Math.min(next, triggers.length - 1);
+                                setRovingFocus(triggers[next]);
+                            } else if (e.key === 'ArrowLeft') {
+                                e.preventDefault();
+                                let prev = idx - 1;
+                                if (loop) prev = (prev + triggers.length) % triggers.length;
+                                else prev = Math.max(prev, 0);
+                                setRovingFocus(triggers[prev]);
+                            } else if (e.key === 'Home') {
+                                e.preventDefault();
+                                setRovingFocus(triggers[0]);
+                            } else if (e.key === 'End') {
+                                e.preventDefault();
+                                setRovingFocus(triggers[triggers.length - 1]);
+                            }
+                        });
+                    });
+                });
+            }
+        },
+
+        // --- NavigationMenu -------------------------------------------------------
+        NavigationMenu: {
+            init() {
+                const roots = document.querySelectorAll('[data-suite-nav-menu]');
+                roots.forEach(root => {
+                    if (root._suiteNavMenu) return;
+                    root._suiteNavMenu = true;
+
+                    const delayDuration = parseInt(root.getAttribute('data-delay-duration') || '200', 10);
+                    const skipDelayDuration = parseInt(root.getAttribute('data-skip-delay-duration') || '300', 10);
+
+                    const items = root.querySelectorAll('[data-suite-nav-menu-item]');
+                    const viewport = root.querySelector('[data-suite-nav-menu-viewport]');
+                    const indicator = root.querySelector('[data-suite-nav-menu-indicator]');
+
+                    let activeValue = '';
+                    let previousValue = '';
+                    let openTimer = null;
+                    let closeTimer = null;
+                    let skipDelayTimer = null;
+                    let isSkipDelay = false;
+                    let wasEscapeClose = false;
+
+                    function getItemByValue(value) {
+                        return root.querySelector(`[data-suite-nav-menu-item][data-value="${value}"]`);
+                    }
+
+                    function open(value) {
+                        if (activeValue === value) return;
+                        previousValue = activeValue;
+                        activeValue = value;
+
+                        // Close all other content panels
+                        items.forEach(item => {
+                            const v = item.getAttribute('data-value');
+                            const trigger = item.querySelector('[data-suite-nav-menu-trigger]');
+                            const content = item.querySelector('[data-suite-nav-menu-content]');
+                            if (v === value) {
+                                if (trigger) trigger.setAttribute('data-state', 'open');
+                                if (content) {
+                                    content.style.display = '';
+                                    content.setAttribute('data-state', 'open');
+                                    // Set motion attribute for animation direction
+                                    const prevItem = previousValue ? getItemByValue(previousValue) : null;
+                                    if (prevItem) {
+                                        const allItems = Array.from(items);
+                                        const prevIdx = allItems.indexOf(prevItem);
+                                        const curIdx = allItems.indexOf(item);
+                                        content.setAttribute('data-motion', curIdx > prevIdx ? 'from-end' : 'from-start');
+                                    } else {
+                                        content.removeAttribute('data-motion');
+                                    }
+                                }
+                            } else {
+                                if (trigger) trigger.setAttribute('data-state', 'closed');
+                                if (content) {
+                                    // Set exit motion
+                                    if (v === previousValue) {
+                                        const allItems = Array.from(items);
+                                        const prevIdx = allItems.indexOf(item);
+                                        const curItem = getItemByValue(value);
+                                        const curIdx = curItem ? allItems.indexOf(curItem) : -1;
+                                        content.setAttribute('data-motion', curIdx > prevIdx ? 'to-start' : 'to-end');
+                                    }
+                                    content.setAttribute('data-state', 'closed');
+                                    const hideContent = content;
+                                    const hide = () => { if (hideContent.getAttribute('data-state') === 'closed') hideContent.style.display = 'none'; };
+                                    hideContent.addEventListener('animationend', hide, { once: true });
+                                    setTimeout(hide, 300);
+                                }
+                            }
+                        });
+
+                        // Update viewport
+                        if (viewport) {
+                            const activeItem = getItemByValue(value);
+                            const content = activeItem ? activeItem.querySelector('[data-suite-nav-menu-content]') : null;
+                            if (content) {
+                                viewport.style.display = '';
+                                viewport.setAttribute('data-state', 'open');
+                                // Size viewport to content
+                                requestAnimationFrame(() => {
+                                    viewport.style.width = content.scrollWidth + 'px';
+                                    viewport.style.height = content.scrollHeight + 'px';
+                                });
+                            }
+                        }
+
+                        // Update indicator
+                        if (indicator) {
+                            const activeItem = getItemByValue(value);
+                            const trigger = activeItem ? activeItem.querySelector('[data-suite-nav-menu-trigger]') : null;
+                            if (trigger) {
+                                indicator.setAttribute('data-state', 'visible');
+                                indicator.style.display = '';
+                                // Position indicator under active trigger
+                                const list = root.querySelector('[data-suite-nav-menu-list]');
+                                if (list) {
+                                    const listRect = list.getBoundingClientRect();
+                                    const triggerRect = trigger.getBoundingClientRect();
+                                    indicator.style.position = 'absolute';
+                                    indicator.style.left = (triggerRect.left - listRect.left) + 'px';
+                                    indicator.style.width = triggerRect.width + 'px';
+                                    indicator.style.transition = 'left 0.2s ease, width 0.2s ease';
+                                }
+                            }
+                        }
+                    }
+
+                    function close() {
+                        previousValue = activeValue;
+                        activeValue = '';
+
+                        items.forEach(item => {
+                            const trigger = item.querySelector('[data-suite-nav-menu-trigger]');
+                            const content = item.querySelector('[data-suite-nav-menu-content]');
+                            if (trigger) trigger.setAttribute('data-state', 'closed');
+                            if (content) {
+                                content.setAttribute('data-state', 'closed');
+                                const hideContent = content;
+                                const hide = () => { if (hideContent.getAttribute('data-state') === 'closed') hideContent.style.display = 'none'; };
+                                hideContent.addEventListener('animationend', hide, { once: true });
+                                setTimeout(hide, 300);
+                            }
+                        });
+
+                        if (viewport) {
+                            viewport.setAttribute('data-state', 'closed');
+                            setTimeout(() => {
+                                if (viewport.getAttribute('data-state') === 'closed') viewport.style.display = 'none';
+                            }, 300);
+                        }
+
+                        if (indicator) {
+                            indicator.setAttribute('data-state', 'hidden');
+                            setTimeout(() => {
+                                if (indicator.getAttribute('data-state') === 'hidden') indicator.style.display = 'none';
+                            }, 200);
+                        }
+
+                        // Start skip delay timer
+                        clearTimeout(skipDelayTimer);
+                        isSkipDelay = true;
+                        skipDelayTimer = setTimeout(() => { isSkipDelay = false; }, skipDelayDuration);
+                    }
+
+                    // Set up event handlers on each item
+                    items.forEach(item => {
+                        const value = item.getAttribute('data-value');
+                        const trigger = item.querySelector('[data-suite-nav-menu-trigger]');
+                        const content = item.querySelector('[data-suite-nav-menu-content]');
+
+                        if (!trigger) return;
+                        // Only items with content have hover/click behavior
+                        if (!content) return;
+
+                        // Hover on trigger — delayed open
+                        trigger.addEventListener('pointerenter', (e) => {
+                            if (e.pointerType === 'touch') return;
+                            if (wasEscapeClose) { wasEscapeClose = false; return; }
+                            clearTimeout(closeTimer);
+                            if (isSkipDelay || activeValue) {
+                                // Open immediately (rapid switching or skip delay)
+                                open(value);
+                            } else {
+                                openTimer = setTimeout(() => open(value), delayDuration);
+                            }
+                        });
+
+                        trigger.addEventListener('pointerleave', (e) => {
+                            if (e.pointerType === 'touch') return;
+                            clearTimeout(openTimer);
+                            closeTimer = setTimeout(close, 150);
+                        });
+
+                        // Click for immediate toggle
+                        trigger.addEventListener('click', () => {
+                            if (activeValue === value) {
+                                close();
+                            } else {
+                                open(value);
+                            }
+                        });
+
+                        // Keyboard on trigger
+                        trigger.addEventListener('keydown', (e) => {
+                            if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                open(value);
+                                // Focus first tabbable in content
+                                if (content) {
+                                    requestAnimationFrame(() => {
+                                        const first = content.querySelector('a, button, [tabindex="0"]');
+                                        if (first) first.focus({ preventScroll: true });
+                                    });
+                                }
+                            }
+                        });
+
+                        // Content hover — keep open
+                        if (content) {
+                            content.addEventListener('pointerenter', (e) => {
+                                if (e.pointerType === 'touch') return;
+                                clearTimeout(closeTimer);
+                            });
+                            content.addEventListener('pointerleave', (e) => {
+                                if (e.pointerType === 'touch') return;
+                                closeTimer = setTimeout(close, 150);
+                            });
+                        }
+                    });
+
+                    // Escape to close
+                    root.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && activeValue) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            wasEscapeClose = true;
+                            const activeItem = getItemByValue(activeValue);
+                            const trigger = activeItem ? activeItem.querySelector('[data-suite-nav-menu-trigger]') : null;
+                            close();
+                            if (trigger) trigger.focus({ preventScroll: true });
+                        }
+                    });
+                });
+            }
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
@@ -2597,6 +3066,8 @@
             this.HoverCard.init();
             this.DropdownMenu.init();
             this.ContextMenu.init();
+            this.Menubar.init();
+            this.NavigationMenu.init();
             this.Select.init();
             this.Command.init();
         },

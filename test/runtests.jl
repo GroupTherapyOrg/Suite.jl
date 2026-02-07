@@ -3800,4 +3800,335 @@ using Test
             @test occursin("border-warm-200", result)
         end
     end
+
+    @testset "SuiteMenubar" begin
+        @testset "Basic rendering" begin
+            html = Therapy.render_to_string(SuiteMenubar(
+                SuiteMenubarMenu(
+                    SuiteMenubarTrigger("File"),
+                    SuiteMenubarContent(
+                        SuiteMenubarItem("New Tab"),
+                        SuiteMenubarItem("New Window"),
+                    )
+                ),
+                SuiteMenubarMenu(
+                    SuiteMenubarTrigger("Edit"),
+                    SuiteMenubarContent(
+                        SuiteMenubarItem("Undo"),
+                        SuiteMenubarItem("Redo"),
+                    )
+                ),
+            ))
+            @test occursin("data-suite-menubar", html)
+            @test occursin("role=\"menubar\"", html)
+            @test occursin("data-suite-menubar-trigger=", html)
+            @test occursin("data-suite-menubar-content", html)
+            @test occursin("aria-haspopup=\"menu\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("File", html)
+            @test occursin("Edit", html)
+            @test occursin("New Tab", html)
+            @test occursin("Undo", html)
+        end
+
+        @testset "Menubar styling" begin
+            html = Therapy.render_to_string(SuiteMenubar(
+                SuiteMenubarMenu(SuiteMenubarTrigger("File"), SuiteMenubarContent(SuiteMenubarItem("A")))
+            ))
+            @test occursin("flex", html)
+            @test occursin("h-9", html)
+            @test occursin("rounded-md", html)
+            @test occursin("bg-warm-50", html)
+            @test occursin("dark:bg-warm-950", html)
+            @test occursin("border-warm-200", html)
+            @test occursin("shadow-xs", html)
+        end
+
+        @testset "Trigger is a button" begin
+            html = Therapy.render_to_string(SuiteMenubarTrigger("File"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+            @test occursin("role=\"menuitem\"", html)
+        end
+
+        @testset "Trigger styling" begin
+            html = Therapy.render_to_string(SuiteMenubarTrigger("File"))
+            @test occursin("text-sm", html)
+            @test occursin("font-medium", html)
+            @test occursin("rounded-sm", html)
+            @test occursin("px-2", html)
+            @test occursin("data-[state=open]:bg-warm-100", html)
+        end
+
+        @testset "Content structure" begin
+            html = Therapy.render_to_string(SuiteMenubarContent(
+                SuiteMenubarItem("A")
+            ))
+            @test occursin("data-suite-menubar-content", html)
+            @test occursin("role=\"menu\"", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("display:none", html)
+            @test occursin("min-w-[12rem]", html)
+            @test occursin("rounded-md", html)
+            @test occursin("shadow-md", html)
+            @test occursin("bg-warm-50", html)
+            @test occursin("animate-in", html)
+        end
+
+        @testset "MenuItem" begin
+            html = Therapy.render_to_string(SuiteMenubarItem("Profile"))
+            @test occursin("data-suite-menu-item", html)
+            @test occursin("role=\"menuitem\"", html)
+            @test occursin("Profile", html)
+        end
+
+        @testset "MenuItem with shortcut" begin
+            html = Therapy.render_to_string(SuiteMenubarItem("New Tab", shortcut="⌘T"))
+            @test occursin("New Tab", html)
+            @test occursin("⌘T", html)
+            @test occursin("data-suite-menu-shortcut", html)
+        end
+
+        @testset "MenuItem disabled" begin
+            html = Therapy.render_to_string(SuiteMenubarItem("Disabled", disabled=true))
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "CheckboxItem" begin
+            html = Therapy.render_to_string(SuiteMenubarCheckboxItem("Toolbar", checked=true))
+            @test occursin("data-suite-menu-checkbox-item", html)
+            @test occursin("role=\"menuitemcheckbox\"", html)
+            @test occursin("aria-checked=\"true\"", html)
+            @test occursin("data-state=\"checked\"", html)
+        end
+
+        @testset "RadioGroup and RadioItem" begin
+            html = Therapy.render_to_string(SuiteMenubarRadioGroup(value="a",
+                SuiteMenubarRadioItem(value="a", checked=true, "Alpha"),
+                SuiteMenubarRadioItem(value="b", "Beta"),
+            ))
+            @test occursin("data-suite-menu-radio-group", html)
+            @test occursin("role=\"menuitemradio\"", html)
+            @test occursin("data-state=\"checked\"", html)
+            @test occursin("data-state=\"unchecked\"", html)
+        end
+
+        @testset "Label" begin
+            html = Therapy.render_to_string(SuiteMenubarLabel("Section"))
+            @test occursin("Section", html)
+            @test occursin("font-medium", html)
+        end
+
+        @testset "Separator" begin
+            html = Therapy.render_to_string(SuiteMenubarSeparator())
+            @test occursin("role=\"separator\"", html)
+            @test occursin("h-px", html)
+            @test occursin("bg-warm-200", html)
+        end
+
+        @testset "SubMenu structure" begin
+            html = Therapy.render_to_string(SuiteMenubarSub(
+                SuiteMenubarSubTrigger("More"),
+                SuiteMenubarSubContent(
+                    SuiteMenubarItem("Sub Item"),
+                )
+            ))
+            @test occursin("data-suite-menu-sub", html)
+            @test occursin("data-suite-menu-sub-trigger", html)
+            @test occursin("data-suite-menu-sub-content", html)
+            @test occursin("Sub Item", html)
+            # Chevron icon
+            @test occursin("M6 12L10 8L6 4", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteMenubar(class="my-bar",
+                SuiteMenubarMenu(SuiteMenubarTrigger("X"), SuiteMenubarContent(SuiteMenubarItem("A")))
+            ))
+            @test occursin("my-bar", html)
+        end
+
+        @testset "Loop attribute" begin
+            html = Therapy.render_to_string(SuiteMenubar(loop=false,
+                SuiteMenubarMenu(SuiteMenubarTrigger("X"), SuiteMenubarContent(SuiteMenubarItem("A")))
+            ))
+            @test occursin("data-loop=\"false\"", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Menubar)
+            meta = Suite.COMPONENT_REGISTRY[:Menubar]
+            @test meta.tier == :js_runtime
+            @test :SuiteMenubar in meta.exports
+            @test :SuiteMenubarTrigger in meta.exports
+            @test :SuiteMenubarContent in meta.exports
+            @test :SuiteMenubarItem in meta.exports
+            @test :Menu in meta.js_modules
+            @test :Menubar in meta.js_modules
+        end
+    end
+
+    @testset "SuiteNavigationMenu" begin
+        @testset "Basic rendering" begin
+            html = Therapy.render_to_string(SuiteNavigationMenu(
+                SuiteNavigationMenuList(
+                    SuiteNavigationMenuItem(
+                        SuiteNavigationMenuTrigger("Getting Started"),
+                        SuiteNavigationMenuContent(
+                            SuiteNavigationMenuLink("Introduction", href="/docs/"),
+                        )
+                    ),
+                    SuiteNavigationMenuItem(
+                        SuiteNavigationMenuLink("Documentation", href="/docs/")
+                    ),
+                ),
+                SuiteNavigationMenuViewport(),
+            ))
+            @test occursin("data-suite-nav-menu=", html)
+            @test occursin("data-suite-nav-menu-list", html)
+            @test occursin("data-suite-nav-menu-item", html)
+            @test occursin("data-suite-nav-menu-trigger", html)
+            @test occursin("data-suite-nav-menu-content", html)
+            @test occursin("data-suite-nav-menu-link", html)
+            @test occursin("data-suite-nav-menu-viewport", html)
+            @test occursin("Getting Started", html)
+            @test occursin("Introduction", html)
+            @test occursin("Documentation", html)
+        end
+
+        @testset "Root styling" begin
+            html = Therapy.render_to_string(SuiteNavigationMenu(
+                SuiteNavigationMenuList(
+                    SuiteNavigationMenuItem(SuiteNavigationMenuLink("A", href="/a/"))
+                )
+            ))
+            @test occursin("relative", html)
+            @test occursin("flex", html)
+            @test occursin("items-center", html)
+        end
+
+        @testset "List is a UL" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuList(
+                SuiteNavigationMenuItem(SuiteNavigationMenuLink("A", href="/a/"))
+            ))
+            @test occursin("<ul", html)
+            @test occursin("list-none", html)
+        end
+
+        @testset "Item is a LI" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuItem(
+                SuiteNavigationMenuLink("A", href="/a/")
+            ))
+            @test occursin("<li", html)
+            @test occursin("data-suite-nav-menu-item", html)
+        end
+
+        @testset "Trigger is a button with chevron" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuTrigger("Products"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+            @test occursin("data-suite-nav-menu-trigger", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("Products", html)
+            # Chevron SVG
+            @test occursin("group-data-[state=open]:rotate-180", html)
+        end
+
+        @testset "Trigger styling" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuTrigger("Products"))
+            @test occursin("h-9", html)
+            @test occursin("rounded-md", html)
+            @test occursin("text-sm", html)
+            @test occursin("font-medium", html)
+            @test occursin("bg-warm-50", html)
+            @test occursin("hover:bg-warm-100", html)
+        end
+
+        @testset "Content structure" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuContent(
+                SuiteNavigationMenuLink("A", href="/a/")
+            ))
+            @test occursin("data-suite-nav-menu-content", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("display:none", html)
+            @test occursin("md:absolute", html)
+            # Motion animation classes
+            @test occursin("data-[motion^=from-]:animate-in", html)
+            @test occursin("data-[motion^=to-]:animate-out", html)
+        end
+
+        @testset "Link rendering" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuLink("Install", href="/install/"))
+            @test occursin("<a", html)
+            @test occursin("href=\"/install/\"", html)
+            @test occursin("data-suite-nav-menu-link", html)
+            @test occursin("Install", html)
+            @test occursin("rounded-sm", html)
+        end
+
+        @testset "Link with description" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuLink("Install", href="/install/", description="How to install Suite.jl"))
+            @test occursin("Install", html)
+            @test occursin("How to install Suite.jl", html)
+            @test occursin("line-clamp-2", html)
+        end
+
+        @testset "Link active state" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuLink("Home", href="/", active=true))
+            @test occursin("data-active=\"true\"", html)
+        end
+
+        @testset "Viewport" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuViewport())
+            @test occursin("data-suite-nav-menu-viewport", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("display:none", html)
+            @test occursin("rounded-md", html)
+            @test occursin("shadow", html)
+            @test occursin("bg-warm-50", html)
+            @test occursin("border-warm-200", html)
+        end
+
+        @testset "Indicator" begin
+            html = Therapy.render_to_string(SuiteNavigationMenuIndicator())
+            @test occursin("data-suite-nav-menu-indicator", html)
+            @test occursin("data-state=\"hidden\"", html)
+            @test occursin("rotate-45", html)  # arrow
+        end
+
+        @testset "Delay attributes" begin
+            html = Therapy.render_to_string(SuiteNavigationMenu(
+                delay_duration=300,
+                skip_delay_duration=500,
+                SuiteNavigationMenuList(
+                    SuiteNavigationMenuItem(SuiteNavigationMenuLink("A", href="/a/"))
+                )
+            ))
+            @test occursin("data-delay-duration=\"300\"", html)
+            @test occursin("data-skip-delay-duration=\"500\"", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteNavigationMenu(class="my-nav",
+                SuiteNavigationMenuList(
+                    SuiteNavigationMenuItem(SuiteNavigationMenuLink("A", href="/a/"))
+                )
+            ))
+            @test occursin("my-nav", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :NavigationMenu)
+            meta = Suite.COMPONENT_REGISTRY[:NavigationMenu]
+            @test meta.tier == :js_runtime
+            @test :SuiteNavigationMenu in meta.exports
+            @test :SuiteNavigationMenuList in meta.exports
+            @test :SuiteNavigationMenuTrigger in meta.exports
+            @test :SuiteNavigationMenuContent in meta.exports
+            @test :SuiteNavigationMenuLink in meta.exports
+            @test :SuiteNavigationMenuViewport in meta.exports
+            @test :NavigationMenu in meta.js_modules
+        end
+    end
 end

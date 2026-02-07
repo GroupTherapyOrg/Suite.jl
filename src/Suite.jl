@@ -57,9 +57,9 @@ include("components/Command.jl")
 include("components/Sheet.jl")
 include("components/Drawer.jl")
 include("components/ContextMenu.jl")
-# include("components/NavigationMenu.jl")
+include("components/NavigationMenu.jl")
 include("components/HoverCard.jl")
-# include("components/Menubar.jl")
+include("components/Menubar.jl")
 # include("components/Toast.jl")
 
 # --- Phase 4: Complex Components ---
