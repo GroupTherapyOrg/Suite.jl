@@ -4523,6 +4523,221 @@
             },
         },
 
+        // --- CodeBlock (copy-to-clipboard) ----------------------------------------
+        CodeBlock: {
+            _initialized: new Set(),
+
+            init() {
+                document.querySelectorAll('[data-suite-codeblock]').forEach(block => {
+                    if (this._initialized.has(block)) return;
+                    this._initialized.add(block);
+
+                    const copyBtn = block.querySelector('[data-suite-codeblock-copy]');
+                    if (!copyBtn) return;
+
+                    copyBtn.addEventListener('click', () => {
+                        const code = block.querySelector('code');
+                        if (!code) return;
+
+                        const text = code.textContent || '';
+                        navigator.clipboard.writeText(text).then(() => {
+                            // Show check icon briefly
+                            const original = copyBtn.innerHTML;
+                            copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+                            setTimeout(() => { copyBtn.innerHTML = original; }, 2000);
+                        });
+                    });
+                });
+            },
+        },
+
+        // --- TreeView (expand/collapse + keyboard nav) ----------------------------
+        TreeView: {
+            _initialized: new Set(),
+
+            init() {
+                document.querySelectorAll('[data-suite-treeview]').forEach(tree => {
+                    if (this._initialized.has(tree)) return;
+                    this._initialized.add(tree);
+                    this._setup(tree);
+                });
+            },
+
+            _setup(tree) {
+                // Click handler for items
+                tree.addEventListener('click', (e) => {
+                    const row = e.target.closest('[data-suite-treeview-item] > div');
+                    if (!row) return;
+                    const item = row.parentElement;
+                    if (item.hasAttribute('data-disabled')) return;
+
+                    const isFolder = item.hasAttribute('data-suite-treeview-folder');
+                    if (isFolder) {
+                        this._toggle(item);
+                    }
+                    this._select(tree, item);
+                });
+
+                // Keyboard navigation
+                tree.addEventListener('keydown', (e) => {
+                    const item = e.target.closest('[data-suite-treeview-item]');
+                    if (!item) return;
+
+                    const visible = this._getVisibleItems(tree);
+                    const idx = visible.indexOf(item);
+                    if (idx === -1) return;
+
+                    switch (e.key) {
+                        case 'ArrowDown': {
+                            e.preventDefault();
+                            if (idx < visible.length - 1) {
+                                this._focus(visible[idx + 1]);
+                            }
+                            break;
+                        }
+                        case 'ArrowUp': {
+                            e.preventDefault();
+                            if (idx > 0) {
+                                this._focus(visible[idx - 1]);
+                            }
+                            break;
+                        }
+                        case 'ArrowRight': {
+                            e.preventDefault();
+                            if (item.hasAttribute('data-suite-treeview-folder')) {
+                                if (item.getAttribute('data-suite-treeview-expanded') !== 'true') {
+                                    this._expand(item);
+                                } else {
+                                    // Move to first child
+                                    const children = item.querySelector('[data-suite-treeview-children]');
+                                    if (children) {
+                                        const first = children.querySelector('[data-suite-treeview-item]');
+                                        if (first) this._focus(first);
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case 'ArrowLeft': {
+                            e.preventDefault();
+                            if (item.hasAttribute('data-suite-treeview-folder') &&
+                                item.getAttribute('data-suite-treeview-expanded') === 'true') {
+                                this._collapse(item);
+                            } else {
+                                // Move to parent
+                                const parentGroup = item.closest('[data-suite-treeview-children]');
+                                if (parentGroup) {
+                                    const parentItem = parentGroup.closest('[data-suite-treeview-item]');
+                                    if (parentItem) this._focus(parentItem);
+                                }
+                            }
+                            break;
+                        }
+                        case 'Enter':
+                        case ' ': {
+                            e.preventDefault();
+                            if (item.hasAttribute('data-suite-treeview-folder')) {
+                                this._toggle(item);
+                            }
+                            this._select(tree, item);
+                            break;
+                        }
+                        case 'Home': {
+                            e.preventDefault();
+                            if (visible.length > 0) this._focus(visible[0]);
+                            break;
+                        }
+                        case 'End': {
+                            e.preventDefault();
+                            if (visible.length > 0) this._focus(visible[visible.length - 1]);
+                            break;
+                        }
+                    }
+                });
+            },
+
+            _getVisibleItems(tree) {
+                const items = [];
+                const walk = (parent) => {
+                    const lis = parent.children;
+                    for (const li of lis) {
+                        if (li.tagName !== 'LI' || !li.hasAttribute('data-suite-treeview-item')) continue;
+                        items.push(li);
+                        // Only traverse children if expanded
+                        if (li.getAttribute('data-suite-treeview-expanded') === 'true') {
+                            const group = li.querySelector(':scope > [data-suite-treeview-children]');
+                            if (group) walk(group);
+                        }
+                    }
+                };
+                walk(tree);
+                return items;
+            },
+
+            _toggle(item) {
+                if (item.getAttribute('data-suite-treeview-expanded') === 'true') {
+                    this._collapse(item);
+                } else {
+                    this._expand(item);
+                }
+            },
+
+            _expand(item) {
+                item.setAttribute('data-suite-treeview-expanded', 'true');
+                item.setAttribute('aria-expanded', 'true');
+                const children = item.querySelector(':scope > [data-suite-treeview-children]');
+                if (children) children.classList.remove('hidden');
+                const chevron = item.querySelector(':scope > div [data-suite-treeview-chevron]');
+                if (chevron) chevron.classList.add('rotate-90');
+            },
+
+            _collapse(item) {
+                item.setAttribute('data-suite-treeview-expanded', 'false');
+                item.setAttribute('aria-expanded', 'false');
+                const children = item.querySelector(':scope > [data-suite-treeview-children]');
+                if (children) children.classList.add('hidden');
+                const chevron = item.querySelector(':scope > div [data-suite-treeview-chevron]');
+                if (chevron) chevron.classList.remove('rotate-90');
+            },
+
+            _select(tree, item) {
+                // Deselect all
+                tree.querySelectorAll('[data-suite-treeview-selected="true"]').forEach(el => {
+                    el.setAttribute('data-suite-treeview-selected', 'false');
+                    el.setAttribute('aria-selected', 'false');
+                    const row = el.querySelector(':scope > div');
+                    if (row) {
+                        row.classList.remove('bg-warm-100', 'dark:bg-warm-800', 'text-accent-700', 'dark:text-accent-400');
+                        row.classList.add('text-warm-700', 'dark:text-warm-300');
+                    }
+                });
+                // Select clicked item
+                item.setAttribute('data-suite-treeview-selected', 'true');
+                item.setAttribute('aria-selected', 'true');
+                const row = item.querySelector(':scope > div');
+                if (row) {
+                    row.classList.add('bg-warm-100', 'dark:bg-warm-800', 'text-accent-700', 'dark:text-accent-400');
+                    row.classList.remove('text-warm-700', 'dark:text-warm-300');
+                }
+                this._focus(item);
+            },
+
+            _focus(item) {
+                // Set tabindex
+                const tree = item.closest('[data-suite-treeview]');
+                if (tree) {
+                    tree.querySelectorAll('[data-suite-treeview-item] > div[tabindex="0"]').forEach(el => {
+                        el.setAttribute('tabindex', '-1');
+                    });
+                }
+                const row = item.querySelector(':scope > div');
+                if (row) {
+                    row.setAttribute('tabindex', '0');
+                    row.focus();
+                }
+            },
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
@@ -4550,6 +4765,8 @@
             this.Calendar.init();
             this.DataTable.init();
             this.Form.init();
+            this.CodeBlock.init();
+            this.TreeView.init();
         },
 
         // --- Init -----------------------------------------------------------------

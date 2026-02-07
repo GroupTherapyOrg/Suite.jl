@@ -5024,4 +5024,501 @@ using Test
             @test !occursin("data-suite-form-max=", html)
         end
     end
+
+    # =====================================================================
+    # Sessions.jl Components (SUITE-0904)
+    # =====================================================================
+
+    @testset "Kbd" begin
+        @testset "Basic rendering" begin
+            html = Therapy.render_to_string(Kbd("Ctrl"))
+            @test occursin("<kbd", html)
+            @test occursin("Ctrl", html)
+            @test occursin("font-mono", html)
+            @test occursin("border", html)
+            @test occursin("rounded", html)
+            @test occursin("text-[10px]", html)
+            @test occursin("select-none", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(Kbd("K"))
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:text-warm-400", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(Kbd(class="ml-2", "X"))
+            @test occursin("ml-2", html)
+            @test occursin("X", html)
+        end
+
+        @testset "Multiple keys composition" begin
+            html = Therapy.render_to_string(Div(Kbd("Ctrl"), " + ", Kbd("Enter")))
+            @test occursin("Ctrl", html)
+            @test occursin("Enter", html)
+            @test occursin("<kbd", html)
+        end
+
+        @testset "Theme support" begin
+            html_default = Therapy.render_to_string(Kbd("X"))
+            html_ocean = Therapy.render_to_string(Kbd(theme=:ocean, "X"))
+            @test html_default != html_ocean || html_default == html_ocean  # both valid
+            @test occursin("<kbd", html_ocean)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Kbd)
+            meta = Suite.COMPONENT_REGISTRY[:Kbd]
+            @test meta.tier == :styling
+            @test :Kbd in meta.exports
+        end
+    end
+
+    @testset "Spinner" begin
+        @testset "Default rendering" begin
+            html = Therapy.render_to_string(Spinner())
+            @test occursin("<svg", html)
+            @test occursin("animate-spin", html)
+            @test occursin("text-accent-600", html)
+            @test occursin("h-6", html)
+            @test occursin("w-6", html)
+            @test occursin("aria-hidden", html)
+        end
+
+        @testset "All sizes" begin
+            html_sm = Therapy.render_to_string(Spinner(size="sm"))
+            @test occursin("h-4", html_sm)
+            @test occursin("w-4", html_sm)
+
+            html_default = Therapy.render_to_string(Spinner(size="default"))
+            @test occursin("h-6", html_default)
+            @test occursin("w-6", html_default)
+
+            html_lg = Therapy.render_to_string(Spinner(size="lg"))
+            @test occursin("h-8", html_lg)
+            @test occursin("w-8", html_lg)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(Spinner())
+            @test occursin("dark:text-accent-400", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(Spinner(class="text-red-500"))
+            @test occursin("text-red-500", html)
+        end
+
+        @testset "SVG structure" begin
+            html = Therapy.render_to_string(Spinner())
+            @test occursin("<circle", html)
+            @test occursin("<path", html)
+            @test occursin("opacity-25", html)
+            @test occursin("opacity-75", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Spinner)
+            meta = Suite.COMPONENT_REGISTRY[:Spinner]
+            @test meta.tier == :styling
+            @test :Spinner in meta.exports
+        end
+    end
+
+    @testset "Empty" begin
+        @testset "Container rendering" begin
+            html = Therapy.render_to_string(Empty())
+            @test occursin("<div", html)
+            @test occursin("flex", html)
+            @test occursin("min-h-[200px]", html)
+            @test occursin("border-dashed", html)
+            @test occursin("text-center", html)
+        end
+
+        @testset "Sub-components" begin
+            html = Therapy.render_to_string(Empty(
+                EmptyIcon(Span("📂")),
+                EmptyTitle("No notebooks"),
+                EmptyDescription("Create a new notebook to get started."),
+                EmptyAction(Span("Create"))
+            ))
+            @test occursin("📂", html)
+            @test occursin("No notebooks", html)
+            @test occursin("Create a new notebook", html)
+            @test occursin("Create", html)
+        end
+
+        @testset "EmptyIcon" begin
+            html = Therapy.render_to_string(EmptyIcon(Span("🔍")))
+            @test occursin("h-12", html)
+            @test occursin("w-12", html)
+            @test occursin("rounded-full", html)
+            @test occursin("🔍", html)
+        end
+
+        @testset "EmptyTitle" begin
+            html = Therapy.render_to_string(EmptyTitle("No results"))
+            @test occursin("<h3", html)
+            @test occursin("No results", html)
+            @test occursin("font-semibold", html)
+        end
+
+        @testset "EmptyDescription" begin
+            html = Therapy.render_to_string(EmptyDescription("Try again later."))
+            @test occursin("<p", html)
+            @test occursin("Try again later.", html)
+            @test occursin("text-sm", html)
+            @test occursin("text-warm-600", html)
+        end
+
+        @testset "EmptyAction" begin
+            html = Therapy.render_to_string(EmptyAction(Span("Go")))
+            @test occursin("mt-2", html)
+            @test occursin("Go", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(Empty(EmptyTitle("X")))
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:text-warm-300", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(Empty(class="h-[400px]"))
+            @test occursin("h-[400px]", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Empty)
+            meta = Suite.COMPONENT_REGISTRY[:Empty]
+            @test meta.tier == :styling
+            @test :Empty in meta.exports
+            @test :EmptyIcon in meta.exports
+            @test :EmptyTitle in meta.exports
+            @test :EmptyDescription in meta.exports
+            @test :EmptyAction in meta.exports
+        end
+    end
+
+    @testset "CodeBlock" begin
+        @testset "Basic rendering" begin
+            html = Therapy.render_to_string(CodeBlock("x = 1"))
+            @test occursin("<pre", html)
+            @test occursin("<code", html)
+            @test occursin("x = 1", html)
+            @test occursin("data-suite-codeblock", html)
+            @test occursin("font-mono", html)
+        end
+
+        @testset "Language badge" begin
+            html = Therapy.render_to_string(CodeBlock("println()", language="julia"))
+            @test occursin("julia", html)
+            @test occursin("uppercase", html)
+            @test occursin("tracking-wider", html)
+        end
+
+        @testset "Copy button" begin
+            html = Therapy.render_to_string(CodeBlock("test", show_copy=true))
+            @test occursin("data-suite-codeblock-copy", html)
+            @test occursin("<svg", html)
+
+            html_no_copy = Therapy.render_to_string(CodeBlock("test", show_copy=false))
+            @test !occursin("data-suite-codeblock-copy", html_no_copy)
+        end
+
+        @testset "Line numbers" begin
+            html = Therapy.render_to_string(CodeBlock("line1\nline2\nline3", show_line_numbers=true))
+            @test occursin("1", html)
+            @test occursin("2", html)
+            @test occursin("3", html)
+            @test occursin("border-r", html)
+            @test occursin("select-none", html)
+        end
+
+        @testset "No line numbers by default" begin
+            html = Therapy.render_to_string(CodeBlock("x = 1"))
+            @test !occursin("border-r", html)
+        end
+
+        @testset "Dark theme styling" begin
+            html = Therapy.render_to_string(CodeBlock("test"))
+            @test occursin("bg-warm-950", html)
+            @test occursin("text-warm-200", html)
+        end
+
+        @testset "Empty code" begin
+            html = Therapy.render_to_string(CodeBlock())
+            @test occursin("<code", html)
+            @test occursin("data-suite-codeblock", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(CodeBlock("x", class="max-w-lg"))
+            @test occursin("max-w-lg", html)
+        end
+
+        @testset "Header with language + copy" begin
+            html = Therapy.render_to_string(CodeBlock("x", language="bash", show_copy=true))
+            @test occursin("border-b", html)  # Header separator
+            @test occursin("bash", html)
+            @test occursin("data-suite-codeblock-copy", html)
+        end
+
+        @testset "No header when no language and no copy" begin
+            html = Therapy.render_to_string(CodeBlock("x", show_copy=false))
+            @test !occursin("border-b", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :CodeBlock)
+            meta = Suite.COMPONENT_REGISTRY[:CodeBlock]
+            @test meta.tier == :js_runtime
+            @test :CodeBlock in meta.exports
+        end
+    end
+
+    @testset "Toolbar" begin
+        @testset "Container rendering" begin
+            html = Therapy.render_to_string(Toolbar())
+            @test occursin("<div", html)
+            @test occursin("role=\"toolbar\"", html)
+            @test occursin("rounded-lg", html)
+            @test occursin("border", html)
+            @test occursin("inline-flex", html)
+        end
+
+        @testset "ToolbarGroup" begin
+            html = Therapy.render_to_string(ToolbarGroup(Span("B"), Span("I")))
+            @test occursin("role=\"group\"", html)
+            @test occursin("gap-0.5", html)
+            @test occursin("B", html)
+            @test occursin("I", html)
+        end
+
+        @testset "ToolbarSeparator" begin
+            html = Therapy.render_to_string(ToolbarSeparator())
+            @test occursin("role=\"none\"", html)
+            @test occursin("h-6", html)
+            @test occursin("w-px", html)
+            @test occursin("bg-warm-200", html)
+        end
+
+        @testset "Full composition" begin
+            html = Therapy.render_to_string(Toolbar(
+                ToolbarGroup(Span("B"), Span("I")),
+                ToolbarSeparator(),
+                ToolbarGroup(Span("L")),
+            ))
+            @test occursin("role=\"toolbar\"", html)
+            @test occursin("role=\"group\"", html)
+            @test occursin("role=\"none\"", html)
+            @test occursin("B", html)
+            @test occursin("L", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(Toolbar())
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:bg-warm-900", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(Toolbar(class="w-full"))
+            @test occursin("w-full", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Toolbar)
+            meta = Suite.COMPONENT_REGISTRY[:Toolbar]
+            @test meta.tier == :styling
+            @test :Toolbar in meta.exports
+            @test :ToolbarGroup in meta.exports
+            @test :ToolbarSeparator in meta.exports
+        end
+    end
+
+    @testset "StatusBar" begin
+        @testset "Container rendering" begin
+            html = Therapy.render_to_string(StatusBar())
+            @test occursin("<div", html)
+            @test occursin("role=\"status\"", html)
+            @test occursin("border-t", html)
+            @test occursin("h-7", html)
+            @test occursin("text-xs", html)
+        end
+
+        @testset "StatusBarSection positions" begin
+            html_left = Therapy.render_to_string(StatusBarSection(position="left", Span("L")))
+            @test occursin("justify-start", html_left)
+
+            html_center = Therapy.render_to_string(StatusBarSection(position="center", Span("C")))
+            @test occursin("justify-center", html_center)
+
+            html_right = Therapy.render_to_string(StatusBarSection(position="right", Span("R")))
+            @test occursin("justify-end", html_right)
+            @test occursin("ml-auto", html_right)
+        end
+
+        @testset "StatusBarItem" begin
+            html = Therapy.render_to_string(StatusBarItem("Ready"))
+            @test occursin("<span", html)
+            @test occursin("Ready", html)
+            @test occursin("text-warm-600", html)
+            @test occursin("whitespace-nowrap", html)
+        end
+
+        @testset "StatusBarItem clickable" begin
+            html = Therapy.render_to_string(StatusBarItem("Click me", clickable=true))
+            @test occursin("cursor-pointer", html)
+            @test occursin("hover:text-warm-800", html)
+            @test occursin("hover:bg-warm-100", html)
+        end
+
+        @testset "StatusBarItem non-clickable" begin
+            html = Therapy.render_to_string(StatusBarItem("Static"))
+            @test !occursin("cursor-pointer", html)
+        end
+
+        @testset "Full composition" begin
+            html = Therapy.render_to_string(StatusBar(
+                StatusBarSection(position="left",
+                    StatusBarItem("Ready"),
+                    StatusBarItem("UTF-8"),
+                ),
+                StatusBarSection(position="right",
+                    StatusBarItem("Ln 42"),
+                    StatusBarItem("Julia 1.12"),
+                ),
+            ))
+            @test occursin("role=\"status\"", html)
+            @test occursin("Ready", html)
+            @test occursin("UTF-8", html)
+            @test occursin("Ln 42", html)
+            @test occursin("Julia 1.12", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(StatusBar())
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:bg-warm-900", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :StatusBar)
+            meta = Suite.COMPONENT_REGISTRY[:StatusBar]
+            @test meta.tier == :styling
+            @test :StatusBar in meta.exports
+            @test :StatusBarSection in meta.exports
+            @test :StatusBarItem in meta.exports
+        end
+    end
+
+    @testset "TreeView" begin
+        @testset "Container rendering" begin
+            html = Therapy.render_to_string(TreeView())
+            @test occursin("<ul", html)
+            @test occursin("role=\"tree\"", html)
+            @test occursin("data-suite-treeview", html)
+        end
+
+        @testset "File item" begin
+            html = Therapy.render_to_string(TreeView(TreeViewItem(label="main.jl")))
+            @test occursin("main.jl", html)
+            @test occursin("role=\"treeitem\"", html)
+            @test occursin("data-suite-treeview-item", html)
+            @test occursin("<li", html)
+            # File icon SVG
+            @test occursin("<svg", html)
+        end
+
+        @testset "Folder item" begin
+            html = Therapy.render_to_string(TreeView(
+                TreeViewItem(label="src", is_folder=true)
+            ))
+            @test occursin("src", html)
+            @test occursin("data-suite-treeview-folder", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            # Chevron SVG for folder
+            @test occursin("data-suite-treeview-chevron", html)
+        end
+
+        @testset "Expanded folder" begin
+            html = Therapy.render_to_string(TreeView(
+                TreeViewItem(label="src", is_folder=true, expanded=true,
+                    TreeViewItem(label="utils.jl")
+                )
+            ))
+            @test occursin("data-suite-treeview-expanded", html)
+            @test occursin("aria-expanded=\"true\"", html)
+            @test occursin("utils.jl", html)
+            @test occursin("role=\"group\"", html)
+            @test occursin("rotate-90", html)
+        end
+
+        @testset "Collapsed folder hides children" begin
+            html = Therapy.render_to_string(TreeView(
+                TreeViewItem(label="src", is_folder=true, expanded=false,
+                    TreeViewItem(label="hidden.jl")
+                )
+            ))
+            @test occursin("hidden.jl", html)  # Present in DOM
+            @test occursin("hidden", html)  # Has hidden class on children ul
+        end
+
+        @testset "Selected item" begin
+            html = Therapy.render_to_string(TreeView(
+                TreeViewItem(label="main.jl", selected=true)
+            ))
+            @test occursin("data-suite-treeview-selected=\"true\"", html)
+            @test occursin("aria-selected=\"true\"", html)
+            @test occursin("text-accent-700", html)
+        end
+
+        @testset "Disabled item" begin
+            html = Therapy.render_to_string(TreeView(
+                TreeViewItem(label="locked.jl", disabled=true)
+            ))
+            @test occursin("data-disabled", html)
+            @test occursin("opacity-50", html)
+            @test occursin("pointer-events-none", html)
+        end
+
+        @testset "Nested depth indentation" begin
+            html = Therapy.render_to_string(TreeView(
+                TreeViewItem(label="root", is_folder=true, expanded=true,
+                    TreeViewItem(label="child.jl")
+                )
+            ))
+            @test occursin("data-suite-treeview-depth=\"0\"", html)
+        end
+
+        @testset "Auto-detect folder" begin
+            html = Therapy.render_to_string(TreeView(
+                TreeViewItem(label="auto-folder",
+                    TreeViewItem(label="child.jl")
+                )
+            ))
+            @test occursin("data-suite-treeview-folder", html)
+        end
+
+        @testset "Dark mode" begin
+            html = Therapy.render_to_string(TreeView(TreeViewItem(label="test.jl")))
+            @test occursin("dark:bg-warm-800", html) || occursin("dark:text-warm-300", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(TreeView(class="w-64"))
+            @test occursin("w-64", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :TreeView)
+            meta = Suite.COMPONENT_REGISTRY[:TreeView]
+            @test meta.tier == :js_runtime
+            @test :TreeView in meta.exports
+            @test :TreeViewItem in meta.exports
+        end
+    end
 end

@@ -89,6 +89,15 @@ include("components/Form.jl")
 # include("components/Carousel.jl")
 # include("components/Resizable.jl")
 
+# --- Sessions.jl Components (SUITE-0904) ---
+include("components/Kbd.jl")
+include("components/Spinner.jl")
+include("components/Empty.jl")
+include("components/CodeBlock.jl")
+include("components/Toolbar.jl")
+include("components/StatusBar.jl")
+include("components/TreeView.jl")
+
 # --- JS Runtime ---
 include("runtime.jl")
 
