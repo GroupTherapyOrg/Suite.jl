@@ -63,12 +63,18 @@ function Layout(children...; title="Suite.jl")
 
         # Footer
         Footer(:class => "bg-warm-100 dark:bg-warm-900 mt-auto transition-colors duration-200",
-            Div(:class => "max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8",
-                Div(:class => "text-center",
-                    P(:class => "text-warm-600 dark:text-warm-400 text-sm",
-                        "Built with ",
-                        A(:href => "https://github.com/TherapeuticJulia/Therapy.jl", :class => "text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300", "Therapy.jl"),
-                        " — A reactive web framework for Julia"
+            Div(:class => "max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8",
+                Div(:class => "flex flex-col sm:flex-row items-center justify-between gap-4",
+                    # GroupTherapyOrg branding
+                    Div(:class => "flex items-center gap-4",
+                        Span(:class => "text-sm font-medium text-warm-800 dark:text-warm-300", "GroupTherapyOrg"),
+                        Span(:class => "text-warm-300 dark:text-warm-600", "/"),
+                        A(:href => "https://github.com/TherapeuticJulia/Therapy.jl", :class => "text-sm text-warm-600 dark:text-warm-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors", :target => "_blank", "Therapy.jl"),
+                        A(:href => "https://github.com/TherapeuticJulia/Suite.jl", :class => "text-sm text-warm-600 dark:text-warm-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors", :target => "_blank", "Suite.jl"),
+                        A(:href => "https://github.com/TherapeuticJulia/WasmTarget.jl", :class => "text-sm text-warm-600 dark:text-warm-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors", :target => "_blank", "WasmTarget.jl")
+                    ),
+                    P(:class => "text-warm-500 dark:text-warm-500 text-xs",
+                        "Built with Therapy.jl — A reactive web framework for Julia"
                     )
                 )
             )
