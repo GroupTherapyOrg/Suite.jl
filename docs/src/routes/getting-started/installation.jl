@@ -27,7 +27,7 @@ function InstallationPage()
             Ul(:class => "list-disc list-inside space-y-2 text-warm-600 dark:text-warm-400 mb-6",
                 Li("Julia 1.12 or later"),
                 Li(
-                    A(:href => "https://github.com/TherapeuticJulia/Therapy.jl", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Therapy.jl"),
+                    A(:href => "https://github.com/GroupTherapyOrg/Therapy.jl", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Therapy.jl"),
                     " — the reactive web framework"
                 ),
                 Li("A Therapy.jl app (created with the App framework)")
@@ -43,7 +43,7 @@ function InstallationPage()
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
                 Pre(:class => "text-sm text-warm-100",
                     Code("""using Pkg
-Pkg.add(url="https://github.com/TherapeuticJulia/Suite.jl")""")
+Pkg.add(url="https://github.com/GroupTherapyOrg/Suite.jl")""")
                 )
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",

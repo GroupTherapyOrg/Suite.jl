@@ -21,7 +21,7 @@ function GettingStartedIndex()
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Suite.jl is a collection of 50+ UI components built on ",
-                A(:href => "https://github.com/TherapeuticJulia/Therapy.jl", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Therapy.jl"),
+                A(:href => "https://github.com/GroupTherapyOrg/Therapy.jl", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Therapy.jl"),
                 ", Julia's reactive web framework. It follows the ",
                 A(:href => "https://ui.shadcn.com", :class => "text-accent-600 dark:text-accent-400 hover:underline", :target => "_blank", "shadcn/ui"),
                 " philosophy: you own the code, not a dependency."
@@ -115,7 +115,7 @@ Suite.extract(:Button, "components/", theme=:nature)""")
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
                 Pre(:class => "text-sm text-warm-100",
                     Code("""using Pkg
-Pkg.add(url="https://github.com/TherapeuticJulia/Suite.jl")""")
+Pkg.add(url="https://github.com/GroupTherapyOrg/Suite.jl")""")
                 )
             ),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
