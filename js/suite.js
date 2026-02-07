@@ -2827,18 +2827,24 @@
         },
 
         // --- NavigationMenu -------------------------------------------------------
+        // Inline content panels (no viewport) — matches shadcn viewport=false.
+        // Content panels render as absolute-positioned dropdowns under their triggers.
         NavigationMenu: {
             init() {
                 const roots = document.querySelectorAll('[data-suite-nav-menu]');
                 roots.forEach(root => {
-                    if (root._suiteNavMenu) return;
+                    // Singleton guard — but expose close() for SPA state reset
+                    if (root._suiteNavMenu) {
+                        // Already initialized — force-close to reset state after SPA navigation
+                        if (root._suiteNavMenuClose) root._suiteNavMenuClose();
+                        return;
+                    }
                     root._suiteNavMenu = true;
 
                     const delayDuration = parseInt(root.getAttribute('data-delay-duration') || '200', 10);
                     const skipDelayDuration = parseInt(root.getAttribute('data-skip-delay-duration') || '300', 10);
 
                     const items = root.querySelectorAll('[data-suite-nav-menu-item]');
-                    const viewport = root.querySelector('[data-suite-nav-menu-viewport]');
                     const indicator = root.querySelector('[data-suite-nav-menu-indicator]');
 
                     let activeValue = '';
@@ -2858,13 +2864,16 @@
                         previousValue = activeValue;
                         activeValue = value;
 
-                        // Close all other content panels
+                        // Update all items — show active content, hide others
                         items.forEach(item => {
                             const v = item.getAttribute('data-value');
                             const trigger = item.querySelector('[data-suite-nav-menu-trigger]');
                             const content = item.querySelector('[data-suite-nav-menu-content]');
                             if (v === value) {
-                                if (trigger) trigger.setAttribute('data-state', 'open');
+                                if (trigger) {
+                                    trigger.setAttribute('data-state', 'open');
+                                    trigger.setAttribute('aria-expanded', 'true');
+                                }
                                 if (content) {
                                     content.style.display = '';
                                     content.setAttribute('data-state', 'open');
@@ -2880,7 +2889,10 @@
                                     }
                                 }
                             } else {
-                                if (trigger) trigger.setAttribute('data-state', 'closed');
+                                if (trigger) {
+                                    trigger.setAttribute('data-state', 'closed');
+                                    trigger.setAttribute('aria-expanded', 'false');
+                                }
                                 if (content) {
                                     // Set exit motion
                                     if (v === previousValue) {
@@ -2898,21 +2910,6 @@
                                 }
                             }
                         });
-
-                        // Update viewport
-                        if (viewport) {
-                            const activeItem = getItemByValue(value);
-                            const content = activeItem ? activeItem.querySelector('[data-suite-nav-menu-content]') : null;
-                            if (content) {
-                                viewport.style.display = '';
-                                viewport.setAttribute('data-state', 'open');
-                                // Size viewport to content
-                                requestAnimationFrame(() => {
-                                    viewport.style.width = content.scrollWidth + 'px';
-                                    viewport.style.height = content.scrollHeight + 'px';
-                                });
-                            }
-                        }
 
                         // Update indicator
                         if (indicator) {
@@ -2936,13 +2933,17 @@
                     }
 
                     function close() {
+                        if (!activeValue) return;
                         previousValue = activeValue;
                         activeValue = '';
 
                         items.forEach(item => {
                             const trigger = item.querySelector('[data-suite-nav-menu-trigger]');
                             const content = item.querySelector('[data-suite-nav-menu-content]');
-                            if (trigger) trigger.setAttribute('data-state', 'closed');
+                            if (trigger) {
+                                trigger.setAttribute('data-state', 'closed');
+                                trigger.setAttribute('aria-expanded', 'false');
+                            }
                             if (content) {
                                 content.setAttribute('data-state', 'closed');
                                 const hideContent = content;
@@ -2951,13 +2952,6 @@
                                 setTimeout(hide, 300);
                             }
                         });
-
-                        if (viewport) {
-                            viewport.setAttribute('data-state', 'closed');
-                            setTimeout(() => {
-                                if (viewport.getAttribute('data-state') === 'closed') viewport.style.display = 'none';
-                            }, 300);
-                        }
 
                         if (indicator) {
                             indicator.setAttribute('data-state', 'hidden');
@@ -2971,6 +2965,9 @@
                         isSkipDelay = true;
                         skipDelayTimer = setTimeout(() => { isSkipDelay = false; }, skipDelayDuration);
                     }
+
+                    // Expose close() for SPA state reset
+                    root._suiteNavMenuClose = close;
 
                     // Set up event handlers on each item
                     items.forEach(item => {
@@ -3048,6 +3045,13 @@
                             const trigger = activeItem ? activeItem.querySelector('[data-suite-nav-menu-trigger]') : null;
                             close();
                             if (trigger) trigger.focus({ preventScroll: true });
+                        }
+                    });
+
+                    // Click outside to close
+                    document.addEventListener('pointerdown', (e) => {
+                        if (activeValue && !root.contains(e.target)) {
+                            close();
                         }
                     });
                 });

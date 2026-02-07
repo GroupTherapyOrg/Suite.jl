@@ -1,6 +1,6 @@
 # NavigationMenu.jl — Suite.jl Navigation Menu Component
 #
-# Tier: js_runtime (requires suite.js for hover timers, viewport sizing, animation)
+# Tier: js_runtime (requires suite.js for hover timers, animation)
 # Suite Dependencies: none (leaf component)
 # JS Modules: NavigationMenu, DismissLayer
 #
@@ -12,7 +12,7 @@
 #   - Click trigger for immediate toggle
 #   - Hover content keeps panel open; leave starts close timer (150ms)
 #   - Skip delay (300ms) for rapid switching between items
-#   - Viewport dynamically sizes to content
+#   - Inline content panels (no viewport — matches shadcn viewport=false)
 #   - Escape to dismiss
 #   - Motion attributes for directional slide animation
 
@@ -50,7 +50,6 @@ NavigationMenu(
             NavigationMenuLink("Documentation", href="/docs/")
         ),
     ),
-    NavigationMenuViewport(),
 )
 ```
 """
@@ -126,6 +125,7 @@ function NavigationMenuTrigger(children...; disabled::Bool=false, theme::Symbol=
 
     Therapy.Button(Symbol("data-suite-nav-menu-trigger") => "",
            Symbol("data-state") => "closed",
+           Symbol("aria-expanded") => "false",
            :type => "button",
            :class => classes,
            (disabled ? [:disabled => ""] : Pair{Symbol,String}[])...,
@@ -139,11 +139,24 @@ end
     NavigationMenuContent(children...; class, kwargs...) -> VNode
 
 The content panel that appears when a trigger is hovered/clicked.
+Renders as an inline dropdown (no viewport).
 """
 function NavigationMenuContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
-        "top-0 left-0 w-full p-4 md:absolute md:w-[400px] lg:w-[500px]",
-        "grid gap-3 md:grid-cols-2",
+        # Inline dropdown positioning (no viewport)
+        "absolute top-full left-0 mt-1.5 z-50",
+        # Sizing and layout
+        "w-[400px] lg:w-[500px] p-4 grid gap-3 md:grid-cols-2",
+        # Visual appearance
+        "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
+        "border border-warm-200 dark:border-warm-700",
+        "rounded-md shadow-lg overflow-hidden",
+        # Open/close animations
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
+        "data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95",
+        "duration-200",
+        # Directional slide animations
         "data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out",
         "data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out",
         "data-[motion=from-end]:slide-in-from-right-52",
@@ -194,28 +207,16 @@ function NavigationMenuLink(children...; href::String="#", active::Bool=false, d
 end
 
 """
-    NavigationMenuViewport(; class, kwargs...) -> VNode
+    NavigationMenuViewport(; kwargs...) -> VNode
 
-Dynamic sizing viewport container for navigation menu content panels.
+Deprecated — no-op. Inline content panels are used instead.
+Kept for backwards compatibility; renders nothing.
 """
 function NavigationMenuViewport(; theme::Symbol=:default, class::String="", kwargs...)
-    classes = cn(
-        "origin-top-center mt-1.5 overflow-hidden rounded-md shadow transition-[width,height] duration-200",
-        "bg-warm-50 dark:bg-warm-900",
-        "border border-warm-200 dark:border-warm-700",
-        "text-warm-800 dark:text-warm-300",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out",
-        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90",
-        class
-    )
-    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
-
-    Div(:class => "absolute top-full left-0 flex justify-center",
-        Div(Symbol("data-suite-nav-menu-viewport") => "",
-            Symbol("data-state") => "closed",
-            :style => "display:none",
-            :class => classes,
-            kwargs...))
+    # No-op — inline content panels render directly under their triggers.
+    # The viewport pattern requires React-style context/portal which is
+    # impractical in vanilla JS. shadcn v4 supports viewport=false natively.
+    Fragment()
 end
 
 """
@@ -248,7 +249,7 @@ if @isdefined(register_component!)
         :NavigationMenu,
         "NavigationMenu.jl",
         :js_runtime,
-        "Site navigation menu with hover-triggered content panels and viewport",
+        "Site navigation menu with hover-triggered inline content panels",
         Symbol[],
         [:NavigationMenu, :DismissLayer],
         [:NavigationMenu, :NavigationMenuList, :NavigationMenuItem,

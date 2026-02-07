@@ -3981,7 +3981,6 @@ using Test
                         NavigationMenuLink("Documentation", href="/docs/")
                     ),
                 ),
-                NavigationMenuViewport(),
             ))
             @test occursin("data-suite-nav-menu=", html)
             @test occursin("data-suite-nav-menu-list", html)
@@ -3989,7 +3988,6 @@ using Test
             @test occursin("data-suite-nav-menu-trigger", html)
             @test occursin("data-suite-nav-menu-content", html)
             @test occursin("data-suite-nav-menu-link", html)
-            @test occursin("data-suite-nav-menu-viewport", html)
             @test occursin("Getting Started", html)
             @test occursin("Introduction", html)
             @test occursin("Documentation", html)
@@ -4028,6 +4026,7 @@ using Test
             @test occursin("type=\"button\"", html)
             @test occursin("data-suite-nav-menu-trigger", html)
             @test occursin("data-state=\"closed\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
             @test occursin("Products", html)
             # Chevron SVG
             @test occursin("group-data-[state=open]:rotate-180", html)
@@ -4050,7 +4049,13 @@ using Test
             @test occursin("data-suite-nav-menu-content", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("display:none", html)
-            @test occursin("md:absolute", html)
+            # Inline dropdown positioning
+            @test occursin("absolute", html)
+            @test occursin("z-50", html)
+            @test occursin("bg-warm-50", html)
+            @test occursin("border-warm-200", html)
+            @test occursin("shadow-lg", html)
+            @test occursin("rounded-md", html)
             # Motion animation classes
             @test occursin("data-[motion^=from-]:animate-in", html)
             @test occursin("data-[motion^=to-]:animate-out", html)
@@ -4077,15 +4082,10 @@ using Test
             @test occursin("data-active=\"true\"", html)
         end
 
-        @testset "Viewport" begin
+        @testset "Viewport (no-op)" begin
+            # NavigationMenuViewport is a no-op — renders nothing (Fragment)
             html = Therapy.render_to_string(NavigationMenuViewport())
-            @test occursin("data-suite-nav-menu-viewport", html)
-            @test occursin("data-state=\"closed\"", html)
-            @test occursin("display:none", html)
-            @test occursin("rounded-md", html)
-            @test occursin("shadow", html)
-            @test occursin("bg-warm-50", html)
-            @test occursin("border-warm-200", html)
+            @test html == ""  # Fragment renders as empty string
         end
 
         @testset "Indicator" begin

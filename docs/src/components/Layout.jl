@@ -91,7 +91,6 @@ function DesktopNav()
                 ),
             ),
         ),
-        Main.NavigationMenuViewport(),
     )
 end
 
