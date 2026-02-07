@@ -4566,4 +4566,298 @@ using Test
             @test display_empty == ""
         end
     end
+
+    @testset "SuiteDataTable" begin
+        using Therapy
+        using Suite
+
+        # Sample data for tests
+        test_data = [
+            (name="Alice", email="alice@example.com", status="Active", amount=250.00),
+            (name="Bob", email="bob@example.com", status="Inactive", amount=150.00),
+            (name="Charlie", email="charlie@example.com", status="Active", amount=350.00),
+            (name="Diana", email="diana@example.com", status="Active", amount=450.00),
+            (name="Eve", email="eve@example.com", status="Inactive", amount=50.00),
+        ]
+
+        test_columns = [
+            SuiteDataTableColumn("name", "Name"),
+            SuiteDataTableColumn("email", "Email"),
+            SuiteDataTableColumn("status", "Status"),
+            SuiteDataTableColumn("amount", "Amount", align="right"),
+        ]
+
+        @testset "SuiteDataTableColumn struct" begin
+            col = SuiteDataTableColumn("name", "Name")
+            @test col.key == "name"
+            @test col.header == "Name"
+            @test col.sortable == true
+            @test col.hideable == true
+            @test col.cell === nothing
+            @test col.align == "left"
+
+            col2 = SuiteDataTableColumn("amount", "Amount", sortable=false, hideable=false, align="right")
+            @test col2.sortable == false
+            @test col2.hideable == false
+            @test col2.align == "right"
+
+            col3 = SuiteDataTableColumn("status" => "Status")
+            @test col3.key == "status"
+            @test col3.header == "Status"
+        end
+
+        @testset "Default rendering" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns))
+            @test occursin("data-suite-datatable", html)
+            @test occursin("<table", html)
+            @test occursin("<thead", html)
+            @test occursin("<tbody", html)
+            @test occursin("Alice", html)
+            @test occursin("alice@example.com", html)
+            @test occursin("250.0", html)
+        end
+
+        @testset "Data store (JSON)" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns))
+            @test occursin("data-suite-datatable-store", html)
+            @test occursin("data-suite-datatable-columns", html)
+            @test occursin("application/json", html)
+            # All data should be in JSON store
+            @test occursin("\"name\":\"Alice\"", html)
+            @test occursin("\"name\":\"Eve\"", html)
+        end
+
+        @testset "Column headers" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns))
+            @test occursin(">Name", html)
+            @test occursin(">Email", html)
+            @test occursin(">Status", html)
+            @test occursin(">Amount", html)
+        end
+
+        @testset "Sort buttons on sortable columns" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, sortable=true))
+            @test occursin("data-suite-datatable-sort", html)
+            @test occursin("<svg", html)  # sort icon SVG
+
+            # Non-sortable column
+            cols_no_sort = [
+                SuiteDataTableColumn("name", "Name", sortable=false),
+                SuiteDataTableColumn("email", "Email"),
+            ]
+            html2 = Therapy.render_to_string(SuiteDataTable(test_data, cols_no_sort))
+            # Email should still have sort button
+            @test occursin("data-suite-datatable-sort", html2)
+        end
+
+        @testset "Sortable=false disables all sorting" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, sortable=false))
+            # No sort buttons should be present — check for sort button SVG icon
+            @test !occursin("data-suite-datatable-sort=\"", html)
+        end
+
+        @testset "Filter input" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, filterable=true))
+            @test occursin("data-suite-datatable-filter", html)
+            @test occursin("Filter...", html)
+
+            html2 = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, filterable=true, filter_placeholder="Search..."))
+            @test occursin("Search...", html2)
+
+            html3 = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, filterable=false))
+            @test !occursin("placeholder=\"Filter...\"", html3)
+        end
+
+        @testset "Pagination" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, paginated=true, page_size=2))
+            @test occursin("data-suite-datatable-pagination", html)
+            @test occursin("data-suite-datatable-prev", html)
+            @test occursin("data-suite-datatable-next", html)
+            @test occursin("Page 1 of 3", html)
+            @test occursin("5 row(s) total", html)
+            # Only first 2 rows rendered in body
+            @test occursin("Alice", html)
+            @test occursin("Bob", html)
+
+            # No pagination
+            html2 = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, paginated=false))
+            @test !occursin("data-suite-datatable-pagination", html2)
+            # All rows rendered
+            @test occursin("Alice", html2)
+            @test occursin("Eve", html2)
+        end
+
+        @testset "Row selection" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, selectable=true))
+            @test occursin("data-suite-datatable-select-all", html)
+            @test occursin("data-suite-datatable-select-row", html)
+            @test occursin("Select all rows", html)
+            @test occursin("Select row", html)
+            @test occursin("row(s) selected", html)
+
+            html2 = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, selectable=false))
+            @test !occursin("data-suite-datatable-select-all", html2)
+            @test !occursin("data-suite-datatable-select-row", html2)
+        end
+
+        @testset "Column visibility" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, column_visibility=true))
+            @test occursin("data-suite-datatable-col-vis", html)
+            @test occursin("data-suite-datatable-col-vis-trigger", html)
+            @test occursin("data-suite-datatable-col-vis-content", html)
+            @test occursin("Columns", html)
+            @test occursin("data-suite-datatable-col-toggle", html)
+
+            html2 = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, column_visibility=false))
+            @test !occursin("data-suite-datatable-col-vis", html2)
+        end
+
+        @testset "Column alignment" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns))
+            @test occursin("text-right", html)  # Amount column
+            @test occursin("text-left", html)   # Name/Email/Status
+        end
+
+        @testset "Custom cell renderer" begin
+            custom_cols = [
+                SuiteDataTableColumn("name", "Name"),
+                SuiteDataTableColumn("amount", "Amount",
+                    cell=(val, row) -> Span(:class => "font-bold", "\$$(val)")),
+            ]
+            html = Therapy.render_to_string(SuiteDataTable(test_data, custom_cols))
+            @test occursin("font-bold", html)
+            @test occursin("\$250.0", html)
+        end
+
+        @testset "Empty data" begin
+            html = Therapy.render_to_string(SuiteDataTable(NamedTuple[], test_columns))
+            @test occursin("No results.", html)
+        end
+
+        @testset "Caption" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, caption="Test data"))
+            @test occursin("<caption", html)
+            @test occursin("Test data", html)
+        end
+
+        @testset "Theme support" begin
+            html_default = Therapy.render_to_string(SuiteDataTable(test_data, test_columns))
+            @test occursin("warm-", html_default)
+
+            html_ocean = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, theme=:ocean))
+            @test occursin("blue-", html_ocean) || occursin("warm-", html_ocean)
+        end
+
+        @testset "Dict data" begin
+            dict_data = [
+                Dict("name" => "Frank", "email" => "frank@example.com"),
+                Dict("name" => "Grace", "email" => "grace@example.com"),
+            ]
+            dict_cols = [
+                SuiteDataTableColumn("name", "Name"),
+                SuiteDataTableColumn("email", "Email"),
+            ]
+            html = Therapy.render_to_string(SuiteDataTable(dict_data, dict_cols))
+            @test occursin("Frank", html)
+            @test occursin("grace@example.com", html)
+        end
+
+        @testset "Data serialization" begin
+            json = Suite._dt_serialize_data(test_data, test_columns)
+            @test occursin("\"name\":\"Alice\"", json)
+            @test occursin("\"amount\":250.0", json)
+            @test startswith(json, "[")
+            @test endswith(json, "]")
+
+            col_json = Suite._dt_serialize_columns(test_columns)
+            @test occursin("\"key\":\"name\"", col_json)
+            @test occursin("\"header\":\"Name\"", col_json)
+            @test occursin("\"sortable\":true", col_json)
+            @test occursin("\"align\":\"right\"", col_json)
+        end
+
+        @testset "JSON value escaping" begin
+            @test Suite._dt_json_value("hello") == "\"hello\""
+            @test Suite._dt_json_value(42) == "42"
+            @test Suite._dt_json_value(3.14) == "3.14"
+            @test Suite._dt_json_value(nothing) == "null"
+            @test Suite._dt_json_value("has \"quotes\"") == "\"has \\\"quotes\\\"\""
+            @test Suite._dt_json_value("back\\slash") == "\"back\\\\slash\""
+        end
+
+        @testset "Data access patterns" begin
+            # NamedTuple access
+            nt = (name="Test", value=42)
+            @test Suite._dt_get_value(nt, "name") == "Test"
+            @test Suite._dt_get_value(nt, "value") == 42
+
+            # Dict access (String keys)
+            d = Dict("name" => "Test2", "value" => 99)
+            @test Suite._dt_get_value(d, "name") == "Test2"
+            @test Suite._dt_get_value(d, "value") == 99
+
+            # Dict access (Symbol keys)
+            d2 = Dict(:name => "Test3")
+            @test Suite._dt_get_value(d2, "name") == "Test3"
+
+            # Missing key
+            @test Suite._dt_get_value(nt, "missing") == ""
+        end
+
+        @testset "Page size config" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, page_size=3))
+            @test occursin("data-suite-datatable-page-size=\"3\"", html)
+            @test occursin("Page 1 of 2", html)
+
+            html2 = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, page_size=10))
+            @test occursin("Page 1 of 1", html2)
+        end
+
+        @testset "Non-hideable columns excluded from visibility toggle" begin
+            cols = [
+                SuiteDataTableColumn("name", "Name", hideable=false),
+                SuiteDataTableColumn("email", "Email", hideable=true),
+            ]
+            html = Therapy.render_to_string(SuiteDataTable(test_data, cols, column_visibility=true))
+            # Only Email should have a toggle checkbox
+            @test occursin("data-suite-datatable-col-check=\"email\"", html)
+            @test !occursin("data-suite-datatable-col-check=\"name\"", html)
+        end
+
+        @testset "Table structure" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns))
+            @test occursin("overflow-x-auto", html)
+            @test occursin("rounded-md", html)
+            @test occursin("border", html)
+            @test occursin("caption-bottom", html)
+        end
+
+        @testset "Row hover + selection styling" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns, selectable=true))
+            @test occursin("hover:bg-warm-100/50", html)
+            @test occursin("data-[state=selected]", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :DataTable)
+            meta = Suite.COMPONENT_REGISTRY[:DataTable]
+            @test meta.tier == :js_runtime
+            @test :SuiteDataTable in meta.exports
+            @test :SuiteDataTableColumn in meta.exports
+            @test :Table in meta.suite_deps
+        end
+
+        @testset "Filter columns attribute" begin
+            html = Therapy.render_to_string(SuiteDataTable(test_data, test_columns,
+                filterable=true, filter_columns=["name", "email"]))
+            @test occursin("data-suite-datatable-filter-columns=\"name,email\"", html)
+        end
+
+        @testset "Large dataset pagination" begin
+            large_data = [(name="Person $i", email="p$i@test.com", status=i % 2 == 0 ? "Active" : "Inactive", amount=Float64(i * 10)) for i in 1:100]
+            html = Therapy.render_to_string(SuiteDataTable(large_data, test_columns, page_size=10))
+            @test occursin("Page 1 of 10", html)
+            @test occursin("100 row(s) total", html)
+        end
+    end
 end

@@ -28,7 +28,7 @@ const SUITE_COMPONENTS = [
         (slug = "collapsible",      title = "Collapsible",      implemented = true),
         (slug = "command",          title = "Command",          implemented = true),
         (slug = "context-menu",     title = "Context Menu",     implemented = true),
-        (slug = "data-table",       title = "Data Table",       implemented = false),
+        (slug = "data-table",       title = "Data Table",       implemented = true),
         (slug = "date-picker",      title = "Date Picker",      implemented = true),
         (slug = "dialog",           title = "Dialog",           implemented = true),
         (slug = "drawer",           title = "Drawer",           implemented = true),

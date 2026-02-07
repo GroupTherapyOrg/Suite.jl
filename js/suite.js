@@ -4020,6 +4020,349 @@
             }
         },
 
+        // --- DataTable -------------------------------------------------------------
+        DataTable: {
+            _initialized: new WeakSet(),
+
+            init() {
+                document.querySelectorAll('[data-suite-datatable]').forEach(root => {
+                    if (this._initialized.has(root)) return;
+                    this._initialized.add(root);
+                    this._setup(root);
+                });
+            },
+
+            _setup(root) {
+                const id = root.getAttribute('data-suite-datatable');
+                const pageSize = parseInt(root.getAttribute('data-suite-datatable-page-size')) || 10;
+                const sortable = root.getAttribute('data-suite-datatable-sortable') !== 'false';
+                const filterable = root.getAttribute('data-suite-datatable-filterable') !== 'false';
+                const selectable = root.getAttribute('data-suite-datatable-selectable') === 'true';
+                const hasColVis = root.getAttribute('data-suite-datatable-column-visibility') === 'true';
+
+                // Load data from embedded JSON
+                const dataStore = root.querySelector(`[data-suite-datatable-store="${id}"]`);
+                const colStore = root.querySelector(`[data-suite-datatable-columns="${id}"]`);
+                if (!dataStore || !colStore) return;
+
+                let allData;
+                let columns;
+                try {
+                    allData = JSON.parse(dataStore.textContent);
+                    columns = JSON.parse(colStore.textContent);
+                } catch (e) { return; }
+
+                const state = {
+                    data: allData,
+                    filtered: [...allData],
+                    sorted: [...allData],
+                    page: 0,
+                    pageSize: pageSize,
+                    sortKey: null,
+                    sortDir: null, // 'asc' | 'desc' | null
+                    filterText: '',
+                    filterColumns: [],
+                    selected: new Set(),
+                    hiddenCols: new Set(),
+                    columns: columns,
+                };
+
+                // Parse filter columns
+                const filterInput = root.querySelector(`[data-suite-datatable-filter="${id}"]`);
+                if (filterInput) {
+                    const fc = filterInput.getAttribute('data-suite-datatable-filter-columns') || '';
+                    state.filterColumns = fc ? fc.split(',').map(s => s.trim()).filter(s => s) : [];
+                }
+
+                // Wire filter
+                if (filterInput) {
+                    filterInput.addEventListener('input', () => {
+                        state.filterText = filterInput.value.toLowerCase();
+                        state.page = 0;
+                        state.selected.clear();
+                        this._applyPipeline(root, id, state);
+                    });
+                }
+
+                // Wire sort buttons
+                if (sortable) {
+                    root.querySelectorAll(`[data-suite-datatable-sort="${id}"]`).forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const key = btn.value;
+                            if (state.sortKey === key) {
+                                if (state.sortDir === 'asc') state.sortDir = 'desc';
+                                else if (state.sortDir === 'desc') { state.sortDir = null; state.sortKey = null; }
+                                else state.sortDir = 'asc';
+                            } else {
+                                state.sortKey = key;
+                                state.sortDir = 'asc';
+                            }
+                            state.page = 0;
+                            this._applyPipeline(root, id, state);
+                            this._updateSortIcons(root, id, state);
+                        });
+                    });
+                }
+
+                // Wire pagination
+                const prevBtn = root.querySelector(`[data-suite-datatable-prev="${id}"]`);
+                const nextBtn = root.querySelector(`[data-suite-datatable-next="${id}"]`);
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        if (state.page > 0) {
+                            state.page--;
+                            this._render(root, id, state);
+                        }
+                    });
+                }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        const totalPages = Math.max(1, Math.ceil(state.sorted.length / state.pageSize));
+                        if (state.page < totalPages - 1) {
+                            state.page++;
+                            this._render(root, id, state);
+                        }
+                    });
+                }
+
+                // Wire select all
+                if (selectable) {
+                    const selectAll = root.querySelector(`[data-suite-datatable-select-all="${id}"]`);
+                    if (selectAll) {
+                        selectAll.addEventListener('change', () => {
+                            const start = state.page * state.pageSize;
+                            const end = Math.min(start + state.pageSize, state.sorted.length);
+                            if (selectAll.checked) {
+                                for (let i = start; i < end; i++) state.selected.add(i);
+                            } else {
+                                for (let i = start; i < end; i++) state.selected.delete(i);
+                            }
+                            this._render(root, id, state);
+                        });
+                    }
+                }
+
+                // Wire column visibility
+                if (hasColVis) {
+                    const visTrigger = root.querySelector(`[data-suite-datatable-col-vis-trigger="${id}"]`);
+                    const visContent = root.querySelector(`[data-suite-datatable-col-vis-content="${id}"]`);
+                    if (visTrigger && visContent) {
+                        visTrigger.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            visContent.classList.toggle('hidden');
+                        });
+                        document.addEventListener('click', (e) => {
+                            if (!visContent.contains(e.target) && e.target !== visTrigger) {
+                                visContent.classList.add('hidden');
+                            }
+                        });
+                    }
+
+                    root.querySelectorAll(`[data-suite-datatable-col-toggle="${id}"]`).forEach(cb => {
+                        cb.addEventListener('change', () => {
+                            const key = cb.value;
+                            if (cb.checked) {
+                                state.hiddenCols.delete(key);
+                            } else {
+                                state.hiddenCols.add(key);
+                            }
+                            // Update check mark
+                            const check = root.querySelector(`[data-suite-datatable-col-check="${key}"]`);
+                            if (check) check.textContent = cb.checked ? '✓ ' : '  ';
+                            this._applyColumnVisibility(root, id, state);
+                        });
+                    });
+                }
+            },
+
+            _applyPipeline(root, id, state) {
+                // 1. Filter
+                const text = state.filterText;
+                if (text) {
+                    const filterKeys = state.filterColumns.length > 0
+                        ? state.filterColumns
+                        : state.columns.map(c => c.key);
+                    state.filtered = state.data.filter(row => {
+                        return filterKeys.some(key => {
+                            const val = row[key];
+                            return val !== null && val !== undefined &&
+                                   String(val).toLowerCase().includes(text);
+                        });
+                    });
+                } else {
+                    state.filtered = [...state.data];
+                }
+
+                // 2. Sort
+                if (state.sortKey && state.sortDir) {
+                    const key = state.sortKey;
+                    const dir = state.sortDir === 'asc' ? 1 : -1;
+                    state.sorted = [...state.filtered].sort((a, b) => {
+                        let va = a[key], vb = b[key];
+                        if (va == null) va = '';
+                        if (vb == null) vb = '';
+                        if (typeof va === 'number' && typeof vb === 'number') {
+                            return (va - vb) * dir;
+                        }
+                        return String(va).localeCompare(String(vb)) * dir;
+                    });
+                } else {
+                    state.sorted = [...state.filtered];
+                }
+
+                this._render(root, id, state);
+            },
+
+            _render(root, id, state) {
+                const tbody = root.querySelector(`[data-suite-datatable-body="${id}"]`);
+                if (!tbody) return;
+
+                const selectable = root.getAttribute('data-suite-datatable-selectable') === 'true';
+                const start = state.page * state.pageSize;
+                const end = Math.min(start + state.pageSize, state.sorted.length);
+                const pageData = state.sorted.slice(start, end);
+                const totalPages = Math.max(1, Math.ceil(state.sorted.length / state.pageSize));
+
+                // Clear tbody
+                tbody.innerHTML = '';
+
+                if (pageData.length === 0) {
+                    const colspan = state.columns.filter(c => !state.hiddenCols.has(c.key)).length + (selectable ? 1 : 0);
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-warm-200 dark:border-warm-700';
+                    const td = document.createElement('td');
+                    td.colSpan = colspan;
+                    td.className = 'p-2 align-middle text-center text-warm-500 dark:text-warm-600 h-24';
+                    td.textContent = 'No results.';
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                } else {
+                    pageData.forEach((row, i) => {
+                        const globalIndex = start + i;
+                        const isSelected = state.selected.has(globalIndex);
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-b border-warm-200 dark:border-warm-700 transition-colors hover:bg-warm-100/50 dark:hover:bg-warm-900/50';
+                        tr.setAttribute('data-suite-datatable-row', id);
+                        tr.setAttribute('data-row-index', String(globalIndex));
+                        if (isSelected) tr.setAttribute('data-state', 'selected');
+
+                        if (selectable) {
+                            const td = document.createElement('td');
+                            td.className = 'w-12 px-2 align-middle';
+                            const cb = document.createElement('input');
+                            cb.type = 'checkbox';
+                            cb.className = 'h-4 w-4 rounded border border-warm-300 dark:border-warm-600 accent-accent-600';
+                            cb.setAttribute('data-suite-datatable-select-row', id);
+                            cb.value = String(globalIndex);
+                            cb.setAttribute('aria-label', 'Select row');
+                            cb.checked = isSelected;
+                            cb.addEventListener('change', () => {
+                                if (cb.checked) state.selected.add(globalIndex);
+                                else state.selected.delete(globalIndex);
+                                tr.toggleAttribute('data-state', cb.checked);
+                                if (cb.checked) tr.setAttribute('data-state', 'selected');
+                                else tr.removeAttribute('data-state');
+                                this._updateSelectionInfo(root, id, state);
+                                this._updateSelectAll(root, id, state);
+                            });
+                            td.appendChild(cb);
+                            tr.appendChild(td);
+                        }
+
+                        state.columns.forEach(col => {
+                            if (state.hiddenCols.has(col.key)) return;
+                            const td = document.createElement('td');
+                            const alignClass = col.align === 'right' ? 'text-right' :
+                                               col.align === 'center' ? 'text-center' : 'text-left';
+                            td.className = 'p-2 align-middle whitespace-nowrap ' + alignClass;
+                            td.setAttribute('data-suite-datatable-col', col.key);
+                            const val = row[col.key];
+                            td.textContent = val != null ? String(val) : '';
+                            tr.appendChild(td);
+                        });
+
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                // Update pagination controls
+                this._updatePagination(root, id, state, totalPages);
+                this._updateSelectionInfo(root, id, state);
+                this._updateSelectAll(root, id, state);
+            },
+
+            _updatePagination(root, id, state, totalPages) {
+                const pageInfo = root.querySelector(`[data-suite-datatable-page-info="${id}"]`);
+                if (pageInfo) pageInfo.textContent = `Page ${state.page + 1} of ${totalPages}`;
+
+                const prevBtn = root.querySelector(`[data-suite-datatable-prev="${id}"]`);
+                if (prevBtn) {
+                    if (state.page <= 0) prevBtn.setAttribute('disabled', 'disabled');
+                    else prevBtn.removeAttribute('disabled');
+                }
+
+                const nextBtn = root.querySelector(`[data-suite-datatable-next="${id}"]`);
+                if (nextBtn) {
+                    if (state.page >= totalPages - 1) nextBtn.setAttribute('disabled', 'disabled');
+                    else nextBtn.removeAttribute('disabled');
+                }
+
+                // Update row info
+                const rowInfo = root.querySelector(`[data-suite-datatable-row-info="${id}"]`);
+                if (rowInfo) rowInfo.textContent = `${state.sorted.length} row(s) total.`;
+            },
+
+            _updateSelectionInfo(root, id, state) {
+                const info = root.querySelector(`[data-suite-datatable-selection-info="${id}"]`);
+                if (info) info.textContent = `${state.selected.size} of ${state.sorted.length} row(s) selected.`;
+            },
+
+            _updateSelectAll(root, id, state) {
+                const selectAll = root.querySelector(`[data-suite-datatable-select-all="${id}"]`);
+                if (!selectAll) return;
+                const start = state.page * state.pageSize;
+                const end = Math.min(start + state.pageSize, state.sorted.length);
+                let allChecked = end > start;
+                let someChecked = false;
+                for (let i = start; i < end; i++) {
+                    if (state.selected.has(i)) someChecked = true;
+                    else allChecked = false;
+                }
+                selectAll.checked = allChecked;
+                selectAll.indeterminate = someChecked && !allChecked;
+            },
+
+            _updateSortIcons(root, id, state) {
+                root.querySelectorAll(`[data-suite-datatable-sort="${id}"]`).forEach(btn => {
+                    const key = btn.value;
+                    const svg = btn.querySelector('svg');
+                    if (!svg) return;
+                    if (key === state.sortKey && state.sortDir === 'asc') {
+                        svg.innerHTML = '<path d="m7 9 5-5 5 5"/>';
+                    } else if (key === state.sortKey && state.sortDir === 'desc') {
+                        svg.innerHTML = '<path d="m7 15 5 5 5-5"/>';
+                    } else {
+                        svg.innerHTML = '<path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>';
+                    }
+                });
+            },
+
+            _applyColumnVisibility(root, id, state) {
+                // Hide/show header cells
+                state.columns.forEach(col => {
+                    const hidden = state.hiddenCols.has(col.key);
+                    root.querySelectorAll(`[data-suite-datatable-col="${col.key}"]`).forEach(el => {
+                        el.style.display = hidden ? 'none' : '';
+                    });
+                    // Also header th
+                    const th = root.querySelector(`th[data-suite-datatable-col="${col.key}"]`);
+                    if (th) th.style.display = hidden ? 'none' : '';
+                });
+                // Re-render to update colspan for empty state
+                this._applyPipeline(root, id, state);
+            },
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
@@ -4045,6 +4388,7 @@
             this.Command.init();
             this.Toast.init();
             this.Calendar.init();
+            this.DataTable.init();
         },
 
         // --- Init -----------------------------------------------------------------
