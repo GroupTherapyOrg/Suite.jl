@@ -47,8 +47,9 @@ end
 
 Ordered list container for breadcrumb items.
 """
-function SuiteBreadcrumbList(children...; class::String="", kwargs...)
+function SuiteBreadcrumbList(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-warm-600 dark:text-warm-500 flex flex-wrap items-center gap-1.5 text-sm break-words", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Ol(:class => classes, kwargs..., children...)
 end
 
@@ -67,8 +68,9 @@ end
 
 Clickable breadcrumb link.
 """
-function SuiteBreadcrumbLink(children...; href::String="#", class::String="", kwargs...)
+function SuiteBreadcrumbLink(children...; href::String="#", class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("hover:text-warm-800 dark:hover:text-warm-300 transition-colors", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     A(:href => href, :class => classes, kwargs..., children...)
 end
 
@@ -77,8 +79,9 @@ end
 
 Current page indicator (non-clickable).
 """
-function SuiteBreadcrumbPage(children...; class::String="", kwargs...)
+function SuiteBreadcrumbPage(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-warm-800 dark:text-warm-300 font-normal", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Span(:role => "link", :aria_disabled => "true", :aria_current => "page",
          :class => classes, kwargs..., children...)
 end
@@ -88,8 +91,9 @@ end
 
 Visual separator between breadcrumb items. Default separator is "/".
 """
-function SuiteBreadcrumbSeparator(children...; class::String="", kwargs...)
+function SuiteBreadcrumbSeparator(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-warm-400 dark:text-warm-600", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     sep_content = isempty(children) ? ("/" ,) : children
     Li(:role => "presentation", :aria_hidden => "true",
        :class => classes, kwargs..., sep_content...)

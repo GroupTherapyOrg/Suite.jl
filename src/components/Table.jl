@@ -55,8 +55,9 @@ end
 
 Table header section (`<thead>`).
 """
-function SuiteTableHeader(children...; class::String="", kwargs...)
+function SuiteTableHeader(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("border-b border-warm-200 dark:border-warm-700", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Thead(:class => classes, kwargs..., children...)
 end
 
@@ -75,8 +76,9 @@ end
 
 Table footer section (`<tfoot>`).
 """
-function SuiteTableFooter(children...; class::String="", kwargs...)
+function SuiteTableFooter(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("bg-warm-100/50 dark:bg-warm-900/50 border-t border-warm-200 dark:border-warm-700 font-medium", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Tfoot(:class => classes, kwargs..., children...)
 end
 
@@ -85,8 +87,9 @@ end
 
 A table row (`<tr>`).
 """
-function SuiteTableRow(children...; class::String="", kwargs...)
+function SuiteTableRow(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("border-b border-warm-200 dark:border-warm-700 transition-colors hover:bg-warm-100/50 dark:hover:bg-warm-900/50", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Tr(:class => classes, kwargs..., children...)
 end
 
@@ -95,8 +98,9 @@ end
 
 A table header cell (`<th>`).
 """
-function SuiteTableHead(children...; class::String="", kwargs...)
+function SuiteTableHead(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-warm-600 dark:text-warm-500", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Th(:class => classes, kwargs..., children...)
 end
 
@@ -115,8 +119,9 @@ end
 
 A table caption (`<caption>`).
 """
-function SuiteTableCaption(children...; class::String="", kwargs...)
+function SuiteTableCaption(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-warm-600 dark:text-warm-500 mt-4 text-sm", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Caption(:class => classes, kwargs..., children...)
 end
 

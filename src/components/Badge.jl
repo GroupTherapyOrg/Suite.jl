@@ -36,7 +36,7 @@ SuiteBadge(variant="destructive", "Error")
 SuiteBadge(variant="outline", "v2.0")
 ```
 """
-function SuiteBadge(children...; variant::String="default", class::String="", kwargs...)
+function SuiteBadge(children...; variant::String="default", class::String="", theme::Symbol=:default, kwargs...)
     base = "inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 rounded-full border border-transparent px-2 py-0.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600"
 
     variant_classes = Dict(
@@ -48,6 +48,7 @@ function SuiteBadge(children...; variant::String="default", class::String="", kw
 
     vc = get(variant_classes, variant, variant_classes["default"])
     classes = cn(base, vc, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Span(:class => classes, kwargs..., children...)
 end

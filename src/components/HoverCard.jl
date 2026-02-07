@@ -109,7 +109,22 @@ The floating hover card content. Positioned relative to the trigger.
 - `side_offset::Int=4`: Distance from anchor in pixels
 - `align::String="center"`: Alignment along side ("start", "center", "end")
 """
-function SuiteHoverCardContent(children...; side::String="bottom", side_offset::Int=4, align::String="center", class::String="", kwargs...)
+function SuiteHoverCardContent(children...; side::String="bottom", side_offset::Int=4, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2",
+        "data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2",
+        "data-[side=top]:slide-in-from-bottom-2",
+        "z-50 w-64 rounded-md border border-warm-200 dark:border-warm-700",
+        "p-4 shadow-md outline-hidden",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-hover-card-content") => "",
         Symbol("data-suite-hover-card-side") => side,
         Symbol("data-suite-hover-card-side-offset") => string(side_offset),
@@ -117,19 +132,7 @@ function SuiteHoverCardContent(children...; side::String="bottom", side_offset::
         Symbol("data-state") => "closed",
         :tabindex => "-1",
         :style => "display:none",
-        :class => cn(
-            "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            "data-[side=bottom]:slide-in-from-top-2",
-            "data-[side=left]:slide-in-from-right-2",
-            "data-[side=right]:slide-in-from-left-2",
-            "data-[side=top]:slide-in-from-bottom-2",
-            "z-50 w-64 rounded-md border border-warm-200 dark:border-warm-700",
-            "p-4 shadow-md outline-hidden",
-            class
-        ),
+        :class => classes,
         kwargs...,
         children...,
     )

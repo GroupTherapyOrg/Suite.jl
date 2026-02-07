@@ -39,7 +39,7 @@ SuiteAlert(variant="destructive",
 )
 ```
 """
-function SuiteAlert(children...; variant::String="default", class::String="", kwargs...)
+function SuiteAlert(children...; variant::String="default", class::String="", theme::Symbol=:default, kwargs...)
     base = "relative w-full rounded-lg border px-4 py-3 text-sm grid gap-1"
 
     variant_classes = Dict(
@@ -49,6 +49,7 @@ function SuiteAlert(children...; variant::String="default", class::String="", kw
 
     vc = get(variant_classes, variant, variant_classes["default"])
     classes = cn(base, vc, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(:role => "alert", :class => classes, kwargs..., children...)
 end

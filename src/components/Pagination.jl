@@ -75,7 +75,7 @@ end
 A pagination page number link.
 """
 function SuitePaginationLink(children...; is_active::Bool=false, size::String="icon",
-                              href::String="#", class::String="", kwargs...)
+                              href::String="#", class::String="", theme::Symbol=:default, kwargs...)
     size_classes = Dict(
         "default" => "h-10 px-4 py-2",
         "icon"    => "h-10 w-10",
@@ -84,6 +84,7 @@ function SuitePaginationLink(children...; is_active::Bool=false, size::String="i
     variant_cls = is_active ? _PAGINATION_OUTLINE : _PAGINATION_GHOST
     sc = get(size_classes, size, size_classes["icon"])
     classes = cn(_PAGINATION_BTN_BASE, variant_cls, sc, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     aria_current = is_active ? "page" : nothing
     extra = is_active ? (:aria_current => aria_current,) : ()

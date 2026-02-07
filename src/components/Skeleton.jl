@@ -30,10 +30,11 @@ SuiteSkeleton(class="h-12 w-12 rounded-full")
 SuiteSkeleton(class="h-4 w-[200px]")
 ```
 """
-function SuiteSkeleton(; class::String="", kwargs...)
+function SuiteSkeleton(; class::String="", theme::Symbol=:default, kwargs...)
     # Note: shadcn's bg-accent is a muted bg color, NOT our accent purple.
     # Maps to warm-100/warm-900 (neutral loading placeholder bg)
     classes = cn("animate-pulse rounded-md bg-warm-200 dark:bg-warm-800", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Div(:class => classes, kwargs...)
 end
 

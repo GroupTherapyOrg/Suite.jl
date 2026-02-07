@@ -59,9 +59,10 @@ SuiteToggleGroup(type="multiple", variant="outline",
 function SuiteToggleGroup(children...; type::String="single", default_value=nothing,
                           variant::String="default", size::String="default",
                           orientation::String="horizontal", disabled::Bool=false,
-                          class::String="", kwargs...)
+                          theme::Symbol=:default, class::String="", kwargs...)
     base = "inline-flex items-center justify-center gap-1 rounded-lg"
     classes = cn(base, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     attrs = Pair{Symbol,Any}[
         Symbol("data-suite-toggle-group") => type,
@@ -100,7 +101,7 @@ A single item within a toggle group.
 """
 function SuiteToggleGroupItem(children...; value::String="", variant::String="default",
                               size::String="default", disabled::Bool=false,
-                              class::String="", kwargs...)
+                              theme::Symbol=:default, class::String="", kwargs...)
     base = "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors hover:bg-warm-100 dark:hover:bg-warm-900 hover:text-warm-600 dark:hover:text-warm-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-warm-100 dark:data-[state=on]:bg-warm-900 data-[state=on]:text-warm-800 dark:data-[state=on]:text-warm-300"
 
     variant_classes = Dict(
@@ -117,6 +118,7 @@ function SuiteToggleGroupItem(children...; value::String="", variant::String="de
     vc = get(variant_classes, variant, variant_classes["default"])
     sc = get(size_classes, size, size_classes["default"])
     classes = cn(base, vc, sc, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     attrs = Pair{Symbol,Any}[
         :type => "button",

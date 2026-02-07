@@ -45,7 +45,8 @@ SuiteSwitch(size="sm", disabled=true)
 ```
 """
 function SuiteSwitch(; checked::Bool=false, disabled::Bool=false,
-                     size::String="default", class::String="", kwargs...)
+                     size::String="default", theme::Symbol=:default,
+                     class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
 
     # Track dimensions
@@ -66,6 +67,12 @@ function SuiteSwitch(; checked::Bool=false, disabled::Bool=false,
 
     thumb_base = "pointer-events-none block rounded-full bg-warm-50 dark:bg-warm-950 shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%+2px)] data-[state=unchecked]:translate-x-0"
     thumb_classes = cn(thumb_base, thumb_size)
+
+    if theme !== :default
+        t = get_theme(theme)
+        track_classes = apply_theme(track_classes, t)
+        thumb_classes = apply_theme(thumb_classes, t)
+    end
 
     attrs = Pair{Symbol,Any}[
         :type => "button",

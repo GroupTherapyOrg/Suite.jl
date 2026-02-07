@@ -64,9 +64,11 @@ SuiteAccordion(type="multiple", default_value=["item-1"],
 """
 function SuiteAccordion(children...; type::String="single", collapsible::Bool=false,
                         default_value=nothing, orientation::String="vertical",
-                        disabled::Bool=false, class::String="", kwargs...)
+                        disabled::Bool=false, theme::Symbol=:default,
+                        class::String="", kwargs...)
     base = "divide-y divide-warm-200 dark:divide-warm-700"
     classes = cn(base, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     attrs = Pair{Symbol,Any}[
         Symbol("data-suite-accordion") => type,
@@ -134,12 +136,19 @@ The button that toggles an accordion item open/closed.
 Rendered as a heading (h3) containing a button, matching Radix/shadcn structure.
 Includes a chevron indicator that rotates on open.
 """
-function SuiteAccordionTrigger(children...; class::String="", kwargs...)
+function SuiteAccordionTrigger(children...; theme::Symbol=:default,
+                               class::String="", kwargs...)
     base = "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180"
     classes = cn(base, class)
+    chevron_classes = "h-4 w-4 shrink-0 text-warm-600 dark:text-warm-500 transition-transform duration-200"
+    if theme !== :default
+        t = get_theme(theme)
+        classes = apply_theme(classes, t)
+        chevron_classes = apply_theme(chevron_classes, t)
+    end
 
     # Chevron SVG icon
-    chevron = Svg(:class => "h-4 w-4 shrink-0 text-warm-600 dark:text-warm-500 transition-transform duration-200",
+    chevron = Svg(:class => chevron_classes,
                   :fill => "none", :viewBox => "0 0 24 24", :stroke => "currentColor", :stroke_width => "2",
                   Path(:d => "M6 9l6 6 6-6"))
 

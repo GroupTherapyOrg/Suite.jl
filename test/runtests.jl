@@ -3563,4 +3563,241 @@ using Test
             @test :Command in meta.js_modules
         end
     end
+
+    # =====================================================================
+    # Theme System Tests
+    # =====================================================================
+    @testset "Themes" begin
+        using Therapy
+        using Suite
+
+        @testset "SuiteTheme struct and registry" begin
+            @test haskey(Suite.SUITE_THEMES, :default)
+            @test haskey(Suite.SUITE_THEMES, :ocean)
+            @test haskey(Suite.SUITE_THEMES, :minimal)
+            @test haskey(Suite.SUITE_THEMES, :nature)
+            @test length(Suite.SUITE_THEMES) == 4
+
+            default = Suite.SUITE_THEMES[:default]
+            @test default.name === :default
+            @test default.accent == "accent"
+            @test default.accent_secondary == "accent-secondary"
+            @test default.neutral == "warm"
+            @test default.radius == "rounded-md"
+            @test default.shadow == "shadow-sm"
+
+            ocean = Suite.SUITE_THEMES[:ocean]
+            @test ocean.accent == "blue"
+            @test ocean.accent_secondary == "rose"
+            @test ocean.neutral == "warm"
+            @test ocean.radius == "rounded-lg"
+            @test ocean.shadow == "shadow-md"
+
+            minimal = Suite.SUITE_THEMES[:minimal]
+            @test minimal.accent == "zinc"
+            @test minimal.accent_secondary == "red"
+            @test minimal.neutral == "slate"
+            @test minimal.radius == "rounded-none"
+            @test minimal.shadow == "shadow-none"
+
+            nature = Suite.SUITE_THEMES[:nature]
+            @test nature.accent == "emerald"
+            @test nature.accent_secondary == "amber"
+            @test nature.neutral == "stone"
+            @test nature.radius == "rounded-xl"
+        end
+
+        @testset "get_theme" begin
+            @test Suite.get_theme(:default).name === :default
+            @test Suite.get_theme(:ocean).name === :ocean
+            @test Suite.get_theme(:nonexistent).name === :default  # fallback
+        end
+
+        @testset "resolve_theme without overrides" begin
+            t = Suite.resolve_theme(:ocean)
+            @test t.name === :ocean
+            @test t.accent == "blue"
+        end
+
+        @testset "resolve_theme with overrides" begin
+            t = Suite.resolve_theme(:ocean; accent="indigo")
+            @test t.accent == "indigo"
+            @test t.neutral == "warm"  # unchanged
+
+            t2 = Suite.resolve_theme(:minimal; neutral="gray", radius="rounded-sm")
+            @test t2.neutral == "gray"
+            @test t2.radius == "rounded-sm"
+            @test t2.accent == "zinc"  # unchanged
+        end
+
+        @testset "apply_theme identity for default" begin
+            input = "bg-accent-600 text-warm-800 rounded-md shadow-sm"
+            @test Suite.apply_theme(input, Suite.get_theme(:default)) == input
+        end
+
+        @testset "apply_theme ocean substitutions" begin
+            t = Suite.get_theme(:ocean)
+            @test Suite.apply_theme("bg-accent-600", t) == "bg-blue-600"
+            @test Suite.apply_theme("text-accent-400", t) == "text-blue-400"
+            @test Suite.apply_theme("bg-accent-secondary-600", t) == "bg-rose-600"
+            # warm stays warm for ocean
+            @test Suite.apply_theme("bg-warm-100", t) == "bg-warm-100"
+            # radius
+            @test Suite.apply_theme("rounded-md", t) == "rounded-lg"
+            @test Suite.apply_theme("rounded-sm", t) == "rounded-md"
+            # shadow
+            @test Suite.apply_theme("shadow-sm", t) == "shadow-md"
+        end
+
+        @testset "apply_theme minimal substitutions" begin
+            t = Suite.get_theme(:minimal)
+            @test Suite.apply_theme("bg-accent-600", t) == "bg-zinc-600"
+            @test Suite.apply_theme("bg-accent-secondary-600", t) == "bg-red-600"
+            @test Suite.apply_theme("bg-warm-100", t) == "bg-slate-100"
+            @test Suite.apply_theme("text-warm-600", t) == "text-slate-600"
+            @test Suite.apply_theme("rounded-md", t) == "rounded-none"
+            @test Suite.apply_theme("shadow-sm", t) == "shadow-none"
+        end
+
+        @testset "apply_theme nature substitutions" begin
+            t = Suite.get_theme(:nature)
+            @test Suite.apply_theme("bg-accent-600", t) == "bg-emerald-600"
+            @test Suite.apply_theme("bg-accent-secondary-600", t) == "bg-amber-600"
+            @test Suite.apply_theme("bg-warm-100", t) == "bg-stone-100"
+            @test Suite.apply_theme("rounded-md", t) == "rounded-xl"
+            @test Suite.apply_theme("rounded-sm", t) == "rounded-lg"
+        end
+
+        @testset "apply_theme ordering: accent-secondary before accent" begin
+            t = Suite.get_theme(:ocean)
+            input = "bg-accent-secondary-600 border-accent-600"
+            result = Suite.apply_theme(input, t)
+            @test result == "bg-rose-600 border-blue-600"
+            @test !occursin("accent-", result)
+        end
+
+        @testset "apply_theme complex class string" begin
+            t = Suite.get_theme(:minimal)
+            input = "bg-accent-600 text-white hover:bg-accent-700 border border-warm-200 dark:border-warm-700 rounded-md shadow-sm"
+            result = Suite.apply_theme(input, t)
+            @test occursin("bg-zinc-600", result)
+            @test occursin("hover:bg-zinc-700", result)
+            @test occursin("border-slate-200", result)
+            @test occursin("dark:border-slate-700", result)
+            @test occursin("rounded-none", result)
+            @test occursin("shadow-none", result)
+            @test !occursin("accent-", result)
+            @test !occursin("warm-", result)
+        end
+
+        @testset "SuiteButton with theme" begin
+            @testset "Default theme unchanged" begin
+                default_html = Therapy.render_to_string(SuiteButton("Click"))
+                themed_html = Therapy.render_to_string(SuiteButton("Click", theme=:default))
+                @test default_html == themed_html
+            end
+
+            @testset "Ocean theme" begin
+                html = Therapy.render_to_string(SuiteButton("Click", theme=:ocean))
+                @test occursin("bg-blue-600", html)
+                @test !occursin("bg-accent-600", html)
+                @test occursin("rounded-lg", html)
+            end
+
+            @testset "Minimal theme" begin
+                html = Therapy.render_to_string(SuiteButton("Click", theme=:minimal))
+                @test occursin("bg-zinc-600", html)
+                @test occursin("rounded-none", html)
+                @test !occursin("shadow-sm", html)
+            end
+
+            @testset "Nature theme" begin
+                html = Therapy.render_to_string(SuiteButton("Click", theme=:nature))
+                @test occursin("bg-emerald-600", html)
+                @test occursin("rounded-xl", html)
+            end
+
+            @testset "Destructive variant with theme" begin
+                html = Therapy.render_to_string(SuiteButton("Del", variant="destructive", theme=:ocean))
+                @test occursin("bg-rose-600", html)
+                @test !occursin("accent-secondary", html)
+            end
+        end
+
+        @testset "SuiteCard with theme" begin
+            html = Therapy.render_to_string(SuiteCard(theme=:minimal, "Content"))
+            @test occursin("border-slate-200", html)
+            @test !occursin("warm-", html)
+            @test occursin("shadow-none", html)
+        end
+
+        @testset "SuiteBadge with theme" begin
+            html = Therapy.render_to_string(SuiteBadge("New", theme=:ocean))
+            @test occursin("bg-blue-600", html)
+            @test !occursin("bg-accent-600", html)
+        end
+
+        @testset "SuiteInput with theme" begin
+            html = Therapy.render_to_string(SuiteInput(theme=:minimal))
+            @test occursin("border-slate-200", html)
+            @test occursin("ring-zinc-600", html)
+        end
+
+        @testset "SuiteProgress with theme" begin
+            html = Therapy.render_to_string(SuiteProgress(value=50, theme=:ocean))
+            @test occursin("bg-blue-600", html)
+            @test !occursin("accent-600", html)
+        end
+
+        @testset "SuiteSeparator with theme" begin
+            html = Therapy.render_to_string(SuiteSeparator(theme=:minimal))
+            @test occursin("bg-slate-200", html)
+            @test !occursin("warm-", html)
+        end
+
+        @testset "SuiteAlert with theme" begin
+            html = Therapy.render_to_string(SuiteAlert(variant="destructive", theme=:ocean, "Error"))
+            @test occursin("rose-600", html)
+            @test !occursin("accent-secondary-", html)
+        end
+
+        @testset "Extraction with theme" begin
+            mktempdir() do dir
+                Suite.extract(:Button, dir, theme=:ocean, overwrite=true)
+                content = read(joinpath(dir, "Button.jl"), String)
+                @test occursin("blue-600", content)
+                @test !occursin("accent-600", content)
+                @test occursin("rose-600", content) || occursin("rose-700", content)
+            end
+
+            mktempdir() do dir
+                Suite.extract(:Button, dir, theme=:minimal, overwrite=true)
+                content = read(joinpath(dir, "Button.jl"), String)
+                @test occursin("zinc-600", content)
+                @test occursin("slate-", content)
+                @test occursin("rounded-none", content)
+            end
+
+            # Default extraction unchanged
+            mktempdir() do dir
+                Suite.extract(:Button, dir, theme=:default, overwrite=true)
+                content = read(joinpath(dir, "Button.jl"), String)
+                @test occursin("accent-600", content)
+                @test occursin("warm-", content)
+            end
+        end
+
+        @testset "apply_theme_to_source" begin
+            source = """
+            "bg-accent-600 text-white hover:bg-accent-700"
+            "border-warm-200 dark:border-warm-700"
+            """
+            t = Suite.get_theme(:ocean)
+            result = Suite.apply_theme_to_source(source, t)
+            @test occursin("bg-blue-600", result)
+            @test occursin("hover:bg-blue-700", result)
+            # warm stays for ocean
+            @test occursin("border-warm-200", result)
+        end
+    end
 end

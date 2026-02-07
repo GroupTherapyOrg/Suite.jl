@@ -6,7 +6,7 @@
 export extract
 
 """
-    extract(components, target_dir; overwrite=false, include_deps=true, include_js=true)
+    extract(components, target_dir; overwrite=false, include_deps=true, include_js=true, theme=:default)
 
 Extract Suite.jl component source files into your project directory.
 
@@ -21,6 +21,7 @@ just like `npx shadcn add` does for React projects.
 - `overwrite::Bool = false`: Overwrite existing files (default: skip with warning)
 - `include_deps::Bool = true`: Also extract component dependencies
 - `include_js::Bool = true`: Copy suite.js if any component needs JS runtime
+- `theme::Symbol = :default`: Apply theme substitutions to extracted source files
 
 # Example
 ```julia
@@ -31,10 +32,14 @@ Suite.extract(:Button, "src/components/")
 
 # Extract multiple with dependencies
 Suite.extract([:Dialog, :Card], "src/components/")
+
+# Extract with a theme — class strings are substituted in the output
+Suite.extract(:Button, "src/components/", theme=:ocean)
 ```
 """
 function extract(components::Union{Symbol, Vector{Symbol}}, target_dir::String;
-                 overwrite::Bool=false, include_deps::Bool=true, include_js::Bool=true)
+                 overwrite::Bool=false, include_deps::Bool=true, include_js::Bool=true,
+                 theme::Symbol=:default)
     comps = components isa Symbol ? [components] : components
 
     # Resolve dependency graph
@@ -53,16 +58,28 @@ function extract(components::Union{Symbol, Vector{Symbol}}, target_dir::String;
     utils_dst = joinpath(target_dir, "utils.jl")
     _copy_file(utils_src, utils_dst, overwrite) && push!(extracted, "utils.jl")
 
+    # Resolve theme for source-level substitution
+    t = theme !== :default ? get_theme(theme) : nothing
+
     # Copy each component
     for comp in all_comps
         meta = COMPONENT_REGISTRY[comp]
         src = joinpath(@__DIR__, "components", meta.file)
         dst = joinpath(target_dir, meta.file)
 
-        if _copy_file(src, dst, overwrite)
-            push!(extracted, meta.file)
+        if t !== nothing
+            # Apply theme substitutions to source before writing
+            if _copy_file_themed(src, dst, overwrite, t)
+                push!(extracted, meta.file)
+            else
+                push!(skipped, meta.file)
+            end
         else
-            push!(skipped, meta.file)
+            if _copy_file(src, dst, overwrite)
+                push!(extracted, meta.file)
+            else
+                push!(skipped, meta.file)
+            end
         end
 
         if !isempty(meta.js_modules)
@@ -170,5 +187,25 @@ function _copy_file(src::String, dst::String, overwrite::Bool)
     end
 
     cp(src, dst; force=overwrite)
+    return true
+end
+
+function _copy_file_themed(src::String, dst::String, overwrite::Bool, t::SuiteTheme)
+    if !isfile(src)
+        @warn "Source file not found: $src"
+        return false
+    end
+
+    content = read(src, String)
+    themed_content = apply_theme_to_source(content, t)
+
+    if isfile(dst) && !overwrite
+        if isfile(dst) && read(dst, String) == themed_content
+            return false  # Skip silently, already up to date
+        end
+        return false  # Skip, file exists and differs
+    end
+
+    write(dst, themed_content)
     return true
 end

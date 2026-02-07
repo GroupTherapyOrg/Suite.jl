@@ -114,21 +114,24 @@ end
 
 The button that opens the select dropdown.
 """
-function SuiteSelectTrigger(children...; class::String="", kwargs...)
+function SuiteSelectTrigger(children...; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "border-warm-200 dark:border-warm-700",
+        "focus-visible:border-accent-600 focus-visible:ring-accent-600/50",
+        "flex h-9 w-full items-center justify-between gap-2",
+        "rounded-md border bg-transparent px-3 py-2 text-sm",
+        "whitespace-nowrap shadow-xs",
+        "disabled:cursor-not-allowed disabled:opacity-50",
+        "data-[placeholder]:text-warm-600 dark:data-[placeholder]:text-warm-500",
+        "focus-visible:ring-[3px]",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-select-trigger-wrapper") => "",
         :style => "display:contents",
         Button(:type => "button",
-               :class => cn(
-                   "border-warm-200 dark:border-warm-700",
-                   "focus-visible:border-accent-600 focus-visible:ring-accent-600/50",
-                   "flex h-9 w-full items-center justify-between gap-2",
-                   "rounded-md border bg-transparent px-3 py-2 text-sm",
-                   "whitespace-nowrap shadow-xs",
-                   "disabled:cursor-not-allowed disabled:opacity-50",
-                   "data-[placeholder]:text-warm-600 dark:data-[placeholder]:text-warm-500",
-                   "focus-visible:ring-[3px]",
-                   class
-               ),
+               :class => classes,
                kwargs...,
                Span(:class => "line-clamp-1 flex items-center gap-2",
                     Symbol("data-slot") => "select-value",
@@ -161,7 +164,27 @@ The floating dropdown content containing items.
 - `align::String="start"`: Alignment along side ("start", "center", "end")
 """
 function SuiteSelectContent(children...; side::String="bottom", side_offset::Int=4,
-                            align::String="start", class::String="", kwargs...)
+                            align::String="start", theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2",
+        "data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2",
+        "data-[side=top]:slide-in-from-bottom-2",
+        "relative z-50 max-h-[--radix-select-content-available-height]",
+        "min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-md",
+        "border border-warm-200 dark:border-warm-700 shadow-md p-1",
+        "data-[side=bottom]:translate-y-1",
+        "data-[side=left]:-translate-x-1",
+        "data-[side=right]:translate-x-1",
+        "data-[side=top]:-translate-y-1",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-select-content") => "",
         Symbol("data-suite-select-side") => side,
         Symbol("data-suite-select-side-offset") => string(side_offset),
@@ -170,24 +193,7 @@ function SuiteSelectContent(children...; side::String="bottom", side_offset::Int
         :role => "listbox",
         :tabindex => "-1",
         :style => "display:none",
-        :class => cn(
-            "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            "data-[side=bottom]:slide-in-from-top-2",
-            "data-[side=left]:slide-in-from-right-2",
-            "data-[side=right]:slide-in-from-left-2",
-            "data-[side=top]:slide-in-from-bottom-2",
-            "relative z-50 max-h-[--radix-select-content-available-height]",
-            "min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-md",
-            "border border-warm-200 dark:border-warm-700 shadow-md p-1",
-            "data-[side=bottom]:translate-y-1",
-            "data-[side=left]:-translate-x-1",
-            "data-[side=right]:translate-x-1",
-            "data-[side=top]:-translate-y-1",
-            class
-        ),
+        :class => classes,
         kwargs...,
         children...,
     )
@@ -204,7 +210,17 @@ An individual option in the select dropdown.
 - `text_value::String=""`: Override text used for typeahead (defaults to content text)
 """
 function SuiteSelectItem(children...; value::String="", disabled::Bool=false,
-                         text_value::String="", class::String="", kwargs...)
+                         text_value::String="", theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "focus:bg-warm-100 dark:focus:bg-warm-800",
+        "focus:text-warm-800 dark:focus:text-warm-300",
+        "relative flex w-full cursor-default items-center gap-2",
+        "rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden",
+        "select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-select-item") => "",
         Symbol("data-suite-select-item-value") => value,
         Symbol("data-suite-select-item-text") => text_value,
@@ -212,14 +228,7 @@ function SuiteSelectItem(children...; value::String="", disabled::Bool=false,
         Symbol("aria-selected") => "false",
         Symbol("data-state") => "unchecked",
         :tabindex => disabled ? nothing : "-1",
-        :class => cn(
-            "focus:bg-warm-100 dark:focus:bg-warm-800",
-            "focus:text-warm-800 dark:focus:text-warm-300",
-            "relative flex w-full cursor-default items-center gap-2",
-            "rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden",
-            "select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-            class
-        ),
+        :class => classes,
         (disabled ? (Symbol("data-disabled") => "", Symbol("aria-disabled") => "true") : ())...,
         kwargs...,
         # Check indicator
@@ -250,10 +259,13 @@ end
 
 A label for a group of select items.
 """
-function SuiteSelectLabel(children...; class::String="", kwargs...)
+function SuiteSelectLabel(children...; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn("px-2 py-1.5 text-sm font-semibold text-warm-800 dark:text-warm-300", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(:role => "presentation",
         Symbol("data-suite-select-label") => "",
-        :class => cn("px-2 py-1.5 text-sm font-semibold text-warm-800 dark:text-warm-300", class),
+        :class => classes,
         kwargs...,
         children...)
 end
@@ -263,10 +275,13 @@ end
 
 A visual separator between select items.
 """
-function SuiteSelectSeparator(; class::String="", kwargs...)
+function SuiteSelectSeparator(; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn("bg-warm-200 dark:bg-warm-700 -mx-1 my-1 h-px", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-select-separator") => "",
         :role => "separator",
-        :class => cn("bg-warm-200 dark:bg-warm-700 -mx-1 my-1 h-px", class),
+        :class => classes,
         kwargs...)
 end
 

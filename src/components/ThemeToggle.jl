@@ -42,8 +42,16 @@ SuiteThemeToggle()
 SuiteThemeToggle(class="ml-2")
 ```
 """
-function SuiteThemeToggle(; class::String="", kwargs...)
+function SuiteThemeToggle(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("inline-flex items-center justify-center rounded-md p-2 hover:bg-warm-200 dark:hover:bg-warm-800 transition-colors cursor-pointer", class)
+    sun_classes = "hidden dark:block w-5 h-5 text-warm-300"
+    moon_classes = "block dark:hidden w-5 h-5 text-warm-600"
+    if theme !== :default
+        t = get_theme(theme)
+        classes = apply_theme(classes, t)
+        sun_classes = apply_theme(sun_classes, t)
+        moon_classes = apply_theme(moon_classes, t)
+    end
     Button(:type => "button",
            :class => classes,
            Symbol("data-suite-theme-toggle") => "",
@@ -51,13 +59,13 @@ function SuiteThemeToggle(; class::String="", kwargs...)
            :title => "Toggle dark mode",
            kwargs...,
         # Sun icon (visible in dark mode)
-        Svg(:class => "hidden dark:block w-5 h-5 text-warm-300",
+        Svg(:class => sun_classes,
             :fill => "none", :viewBox => "0 0 24 24", :stroke => "currentColor", :stroke_width => "2",
             Path(:stroke_linecap => "round", :stroke_linejoin => "round",
                  :d => "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z")
         ),
         # Moon icon (visible in light mode)
-        Svg(:class => "block dark:hidden w-5 h-5 text-warm-600",
+        Svg(:class => moon_classes,
             :fill => "none", :viewBox => "0 0 24 24", :stroke => "currentColor", :stroke_width => "2",
             Path(:stroke_linecap => "round", :stroke_linejoin => "round",
                  :d => "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z")

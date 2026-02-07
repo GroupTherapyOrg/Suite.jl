@@ -34,8 +34,9 @@ end
 
 Section heading (h2) with bottom border.
 """
-function SuiteH2(children...; class::String="", kwargs...)
+function SuiteH2(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("scroll-m-20 border-b border-warm-200 dark:border-warm-700 pb-2 text-3xl font-semibold tracking-tight first:mt-0", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     H2(:class => classes, kwargs..., children...)
 end
 
@@ -74,8 +75,9 @@ end
 
 Styled blockquote with left border.
 """
-function SuiteBlockquote(children...; class::String="", kwargs...)
+function SuiteBlockquote(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("mt-6 border-l-2 border-warm-200 dark:border-warm-700 pl-6 italic text-warm-600 dark:text-warm-500", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Blockquote(:class => classes, kwargs..., children...)
 end
 
@@ -84,8 +86,9 @@ end
 
 Inline code snippet styling.
 """
-function SuiteInlineCode(children...; class::String="", kwargs...)
+function SuiteInlineCode(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("relative rounded bg-warm-100 dark:bg-warm-900 px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Code(:class => classes, kwargs..., children...)
 end
 
@@ -94,8 +97,9 @@ end
 
 Lead paragraph — larger, muted text for introductions.
 """
-function SuiteLead(children...; class::String="", kwargs...)
+function SuiteLead(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-xl text-warm-600 dark:text-warm-500", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     P(:class => classes, kwargs..., children...)
 end
 
@@ -124,8 +128,9 @@ end
 
 Muted secondary text.
 """
-function SuiteMuted(children...; class::String="", kwargs...)
+function SuiteMuted(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-sm text-warm-600 dark:text-warm-500", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     P(:class => classes, kwargs..., children...)
 end
 

@@ -75,9 +75,11 @@ Contains the tab triggers. Renders as a tablist with roving tabindex.
 # Props
 - `loop`: whether keyboard navigation wraps (default `true`)
 """
-function SuiteTabsList(children...; loop::Bool=true, class::String="", kwargs...)
+function SuiteTabsList(children...; loop::Bool=true, theme::Symbol=:default,
+                       class::String="", kwargs...)
     base = "inline-flex h-9 items-center justify-center rounded-lg bg-warm-100 dark:bg-warm-900 p-1 text-warm-600 dark:text-warm-500"
     classes = cn(base, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     attrs = Pair{Symbol,Any}[
         Symbol("data-suite-tabslist") => "",
@@ -102,9 +104,10 @@ A tab trigger button. When clicked/focused, activates the corresponding content 
 - `disabled`: disable this tab
 """
 function SuiteTabsTrigger(children...; value::String="", disabled::Bool=false,
-                          class::String="", kwargs...)
+                          theme::Symbol=:default, class::String="", kwargs...)
     base = "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-warm-50 dark:ring-offset-warm-950 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-warm-50 dark:data-[state=active]:bg-warm-950 data-[state=active]:text-warm-800 dark:data-[state=active]:text-warm-300 data-[state=active]:shadow"
     classes = cn(base, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     attrs = Pair{Symbol,Any}[
         :type => "button",
@@ -131,9 +134,11 @@ The content panel associated with a tab trigger.
 # Props
 - `value`: identifies which TabsTrigger activates this panel (required)
 """
-function SuiteTabsContent(children...; value::String="", class::String="", kwargs...)
+function SuiteTabsContent(children...; value::String="", theme::Symbol=:default,
+                          class::String="", kwargs...)
     base = "mt-2 ring-offset-warm-50 dark:ring-offset-warm-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2"
     classes = cn(base, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-suite-tabs-content") => value,
         Symbol("data-state") => "inactive",

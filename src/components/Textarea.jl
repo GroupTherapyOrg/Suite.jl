@@ -30,7 +30,7 @@ SuiteTextarea(:rows => "5", placeholder="Bio")
 SuiteTextarea(:disabled => true, placeholder="Disabled")
 ```
 """
-function SuiteTextarea(; class::String="", kwargs...)
+function SuiteTextarea(; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn(
         "min-h-16 w-full rounded-md border border-warm-200 dark:border-warm-700 bg-transparent px-3 py-2 text-base shadow-sm transition-colors outline-none",
         "placeholder:text-warm-500 dark:placeholder:text-warm-600",
@@ -39,6 +39,7 @@ function SuiteTextarea(; class::String="", kwargs...)
         "md:text-sm",
         class,
     )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Textarea(:class => classes, kwargs...)
 end

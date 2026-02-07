@@ -67,12 +67,13 @@ end
 
 Fallback content (initials/icon) shown when avatar image is unavailable.
 """
-function SuiteAvatarFallback(children...; class::String="", kwargs...)
+function SuiteAvatarFallback(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn(
         "flex size-full items-center justify-center rounded-full text-sm",
         "bg-warm-100 dark:bg-warm-900 text-warm-600 dark:text-warm-500",
         class,
     )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Span(:class => classes, kwargs..., children...)
 end
 

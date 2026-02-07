@@ -35,7 +35,7 @@ SuiteSeparator(decorative=false)
 ```
 """
 function SuiteSeparator(; orientation::String="horizontal", decorative::Bool=true,
-                         class::String="", kwargs...)
+                         class::String="", theme::Symbol=:default, kwargs...)
     orientation_classes = if orientation == "vertical"
         "h-full w-px"
     else
@@ -43,6 +43,7 @@ function SuiteSeparator(; orientation::String="horizontal", decorative::Bool=tru
     end
 
     classes = cn("shrink-0 bg-warm-200 dark:bg-warm-700", orientation_classes, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     role_attrs = if decorative
         (:role => "none",)

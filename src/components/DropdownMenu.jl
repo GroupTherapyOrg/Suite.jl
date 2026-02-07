@@ -113,7 +113,23 @@ end
 
 The floating menu content panel. Positioned relative to the trigger.
 """
-function SuiteDropdownMenuContent(children...; side::String="bottom", side_offset::Int=4, align::String="start", class::String="", kwargs...)
+function SuiteDropdownMenuContent(children...; side::String="bottom", side_offset::Int=4, align::String="start", theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "z-50 max-h-[var(--radix-popper-available-height,300px)] min-w-[8rem]",
+        "overflow-x-hidden overflow-y-auto rounded-md p-1 shadow-md",
+        "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
+        "border border-warm-200 dark:border-warm-700",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2",
+        "data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2",
+        "data-[side=top]:slide-in-from-bottom-2",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-dropdown-menu-content") => "",
         Symbol("data-side-preference") => side,
         Symbol("data-side-offset") => string(side_offset),
@@ -123,20 +139,7 @@ function SuiteDropdownMenuContent(children...; side::String="bottom", side_offse
         :aria_orientation => "vertical",
         :tabindex => "-1",
         :style => "display:none",
-        :class => cn(
-            "z-50 max-h-[var(--radix-popper-available-height,300px)] min-w-[8rem]",
-            "overflow-x-hidden overflow-y-auto rounded-md p-1 shadow-md",
-            "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
-            "border border-warm-200 dark:border-warm-700",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            "data-[side=bottom]:slide-in-from-top-2",
-            "data-[side=left]:slide-in-from-right-2",
-            "data-[side=right]:slide-in-from-left-2",
-            "data-[side=top]:slide-in-from-bottom-2",
-            class
-        ),
+        :class => classes,
         kwargs...,
         children...,
     )
@@ -174,7 +177,7 @@ end
 
 A menu item. Optionally pass a `shortcut` string to display a keyboard shortcut.
 """
-function SuiteDropdownMenuItem(children...; shortcut::String="", disabled::Bool=false, text_value::String="", class::String="", kwargs...)
+function SuiteDropdownMenuItem(children...; shortcut::String="", disabled::Bool=false, text_value::String="", theme::Symbol=:default, class::String="", kwargs...)
     item_children = collect(Any, children)
     if !isempty(shortcut)
         push!(item_children, Span(:class => "ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500",
@@ -186,16 +189,19 @@ function SuiteDropdownMenuItem(children...; shortcut::String="", disabled::Bool=
     if disabled; push!(extra, Symbol("data-disabled") => ""); end
     if !isempty(text_value); push!(extra, Symbol("data-text-value") => text_value); end
 
+    classes = cn(
+        "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5",
+        "text-sm outline-hidden select-none",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-menu-item") => "",
         :role => "menuitem",
         :tabindex => "-1",
-        :class => cn(
-            "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5",
-            "text-sm outline-hidden select-none",
-            "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-            "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
-            class
-        ),
+        :class => classes,
         extra...,
         kwargs...,
         item_children...)
@@ -206,21 +212,24 @@ end
 
 A menu item with a checkbox. Toggles checked state on click.
 """
-function SuiteDropdownMenuCheckboxItem(children...; checked::Bool=false, disabled::Bool=false, class::String="", kwargs...)
+function SuiteDropdownMenuCheckboxItem(children...; checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
+
+    classes = cn(
+        "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
+        "text-sm outline-hidden select-none",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-suite-menu-checkbox-item") => "",
         Symbol("data-state") => state,
         :role => "menuitemcheckbox",
         Symbol("aria-checked") => string(checked),
         :tabindex => "-1",
-        :class => cn(
-            "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
-            "text-sm outline-hidden select-none",
-            "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-            "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
-            class
-        ),
+        :class => classes,
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         # Indicator
@@ -251,8 +260,17 @@ end
 
 A radio menu item within a RadioGroup.
 """
-function SuiteDropdownMenuRadioItem(children...; value::String="", checked::Bool=false, disabled::Bool=false, class::String="", kwargs...)
+function SuiteDropdownMenuRadioItem(children...; value::String="", checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
+
+    classes = cn(
+        "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
+        "text-sm outline-hidden select-none",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-suite-menu-radio-item") => "",
         Symbol("data-value") => value,
@@ -260,13 +278,7 @@ function SuiteDropdownMenuRadioItem(children...; value::String="", checked::Bool
         :role => "menuitemradio",
         Symbol("aria-checked") => string(checked),
         :tabindex => "-1",
-        :class => cn(
-            "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
-            "text-sm outline-hidden select-none",
-            "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-            "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
-            class
-        ),
+        :class => classes,
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         # Indicator dot
@@ -295,10 +307,13 @@ end
 
 A visual separator between menu items.
 """
-function SuiteDropdownMenuSeparator(; class::String="", kwargs...)
+function SuiteDropdownMenuSeparator(; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn("-mx-1 my-1 h-px bg-warm-200 dark:bg-warm-700", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-menu-separator") => "",
         :role => "separator",
-        :class => cn("-mx-1 my-1 h-px bg-warm-200 dark:bg-warm-700", class),
+        :class => classes,
         kwargs...)
 end
 
@@ -307,8 +322,11 @@ end
 
 Displays a keyboard shortcut hint aligned to the right of a menu item.
 """
-function SuiteDropdownMenuShortcut(children...; class::String="", kwargs...)
-    Span(:class => cn("ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500", class),
+function SuiteDropdownMenuShortcut(children...; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn("ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
+    Span(:class => classes,
          Symbol("data-suite-menu-shortcut") => "",
          kwargs...,
          children...)
@@ -331,22 +349,25 @@ end
 
 The item that opens a sub-menu on hover or ArrowRight.
 """
-function SuiteDropdownMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=false, class::String="", kwargs...)
+function SuiteDropdownMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
+        "outline-hidden select-none",
+        "data-[state=open]:bg-warm-100 data-[state=open]:dark:bg-warm-800",
+        "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        inset && "pl-8",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-menu-sub-trigger") => "",
         Symbol("data-state") => "closed",
         :role => "menuitem",
         Symbol("aria-haspopup") => "menu",
         Symbol("aria-expanded") => "false",
         :tabindex => "-1",
-        :class => cn(
-            "flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
-            "outline-hidden select-none",
-            "data-[state=open]:bg-warm-100 data-[state=open]:dark:bg-warm-800",
-            "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
-            "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-            inset && "pl-8",
-            class
-        ),
+        :class => classes,
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         children...,
@@ -359,26 +380,29 @@ end
 
 The floating panel of a sub-menu.
 """
-function SuiteDropdownMenuSubContent(children...; class::String="", kwargs...)
+function SuiteDropdownMenuSubContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "z-50 min-w-[8rem] overflow-hidden rounded-md p-1 shadow-lg",
+        "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
+        "border border-warm-200 dark:border-warm-700",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2",
+        "data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2",
+        "data-[side=top]:slide-in-from-bottom-2",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-menu-sub-content") => "",
         Symbol("data-state") => "closed",
         :role => "menu",
         :aria_orientation => "vertical",
         :tabindex => "-1",
         :style => "display:none",
-        :class => cn(
-            "z-50 min-w-[8rem] overflow-hidden rounded-md p-1 shadow-lg",
-            "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
-            "border border-warm-200 dark:border-warm-700",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            "data-[side=bottom]:slide-in-from-top-2",
-            "data-[side=left]:slide-in-from-right-2",
-            "data-[side=right]:slide-in-from-left-2",
-            "data-[side=top]:slide-in-from-bottom-2",
-            class
-        ),
+        :class => classes,
         kwargs...,
         children...,
     )

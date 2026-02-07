@@ -112,8 +112,19 @@ The sheet content panel. Slides from the specified edge.
 # Arguments
 - `side::String="right"`: Edge to slide from ("top", "right", "bottom", "left")
 """
-function SuiteSheetContent(children...; side::String="right", class::String="", kwargs...)
+function SuiteSheetContent(children...; side::String="right", theme::Symbol=:default, class::String="", kwargs...)
     side_classes = get(SHEET_SIDE_CLASSES, side, SHEET_SIDE_CLASSES["right"])
+
+    classes = cn(
+        "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
+        "fixed z-50 gap-4 p-6 shadow-lg outline-none",
+        "transition ease-in-out",
+        "data-[state=closed]:duration-300 data-[state=open]:duration-500",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        side_classes,
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(
         # Overlay backdrop
@@ -128,15 +139,7 @@ function SuiteSheetContent(children...; side::String="right", class::String="", 
             :role => "dialog",
             :aria_modal => "true",
             :tabindex => "-1",
-            :class => cn(
-                "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
-                "fixed z-50 gap-4 p-6 shadow-lg outline-none",
-                "transition ease-in-out",
-                "data-[state=closed]:duration-300 data-[state=open]:duration-500",
-                "data-[state=open]:animate-in data-[state=closed]:animate-out",
-                side_classes,
-                class
-            ),
+            :class => classes,
             kwargs...,
             children...,
             # Default close button (X in top-right)

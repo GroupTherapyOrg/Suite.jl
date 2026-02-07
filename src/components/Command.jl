@@ -59,17 +59,20 @@ SuiteCommand(
 ```
 """
 function SuiteCommand(children...; should_filter::Bool=true, loop::Bool=true,
-                      class::String="", kwargs...)
+                      theme::Symbol=:default, class::String="", kwargs...)
     id = "suite-command-" * string(rand(UInt32), base=16)
+
+    classes = cn(
+        "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
+        "flex h-full w-full flex-col overflow-hidden rounded-md",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-suite-command") => id,
         Symbol("data-suite-command-filter") => should_filter ? "true" : "false",
         Symbol("data-suite-command-loop") => loop ? "true" : "false",
-        :class => cn(
-            "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
-            "flex h-full w-full flex-col overflow-hidden rounded-md",
-            class
-        ),
+        :class => classes,
         kwargs...,
         children...,
     )
@@ -80,8 +83,21 @@ end
 
 The search input for the command palette.
 """
-function SuiteCommandInput(; placeholder::String="", class::String="", kwargs...)
-    Div(:class => "flex h-9 items-center gap-2 border-b border-warm-200 dark:border-warm-700 px-3",
+function SuiteCommandInput(; placeholder::String="", theme::Symbol=:default, class::String="", kwargs...)
+    wrapper_classes = "flex h-9 items-center gap-2 border-b border-warm-200 dark:border-warm-700 px-3"
+    input_classes = cn(
+        "placeholder:text-warm-600 dark:placeholder:text-warm-500",
+        "flex h-10 w-full rounded-md bg-transparent py-3 text-sm",
+        "outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+        class
+    )
+    if theme !== :default
+        t = get_theme(theme)
+        wrapper_classes = apply_theme(wrapper_classes, t)
+        input_classes = apply_theme(input_classes, t)
+    end
+
+    Div(:class => wrapper_classes,
         Therapy.RawHtml(_COMMAND_SEARCH_SVG),
         Input(Symbol("data-suite-command-input") => "",
               :type => "text",
@@ -89,12 +105,7 @@ function SuiteCommandInput(; placeholder::String="", class::String="", kwargs...
               :autocomplete => "off",
               :autocorrect => "off",
               :spellcheck => "false",
-              :class => cn(
-                  "placeholder:text-warm-600 dark:placeholder:text-warm-500",
-                  "flex h-10 w-full rounded-md bg-transparent py-3 text-sm",
-                  "outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
-                  class
-              ),
+              :class => input_classes,
               kwargs...))
 end
 
@@ -139,23 +150,31 @@ A group of related command items with an optional heading.
 # Arguments
 - `heading::String=""`: Group heading text
 """
-function SuiteCommandGroup(children...; heading::String="", class::String="", kwargs...)
+function SuiteCommandGroup(children...; heading::String="", theme::Symbol=:default, class::String="", kwargs...)
     group_id = "suite-cmd-group-" * string(rand(UInt32), base=16)
     heading_id = group_id * "-heading"
+
+    group_classes = cn(
+        "text-warm-800 dark:text-warm-300 overflow-hidden p-1",
+        class
+    )
+    heading_classes = "text-warm-600 dark:text-warm-500 px-2 py-1.5 text-xs font-medium"
+    if theme !== :default
+        t = get_theme(theme)
+        group_classes = apply_theme(group_classes, t)
+        heading_classes = apply_theme(heading_classes, t)
+    end
 
     Div(Symbol("data-suite-command-group") => "",
         :role => "group",
         (isempty(heading) ? () : (Symbol("aria-labelledby") => heading_id,))...,
-        :class => cn(
-            "text-warm-800 dark:text-warm-300 overflow-hidden p-1",
-            class
-        ),
+        :class => group_classes,
         kwargs...,
         (isempty(heading) ? () : (
             Div(:role => "presentation",
                 :id => heading_id,
                 Symbol("data-suite-command-group-heading") => "",
-                :class => "text-warm-600 dark:text-warm-500 px-2 py-1.5 text-xs font-medium",
+                :class => heading_classes,
                 heading),
         ))...,
         children...,
@@ -173,21 +192,24 @@ An individual item in the command palette.
 - `keywords::Vector{String}=String[]`: Additional searchable text
 """
 function SuiteCommandItem(children...; value::String="", disabled::Bool=false,
-                          keywords::Vector{String}=String[], class::String="", kwargs...)
+                          keywords::Vector{String}=String[], theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "data-[selected=true]:bg-warm-100 dark:data-[selected=true]:bg-warm-800",
+        "data-[selected=true]:text-warm-800 dark:data-[selected=true]:text-warm-300",
+        "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
+        "outline-hidden select-none",
+        "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-command-item") => "",
         Symbol("data-suite-command-item-value") => value,
         (isempty(keywords) ? () : (Symbol("data-suite-command-item-keywords") => join(keywords, ","),))...,
         :role => "option",
         Symbol("aria-selected") => "false",
         :tabindex => "-1",
-        :class => cn(
-            "data-[selected=true]:bg-warm-100 dark:data-[selected=true]:bg-warm-800",
-            "data-[selected=true]:text-warm-800 dark:data-[selected=true]:text-warm-300",
-            "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
-            "outline-hidden select-none",
-            "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
-            class
-        ),
+        :class => classes,
         (disabled ? (Symbol("data-disabled") => "true",) : ())...,
         kwargs...,
         children...,
@@ -199,10 +221,13 @@ end
 
 A visual separator between command groups.
 """
-function SuiteCommandSeparator(; class::String="", kwargs...)
+function SuiteCommandSeparator(; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn("bg-warm-200 dark:bg-warm-700 -mx-1 h-px", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-command-separator") => "",
         :role => "separator",
-        :class => cn("bg-warm-200 dark:bg-warm-700 -mx-1 h-px", class),
+        :class => classes,
         kwargs...)
 end
 
@@ -211,9 +236,12 @@ end
 
 Displays a keyboard shortcut alongside a command item.
 """
-function SuiteCommandShortcut(children...; class::String="", kwargs...)
+function SuiteCommandShortcut(children...; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn("text-warm-600 dark:text-warm-500 ml-auto text-xs tracking-widest", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Span(Symbol("data-suite-command-shortcut") => "",
-         :class => cn("text-warm-600 dark:text-warm-500 ml-auto text-xs tracking-widest", class),
+         :class => classes,
          children...)
 end
 
@@ -225,8 +253,25 @@ A command palette inside a dialog overlay. Useful for ⌘K command palette patte
 The dialog is triggered externally (e.g. via keyboard shortcut).
 Uses SuiteDialog internally.
 """
-function SuiteCommandDialog(children...; class::String="", kwargs...)
+function SuiteCommandDialog(children...; theme::Symbol=:default, class::String="", kwargs...)
     id = "suite-command-dialog-" * string(rand(UInt32), base=16)
+
+    overlay_classes = "fixed inset-0 bg-warm-950/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+    content_classes = cn(
+        "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
+        "z-50 w-full max-w-lg",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
+        "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+        class
+    )
+    if theme !== :default
+        t = get_theme(theme)
+        overlay_classes = apply_theme(overlay_classes, t)
+        content_classes = apply_theme(content_classes, t)
+    end
 
     # Overlay + centered command palette
     Div(Symbol("data-suite-command-dialog") => id,
@@ -234,22 +279,13 @@ function SuiteCommandDialog(children...; class::String="", kwargs...)
         :style => "display:none",
         :class => "fixed inset-0 z-50",
         # Overlay
-        Div(:class => "fixed inset-0 bg-warm-950/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        Div(:class => overlay_classes,
             Symbol("data-suite-command-dialog-overlay") => id),
         # Content
-        Div(:class => cn(
-                "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
-                "z-50 w-full max-w-lg",
-                "data-[state=open]:animate-in data-[state=closed]:animate-out",
-                "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-                "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-                "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
-                "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
-                class
-            ),
+        Div(:class => content_classes,
             Symbol("data-suite-command-dialog-content") => id,
             kwargs...,
-            SuiteCommand(children...),
+            SuiteCommand(children...; theme=theme),
         ),
     )
 end

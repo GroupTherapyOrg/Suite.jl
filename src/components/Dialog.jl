@@ -105,7 +105,20 @@ end
 The dialog content panel. Contains header, body, footer, and close button.
 Renders with overlay backdrop. Hidden by default, shown by JS.
 """
-function SuiteDialogContent(children...; class::String="", kwargs...)
+function SuiteDialogContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)]",
+        "translate-x-[-50%] translate-y-[-50%]",
+        "gap-4 rounded-lg border border-warm-200 dark:border-warm-700",
+        "p-6 shadow-lg duration-200 outline-none sm:max-w-lg",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(
         # Overlay backdrop
         Div(Symbol("data-suite-dialog-overlay") => "",
@@ -119,17 +132,7 @@ function SuiteDialogContent(children...; class::String="", kwargs...)
             :role => "dialog",
             :aria_modal => "true",
             :tabindex => "-1",
-            :class => cn(
-                "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
-                "data-[state=open]:animate-in data-[state=closed]:animate-out",
-                "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-                "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-                "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)]",
-                "translate-x-[-50%] translate-y-[-50%]",
-                "gap-4 rounded-lg border border-warm-200 dark:border-warm-700",
-                "p-6 shadow-lg duration-200 outline-none sm:max-w-lg",
-                class
-            ),
+            :class => classes,
             kwargs...,
             children...,
             # Default close button (X in top-right)

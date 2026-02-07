@@ -48,7 +48,7 @@ SuiteToggle(pressed=true, "Bold")
 """
 function SuiteToggle(children...; variant::String="default", size::String="default",
                      pressed::Bool=false, disabled::Bool=false,
-                     class::String="", kwargs...)
+                     theme::Symbol=:default, class::String="", kwargs...)
     base = "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors hover:bg-warm-100 dark:hover:bg-warm-900 hover:text-warm-600 dark:hover:text-warm-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-warm-100 dark:data-[state=on]:bg-warm-900 data-[state=on]:text-warm-800 dark:data-[state=on]:text-warm-300"
 
     variant_classes = Dict(
@@ -66,6 +66,7 @@ function SuiteToggle(children...; variant::String="default", size::String="defau
     sc = get(size_classes, size, size_classes["default"])
     state = pressed ? "on" : "off"
     classes = cn(base, vc, sc, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     attrs = Pair{Symbol,Any}[
         :type => "button",

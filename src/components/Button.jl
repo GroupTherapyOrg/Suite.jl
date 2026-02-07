@@ -46,7 +46,7 @@ SuiteButton(variant="icon", size="icon", "✕")
 ```
 """
 function SuiteButton(children...; variant::String="default", size::String="default",
-                     class::String="", kwargs...)
+                     class::String="", theme::Symbol=:default, kwargs...)
     base = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
 
     variant_classes = Dict(
@@ -68,6 +68,7 @@ function SuiteButton(children...; variant::String="default", size::String="defau
     vc = get(variant_classes, variant, variant_classes["default"])
     sc = get(size_classes, size, size_classes["default"])
     classes = cn(base, vc, sc, class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Button(:class => classes, kwargs..., children...)
 end

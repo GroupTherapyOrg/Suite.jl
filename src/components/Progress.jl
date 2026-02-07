@@ -32,7 +32,7 @@ SuiteProgress(value=33)
 SuiteProgress(value=75, class="w-[60%]")
 ```
 """
-function SuiteProgress(; value::Real=0, class::String="", kwargs...)
+function SuiteProgress(; value::Real=0, class::String="", theme::Symbol=:default, kwargs...)
     clamped = clamp(value, 0, 100)
     transform_val = "translateX(-$(100 - clamped)%)"
 
@@ -43,6 +43,12 @@ function SuiteProgress(; value::Real=0, class::String="", kwargs...)
     )
 
     indicator_classes = "bg-accent-600 h-full w-full flex-1 transition-all"
+
+    if theme !== :default
+        t = get_theme(theme)
+        root_classes = apply_theme(root_classes, t)
+        indicator_classes = apply_theme(indicator_classes, t)
+    end
 
     Div(
         :role => "progressbar",

@@ -108,7 +108,7 @@ The drawer content panel. Supports drag-to-dismiss.
 # Arguments
 - `direction::String="bottom"`: Direction to slide from ("bottom", "top", "left", "right")
 """
-function SuiteDrawerContent(children...; direction::String="bottom", class::String="", kwargs...)
+function SuiteDrawerContent(children...; direction::String="bottom", theme::Symbol=:default, class::String="", kwargs...)
     # Direction-specific positioning classes
     dir_classes = if direction == "bottom"
         "inset-x-0 bottom-0 mt-24 rounded-t-[10px] border-t"
@@ -121,6 +121,15 @@ function SuiteDrawerContent(children...; direction::String="bottom", class::Stri
     else
         "inset-x-0 bottom-0 mt-24 rounded-t-[10px] border-t"
     end
+
+    classes = cn(
+        "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
+        "fixed z-50 flex h-auto flex-col outline-none",
+        "border-warm-200 dark:border-warm-700",
+        dir_classes,
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(
         # Overlay backdrop
@@ -137,13 +146,7 @@ function SuiteDrawerContent(children...; direction::String="bottom", class::Stri
             :aria_modal => "true",
             :tabindex => "-1",
             :style => "touch-action:none",
-            :class => cn(
-                "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
-                "fixed z-50 flex h-auto flex-col outline-none",
-                "border-warm-200 dark:border-warm-700",
-                dir_classes,
-                class
-            ),
+            :class => classes,
             kwargs...,
             children...,
         ),
@@ -155,8 +158,11 @@ end
 
 A visual drag handle indicator for the drawer.
 """
-function SuiteDrawerHandle(; class::String="", kwargs...)
-    Div(:class => cn("mx-auto mt-4 h-2 w-[100px] rounded-full bg-warm-200 dark:bg-warm-800", class),
+function SuiteDrawerHandle(; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn("mx-auto mt-4 h-2 w-[100px] rounded-full bg-warm-200 dark:bg-warm-800", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
+    Div(:class => classes,
         kwargs...)
 end
 

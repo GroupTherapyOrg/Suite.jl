@@ -36,8 +36,9 @@ SuiteCard(
 )
 ```
 """
-function SuiteCard(children...; class::String="", kwargs...)
+function SuiteCard(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("rounded-xl border border-warm-200 dark:border-warm-700 bg-warm-100 dark:bg-warm-900 text-warm-800 dark:text-warm-300 shadow-sm flex flex-col gap-6 py-6 text-sm overflow-hidden", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Div(:class => classes, kwargs..., children...)
 end
 
@@ -66,8 +67,9 @@ end
 
 Description text inside a SuiteCardHeader.
 """
-function SuiteCardDescription(children...; class::String="", kwargs...)
+function SuiteCardDescription(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-sm text-warm-600 dark:text-warm-500", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Div(:class => classes, kwargs..., children...)
 end
 

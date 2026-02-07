@@ -31,7 +31,7 @@ SuiteInput(type="file")
 SuiteInput(:disabled => true, placeholder="Disabled")
 ```
 """
-function SuiteInput(; type::String="text", class::String="", kwargs...)
+function SuiteInput(; type::String="text", class::String="", theme::Symbol=:default, kwargs...)
     classes = cn(
         "h-9 w-full min-w-0 rounded-md border border-warm-200 dark:border-warm-700 bg-transparent px-3 py-1 text-base shadow-sm transition-colors outline-none",
         "placeholder:text-warm-500 dark:placeholder:text-warm-600",
@@ -41,6 +41,7 @@ function SuiteInput(; type::String="text", class::String="", kwargs...)
         "md:text-sm",
         class,
     )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Input(:type => type, :class => classes, kwargs...)
 end

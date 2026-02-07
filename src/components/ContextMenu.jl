@@ -105,27 +105,30 @@ end
 
 The floating menu content panel. Positioned at the right-click location.
 """
-function SuiteContextMenuContent(children...; class::String="", kwargs...)
+function SuiteContextMenuContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "z-50 max-h-[var(--radix-popper-available-height,300px)] min-w-[8rem]",
+        "overflow-x-hidden overflow-y-auto rounded-md p-1 shadow-md",
+        "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
+        "border border-warm-200 dark:border-warm-700",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2",
+        "data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2",
+        "data-[side=top]:slide-in-from-bottom-2",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-context-menu-content") => "",
         Symbol("data-state") => "closed",
         :role => "menu",
         :aria_orientation => "vertical",
         :tabindex => "-1",
         :style => "display:none",
-        :class => cn(
-            "z-50 max-h-[var(--radix-popper-available-height,300px)] min-w-[8rem]",
-            "overflow-x-hidden overflow-y-auto rounded-md p-1 shadow-md",
-            "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
-            "border border-warm-200 dark:border-warm-700",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            "data-[side=bottom]:slide-in-from-top-2",
-            "data-[side=left]:slide-in-from-right-2",
-            "data-[side=right]:slide-in-from-left-2",
-            "data-[side=top]:slide-in-from-bottom-2",
-            class
-        ),
+        :class => classes,
         kwargs...,
         children...,
     )
@@ -148,12 +151,15 @@ end
 
 A label for a group of menu items.
 """
-function SuiteContextMenuLabel(children...; inset::Bool=false, class::String="", kwargs...)
-    Div(:class => cn(
-            "px-2 py-1.5 text-sm font-medium text-warm-800 dark:text-warm-300",
-            inset && "pl-8",
-            class
-        ),
+function SuiteContextMenuLabel(children...; inset::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "px-2 py-1.5 text-sm font-medium text-warm-800 dark:text-warm-300",
+        inset && "pl-8",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
+    Div(:class => classes,
         kwargs...,
         children...)
 end
@@ -163,7 +169,7 @@ end
 
 A menu item. Optionally pass a `shortcut` string to display a keyboard shortcut.
 """
-function SuiteContextMenuItem(children...; shortcut::String="", disabled::Bool=false, text_value::String="", class::String="", kwargs...)
+function SuiteContextMenuItem(children...; shortcut::String="", disabled::Bool=false, text_value::String="", theme::Symbol=:default, class::String="", kwargs...)
     item_children = collect(Any, children)
     if !isempty(shortcut)
         push!(item_children, Span(:class => "ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500",
@@ -171,16 +177,19 @@ function SuiteContextMenuItem(children...; shortcut::String="", disabled::Bool=f
                                    shortcut))
     end
 
+    classes = cn(
+        "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5",
+        "text-sm outline-hidden select-none",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-menu-item") => "",
         :role => "menuitem",
         :tabindex => "-1",
-        :class => cn(
-            "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5",
-            "text-sm outline-hidden select-none",
-            "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-            "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
-            class
-        ),
+        :class => classes,
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         (!isempty(text_value) ? [Symbol("data-text-value") => text_value] : Pair{Symbol,String}[])...,
         kwargs...,
@@ -192,21 +201,24 @@ end
 
 A menu item with a checkbox.
 """
-function SuiteContextMenuCheckboxItem(children...; checked::Bool=false, disabled::Bool=false, class::String="", kwargs...)
+function SuiteContextMenuCheckboxItem(children...; checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
+
+    classes = cn(
+        "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
+        "text-sm outline-hidden select-none",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-suite-menu-checkbox-item") => "",
         Symbol("data-state") => state,
         :role => "menuitemcheckbox",
         Symbol("aria-checked") => string(checked),
         :tabindex => "-1",
-        :class => cn(
-            "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
-            "text-sm outline-hidden select-none",
-            "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-            "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
-            class
-        ),
+        :class => classes,
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         Span(:class => "pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
@@ -236,8 +248,17 @@ end
 
 A radio menu item within a RadioGroup.
 """
-function SuiteContextMenuRadioItem(children...; value::String="", checked::Bool=false, disabled::Bool=false, class::String="", kwargs...)
+function SuiteContextMenuRadioItem(children...; value::String="", checked::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     state = checked ? "checked" : "unchecked"
+
+    classes = cn(
+        "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
+        "text-sm outline-hidden select-none",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-suite-menu-radio-item") => "",
         Symbol("data-value") => value,
@@ -245,13 +266,7 @@ function SuiteContextMenuRadioItem(children...; value::String="", checked::Bool=
         :role => "menuitemradio",
         Symbol("aria-checked") => string(checked),
         :tabindex => "-1",
-        :class => cn(
-            "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8",
-            "text-sm outline-hidden select-none",
-            "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-            "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
-            class
-        ),
+        :class => classes,
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         Span(:class => "pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
@@ -279,10 +294,13 @@ end
 
 A visual separator between menu items.
 """
-function SuiteContextMenuSeparator(; class::String="", kwargs...)
+function SuiteContextMenuSeparator(; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn("-mx-1 my-1 h-px bg-warm-200 dark:bg-warm-700", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-menu-separator") => "",
         :role => "separator",
-        :class => cn("-mx-1 my-1 h-px bg-warm-200 dark:bg-warm-700", class),
+        :class => classes,
         kwargs...)
 end
 
@@ -291,8 +309,11 @@ end
 
 Displays a keyboard shortcut hint.
 """
-function SuiteContextMenuShortcut(children...; class::String="", kwargs...)
-    Span(:class => cn("ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500", class),
+function SuiteContextMenuShortcut(children...; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn("ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500", class)
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
+    Span(:class => classes,
          Symbol("data-suite-menu-shortcut") => "",
          kwargs...,
          children...)
@@ -315,22 +336,25 @@ end
 
 The item that opens a sub-menu.
 """
-function SuiteContextMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=false, class::String="", kwargs...)
+function SuiteContextMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
+        "outline-hidden select-none",
+        "data-[state=open]:bg-warm-100 data-[state=open]:dark:bg-warm-800",
+        "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        inset && "pl-8",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-menu-sub-trigger") => "",
         Symbol("data-state") => "closed",
         :role => "menuitem",
         Symbol("aria-haspopup") => "menu",
         Symbol("aria-expanded") => "false",
         :tabindex => "-1",
-        :class => cn(
-            "flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
-            "outline-hidden select-none",
-            "data-[state=open]:bg-warm-100 data-[state=open]:dark:bg-warm-800",
-            "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
-            "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-            inset && "pl-8",
-            class
-        ),
+        :class => classes,
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         children...,
@@ -343,26 +367,29 @@ end
 
 The floating panel of a sub-menu.
 """
-function SuiteContextMenuSubContent(children...; class::String="", kwargs...)
+function SuiteContextMenuSubContent(children...; theme::Symbol=:default, class::String="", kwargs...)
+    classes = cn(
+        "z-50 min-w-[8rem] overflow-hidden rounded-md p-1 shadow-lg",
+        "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
+        "border border-warm-200 dark:border-warm-700",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2",
+        "data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2",
+        "data-[side=top]:slide-in-from-bottom-2",
+        class
+    )
+    theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
+
     Div(Symbol("data-suite-menu-sub-content") => "",
         Symbol("data-state") => "closed",
         :role => "menu",
         :aria_orientation => "vertical",
         :tabindex => "-1",
         :style => "display:none",
-        :class => cn(
-            "z-50 min-w-[8rem] overflow-hidden rounded-md p-1 shadow-lg",
-            "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
-            "border border-warm-200 dark:border-warm-700",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            "data-[side=bottom]:slide-in-from-top-2",
-            "data-[side=left]:slide-in-from-right-2",
-            "data-[side=right]:slide-in-from-left-2",
-            "data-[side=top]:slide-in-from-bottom-2",
-            class
-        ),
+        :class => classes,
         kwargs...,
         children...,
     )

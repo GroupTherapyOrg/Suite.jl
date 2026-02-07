@@ -5,6 +5,10 @@ using Therapy
 # --- Utility ---
 include("utils.jl")
 
+# --- Theme System ---
+include("themes.jl")
+include("theme_classes.jl")
+
 # --- Component Registry & Extraction ---
 include("registry.jl")
 include("extract.jl")
