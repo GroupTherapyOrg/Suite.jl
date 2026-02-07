@@ -73,17 +73,15 @@ Must be a direct child of `Collapsible`.
 """
 function CollapsibleTrigger(children...; theme::Symbol=:default,
                                 class::String="", kwargs...)
-    base = "inline-flex items-center justify-center cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-    classes = cn(base, class)
+    classes = cn("cursor-pointer text-warm-800 dark:text-warm-300", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Therapy.Button(:type => "button",
-           Symbol("data-suite-collapsible-trigger") => "",
-           Symbol("data-state") => "closed",
-           :aria_expanded => "false",
-           :class => classes,
-           kwargs...,
-           children...)
+    Div(Symbol("data-suite-collapsible-trigger") => "",
+        Symbol("data-state") => "closed",
+        :aria_expanded => "false",
+        :class => classes,
+        kwargs...,
+        children...)
 end
 
 """

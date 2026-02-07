@@ -113,7 +113,7 @@ The trigger button that opens a navigation menu content panel.
 function NavigationMenuTrigger(children...; disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "group inline-flex h-9 w-max items-center justify-center cursor-pointer rounded-md px-4 py-2",
-        "text-sm font-medium transition-[color,box-shadow]",
+        "text-sm font-medium text-warm-800 dark:text-warm-300 transition-[color,box-shadow]",
         "bg-warm-50 dark:bg-warm-950",
         "hover:bg-warm-100 hover:dark:bg-warm-800",
         "data-[state=open]:bg-warm-100/50 data-[state=open]:dark:bg-warm-800/50",

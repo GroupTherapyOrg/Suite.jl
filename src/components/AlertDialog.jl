@@ -165,7 +165,7 @@ end
 Title of the alert dialog. Renders as h2.
 """
 function AlertDialogTitle(children...; class::String="", kwargs...)
-    H2(:class => cn("text-lg leading-none font-semibold", class),
+    H2(:class => cn("text-lg leading-none font-semibold text-warm-800 dark:text-warm-300", class),
        kwargs...,
        children...)
 end
