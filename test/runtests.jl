@@ -5521,4 +5521,110 @@ using Test
             @test :TreeViewItem in meta.exports
         end
     end
+
+    @testset "Carousel" begin
+        @testset "Container rendering" begin
+            html = Therapy.render_to_string(Suite.Carousel(
+                Suite.CarouselContent(
+                    Suite.CarouselItem("Slide 1"),
+                ),
+            ))
+            @test occursin("data-suite-carousel", html)
+            @test occursin("role=\"region\"", html)
+            @test occursin("aria-roledescription=\"carousel\"", html)
+            @test occursin("relative", html)
+        end
+
+        @testset "Carousel orientation" begin
+            html = Therapy.render_to_string(Suite.Carousel(orientation="vertical"))
+            @test occursin("data-suite-carousel-orientation=\"vertical\"", html)
+        end
+
+        @testset "Carousel loop and autoplay" begin
+            html = Therapy.render_to_string(Suite.Carousel(loop=true, autoplay=true, autoplay_interval=3000))
+            @test occursin("data-suite-carousel-loop=\"true\"", html)
+            @test occursin("data-suite-carousel-autoplay=\"true\"", html)
+            @test occursin("data-suite-carousel-autoplay-interval=\"3000\"", html)
+        end
+
+        @testset "CarouselContent" begin
+            html = Therapy.render_to_string(Suite.CarouselContent(
+                Suite.CarouselItem("Slide 1"),
+            ))
+            @test occursin("data-suite-carousel-viewport", html)
+            @test occursin("data-suite-carousel-content", html)
+            @test occursin("overflow-hidden", html)
+            @test occursin("scroll-smooth", html)
+            @test occursin("snap-x", html)
+            @test occursin("snap-mandatory", html)
+        end
+
+        @testset "CarouselItem" begin
+            html = Therapy.render_to_string(Suite.CarouselItem("Slide Content"))
+            @test occursin("Slide Content", html)
+            @test occursin("data-suite-carousel-item", html)
+            @test occursin("role=\"group\"", html)
+            @test occursin("aria-roledescription=\"slide\"", html)
+            @test occursin("snap-start", html)
+            @test occursin("basis-full", html)
+        end
+
+        @testset "CarouselPrevious" begin
+            html = Therapy.render_to_string(Suite.CarouselPrevious())
+            @test occursin("<button", html)
+            @test occursin("data-suite-carousel-prev", html)
+            @test occursin("aria-label=\"Previous slide\"", html)
+            @test occursin("<svg", html)
+            @test occursin("rounded-full", html)
+        end
+
+        @testset "CarouselNext" begin
+            html = Therapy.render_to_string(Suite.CarouselNext())
+            @test occursin("<button", html)
+            @test occursin("data-suite-carousel-next", html)
+            @test occursin("aria-label=\"Next slide\"", html)
+            @test occursin("<svg", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(Suite.CarouselPrevious())
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:bg-warm-900/90", html)
+            @test occursin("dark:text-warm-300", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(Suite.Carousel(class="w-full max-w-md"))
+            @test occursin("w-full", html)
+            @test occursin("max-w-md", html)
+        end
+
+        @testset "Full composition" begin
+            html = Therapy.render_to_string(Suite.Carousel(
+                Suite.CarouselContent(
+                    Suite.CarouselItem("Slide 1"),
+                    Suite.CarouselItem("Slide 2"),
+                    Suite.CarouselItem("Slide 3"),
+                ),
+                Suite.CarouselPrevious(),
+                Suite.CarouselNext(),
+            ))
+            @test occursin("Slide 1", html)
+            @test occursin("Slide 2", html)
+            @test occursin("Slide 3", html)
+            @test occursin("data-suite-carousel-prev", html)
+            @test occursin("data-suite-carousel-next", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Carousel)
+            meta = Suite.COMPONENT_REGISTRY[:Carousel]
+            @test meta.tier == :js_runtime
+            @test :Carousel in meta.exports
+            @test :CarouselContent in meta.exports
+            @test :CarouselItem in meta.exports
+            @test :CarouselPrevious in meta.exports
+            @test :CarouselNext in meta.exports
+        end
+    end
 end

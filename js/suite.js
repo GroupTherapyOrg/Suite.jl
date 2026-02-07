@@ -4738,6 +4738,124 @@
             },
         },
 
+        // --- Carousel (scroll-snap navigation + autoplay) --------------------------
+        Carousel: {
+            _initialized: new Set(),
+
+            init() {
+                document.querySelectorAll('[data-suite-carousel]').forEach(root => {
+                    if (this._initialized.has(root)) return;
+                    this._initialized.add(root);
+                    this._setup(root);
+                });
+            },
+
+            _setup(root) {
+                const orientation = root.getAttribute('data-suite-carousel-orientation') || 'horizontal';
+                const loop = root.getAttribute('data-suite-carousel-loop') === 'true';
+                const autoplay = root.getAttribute('data-suite-carousel-autoplay') === 'true';
+                const interval = parseInt(root.getAttribute('data-suite-carousel-autoplay-interval') || '4000', 10);
+
+                const content = root.querySelector('[data-suite-carousel-content]');
+                const prevBtn = root.querySelector('[data-suite-carousel-prev]');
+                const nextBtn = root.querySelector('[data-suite-carousel-next]');
+                if (!content) return;
+
+                const getItems = () => Array.from(content.querySelectorAll('[data-suite-carousel-item]'));
+
+                const scrollToIdx = (idx) => {
+                    const items = getItems();
+                    if (items.length === 0) return;
+                    const target = items[Math.max(0, Math.min(idx, items.length - 1))];
+                    target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                };
+
+                const getCurrentIdx = () => {
+                    const items = getItems();
+                    if (items.length === 0) return 0;
+                    const viewport = root.querySelector('[data-suite-carousel-viewport]');
+                    if (!viewport) return 0;
+                    const rect = viewport.getBoundingClientRect();
+                    const center = orientation === 'horizontal'
+                        ? rect.left + rect.width / 2
+                        : rect.top + rect.height / 2;
+                    let closest = 0;
+                    let minDist = Infinity;
+                    items.forEach((item, i) => {
+                        const ir = item.getBoundingClientRect();
+                        const ic = orientation === 'horizontal'
+                            ? ir.left + ir.width / 2
+                            : ir.top + ir.height / 2;
+                        const d = Math.abs(ic - center);
+                        if (d < minDist) { minDist = d; closest = i; }
+                    });
+                    return closest;
+                };
+
+                const updateButtons = () => {
+                    const items = getItems();
+                    const idx = getCurrentIdx();
+                    if (prevBtn) {
+                        prevBtn.disabled = !loop && idx === 0;
+                    }
+                    if (nextBtn) {
+                        nextBtn.disabled = !loop && idx >= items.length - 1;
+                    }
+                };
+
+                const goPrev = () => {
+                    const items = getItems();
+                    const idx = getCurrentIdx();
+                    if (idx > 0) {
+                        scrollToIdx(idx - 1);
+                    } else if (loop && items.length > 0) {
+                        scrollToIdx(items.length - 1);
+                    }
+                };
+
+                const goNext = () => {
+                    const items = getItems();
+                    const idx = getCurrentIdx();
+                    if (idx < items.length - 1) {
+                        scrollToIdx(idx + 1);
+                    } else if (loop && items.length > 0) {
+                        scrollToIdx(0);
+                    }
+                };
+
+                if (prevBtn) prevBtn.addEventListener('click', () => { goPrev(); setTimeout(updateButtons, 350); });
+                if (nextBtn) nextBtn.addEventListener('click', () => { goNext(); setTimeout(updateButtons, 350); });
+
+                // Scroll listener to update button states
+                content.addEventListener('scrollend', updateButtons);
+                content.addEventListener('scroll', () => { clearTimeout(content._scrollTimer); content._scrollTimer = setTimeout(updateButtons, 150); });
+
+                // Keyboard navigation
+                root.addEventListener('keydown', (e) => {
+                    if (orientation === 'horizontal') {
+                        if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); setTimeout(updateButtons, 350); }
+                        if (e.key === 'ArrowRight') { e.preventDefault(); goNext(); setTimeout(updateButtons, 350); }
+                    } else {
+                        if (e.key === 'ArrowUp') { e.preventDefault(); goPrev(); setTimeout(updateButtons, 350); }
+                        if (e.key === 'ArrowDown') { e.preventDefault(); goNext(); setTimeout(updateButtons, 350); }
+                    }
+                });
+
+                // Autoplay
+                if (autoplay && interval > 0) {
+                    let timer = setInterval(() => { goNext(); setTimeout(updateButtons, 350); }, interval);
+                    // Pause on hover
+                    root.addEventListener('mouseenter', () => clearInterval(timer));
+                    root.addEventListener('mouseleave', () => {
+                        timer = setInterval(() => { goNext(); setTimeout(updateButtons, 350); }, interval);
+                    });
+                }
+
+                // Initial button state
+                requestAnimationFrame(updateButtons);
+            },
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
@@ -4767,6 +4885,7 @@
             this.Form.init();
             this.CodeBlock.init();
             this.TreeView.init();
+            this.Carousel.init();
         },
 
         // --- Init -----------------------------------------------------------------

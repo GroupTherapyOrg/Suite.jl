@@ -23,7 +23,7 @@ const SUITE_COMPONENTS = [
         (slug = "button",           title = "Button",           implemented = true),
         (slug = "calendar",         title = "Calendar",         implemented = true),
         (slug = "card",             title = "Card",             implemented = true),
-        (slug = "carousel",         title = "Carousel",         implemented = false),
+        (slug = "carousel",         title = "Carousel",         implemented = true),
         (slug = "checkbox",         title = "Checkbox",         implemented = false),
         (slug = "code-block",       title = "Code Block",       implemented = true),
         (slug = "collapsible",      title = "Collapsible",      implemented = true),
