@@ -43,7 +43,8 @@ include("components/Switch.jl")
 include("components/ThemeToggle.jl")
 
 # --- Phase 3: JS Runtime Components ---
-# include("components/Dialog.jl")
+include("components/Dialog.jl")
+include("components/AlertDialog.jl")
 # include("components/DropdownMenu.jl")
 # include("components/Popover.jl")
 # include("components/Tooltip.jl")

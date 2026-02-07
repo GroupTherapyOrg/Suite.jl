@@ -29,80 +29,215 @@
     const Suite = {
         version: '0.1.0',
 
-        // --- Focus Trap -----------------------------------------------------------
-        FocusTrap: {
-            /**
-             * Trap focus within a container element.
-             * @param {HTMLElement} container - The element to trap focus within
-             * @returns {Function} cleanup - Call to release the trap
-             */
-            activate(container) {
-                const focusable = container.querySelectorAll(
-                    'a[href], button:not([disabled]), textarea:not([disabled]), ' +
-                    'input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-                );
-                if (focusable.length === 0) return () => {};
+        // --- Focus Guards ---------------------------------------------------------
+        FocusGuards: {
+            _count: 0,
+            install() {
+                if (this._count === 0) {
+                    const create = () => {
+                        const s = document.createElement('span');
+                        s.setAttribute('data-suite-focus-guard', '');
+                        s.tabIndex = 0;
+                        Object.assign(s.style, { outline: 'none', opacity: '0', position: 'fixed', pointerEvents: 'none' });
+                        return s;
+                    };
+                    document.body.insertAdjacentElement('afterbegin', create());
+                    document.body.insertAdjacentElement('beforeend', create());
+                }
+                this._count++;
+            },
+            uninstall() {
+                this._count--;
+                if (this._count === 0) {
+                    document.querySelectorAll('[data-suite-focus-guard]').forEach(n => n.remove());
+                }
+            }
+        },
 
-                const first = focusable[0];
-                const last = focusable[focusable.length - 1];
-                const previouslyFocused = document.activeElement;
-
-                function handleKeyDown(e) {
-                    if (e.key !== 'Tab') return;
-                    if (e.shiftKey) {
-                        if (document.activeElement === first) {
-                            e.preventDefault();
-                            last.focus();
-                        }
-                    } else {
-                        if (document.activeElement === last) {
-                            e.preventDefault();
-                            first.focus();
-                        }
+        // --- Scroll Lock ----------------------------------------------------------
+        ScrollLock: {
+            _saved: null,
+            _count: 0,
+            lock() {
+                if (this._count === 0) {
+                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                    this._saved = {
+                        overflow: document.body.style.overflow,
+                        paddingRight: document.body.style.paddingRight,
+                    };
+                    document.body.style.overflow = 'hidden';
+                    if (scrollbarWidth > 0) {
+                        document.body.style.paddingRight = scrollbarWidth + 'px';
                     }
                 }
+                this._count++;
+            },
+            unlock() {
+                this._count--;
+                if (this._count === 0 && this._saved) {
+                    document.body.style.overflow = this._saved.overflow;
+                    document.body.style.paddingRight = this._saved.paddingRight;
+                    this._saved = null;
+                }
+            }
+        },
 
-                container.addEventListener('keydown', handleKeyDown);
-                first.focus();
-
-                return function cleanup() {
-                    container.removeEventListener('keydown', handleKeyDown);
-                    if (previouslyFocused && previouslyFocused.focus) {
-                        previouslyFocused.focus();
+        // --- Focus Trap -----------------------------------------------------------
+        FocusTrap: {
+            _scopes: [],
+            _getTabbable(container) {
+                const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
+                    acceptNode(node) {
+                        if (node.tagName === 'INPUT' && node.type === 'hidden') return NodeFilter.FILTER_SKIP;
+                        if (node.disabled || node.hidden) return NodeFilter.FILTER_SKIP;
+                        if (node.tabIndex >= 0) return NodeFilter.FILTER_ACCEPT;
+                        return NodeFilter.FILTER_SKIP;
                     }
+                });
+                const result = [];
+                while (walker.nextNode()) result.push(walker.currentNode);
+                return result;
+            },
+            _isVisible(el, upTo) {
+                if (getComputedStyle(el).visibility === 'hidden') return false;
+                let node = el;
+                while (node && node !== upTo) {
+                    if (getComputedStyle(node).display === 'none') return false;
+                    node = node.parentElement;
+                }
+                return true;
+            },
+            activate(container, options) {
+                options = options || {};
+                const previouslyFocused = document.activeElement;
+                const scope = { container, paused: false };
+
+                // Pause previous scope
+                if (this._scopes.length > 0) this._scopes[this._scopes.length - 1].paused = true;
+                this._scopes.push(scope);
+
+                // Auto-focus: first tabbable non-link element, or container
+                if (!options.skipAutoFocus) {
+                    const tabbable = this._getTabbable(container);
+                    const nonLinks = tabbable.filter(el => el.tagName !== 'A' && this._isVisible(el, container));
+                    const target = options.initialFocus
+                        ? (typeof options.initialFocus === 'function' ? options.initialFocus() : options.initialFocus)
+                        : (nonLinks[0] || tabbable[0]);
+                    if (target) target.focus({ preventScroll: true });
+                    else container.focus({ preventScroll: true });
+                }
+
+                // Focusin handler — yank focus back if it escapes
+                const onFocusIn = (e) => {
+                    if (scope.paused) return;
+                    if (container.contains(e.target)) {
+                        scope._lastFocused = e.target;
+                    } else if (scope._lastFocused) {
+                        scope._lastFocused.focus({ preventScroll: true });
+                    }
+                };
+
+                // Tab key handler — loop focus
+                const onKeyDown = (e) => {
+                    if (scope.paused) return;
+                    if (e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return;
+                    const tabbable = this._getTabbable(container).filter(el => this._isVisible(el, container));
+                    if (tabbable.length === 0) { e.preventDefault(); return; }
+                    const first = tabbable[0];
+                    const last = tabbable[tabbable.length - 1];
+                    if (!e.shiftKey && document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus({ preventScroll: true });
+                    } else if (e.shiftKey && document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus({ preventScroll: true });
+                    }
+                };
+
+                document.addEventListener('focusin', onFocusIn);
+                container.addEventListener('keydown', onKeyDown);
+
+                return () => {
+                    document.removeEventListener('focusin', onFocusIn);
+                    container.removeEventListener('keydown', onKeyDown);
+                    // Remove scope and resume previous
+                    this._scopes = this._scopes.filter(s => s !== scope);
+                    if (this._scopes.length > 0) this._scopes[this._scopes.length - 1].paused = false;
+                    // Return focus
+                    setTimeout(() => {
+                        if (previouslyFocused && previouslyFocused.focus) {
+                            previouslyFocused.focus({ preventScroll: true });
+                        }
+                    }, 0);
                 };
             }
         },
 
         // --- Dismiss Layer --------------------------------------------------------
         DismissLayer: {
-            /**
-             * Dismiss on click-outside or Escape key.
-             * @param {HTMLElement} container - The dismissable element
-             * @param {Function} onDismiss - Called when dismissed
-             * @returns {Function} cleanup
-             */
-            activate(container, onDismiss) {
-                function handleClickOutside(e) {
-                    if (!container.contains(e.target)) {
-                        onDismiss();
-                    }
-                }
-                function handleEscape(e) {
-                    if (e.key === 'Escape') {
-                        onDismiss();
-                    }
+            _layers: [],
+            activate(container, options) {
+                options = options || {};
+                const onDismiss = options.onDismiss || options;
+                const isFunc = typeof onDismiss === 'function';
+
+                this._layers.push(container);
+
+                // Body pointer-events management for modal overlays
+                let savedPointerEvents;
+                if (options.disableOutsidePointerEvents) {
+                    savedPointerEvents = document.body.style.pointerEvents;
+                    document.body.style.pointerEvents = 'none';
+                    container.style.pointerEvents = 'auto';
                 }
 
-                // Delay to avoid immediate dismiss from the opening click
-                requestAnimationFrame(() => {
-                    document.addEventListener('pointerdown', handleClickOutside);
-                    document.addEventListener('keydown', handleEscape);
-                });
+                // Escape handler — only top layer responds
+                const onKeyDown = (e) => {
+                    if (e.key !== 'Escape') return;
+                    if (this._layers[this._layers.length - 1] !== container) return;
+                    if (options.onEscapeKeyDown) {
+                        options.onEscapeKeyDown(e);
+                        if (e.defaultPrevented) return;
+                    }
+                    if (isFunc) onDismiss();
+                    else if (options.onDismiss) options.onDismiss();
+                };
 
-                return function cleanup() {
-                    document.removeEventListener('pointerdown', handleClickOutside);
-                    document.removeEventListener('keydown', handleEscape);
+                // Pointer down outside handler
+                let isPointerInside = false;
+                const onPointerDownCapture = () => { isPointerInside = true; };
+                container.addEventListener('pointerdown', onPointerDownCapture, true);
+
+                const onPointerDown = (e) => {
+                    if (isPointerInside) { isPointerInside = false; return; }
+                    if (container.contains(e.target)) return;
+                    if (options.onPointerDownOutside) {
+                        options.onPointerDownOutside(e);
+                        if (e.defaultPrevented) return;
+                    }
+                    if (isFunc) onDismiss();
+                    else if (options.onDismiss) options.onDismiss();
+                    isPointerInside = false;
+                };
+
+                // Delayed registration to prevent the opening click from dismissing
+                const timerId = setTimeout(() => {
+                    document.addEventListener('pointerdown', onPointerDown);
+                }, 0);
+
+                document.addEventListener('keydown', onKeyDown);
+
+                return () => {
+                    clearTimeout(timerId);
+                    document.removeEventListener('pointerdown', onPointerDown);
+                    document.removeEventListener('keydown', onKeyDown);
+                    container.removeEventListener('pointerdown', onPointerDownCapture, true);
+                    this._layers = this._layers.filter(l => l !== container);
+                    if (options.disableOutsidePointerEvents) {
+                        if (this._layers.length === 0) {
+                            document.body.style.pointerEvents = savedPointerEvents || '';
+                        }
+                    }
                 };
             }
         },
@@ -670,6 +805,157 @@
             }
         },
 
+        // --- Dialog ---------------------------------------------------------------
+        Dialog: {
+            init() {
+                const triggers = document.querySelectorAll('[data-suite-dialog-trigger]');
+                triggers.forEach(trigger => {
+                    if (trigger._suiteDialog) return;
+                    trigger._suiteDialog = true;
+
+                    const dialogId = trigger.getAttribute('data-suite-dialog-trigger');
+                    const root = document.querySelector('[data-suite-dialog="' + dialogId + '"]');
+                    if (!root) return;
+
+                    const overlay = root.querySelector('[data-suite-dialog-overlay]');
+                    const content = root.querySelector('[data-suite-dialog-content]');
+                    if (!content) return;
+
+                    let cleanupFocusTrap, cleanupDismiss;
+
+                    function open() {
+                        root.style.display = '';
+                        if (overlay) {
+                            overlay.setAttribute('data-state', 'open');
+                            overlay.style.display = '';
+                        }
+                        content.setAttribute('data-state', 'open');
+                        trigger.setAttribute('data-state', 'open');
+                        trigger.setAttribute('aria-expanded', 'true');
+
+                        Suite.ScrollLock.lock();
+                        Suite.FocusGuards.install();
+
+                        cleanupFocusTrap = Suite.FocusTrap.activate(content);
+                        cleanupDismiss = Suite.DismissLayer.activate(content, {
+                            disableOutsidePointerEvents: true,
+                            onDismiss: close,
+                        });
+                    }
+
+                    function close() {
+                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
+                        if (cleanupFocusTrap) { cleanupFocusTrap(); cleanupFocusTrap = null; }
+
+                        if (overlay) overlay.setAttribute('data-state', 'closed');
+                        content.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('aria-expanded', 'false');
+
+                        Suite.ScrollLock.unlock();
+                        Suite.FocusGuards.uninstall();
+
+                        // Wait for close animation before hiding
+                        const hide = () => {
+                            root.style.display = 'none';
+                            if (overlay) overlay.style.display = 'none';
+                        };
+                        content.addEventListener('animationend', hide, { once: true });
+                        setTimeout(hide, 250); // fallback
+                    }
+
+                    trigger.addEventListener('click', () => {
+                        const isOpen = content.getAttribute('data-state') === 'open';
+                        if (isOpen) close(); else open();
+                    });
+
+                    // Close buttons inside dialog
+                    root.querySelectorAll('[data-suite-dialog-close]').forEach(btn => {
+                        btn.addEventListener('click', close);
+                    });
+                });
+            }
+        },
+
+        // --- AlertDialog ----------------------------------------------------------
+        AlertDialog: {
+            init() {
+                const triggers = document.querySelectorAll('[data-suite-alert-dialog-trigger]');
+                triggers.forEach(trigger => {
+                    if (trigger._suiteAlertDialog) return;
+                    trigger._suiteAlertDialog = true;
+
+                    const dialogId = trigger.getAttribute('data-suite-alert-dialog-trigger');
+                    const root = document.querySelector('[data-suite-alert-dialog="' + dialogId + '"]');
+                    if (!root) return;
+
+                    const overlay = root.querySelector('[data-suite-alert-dialog-overlay]');
+                    const content = root.querySelector('[data-suite-alert-dialog-content]');
+                    if (!content) return;
+
+                    let cleanupFocusTrap, cleanupDismiss;
+
+                    function open() {
+                        root.style.display = '';
+                        if (overlay) {
+                            overlay.setAttribute('data-state', 'open');
+                            overlay.style.display = '';
+                        }
+                        content.setAttribute('data-state', 'open');
+                        trigger.setAttribute('data-state', 'open');
+                        trigger.setAttribute('aria-expanded', 'true');
+
+                        Suite.ScrollLock.lock();
+                        Suite.FocusGuards.install();
+
+                        // Auto-focus Cancel button (not first tabbable)
+                        const cancelBtn = content.querySelector('[data-suite-alert-dialog-cancel]');
+                        cleanupFocusTrap = Suite.FocusTrap.activate(content, {
+                            initialFocus: cancelBtn || undefined
+                        });
+
+                        // AlertDialog: Escape and click-outside do NOT dismiss
+                        cleanupDismiss = Suite.DismissLayer.activate(content, {
+                            disableOutsidePointerEvents: true,
+                            onEscapeKeyDown: (e) => e.preventDefault(),
+                            onPointerDownOutside: (e) => e.preventDefault(),
+                            onDismiss: () => {}, // never auto-dismisses
+                        });
+                    }
+
+                    function close() {
+                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
+                        if (cleanupFocusTrap) { cleanupFocusTrap(); cleanupFocusTrap = null; }
+
+                        if (overlay) overlay.setAttribute('data-state', 'closed');
+                        content.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('aria-expanded', 'false');
+
+                        Suite.ScrollLock.unlock();
+                        Suite.FocusGuards.uninstall();
+
+                        const hide = () => {
+                            root.style.display = 'none';
+                            if (overlay) overlay.style.display = 'none';
+                        };
+                        content.addEventListener('animationend', hide, { once: true });
+                        setTimeout(hide, 250);
+                    }
+
+                    trigger.addEventListener('click', () => {
+                        const isOpen = content.getAttribute('data-state') === 'open';
+                        if (isOpen) close(); else open();
+                    });
+
+                    // Action and Cancel both close
+                    root.querySelectorAll('[data-suite-alert-dialog-action], [data-suite-alert-dialog-cancel]').forEach(btn => {
+                        btn.addEventListener('click', close);
+                    });
+                });
+            }
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
@@ -680,6 +966,8 @@
             this.Toggle.init();
             this.ToggleGroup.init();
             this.Switch.init();
+            this.Dialog.init();
+            this.AlertDialog.init();
         },
 
         // --- Init -----------------------------------------------------------------

@@ -1640,4 +1640,275 @@ using Test
             @test :Switch in meta.js_modules
         end
     end
+
+    @testset "SuiteDialog" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteDialog(
+                SuiteDialogTrigger("Open"),
+                SuiteDialogContent(
+                    SuiteDialogHeader(
+                        SuiteDialogTitle("Title"),
+                        SuiteDialogDescription("Description")
+                    ),
+                    SuiteDialogFooter(
+                        SuiteDialogClose("Cancel"),
+                        "Save"
+                    )
+                )
+            ))
+            @test occursin("data-suite-dialog", html)
+            @test occursin("Title", html)
+            @test occursin("Description", html)
+            @test occursin("Cancel", html)
+            @test occursin("Save", html)
+        end
+
+        @testset "Trigger wiring" begin
+            html = Therapy.render_to_string(SuiteDialog(
+                SuiteDialogTrigger("Open"),
+                SuiteDialogContent(SuiteDialogTitle("T"))
+            ))
+            @test occursin("data-suite-dialog-trigger", html)
+            @test occursin("aria-haspopup=\"dialog\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("Open", html)
+        end
+
+        @testset "Trigger is a button" begin
+            html = Therapy.render_to_string(SuiteDialogTrigger("Click"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+            @test occursin("Click", html)
+        end
+
+        @testset "Content structure" begin
+            html = Therapy.render_to_string(SuiteDialogContent(
+                SuiteDialogTitle("Title")
+            ))
+            # Overlay
+            @test occursin("data-suite-dialog-overlay", html)
+            @test occursin("bg-warm-950/80", html)
+            # Content panel
+            @test occursin("data-suite-dialog-content", html)
+            @test occursin("role=\"dialog\"", html)
+            @test occursin("aria-modal=\"true\"", html)
+            # Default close button
+            @test occursin("data-suite-dialog-close", html)
+            @test occursin("aria-label=\"Close\"", html)
+        end
+
+        @testset "Content CSS classes" begin
+            html = Therapy.render_to_string(SuiteDialogContent(
+                SuiteDialogTitle("T")
+            ))
+            @test occursin("fixed", html)
+            @test occursin("z-50", html)
+            @test occursin("rounded-lg", html)
+            @test occursin("shadow-lg", html)
+            @test occursin("sm:max-w-lg", html)
+            @test occursin("bg-warm-50", html)
+            @test occursin("dark:bg-warm-950", html)
+        end
+
+        @testset "Animation classes" begin
+            html = Therapy.render_to_string(SuiteDialogContent(
+                SuiteDialogTitle("T")
+            ))
+            @test occursin("data-[state=open]:animate-in", html)
+            @test occursin("data-[state=closed]:animate-out", html)
+            @test occursin("data-[state=open]:fade-in-0", html)
+            @test occursin("data-[state=closed]:fade-out-0", html)
+        end
+
+        @testset "Header" begin
+            html = Therapy.render_to_string(SuiteDialogHeader(
+                SuiteDialogTitle("T"),
+                SuiteDialogDescription("D")
+            ))
+            @test occursin("flex flex-col", html)
+            @test occursin("text-center sm:text-left", html)
+        end
+
+        @testset "Footer" begin
+            html = Therapy.render_to_string(SuiteDialogFooter("Save"))
+            @test occursin("flex-col-reverse", html)
+            @test occursin("sm:flex-row sm:justify-end", html)
+        end
+
+        @testset "Title renders as h2" begin
+            html = Therapy.render_to_string(SuiteDialogTitle("My Title"))
+            @test occursin("<h2", html)
+            @test occursin("text-lg", html)
+            @test occursin("font-semibold", html)
+            @test occursin("My Title", html)
+        end
+
+        @testset "Description" begin
+            html = Therapy.render_to_string(SuiteDialogDescription("My Desc"))
+            @test occursin("<p", html)
+            @test occursin("text-sm", html)
+            @test occursin("text-warm-600", html)
+            @test occursin("My Desc", html)
+        end
+
+        @testset "Close wrapper" begin
+            html = Therapy.render_to_string(SuiteDialogClose("Cancel"))
+            @test occursin("data-suite-dialog-close", html)
+            @test occursin("display:contents", html)
+            @test occursin("Cancel", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteDialog(class="my-dialog",
+                SuiteDialogTrigger("X"),
+                SuiteDialogContent(SuiteDialogTitle("T"))
+            ))
+            @test occursin("my-dialog", html)
+
+            html2 = Therapy.render_to_string(SuiteDialogContent(class="max-w-2xl",
+                SuiteDialogTitle("T")
+            ))
+            @test occursin("max-w-2xl", html2)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Dialog)
+            meta = Suite.COMPONENT_REGISTRY[:Dialog]
+            @test meta.tier == :js_runtime
+            @test :SuiteDialog in meta.exports
+            @test :SuiteDialogTrigger in meta.exports
+            @test :SuiteDialogContent in meta.exports
+            @test :SuiteDialogClose in meta.exports
+            @test :Dialog in meta.js_modules
+            @test :FocusTrap in meta.js_modules
+            @test :DismissLayer in meta.js_modules
+            @test :ScrollLock in meta.js_modules
+        end
+    end
+
+    @testset "SuiteAlertDialog" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteAlertDialog(
+                SuiteAlertDialogTrigger("Delete"),
+                SuiteAlertDialogContent(
+                    SuiteAlertDialogHeader(
+                        SuiteAlertDialogTitle("Are you sure?"),
+                        SuiteAlertDialogDescription("This cannot be undone.")
+                    ),
+                    SuiteAlertDialogFooter(
+                        SuiteAlertDialogCancel("Cancel"),
+                        SuiteAlertDialogAction("Delete")
+                    )
+                )
+            ))
+            @test occursin("data-suite-alert-dialog", html)
+            @test occursin("Are you sure?", html)
+            @test occursin("This cannot be undone.", html)
+        end
+
+        @testset "Trigger wiring" begin
+            html = Therapy.render_to_string(SuiteAlertDialog(
+                SuiteAlertDialogTrigger("Delete"),
+                SuiteAlertDialogContent(SuiteAlertDialogTitle("T"))
+            ))
+            @test occursin("data-suite-alert-dialog-trigger", html)
+            @test occursin("aria-haspopup=\"dialog\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("data-state=\"closed\"", html)
+        end
+
+        @testset "Trigger is a button" begin
+            html = Therapy.render_to_string(SuiteAlertDialogTrigger("Click"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+        end
+
+        @testset "Content uses alertdialog role" begin
+            html = Therapy.render_to_string(SuiteAlertDialogContent(
+                SuiteAlertDialogTitle("T")
+            ))
+            @test occursin("role=\"alertdialog\"", html)
+            @test occursin("aria-modal=\"true\"", html)
+            # No default close button (unlike Dialog)
+            @test !occursin("aria-label=\"Close\"", html)
+        end
+
+        @testset "Content structure" begin
+            html = Therapy.render_to_string(SuiteAlertDialogContent(
+                SuiteAlertDialogTitle("T")
+            ))
+            @test occursin("data-suite-alert-dialog-overlay", html)
+            @test occursin("data-suite-alert-dialog-content", html)
+            @test occursin("bg-warm-950/80", html)
+            @test occursin("fixed", html)
+            @test occursin("z-50", html)
+        end
+
+        @testset "Header" begin
+            html = Therapy.render_to_string(SuiteAlertDialogHeader(
+                SuiteAlertDialogTitle("T"),
+                SuiteAlertDialogDescription("D")
+            ))
+            @test occursin("flex flex-col", html)
+            @test occursin("text-center sm:text-left", html)
+        end
+
+        @testset "Footer" begin
+            html = Therapy.render_to_string(SuiteAlertDialogFooter("X"))
+            @test occursin("flex-col-reverse", html)
+            @test occursin("sm:flex-row sm:justify-end", html)
+        end
+
+        @testset "Title renders as h2" begin
+            html = Therapy.render_to_string(SuiteAlertDialogTitle("Alert Title"))
+            @test occursin("<h2", html)
+            @test occursin("text-lg", html)
+            @test occursin("font-semibold", html)
+            @test occursin("Alert Title", html)
+        end
+
+        @testset "Description" begin
+            html = Therapy.render_to_string(SuiteAlertDialogDescription("Alert Desc"))
+            @test occursin("<p", html)
+            @test occursin("text-sm", html)
+            @test occursin("text-warm-600", html)
+            @test occursin("Alert Desc", html)
+        end
+
+        @testset "Action wrapper" begin
+            html = Therapy.render_to_string(SuiteAlertDialogAction("Confirm"))
+            @test occursin("data-suite-alert-dialog-action", html)
+            @test occursin("display:contents", html)
+            @test occursin("Confirm", html)
+        end
+
+        @testset "Cancel wrapper" begin
+            html = Therapy.render_to_string(SuiteAlertDialogCancel("Cancel"))
+            @test occursin("data-suite-alert-dialog-cancel", html)
+            @test occursin("display:contents", html)
+            @test occursin("Cancel", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteAlertDialog(class="danger",
+                SuiteAlertDialogTrigger("X"),
+                SuiteAlertDialogContent(SuiteAlertDialogTitle("T"))
+            ))
+            @test occursin("danger", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :AlertDialog)
+            meta = Suite.COMPONENT_REGISTRY[:AlertDialog]
+            @test meta.tier == :js_runtime
+            @test :SuiteAlertDialog in meta.exports
+            @test :SuiteAlertDialogTrigger in meta.exports
+            @test :SuiteAlertDialogContent in meta.exports
+            @test :SuiteAlertDialogAction in meta.exports
+            @test :SuiteAlertDialogCancel in meta.exports
+            @test :AlertDialog in meta.js_modules
+            @test :FocusTrap in meta.js_modules
+        end
+    end
 end

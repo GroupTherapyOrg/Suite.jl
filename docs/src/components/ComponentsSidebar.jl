@@ -15,7 +15,7 @@ const SUITE_COMPONENTS = [
     (section = "Components", items = [
         (slug = "accordion",        title = "Accordion",        implemented = true),
         (slug = "alert",            title = "Alert",            implemented = true),
-        (slug = "alert-dialog",     title = "Alert Dialog",     implemented = false),
+        (slug = "alert-dialog",     title = "Alert Dialog",     implemented = true),
         (slug = "aspect-ratio",     title = "Aspect Ratio",     implemented = true),
         (slug = "avatar",           title = "Avatar",           implemented = true),
         (slug = "badge",            title = "Badge",            implemented = true),
@@ -30,7 +30,7 @@ const SUITE_COMPONENTS = [
         (slug = "context-menu",     title = "Context Menu",     implemented = false),
         (slug = "data-table",       title = "Data Table",       implemented = false),
         (slug = "date-picker",      title = "Date Picker",      implemented = false),
-        (slug = "dialog",           title = "Dialog",           implemented = false),
+        (slug = "dialog",           title = "Dialog",           implemented = true),
         (slug = "drawer",           title = "Drawer",           implemented = false),
         (slug = "dropdown-menu",    title = "Dropdown Menu",    implemented = false),
         (slug = "form",             title = "Form",             implemented = false),
