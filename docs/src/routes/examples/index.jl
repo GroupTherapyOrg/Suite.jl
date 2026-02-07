@@ -28,6 +28,11 @@ function ExamplesIndex()
                 "Forms",
                 "Login, signup, and settings forms with validation and styled inputs.",
                 "./examples/forms/"
+            ),
+            _ExampleCard(
+                "Widgets",
+                "Interactive components as Pluto @bind widgets — switches, toggles, inputs.",
+                "./examples/widgets/"
             )
         )
     )

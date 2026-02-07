@@ -12,6 +12,11 @@ const SUITE_COMPONENTS = [
         (slug = "installation",     title = "Installation",     implemented = true),
         (slug = "theming",          title = "Theming",          implemented = true),
     ]),
+    # --- Widgets ---
+    (section = "Widgets", base_path = "widgets", items = [
+        (slug = "index",            title = "Overview",          implemented = true),
+        (slug = "bind",             title = "The @bind Pattern", implemented = true),
+    ]),
     # --- Components (alphabetical) ---
     (section = "Components", base_path = "components", items = [
         (slug = "accordion",        title = "Accordion",        implemented = true),
