@@ -99,3 +99,25 @@
     --text-tertiary: #5a5855;
   }
 }
+
+/* Calendar selection states */
+@layer components {
+  .suite-cal-selected {
+    @apply bg-accent-600 text-white hover:bg-accent-700;
+  }
+  .suite-cal-range-middle {
+    @apply bg-accent-100 dark:bg-accent-900/30 rounded-none;
+  }
+  td[data-range-start] {
+    @apply rounded-l-md;
+  }
+  td[data-range-end] {
+    @apply rounded-r-md;
+  }
+  td[data-range-start] .suite-cal-selected {
+    @apply rounded-l-md rounded-r-none;
+  }
+  td[data-range-end] .suite-cal-selected {
+    @apply rounded-r-md rounded-l-none;
+  }
+}

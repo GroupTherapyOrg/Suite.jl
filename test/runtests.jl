@@ -4263,4 +4263,307 @@ using Test
             @test occursin("aria-atomic", js)
         end
     end
+
+    @testset "SuiteCalendar" begin
+        using Therapy
+        using Suite
+        using Dates
+
+        @testset "Default rendering" begin
+            html = Therapy.render_to_string(SuiteCalendar())
+            @test occursin("data-suite-calendar", html)
+            @test occursin("role=\"grid\"", html)
+            @test occursin("data-suite-calendar-mode=\"single\"", html)
+            @test occursin("p-3", html)
+        end
+
+        @testset "Month/year navigation buttons" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=2, year=2026))
+            @test occursin("data-suite-calendar-month=\"2\"", html)
+            @test occursin("data-suite-calendar-year=\"2026\"", html)
+            @test occursin("data-suite-calendar-prev", html)
+            @test occursin("data-suite-calendar-next", html)
+            @test occursin("Go to previous month", html)
+            @test occursin("Go to next month", html)
+        end
+
+        @testset "Caption displays month and year" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=6, year=2026))
+            @test occursin("June 2026", html)
+            @test occursin("aria-live=\"polite\"", html)
+        end
+
+        @testset "Weekday headers" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=2, year=2026))
+            @test occursin("Mo", html)
+            @test occursin("Tu", html)
+            @test occursin("We", html)
+            @test occursin("Th", html)
+            @test occursin("Fr", html)
+            @test occursin("Sa", html)
+            @test occursin("Su", html)
+            @test occursin("aria-hidden=\"true\"", html)
+        end
+
+        @testset "Day buttons rendered" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=2, year=2026))
+            # February 2026 has 28 days
+            @test occursin("data-suite-calendar-day-btn=\"2026-02-01\"", html)
+            @test occursin("data-suite-calendar-day-btn=\"2026-02-28\"", html)
+            @test occursin("data-suite-calendar-day=\"2026-02-01\"", html)
+        end
+
+        @testset "Day button ARIA label" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=2, year=2026))
+            # Feb 1, 2026 is a Sunday
+            @test occursin("Sun, Feb 1, 2026", html) || occursin("2026-02-01", html)
+        end
+
+        @testset "Today highlighting" begin
+            today = Dates.today()
+            html = Therapy.render_to_string(SuiteCalendar(month=Dates.month(today), year=Dates.year(today)))
+            @test occursin("data-today=\"true\"", html)
+            @test occursin("bg-warm-100", html)
+        end
+
+        @testset "Outside days" begin
+            # show_outside_days=true (default)
+            html_show = Therapy.render_to_string(SuiteCalendar(month=2, year=2026, show_outside_days=true))
+            @test occursin("data-outside=\"true\"", html_show)
+            @test occursin("opacity-50", html_show)
+
+            # show_outside_days=false
+            html_hide = Therapy.render_to_string(SuiteCalendar(month=2, year=2026, show_outside_days=false))
+            # Outside days should be empty cells (no button)
+            # The non-outside cells should still have buttons
+            @test occursin("data-suite-calendar-day-btn=\"2026-02-01\"", html_hide)
+        end
+
+        @testset "Selection modes" begin
+            for mode in ["single", "multiple", "range"]
+                html = Therapy.render_to_string(SuiteCalendar(mode=mode))
+                @test occursin("data-suite-calendar-mode=\"$mode\"", html)
+            end
+
+            # range and multiple have aria-multiselectable
+            html_range = Therapy.render_to_string(SuiteCalendar(mode="range"))
+            @test occursin("aria-multiselectable=\"true\"", html_range)
+
+            html_multi = Therapy.render_to_string(SuiteCalendar(mode="multiple"))
+            @test occursin("aria-multiselectable=\"true\"", html_multi)
+
+            # single should NOT have aria-multiselectable
+            html_single = Therapy.render_to_string(SuiteCalendar(mode="single"))
+            @test !occursin("aria-multiselectable", html_single)
+        end
+
+        @testset "Pre-selected date" begin
+            html = Therapy.render_to_string(SuiteCalendar(selected="2026-02-14", month=2, year=2026))
+            @test occursin("data-suite-calendar-selected=\"2026-02-14\"", html)
+        end
+
+        @testset "Disabled dates" begin
+            html = Therapy.render_to_string(SuiteCalendar(disabled_dates="2026-02-14,2026-02-15", month=2, year=2026))
+            @test occursin("data-suite-calendar-disabled=\"2026-02-14,2026-02-15\"", html)
+        end
+
+        @testset "Number of months" begin
+            html = Therapy.render_to_string(SuiteCalendar(number_of_months=2, month=1, year=2026))
+            @test occursin("data-suite-calendar-months-count=\"2\"", html)
+            @test occursin("January 2026", html)
+            @test occursin("February 2026", html)
+        end
+
+        @testset "Custom class merging" begin
+            html = Therapy.render_to_string(SuiteCalendar(class="my-custom"))
+            @test occursin("my-custom", html)
+            @test occursin("p-3", html)
+        end
+
+        @testset "Keyboard accessibility" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=2, year=2026))
+            # Roving tabindex - all buttons start with tabindex=-1
+            @test occursin("tabindex=\"-1\"", html)
+            # Focus ring classes
+            @test occursin("focus-visible:ring-2", html)
+            @test occursin("focus-visible:ring-accent-600", html)
+        end
+
+        @testset "Grid structure" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=2, year=2026))
+            # Semantic table structure
+            @test occursin("<table", html)
+            @test occursin("<thead", html)
+            @test occursin("<tbody", html)
+            @test occursin("<tr", html)
+            @test occursin("<th", html)
+            @test occursin("<td", html)
+            @test occursin("scope=\"col\"", html)
+            @test occursin("role=\"gridcell\"", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=2, year=2026))
+            @test occursin("dark:hover:bg-warm-900", html)
+            @test occursin("dark:text-warm-300", html)
+        end
+
+        @testset "Nav button styling" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=2, year=2026))
+            @test occursin("border-warm-200", html)
+            @test occursin("hover:bg-warm-100", html)
+        end
+
+        @testset "Registry registration" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Calendar)
+            meta = Suite.COMPONENT_REGISTRY[:Calendar]
+            @test meta.tier == :js_runtime
+            @test meta.file == "Calendar.jl"
+            @test :SuiteCalendar in meta.exports
+            @test :SuiteDatePicker in meta.exports
+        end
+
+        @testset "Theme support" begin
+            html_default = Therapy.render_to_string(SuiteCalendar(month=2, year=2026))
+            html_ocean = Therapy.render_to_string(SuiteCalendar(month=2, year=2026, theme=:ocean))
+
+            @test occursin("accent-600", html_default)
+            # Ocean theme should substitute accent colors
+            @test occursin("blue-600", html_ocean)
+        end
+
+        @testset "Fixed weeks" begin
+            html = Therapy.render_to_string(SuiteCalendar(month=2, year=2026, fixed_weeks=true))
+            @test occursin("data-suite-calendar-fixed-weeks=\"true\"", html)
+        end
+
+        @testset "JS module in suite.js" begin
+            js = Suite.suite_js_source()
+            @test occursin("Calendar:", js)
+            @test occursin("data-suite-calendar", js)
+            @test occursin("_handleKeyDown", js)
+            @test occursin("ArrowLeft", js)
+            @test occursin("ArrowRight", js)
+            @test occursin("ArrowUp", js)
+            @test occursin("ArrowDown", js)
+            @test occursin("PageUp", js)
+            @test occursin("PageDown", js)
+            @test occursin("Home", js)
+            @test occursin("End", js)
+        end
+    end
+
+    @testset "SuiteDatePicker" begin
+        using Therapy
+        using Suite
+        using Dates
+
+        @testset "Default rendering" begin
+            html = Therapy.render_to_string(SuiteDatePicker())
+            @test occursin("data-suite-datepicker", html)
+            @test occursin("data-suite-datepicker-trigger", html)
+            @test occursin("data-suite-datepicker-content", html)
+            @test occursin("data-suite-datepicker-value", html)
+        end
+
+        @testset "Trigger button" begin
+            html = Therapy.render_to_string(SuiteDatePicker())
+            @test occursin("Pick a date", html)
+            @test occursin("aria-haspopup=\"dialog\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("w-[280px]", html)
+            # Calendar icon SVG
+            @test occursin("<svg", html)
+        end
+
+        @testset "Placeholder text" begin
+            html = Therapy.render_to_string(SuiteDatePicker(placeholder="Select a date"))
+            @test occursin("Select a date", html)
+        end
+
+        @testset "Pre-selected date display" begin
+            html = Therapy.render_to_string(SuiteDatePicker(selected="2026-02-14", month=2, year=2026))
+            @test occursin("data-suite-datepicker-selected=\"2026-02-14\"", html)
+            # Should show formatted date, not placeholder
+            @test !occursin("Pick a date", html)
+        end
+
+        @testset "Contains Calendar component" begin
+            html = Therapy.render_to_string(SuiteDatePicker(month=2, year=2026))
+            @test occursin("data-suite-calendar", html)
+            @test occursin("role=\"grid\"", html)
+            @test occursin("February 2026", html)
+        end
+
+        @testset "Content hidden by default" begin
+            html = Therapy.render_to_string(SuiteDatePicker())
+            @test occursin("display:none", html)
+            @test occursin("data-state=\"closed\"", html)
+        end
+
+        @testset "Dialog role on content" begin
+            html = Therapy.render_to_string(SuiteDatePicker())
+            @test occursin("role=\"dialog\"", html)
+            @test occursin("aria-modal=\"true\"", html)
+        end
+
+        @testset "Selection mode passthrough" begin
+            html = Therapy.render_to_string(SuiteDatePicker(mode="range", number_of_months=2, month=1, year=2026))
+            @test occursin("data-suite-datepicker-mode=\"range\"", html)
+            @test occursin("data-suite-calendar-mode=\"range\"", html)
+            @test occursin("January 2026", html)
+            @test occursin("February 2026", html)
+        end
+
+        @testset "Custom class on trigger" begin
+            html = Therapy.render_to_string(SuiteDatePicker(class="my-picker"))
+            @test occursin("my-picker", html)
+        end
+
+        @testset "Theme support" begin
+            html_default = Therapy.render_to_string(SuiteDatePicker(month=2, year=2026))
+            html_ocean = Therapy.render_to_string(SuiteDatePicker(month=2, year=2026, theme=:ocean))
+            @test occursin("accent-600", html_default)
+            @test occursin("blue-600", html_ocean)
+        end
+
+        @testset "Outline trigger styling" begin
+            html = Therapy.render_to_string(SuiteDatePicker())
+            @test occursin("border", html)
+            @test occursin("border-warm-200", html)
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("bg-warm-50", html)
+        end
+
+        @testset "JS datepicker module in suite.js" begin
+            js = Suite.suite_js_source()
+            @test occursin("_setupDatePicker", js)
+            @test occursin("_openDatePicker", js)
+            @test occursin("_closeDatePicker", js)
+            @test occursin("_updateDatePickerDisplay", js)
+            @test occursin("suite:calendar:select", js)
+        end
+
+        @testset "Display format helpers" begin
+            # Single date
+            display = Suite._format_display_date("2026-02-14", "single")
+            @test occursin("Feb", display) || occursin("February", display)
+            @test occursin("14", display)
+            @test occursin("2026", display)
+
+            # Range
+            display_range = Suite._format_display_date("2026-02-10,2026-02-20", "range")
+            @test occursin("Feb", display_range)
+            @test occursin("10", display_range)
+            @test occursin("20", display_range)
+
+            # Multiple
+            display_multi = Suite._format_display_date("2026-02-10,2026-02-20,2026-02-25", "multiple")
+            @test occursin("3 dates selected", display_multi)
+
+            # Empty
+            display_empty = Suite._format_display_date("", "single")
+            @test display_empty == ""
+        end
+    end
 end

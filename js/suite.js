@@ -3412,6 +3412,614 @@
             info(title, opts = {})    { return this.show(title, { ...opts, type: 'info' }); }
         },
 
+        // --- Calendar -------------------------------------------------------------
+        Calendar: {
+            _initialized: new WeakSet(),
+
+            init() {
+                document.querySelectorAll('[data-suite-calendar]').forEach(root => {
+                    if (this._initialized.has(root)) return;
+                    this._initialized.add(root);
+                    this._setup(root);
+                });
+                document.querySelectorAll('[data-suite-datepicker]').forEach(root => {
+                    if (this._initialized.has(root)) return;
+                    this._initialized.add(root);
+                    this._setupDatePicker(root);
+                });
+            },
+
+            _setup(root) {
+                const id = root.getAttribute('data-suite-calendar');
+                const mode = root.getAttribute('data-suite-calendar-mode') || 'single';
+                let month = parseInt(root.getAttribute('data-suite-calendar-month')) || (new Date().getMonth() + 1);
+                let year = parseInt(root.getAttribute('data-suite-calendar-year')) || new Date().getFullYear();
+                const showOutside = root.getAttribute('data-suite-calendar-show-outside') !== 'false';
+                const fixedWeeks = root.getAttribute('data-suite-calendar-fixed-weeks') === 'true';
+                const monthsCount = parseInt(root.getAttribute('data-suite-calendar-months-count')) || 1;
+
+                // Parse selected dates
+                const selectedStr = root.getAttribute('data-suite-calendar-selected') || '';
+                let selected = selectedStr ? selectedStr.split(',').map(s => s.trim()).filter(s => s) : [];
+
+                // Parse disabled dates
+                const disabledStr = root.getAttribute('data-suite-calendar-disabled') || '';
+                const disabled = disabledStr ? disabledStr.split(',').map(s => s.trim()).filter(s => s) : [];
+
+                // State
+                const state = { month, year, selected, disabled, mode, showOutside, fixedWeeks, monthsCount, focusedDate: null };
+
+                // Prev/Next buttons
+                const prevBtn = root.querySelector(`[data-suite-calendar-prev="${id}"]`);
+                const nextBtn = root.querySelector(`[data-suite-calendar-next="${id}"]`);
+
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        state.month--;
+                        if (state.month < 1) { state.month = 12; state.year--; }
+                        this._render(root, id, state);
+                    });
+                }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        state.month++;
+                        if (state.month > 12) { state.month = 1; state.year++; }
+                        this._render(root, id, state);
+                    });
+                }
+
+                // Apply initial selection styling
+                this._applySelection(root, state);
+
+                // Set initial focus target (selected or today)
+                this._setInitialFocus(root, state);
+
+                // Keyboard navigation on the grid
+                root.addEventListener('keydown', (e) => this._handleKeyDown(e, root, id, state));
+
+                // Click on day buttons
+                root.addEventListener('click', (e) => {
+                    const dayBtn = e.target.closest('[data-suite-calendar-day-btn]');
+                    if (!dayBtn) return;
+                    const dateStr = dayBtn.getAttribute('data-suite-calendar-day-btn');
+                    if (disabled.includes(dateStr)) return;
+                    this._selectDate(root, id, state, dateStr);
+                });
+            },
+
+            _setInitialFocus(root, state) {
+                // Set tabindex=0 on the first selected date, or today, or first available day
+                const allBtns = root.querySelectorAll('[data-suite-calendar-day-btn]');
+                let target = null;
+
+                // Priority: selected > today > first non-outside
+                if (state.selected.length > 0) {
+                    target = root.querySelector(`[data-suite-calendar-day-btn="${state.selected[0]}"]`);
+                }
+                if (!target) {
+                    const todayCell = root.querySelector('[data-today="true"] [data-suite-calendar-day-btn]');
+                    if (todayCell) target = todayCell;
+                }
+                if (!target && allBtns.length > 0) {
+                    for (const btn of allBtns) {
+                        const cell = btn.closest('td');
+                        if (cell && !cell.hasAttribute('data-outside')) {
+                            target = btn;
+                            break;
+                        }
+                    }
+                }
+
+                if (target) {
+                    target.setAttribute('tabindex', '0');
+                    state.focusedDate = target.getAttribute('data-suite-calendar-day-btn');
+                }
+            },
+
+            _selectDate(root, id, state, dateStr) {
+                if (state.mode === 'single') {
+                    // Toggle or replace
+                    if (state.selected.length === 1 && state.selected[0] === dateStr) {
+                        state.selected = [];
+                    } else {
+                        state.selected = [dateStr];
+                    }
+                } else if (state.mode === 'multiple') {
+                    const idx = state.selected.indexOf(dateStr);
+                    if (idx >= 0) {
+                        state.selected.splice(idx, 1);
+                    } else {
+                        state.selected.push(dateStr);
+                    }
+                } else if (state.mode === 'range') {
+                    if (state.selected.length === 0 || state.selected.length === 2) {
+                        // Start new range
+                        state.selected = [dateStr];
+                    } else if (state.selected.length === 1) {
+                        // Complete range
+                        const from = state.selected[0];
+                        if (dateStr < from) {
+                            state.selected = [dateStr, from];
+                        } else {
+                            state.selected.push(dateStr);
+                        }
+                    }
+                }
+
+                // Update the root data attribute
+                root.setAttribute('data-suite-calendar-selected', state.selected.join(','));
+
+                this._applySelection(root, state);
+
+                // Fire custom event for integration
+                root.dispatchEvent(new CustomEvent('suite:calendar:select', {
+                    bubbles: true,
+                    detail: { selected: [...state.selected], mode: state.mode }
+                }));
+
+                // If inside a datepicker, update the trigger display
+                const datepicker = root.closest('[data-suite-datepicker]');
+                if (datepicker) {
+                    this._updateDatePickerDisplay(datepicker, state);
+                    // Auto-close on single select
+                    if (state.mode === 'single' || (state.mode === 'range' && state.selected.length === 2)) {
+                        setTimeout(() => this._closeDatePicker(datepicker), 150);
+                    }
+                }
+            },
+
+            _applySelection(root, state) {
+                const allBtns = root.querySelectorAll('[data-suite-calendar-day-btn]');
+                allBtns.forEach(btn => {
+                    const dateStr = btn.getAttribute('data-suite-calendar-day-btn');
+                    const cell = btn.closest('td');
+                    const isDisabled = state.disabled.includes(dateStr);
+
+                    // Reset
+                    btn.removeAttribute('data-selected');
+                    btn.removeAttribute('aria-selected');
+                    if (cell) {
+                        cell.removeAttribute('data-selected');
+                        cell.removeAttribute('data-range-start');
+                        cell.removeAttribute('data-range-middle');
+                        cell.removeAttribute('data-range-end');
+                    }
+
+                    if (isDisabled) {
+                        btn.setAttribute('aria-disabled', 'true');
+                        btn.style.opacity = '0.5';
+                        btn.style.pointerEvents = 'none';
+                        return;
+                    }
+
+                    if (state.mode === 'range' && state.selected.length === 2) {
+                        const [from, to] = state.selected;
+                        if (dateStr === from) {
+                            btn.setAttribute('data-selected', 'true');
+                            btn.setAttribute('aria-selected', 'true');
+                            if (cell) {
+                                cell.setAttribute('data-selected', 'true');
+                                cell.setAttribute('data-range-start', 'true');
+                            }
+                            btn.className = btn.className.replace(/bg-warm-100 dark:bg-warm-900/g, '').replace(/hover:bg-warm-100 dark:hover:bg-warm-900/g, '');
+                            btn.style.backgroundColor = '';
+                            btn.classList.add('suite-cal-selected');
+                        } else if (dateStr === to) {
+                            btn.setAttribute('data-selected', 'true');
+                            btn.setAttribute('aria-selected', 'true');
+                            if (cell) {
+                                cell.setAttribute('data-selected', 'true');
+                                cell.setAttribute('data-range-end', 'true');
+                            }
+                            btn.classList.add('suite-cal-selected');
+                        } else if (dateStr > from && dateStr < to) {
+                            btn.setAttribute('aria-selected', 'true');
+                            if (cell) cell.setAttribute('data-range-middle', 'true');
+                            btn.classList.add('suite-cal-range-middle');
+                        }
+                    } else if (state.selected.includes(dateStr)) {
+                        btn.setAttribute('data-selected', 'true');
+                        btn.setAttribute('aria-selected', 'true');
+                        if (cell) cell.setAttribute('data-selected', 'true');
+                        btn.classList.add('suite-cal-selected');
+                    }
+                });
+            },
+
+            _handleKeyDown(e, root, id, state) {
+                const dayBtn = e.target.closest('[data-suite-calendar-day-btn]');
+                if (!dayBtn) return;
+
+                const dateStr = dayBtn.getAttribute('data-suite-calendar-day-btn');
+                const currentDate = new Date(dateStr + 'T00:00:00');
+                let newDate = null;
+                let handled = false;
+
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        newDate = new Date(currentDate);
+                        if (e.shiftKey) {
+                            newDate.setMonth(newDate.getMonth() - 1);
+                        } else {
+                            newDate.setDate(newDate.getDate() - 1);
+                        }
+                        handled = true;
+                        break;
+                    case 'ArrowRight':
+                        newDate = new Date(currentDate);
+                        if (e.shiftKey) {
+                            newDate.setMonth(newDate.getMonth() + 1);
+                        } else {
+                            newDate.setDate(newDate.getDate() + 1);
+                        }
+                        handled = true;
+                        break;
+                    case 'ArrowUp':
+                        newDate = new Date(currentDate);
+                        if (e.shiftKey) {
+                            newDate.setFullYear(newDate.getFullYear() - 1);
+                        } else {
+                            newDate.setDate(newDate.getDate() - 7);
+                        }
+                        handled = true;
+                        break;
+                    case 'ArrowDown':
+                        newDate = new Date(currentDate);
+                        if (e.shiftKey) {
+                            newDate.setFullYear(newDate.getFullYear() + 1);
+                        } else {
+                            newDate.setDate(newDate.getDate() + 7);
+                        }
+                        handled = true;
+                        break;
+                    case 'PageUp':
+                        newDate = new Date(currentDate);
+                        if (e.shiftKey) {
+                            newDate.setFullYear(newDate.getFullYear() - 1);
+                        } else {
+                            newDate.setMonth(newDate.getMonth() - 1);
+                        }
+                        handled = true;
+                        break;
+                    case 'PageDown':
+                        newDate = new Date(currentDate);
+                        if (e.shiftKey) {
+                            newDate.setFullYear(newDate.getFullYear() + 1);
+                        } else {
+                            newDate.setMonth(newDate.getMonth() + 1);
+                        }
+                        handled = true;
+                        break;
+                    case 'Home':
+                        // Start of week (Monday)
+                        newDate = new Date(currentDate);
+                        const dow = newDate.getDay(); // 0=Sun
+                        const diff = dow === 0 ? -6 : 1 - dow;
+                        newDate.setDate(newDate.getDate() + diff);
+                        handled = true;
+                        break;
+                    case 'End':
+                        // End of week (Sunday)
+                        newDate = new Date(currentDate);
+                        const endDow = newDate.getDay(); // 0=Sun
+                        const endDiff = endDow === 0 ? 0 : 7 - endDow;
+                        newDate.setDate(newDate.getDate() + endDiff);
+                        handled = true;
+                        break;
+                }
+
+                if (handled && newDate) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Format as ISO date string
+                    const y = newDate.getFullYear();
+                    const m = String(newDate.getMonth() + 1).padStart(2, '0');
+                    const d = String(newDate.getDate()).padStart(2, '0');
+                    const newDateStr = `${y}-${m}-${d}`;
+
+                    // Check if the new date is in the current grid
+                    let targetBtn = root.querySelector(`[data-suite-calendar-day-btn="${newDateStr}"]`);
+
+                    if (!targetBtn) {
+                        // Need to navigate months
+                        state.month = newDate.getMonth() + 1;
+                        state.year = newDate.getFullYear();
+                        state.focusedDate = newDateStr;
+                        this._render(root, id, state);
+                        // After re-render, find and focus
+                        targetBtn = root.querySelector(`[data-suite-calendar-day-btn="${newDateStr}"]`);
+                    }
+
+                    if (targetBtn) {
+                        // Update roving tabindex
+                        root.querySelectorAll('[data-suite-calendar-day-btn]').forEach(b => b.setAttribute('tabindex', '-1'));
+                        targetBtn.setAttribute('tabindex', '0');
+                        targetBtn.focus();
+                        state.focusedDate = newDateStr;
+                    }
+                }
+            },
+
+            _render(root, id, state) {
+                // Re-render the calendar grid for the current month/year
+                const container = root.querySelector('.flex.gap-4');
+                if (!container) return;
+
+                const panels = [];
+                for (let i = 0; i < state.monthsCount; i++) {
+                    let m = state.month + i;
+                    let y = state.year;
+                    while (m > 12) { m -= 12; y++; }
+                    panels.push(this._buildMonthPanel(id, y, m, state));
+                }
+
+                container.innerHTML = panels.join('');
+
+                // Update caption
+                const caption = root.querySelector(`[data-suite-calendar-caption="${id}"]`);
+                if (caption) {
+                    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                    caption.textContent = months[state.month - 1] + ' ' + state.year;
+                }
+
+                // Re-apply selection
+                this._applySelection(root, state);
+
+                // Re-set focus
+                if (state.focusedDate) {
+                    const target = root.querySelector(`[data-suite-calendar-day-btn="${state.focusedDate}"]`);
+                    if (target) {
+                        root.querySelectorAll('[data-suite-calendar-day-btn]').forEach(b => b.setAttribute('tabindex', '-1'));
+                        target.setAttribute('tabindex', '0');
+                        target.focus();
+                    }
+                } else {
+                    this._setInitialFocus(root, state);
+                }
+
+                // Update data attributes
+                root.setAttribute('data-suite-calendar-month', String(state.month));
+                root.setAttribute('data-suite-calendar-year', String(state.year));
+            },
+
+            _buildMonthPanel(calId, year, month, state) {
+                const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                const dayAbbrs = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+                const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+                const monthLabel = months[month - 1] + ' ' + year;
+
+                const weeks = this._getWeeks(year, month, state.showOutside, state.fixedWeeks);
+
+                let gridHtml = '';
+                gridHtml += `<div class="flex items-center justify-center h-7 relative">`;
+                gridHtml += `<span class="text-sm font-medium select-none" role="status" aria-live="polite" data-suite-calendar-caption="${calId}">${monthLabel}</span>`;
+                gridHtml += `</div>`;
+
+                const multiselect = (state.mode === 'multiple' || state.mode === 'range') ? ' aria-multiselectable="true"' : '';
+                gridHtml += `<table role="grid" aria-label="${monthLabel}" class="w-full border-collapse" data-suite-calendar-grid="${calId}" data-suite-calendar-grid-month="${month}" data-suite-calendar-grid-year="${year}"${multiselect}>`;
+
+                // Weekday headers
+                gridHtml += `<thead aria-hidden="true"><tr class="flex">`;
+                for (let i = 0; i < 7; i++) {
+                    gridHtml += `<th scope="col" class="text-warm-600 dark:text-warm-500 rounded-md flex-1 font-normal text-xs select-none w-9 text-center" aria-label="${dayNames[i]}">${dayAbbrs[i]}</th>`;
+                }
+                gridHtml += `</tr></thead>`;
+
+                // Weeks
+                gridHtml += `<tbody class="suite-calendar-weeks">`;
+                for (const week of weeks) {
+                    gridHtml += `<tr class="flex w-full mt-2">`;
+                    for (const day of week) {
+                        if (day.outside && !state.showOutside) {
+                            gridHtml += `<td class="relative w-9 h-9 p-0 text-center" role="gridcell"></td>`;
+                        } else {
+                            const outsideAttr = day.outside ? ' data-outside="true"' : '';
+                            const todayAttr = day.isToday ? ' data-today="true"' : '';
+                            const outsideClass = day.outside ? 'text-warm-400 dark:text-warm-600 opacity-50' : 'text-warm-800 dark:text-warm-300';
+                            const todayClass = day.isToday ? ' bg-warm-100 dark:bg-warm-900' : '';
+                            gridHtml += `<td class="relative w-9 h-9 p-0 text-center select-none group/day" role="gridcell"${outsideAttr}${todayAttr}>`;
+                            gridHtml += `<button type="button" class="relative flex items-center justify-center w-9 h-9 rounded-md text-sm font-normal p-0 border-0 hover:bg-warm-100 dark:hover:bg-warm-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 transition-colors ${outsideClass}${todayClass}" tabindex="-1" data-suite-calendar-day-btn="${day.isoDate}" aria-label="${day.label}">${day.dayNum}</button>`;
+                            gridHtml += `</td>`;
+                        }
+                    }
+                    gridHtml += `</tr>`;
+                }
+                gridHtml += `</tbody></table>`;
+
+                return `<div class="flex flex-col gap-4 w-full">${gridHtml}</div>`;
+            },
+
+            _getWeeks(year, month, showOutside, fixedWeeks) {
+                const firstDay = new Date(year, month - 1, 1);
+                const lastDay = new Date(year, month, 0);
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
+                // Day of week: 0=Sun -> convert to Mon=0
+                let startDow = firstDay.getDay(); // 0=Sun
+                startDow = startDow === 0 ? 6 : startDow - 1; // Mon=0
+
+                const gridStart = new Date(firstDay);
+                gridStart.setDate(gridStart.getDate() - startDow);
+
+                let endDow = lastDay.getDay();
+                endDow = endDow === 0 ? 6 : endDow - 1;
+                const gridEnd = new Date(lastDay);
+                gridEnd.setDate(gridEnd.getDate() + (6 - endDow));
+
+                const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+                const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+                const weeks = [];
+                let current = new Date(gridStart);
+                while (current <= gridEnd) {
+                    const week = [];
+                    for (let d = 0; d < 7; d++) {
+                        const isOutside = current.getMonth() !== month - 1;
+                        const isToday = current.getTime() === today.getTime();
+                        const y = current.getFullYear();
+                        const m = String(current.getMonth() + 1).padStart(2, '0');
+                        const day = String(current.getDate()).padStart(2, '0');
+                        const dow = current.getDay();
+                        const dowIdx = dow === 0 ? 6 : dow - 1;
+
+                        week.push({
+                            dayNum: current.getDate(),
+                            outside: isOutside,
+                            isToday,
+                            isoDate: `${y}-${m}-${day}`,
+                            label: `${dayNames[dowIdx]}, ${monthNames[current.getMonth()]} ${current.getDate()}, ${y}`
+                        });
+                        current.setDate(current.getDate() + 1);
+                    }
+                    weeks.push(week);
+                }
+
+                // Pad to 6 weeks if fixedWeeks
+                while (fixedWeeks && weeks.length < 6) {
+                    const week = [];
+                    for (let d = 0; d < 7; d++) {
+                        const y = current.getFullYear();
+                        const m = String(current.getMonth() + 1).padStart(2, '0');
+                        const day = String(current.getDate()).padStart(2, '0');
+                        const dow = current.getDay();
+                        const dowIdx = dow === 0 ? 6 : dow - 1;
+                        week.push({
+                            dayNum: current.getDate(),
+                            outside: true,
+                            isToday: false,
+                            isoDate: `${y}-${m}-${day}`,
+                            label: `${dayNames[dowIdx]}, ${monthNames[current.getMonth()]} ${current.getDate()}, ${y}`
+                        });
+                        current.setDate(current.getDate() + 1);
+                    }
+                    weeks.push(week);
+                }
+
+                return weeks;
+            },
+
+            // --- DatePicker ---
+
+            _setupDatePicker(root) {
+                const id = root.getAttribute('data-suite-datepicker');
+                const trigger = root.querySelector(`[data-suite-datepicker-trigger="${id}"]`);
+                const content = root.querySelector(`[data-suite-datepicker-content="${id}"]`);
+
+                if (!trigger || !content) return;
+
+                let isOpen = false;
+
+                // Click trigger to open/close
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isOpen) {
+                        this._closeDatePicker(root);
+                        isOpen = false;
+                    } else {
+                        this._openDatePicker(root);
+                        isOpen = true;
+                    }
+                });
+
+                // Escape closes
+                root.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && isOpen) {
+                        e.preventDefault();
+                        this._closeDatePicker(root);
+                        isOpen = false;
+                        trigger.focus();
+                    }
+                });
+
+                // Click outside closes
+                document.addEventListener('pointerdown', (e) => {
+                    if (isOpen && !root.contains(e.target)) {
+                        this._closeDatePicker(root);
+                        isOpen = false;
+                    }
+                });
+
+                // Track open state
+                root._isOpen = () => isOpen;
+                root._setOpen = (v) => { isOpen = v; };
+            },
+
+            _openDatePicker(root) {
+                const id = root.getAttribute('data-suite-datepicker');
+                const trigger = root.querySelector(`[data-suite-datepicker-trigger="${id}"]`);
+                const content = root.querySelector(`[data-suite-datepicker-content="${id}"]`);
+                if (!content) return;
+
+                content.style.display = '';
+                content.setAttribute('data-state', 'open');
+                trigger.setAttribute('aria-expanded', 'true');
+                root._setOpen && root._setOpen(true);
+
+                // Position below trigger using Floating if available
+                if (Suite.Floating) {
+                    const side = content.getAttribute('data-suite-datepicker-side') || 'bottom';
+                    const align = content.getAttribute('data-suite-datepicker-align') || 'start';
+                    Suite.Floating.position(trigger, content, side, 0, align);
+                }
+
+                // Focus the first focusable day
+                requestAnimationFrame(() => {
+                    const focusTarget = content.querySelector('[data-suite-calendar-day-btn][tabindex="0"]')
+                                     || content.querySelector('[data-suite-calendar-day-btn]');
+                    if (focusTarget) focusTarget.focus();
+                });
+            },
+
+            _closeDatePicker(root) {
+                const id = root.getAttribute('data-suite-datepicker');
+                const trigger = root.querySelector(`[data-suite-datepicker-trigger="${id}"]`);
+                const content = root.querySelector(`[data-suite-datepicker-content="${id}"]`);
+                if (!content) return;
+
+                content.setAttribute('data-state', 'closed');
+                trigger.setAttribute('aria-expanded', 'false');
+                root._setOpen && root._setOpen(false);
+                setTimeout(() => { content.style.display = 'none'; }, 150);
+            },
+
+            _updateDatePickerDisplay(root, state) {
+                const id = root.getAttribute('data-suite-datepicker');
+                const valueEl = root.querySelector(`[data-suite-datepicker-value="${id}"]`);
+                if (!valueEl) return;
+
+                root.setAttribute('data-suite-datepicker-selected', state.selected.join(','));
+
+                if (state.selected.length === 0) {
+                    valueEl.textContent = valueEl.textContent || 'Pick a date';
+                    valueEl.classList.add('text-warm-400', 'dark:text-warm-600');
+                    return;
+                }
+
+                valueEl.classList.remove('text-warm-400', 'dark:text-warm-600');
+
+                const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                const fullMonths = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+                if (state.mode === 'single' && state.selected.length === 1) {
+                    const d = new Date(state.selected[0] + 'T00:00:00');
+                    valueEl.textContent = `${dayNames[d.getDay()]}, ${fullMonths[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+                } else if (state.mode === 'range' && state.selected.length === 2) {
+                    const d1 = new Date(state.selected[0] + 'T00:00:00');
+                    const d2 = new Date(state.selected[1] + 'T00:00:00');
+                    valueEl.textContent = `${months[d1.getMonth()]} ${d1.getDate()}, ${d1.getFullYear()} – ${months[d2.getMonth()]} ${d2.getDate()}, ${d2.getFullYear()}`;
+                } else if (state.mode === 'range' && state.selected.length === 1) {
+                    const d = new Date(state.selected[0] + 'T00:00:00');
+                    valueEl.textContent = `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} – ...`;
+                } else if (state.mode === 'multiple') {
+                    valueEl.textContent = state.selected.length + ' date' + (state.selected.length === 1 ? '' : 's') + ' selected';
+                }
+            }
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
@@ -3436,6 +4044,7 @@
             this.Select.init();
             this.Command.init();
             this.Toast.init();
+            this.Calendar.init();
         },
 
         // --- Init -----------------------------------------------------------------
