@@ -2240,4 +2240,831 @@ using Test
             @test :FocusTrap in meta.js_modules
         end
     end
+
+    @testset "SuitePopover" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuitePopover(
+                SuitePopoverTrigger("Open"),
+                SuitePopoverContent(
+                    P("Popover content here")
+                )
+            ))
+            @test occursin("data-suite-popover", html)
+            @test occursin("Popover content here", html)
+        end
+
+        @testset "Trigger wiring" begin
+            html = Therapy.render_to_string(SuitePopover(
+                SuitePopoverTrigger("Open"),
+                SuitePopoverContent(P("Content"))
+            ))
+            @test occursin("data-suite-popover-trigger", html)
+            @test occursin("aria-haspopup=\"dialog\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("data-state=\"closed\"", html)
+        end
+
+        @testset "Trigger is a button" begin
+            html = Therapy.render_to_string(SuitePopoverTrigger("Click"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+        end
+
+        @testset "Content structure" begin
+            html = Therapy.render_to_string(SuitePopoverContent(P("Hello")))
+            @test occursin("data-suite-popover-content", html)
+            @test occursin("role=\"dialog\"", html)
+            @test occursin("aria-modal=\"true\"", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("display:none", html)
+        end
+
+        @testset "Content positioning attributes" begin
+            html = Therapy.render_to_string(SuitePopoverContent(
+                side="top", side_offset=8, align="start",
+                P("Content")
+            ))
+            @test occursin("data-suite-popover-side=\"top\"", html)
+            @test occursin("data-suite-popover-side-offset=\"8\"", html)
+            @test occursin("data-suite-popover-align=\"start\"", html)
+        end
+
+        @testset "Content default positioning" begin
+            html = Therapy.render_to_string(SuitePopoverContent(P("Content")))
+            @test occursin("data-suite-popover-side=\"bottom\"", html)
+            @test occursin("data-suite-popover-side-offset=\"0\"", html)
+            @test occursin("data-suite-popover-align=\"center\"", html)
+        end
+
+        @testset "Content CSS classes" begin
+            html = Therapy.render_to_string(SuitePopoverContent(P("Content")))
+            @test occursin("bg-warm-50", html)
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("w-72", html)
+            @test occursin("rounded-md", html)
+            @test occursin("border", html)
+            @test occursin("p-4", html)
+            @test occursin("shadow-md", html)
+        end
+
+        @testset "Content animation classes" begin
+            html = Therapy.render_to_string(SuitePopoverContent(P("Content")))
+            @test occursin("data-[state=open]:animate-in", html)
+            @test occursin("data-[state=closed]:animate-out", html)
+            @test occursin("data-[state=closed]:fade-out-0", html)
+            @test occursin("data-[state=open]:fade-in-0", html)
+            @test occursin("data-[state=closed]:zoom-out-95", html)
+            @test occursin("data-[state=open]:zoom-in-95", html)
+            @test occursin("data-[side=bottom]:slide-in-from-top-2", html)
+            @test occursin("data-[side=top]:slide-in-from-bottom-2", html)
+        end
+
+        @testset "Close wrapper" begin
+            html = Therapy.render_to_string(SuitePopoverClose("Close"))
+            @test occursin("data-suite-popover-close", html)
+            @test occursin("display:contents", html)
+            @test occursin("Close", html)
+        end
+
+        @testset "Anchor" begin
+            html = Therapy.render_to_string(SuitePopoverAnchor(Span("Anchor")))
+            @test occursin("data-suite-popover-anchor", html)
+            @test occursin("Anchor", html)
+        end
+
+        @testset "Root uses display:contents" begin
+            html = Therapy.render_to_string(SuitePopover(
+                SuitePopoverTrigger("X"),
+                SuitePopoverContent(P("Y"))
+            ))
+            @test occursin("display:contents", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuitePopoverContent(class="max-w-lg",
+                P("Content")
+            ))
+            @test occursin("max-w-lg", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Popover)
+            meta = Suite.COMPONENT_REGISTRY[:Popover]
+            @test meta.tier == :js_runtime
+            @test :SuitePopover in meta.exports
+            @test :SuitePopoverTrigger in meta.exports
+            @test :SuitePopoverContent in meta.exports
+            @test :SuitePopoverClose in meta.exports
+            @test :Popover in meta.js_modules
+            @test :Floating in meta.js_modules
+            @test :FocusTrap in meta.js_modules
+            @test :DismissLayer in meta.js_modules
+        end
+    end
+
+    @testset "SuiteTooltip" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteTooltipProvider(
+                SuiteTooltip(
+                    SuiteTooltipTrigger("Hover me"),
+                    SuiteTooltipContent(P("Tooltip text"))
+                )
+            ))
+            @test occursin("data-suite-tooltip-provider", html)
+            @test occursin("data-suite-tooltip", html)
+            @test occursin("Tooltip text", html)
+        end
+
+        @testset "Provider attributes" begin
+            html = Therapy.render_to_string(SuiteTooltipProvider(
+                delay_duration=500, skip_delay_duration=200,
+                Span("Children")
+            ))
+            @test occursin("data-suite-tooltip-delay=\"500\"", html)
+            @test occursin("data-suite-tooltip-skip-delay=\"200\"", html)
+        end
+
+        @testset "Provider default attributes" begin
+            html = Therapy.render_to_string(SuiteTooltipProvider(Span("X")))
+            @test occursin("data-suite-tooltip-delay=\"700\"", html)
+            @test occursin("data-suite-tooltip-skip-delay=\"300\"", html)
+        end
+
+        @testset "Trigger wiring" begin
+            html = Therapy.render_to_string(SuiteTooltip(
+                SuiteTooltipTrigger("Hover"),
+                SuiteTooltipContent(P("Tip"))
+            ))
+            @test occursin("data-suite-tooltip-trigger", html)
+            @test occursin("data-state=\"closed\"", html)
+        end
+
+        @testset "Trigger is a button" begin
+            html = Therapy.render_to_string(SuiteTooltipTrigger("Click"))
+            @test occursin("<button", html)
+            @test occursin("type=\"button\"", html)
+        end
+
+        @testset "Content structure" begin
+            html = Therapy.render_to_string(SuiteTooltipContent(P("Tip")))
+            @test occursin("data-suite-tooltip-content", html)
+            @test occursin("role=\"tooltip\"", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("display:none", html)
+        end
+
+        @testset "Content positioning attributes" begin
+            html = Therapy.render_to_string(SuiteTooltipContent(
+                side="bottom", side_offset=8, align="end",
+                P("Tip")
+            ))
+            @test occursin("data-suite-tooltip-side=\"bottom\"", html)
+            @test occursin("data-suite-tooltip-side-offset=\"8\"", html)
+            @test occursin("data-suite-tooltip-align=\"end\"", html)
+        end
+
+        @testset "Content default positioning" begin
+            html = Therapy.render_to_string(SuiteTooltipContent(P("Tip")))
+            @test occursin("data-suite-tooltip-side=\"top\"", html)
+            @test occursin("data-suite-tooltip-side-offset=\"4\"", html)
+            @test occursin("data-suite-tooltip-align=\"center\"", html)
+        end
+
+        @testset "Content CSS — inverted colors" begin
+            html = Therapy.render_to_string(SuiteTooltipContent(P("Tip")))
+            @test occursin("bg-warm-800", html)
+            @test occursin("dark:bg-warm-300", html)
+            @test occursin("text-warm-50", html)
+            @test occursin("dark:text-warm-950", html)
+        end
+
+        @testset "Content CSS — layout" begin
+            html = Therapy.render_to_string(SuiteTooltipContent(P("Tip")))
+            @test occursin("px-3", html)
+            @test occursin("py-1.5", html)
+            @test occursin("rounded-md", html)
+            @test occursin("text-xs", html)
+            @test occursin("text-balance", html)
+        end
+
+        @testset "Content animation classes" begin
+            html = Therapy.render_to_string(SuiteTooltipContent(P("Tip")))
+            @test occursin("animate-in", html)
+            @test occursin("fade-in-0", html)
+            @test occursin("zoom-in-95", html)
+            @test occursin("data-[state=closed]:animate-out", html)
+            @test occursin("data-[state=closed]:fade-out-0", html)
+            @test occursin("data-[side=bottom]:slide-in-from-top-2", html)
+            @test occursin("data-[side=top]:slide-in-from-bottom-2", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteTooltipContent(class="max-w-xs",
+                P("Tip")
+            ))
+            @test occursin("max-w-xs", html)
+        end
+
+        @testset "Provider uses display:contents" begin
+            html = Therapy.render_to_string(SuiteTooltipProvider(Span("X")))
+            @test occursin("display:contents", html)
+        end
+
+        @testset "Root uses display:contents" begin
+            html = Therapy.render_to_string(SuiteTooltip(
+                SuiteTooltipTrigger("X"),
+                SuiteTooltipContent(P("Y"))
+            ))
+            @test occursin("display:contents", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Tooltip)
+            meta = Suite.COMPONENT_REGISTRY[:Tooltip]
+            @test meta.tier == :js_runtime
+            @test :SuiteTooltipProvider in meta.exports
+            @test :SuiteTooltip in meta.exports
+            @test :SuiteTooltipTrigger in meta.exports
+            @test :SuiteTooltipContent in meta.exports
+            @test :Tooltip in meta.js_modules
+            @test :Floating in meta.js_modules
+            @test :DismissLayer in meta.js_modules
+        end
+    end
+
+    @testset "SuiteHoverCard" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(SuiteHoverCard(
+                SuiteHoverCardTrigger(A(:href => "#", "@user")),
+                SuiteHoverCardContent(
+                    P("User bio here")
+                )
+            ))
+            @test occursin("data-suite-hover-card", html)
+            @test occursin("User bio here", html)
+            @test occursin("@user", html)
+        end
+
+        @testset "Trigger wiring" begin
+            html = Therapy.render_to_string(SuiteHoverCard(
+                SuiteHoverCardTrigger(Span("Hover")),
+                SuiteHoverCardContent(P("Card"))
+            ))
+            @test occursin("data-suite-hover-card-trigger", html)
+            @test occursin("data-state=\"closed\"", html)
+        end
+
+        @testset "Trigger uses span wrapper" begin
+            html = Therapy.render_to_string(SuiteHoverCardTrigger(Span("Link")))
+            @test occursin("<span", html)
+            @test occursin("Link", html)
+        end
+
+        @testset "Content structure" begin
+            html = Therapy.render_to_string(SuiteHoverCardContent(P("Card")))
+            @test occursin("data-suite-hover-card-content", html)
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("display:none", html)
+        end
+
+        @testset "Content positioning attributes" begin
+            html = Therapy.render_to_string(SuiteHoverCardContent(
+                side="top", side_offset=8, align="start",
+                P("Card")
+            ))
+            @test occursin("data-suite-hover-card-side=\"top\"", html)
+            @test occursin("data-suite-hover-card-side-offset=\"8\"", html)
+            @test occursin("data-suite-hover-card-align=\"start\"", html)
+        end
+
+        @testset "Content default positioning" begin
+            html = Therapy.render_to_string(SuiteHoverCardContent(P("Card")))
+            @test occursin("data-suite-hover-card-side=\"bottom\"", html)
+            @test occursin("data-suite-hover-card-side-offset=\"4\"", html)
+            @test occursin("data-suite-hover-card-align=\"center\"", html)
+        end
+
+        @testset "Content CSS classes" begin
+            html = Therapy.render_to_string(SuiteHoverCardContent(P("Card")))
+            @test occursin("bg-warm-50", html)
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("w-64", html)
+            @test occursin("rounded-md", html)
+            @test occursin("border", html)
+            @test occursin("p-4", html)
+            @test occursin("shadow-md", html)
+        end
+
+        @testset "Content animation classes" begin
+            html = Therapy.render_to_string(SuiteHoverCardContent(P("Card")))
+            @test occursin("data-[state=open]:animate-in", html)
+            @test occursin("data-[state=closed]:animate-out", html)
+            @test occursin("data-[state=closed]:fade-out-0", html)
+            @test occursin("data-[state=open]:fade-in-0", html)
+            @test occursin("data-[state=closed]:zoom-out-95", html)
+            @test occursin("data-[state=open]:zoom-in-95", html)
+            @test occursin("data-[side=bottom]:slide-in-from-top-2", html)
+            @test occursin("data-[side=top]:slide-in-from-bottom-2", html)
+        end
+
+        @testset "Delay attributes" begin
+            html = Therapy.render_to_string(SuiteHoverCard(
+                open_delay=500, close_delay=200,
+                SuiteHoverCardTrigger(Span("X")),
+                SuiteHoverCardContent(P("Y"))
+            ))
+            @test occursin("data-suite-hover-card-open-delay=\"500\"", html)
+            @test occursin("data-suite-hover-card-close-delay=\"200\"", html)
+        end
+
+        @testset "Default delay attributes" begin
+            html = Therapy.render_to_string(SuiteHoverCard(
+                SuiteHoverCardTrigger(Span("X")),
+                SuiteHoverCardContent(P("Y"))
+            ))
+            @test occursin("data-suite-hover-card-open-delay=\"700\"", html)
+            @test occursin("data-suite-hover-card-close-delay=\"300\"", html)
+        end
+
+        @testset "Root uses display:contents" begin
+            html = Therapy.render_to_string(SuiteHoverCard(
+                SuiteHoverCardTrigger(Span("X")),
+                SuiteHoverCardContent(P("Y"))
+            ))
+            @test occursin("display:contents", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteHoverCardContent(class="max-w-md",
+                P("Card")
+            ))
+            @test occursin("max-w-md", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :HoverCard)
+            meta = Suite.COMPONENT_REGISTRY[:HoverCard]
+            @test meta.tier == :js_runtime
+            @test :SuiteHoverCard in meta.exports
+            @test :SuiteHoverCardTrigger in meta.exports
+            @test :SuiteHoverCardContent in meta.exports
+            @test :HoverCard in meta.js_modules
+            @test :Floating in meta.js_modules
+            @test :DismissLayer in meta.js_modules
+        end
+    end
+
+    # ==================== DropdownMenu ==========================================
+    @testset "SuiteDropdownMenu" begin
+        @testset "Basic rendering" begin
+            html = Therapy.render_to_string(SuiteDropdownMenu(
+                SuiteDropdownMenuTrigger(Span("Open")),
+                SuiteDropdownMenuContent(
+                    SuiteDropdownMenuItem("Profile"),
+                    SuiteDropdownMenuItem("Settings"),
+                )
+            ))
+            @test occursin("data-suite-dropdown-menu=", html)
+            @test occursin("data-suite-dropdown-menu-trigger=", html)
+            @test occursin("data-suite-dropdown-menu-content", html)
+            @test occursin("role=\"menu\"", html)
+            @test occursin("aria-haspopup=\"menu\"", html)
+            @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("Profile", html)
+            @test occursin("Settings", html)
+        end
+
+        @testset "MenuItem" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuItem("Profile"))
+            @test occursin("data-suite-menu-item", html)
+            @test occursin("role=\"menuitem\"", html)
+            @test occursin("tabindex=\"-1\"", html)
+            @test occursin("Profile", html)
+            @test occursin("cursor-default", html)
+            @test occursin("data-[highlighted]", html)
+        end
+
+        @testset "MenuItem with shortcut" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuItem("Profile", shortcut="⇧⌘P"))
+            @test occursin("Profile", html)
+            @test occursin("⇧⌘P", html)
+            @test occursin("data-suite-menu-shortcut", html)
+            @test occursin("tracking-widest", html)
+        end
+
+        @testset "MenuItem disabled" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuItem("Disabled", disabled=true))
+            @test occursin("data-disabled", html)
+            @test occursin("data-[disabled]", html)
+        end
+
+        @testset "MenuItem with text_value" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuItem("🎵 Music", text_value="Music"))
+            @test occursin("data-text-value=\"Music\"", html)
+        end
+
+        @testset "CheckboxItem unchecked" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuCheckboxItem("Show toolbar"))
+            @test occursin("data-suite-menu-checkbox-item", html)
+            @test occursin("role=\"menuitemcheckbox\"", html)
+            @test occursin("aria-checked=\"false\"", html)
+            @test occursin("data-state=\"unchecked\"", html)
+            @test occursin("display:none", html)  # indicator hidden
+            @test occursin("pl-8", html)  # left padding for indicator
+        end
+
+        @testset "CheckboxItem checked" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuCheckboxItem("Show toolbar", checked=true))
+            @test occursin("aria-checked=\"true\"", html)
+            @test occursin("data-state=\"checked\"", html)
+            @test occursin("data-suite-menu-item-indicator", html)
+            # Check SVG should be visible
+            @test occursin("M20 6L9 17l-5-5", html)
+        end
+
+        @testset "RadioGroup and RadioItem" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuRadioGroup(value="center",
+                SuiteDropdownMenuRadioItem(value="top", "Top"),
+                SuiteDropdownMenuRadioItem(value="center", checked=true, "Center"),
+                SuiteDropdownMenuRadioItem(value="bottom", "Bottom"),
+            ))
+            @test occursin("data-suite-menu-radio-group", html)
+            @test occursin("role=\"group\"", html)
+            @test occursin("role=\"menuitemradio\"", html)
+            # Checked item
+            @test occursin("data-state=\"checked\"", html)
+            @test occursin("aria-checked=\"true\"", html)
+            # Unchecked items
+            @test occursin("data-state=\"unchecked\"", html)
+        end
+
+        @testset "Label" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuLabel("My Account"))
+            @test occursin("My Account", html)
+            @test occursin("font-medium", html)
+            @test occursin("text-sm", html)
+        end
+
+        @testset "Label with inset" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuLabel("My Account", inset=true))
+            @test occursin("pl-8", html)
+        end
+
+        @testset "Separator" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuSeparator())
+            @test occursin("role=\"separator\"", html)
+            @test occursin("data-suite-menu-separator", html)
+            @test occursin("h-px", html)
+            @test occursin("bg-warm-200", html)
+        end
+
+        @testset "Shortcut standalone" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuShortcut("⌘S"))
+            @test occursin("⌘S", html)
+            @test occursin("tracking-widest", html)
+            @test occursin("data-suite-menu-shortcut", html)
+        end
+
+        @testset "Group" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuGroup(
+                SuiteDropdownMenuItem("A"),
+                SuiteDropdownMenuItem("B"),
+            ))
+            @test occursin("role=\"group\"", html)
+        end
+
+        @testset "SubMenu structure" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuSub(
+                SuiteDropdownMenuSubTrigger("More Tools"),
+                SuiteDropdownMenuSubContent(
+                    SuiteDropdownMenuItem("Sub Item 1"),
+                    SuiteDropdownMenuItem("Sub Item 2"),
+                )
+            ))
+            @test occursin("data-suite-menu-sub", html)
+            @test occursin("data-suite-menu-sub-trigger", html)
+            @test occursin("aria-haspopup=\"menu\"", html)
+            @test occursin("data-suite-menu-sub-content", html)
+            @test occursin("Sub Item 1", html)
+            # Chevron icon in sub-trigger
+            @test occursin("M6 12L10 8L6 4", html)
+        end
+
+        @testset "SubTrigger inset" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuSubTrigger("More", inset=true))
+            @test occursin("pl-8", html)
+        end
+
+        @testset "SubTrigger disabled" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuSubTrigger("More", disabled=true))
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "Content styling" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuContent(
+                SuiteDropdownMenuItem("A")
+            ))
+            @test occursin("rounded-md", html)
+            @test occursin("shadow-md", html)
+            @test occursin("bg-warm-50", html)
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("border-warm-200", html)
+            @test occursin("animate-in", html)
+            @test occursin("animate-out", html)
+            @test occursin("slide-in-from-top-2", html)
+        end
+
+        @testset "Content custom class" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuContent(class="w-56",
+                SuiteDropdownMenuItem("A")
+            ))
+            @test occursin("w-56", html)
+        end
+
+        @testset "Content custom side/align" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuContent(side="top", align="end", side_offset=8,
+                SuiteDropdownMenuItem("A")
+            ))
+            @test occursin("data-side-preference=\"top\"", html)
+            @test occursin("data-align-preference=\"end\"", html)
+            @test occursin("data-side-offset=\"8\"", html)
+        end
+
+        @testset "SubContent styling" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuSubContent(
+                SuiteDropdownMenuItem("A")
+            ))
+            @test occursin("shadow-lg", html)  # SubContent uses shadow-lg
+            @test occursin("data-suite-menu-sub-content", html)
+            @test occursin("role=\"menu\"", html)
+        end
+
+        @testset "ItemIndicator" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuItemIndicator(Span("✓")))
+            @test occursin("data-suite-menu-item-indicator", html)
+            @test occursin("✓", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(SuiteDropdownMenuContent(
+                SuiteDropdownMenuItem("A"),
+                SuiteDropdownMenuSeparator(),
+            ))
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:text-warm-300", html)
+            @test occursin("dark:border-warm-700", html)
+            @test occursin("dark:bg-warm-700", html)  # separator dark
+        end
+
+        @testset "Full composition" begin
+            html = Therapy.render_to_string(SuiteDropdownMenu(
+                SuiteDropdownMenuTrigger(Span("Menu")),
+                SuiteDropdownMenuContent(
+                    SuiteDropdownMenuLabel("Account"),
+                    SuiteDropdownMenuSeparator(),
+                    SuiteDropdownMenuGroup(
+                        SuiteDropdownMenuItem("Profile", shortcut="⇧⌘P"),
+                        SuiteDropdownMenuItem("Settings", shortcut="⌘S"),
+                    ),
+                    SuiteDropdownMenuSeparator(),
+                    SuiteDropdownMenuCheckboxItem("Status Bar", checked=true),
+                    SuiteDropdownMenuSeparator(),
+                    SuiteDropdownMenuRadioGroup(value="center",
+                        SuiteDropdownMenuRadioItem(value="top", "Top"),
+                        SuiteDropdownMenuRadioItem(value="center", checked=true, "Center"),
+                    ),
+                    SuiteDropdownMenuSeparator(),
+                    SuiteDropdownMenuSub(
+                        SuiteDropdownMenuSubTrigger("More"),
+                        SuiteDropdownMenuSubContent(
+                            SuiteDropdownMenuItem("Sub A"),
+                        )
+                    ),
+                    SuiteDropdownMenuSeparator(),
+                    SuiteDropdownMenuItem("Log out", shortcut="⇧⌘Q"),
+                )
+            ))
+            @test occursin("data-suite-dropdown-menu=", html)
+            @test occursin("Account", html)
+            @test occursin("Profile", html)
+            @test occursin("Status Bar", html)
+            @test occursin("Sub A", html)
+            @test occursin("Log out", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :DropdownMenu)
+            meta = Suite.COMPONENT_REGISTRY[:DropdownMenu]
+            @test meta.tier == :js_runtime
+            @test :SuiteDropdownMenu in meta.exports
+            @test :SuiteDropdownMenuTrigger in meta.exports
+            @test :SuiteDropdownMenuContent in meta.exports
+            @test :SuiteDropdownMenuItem in meta.exports
+            @test :SuiteDropdownMenuCheckboxItem in meta.exports
+            @test :SuiteDropdownMenuRadioGroup in meta.exports
+            @test :SuiteDropdownMenuRadioItem in meta.exports
+            @test :SuiteDropdownMenuSeparator in meta.exports
+            @test :SuiteDropdownMenuLabel in meta.exports
+            @test :SuiteDropdownMenuShortcut in meta.exports
+            @test :SuiteDropdownMenuSub in meta.exports
+            @test :SuiteDropdownMenuSubTrigger in meta.exports
+            @test :SuiteDropdownMenuSubContent in meta.exports
+            @test :SuiteDropdownMenuItemIndicator in meta.exports
+            @test :SuiteDropdownMenuGroup in meta.exports
+            @test :Menu in meta.js_modules
+            @test :DropdownMenu in meta.js_modules
+            @test :Floating in meta.js_modules
+            @test :DismissLayer in meta.js_modules
+        end
+    end
+
+    # ==================== ContextMenu ===========================================
+    @testset "SuiteContextMenu" begin
+        @testset "Basic rendering" begin
+            html = Therapy.render_to_string(SuiteContextMenu(
+                SuiteContextMenuTrigger(Div("Right click here")),
+                SuiteContextMenuContent(
+                    SuiteContextMenuItem("Cut"),
+                    SuiteContextMenuItem("Copy"),
+                    SuiteContextMenuItem("Paste"),
+                )
+            ))
+            @test occursin("data-suite-context-menu=", html)
+            @test occursin("data-suite-context-menu-trigger=", html)
+            @test occursin("data-suite-context-menu-content", html)
+            @test occursin("role=\"menu\"", html)
+            @test occursin("Cut", html)
+            @test occursin("Copy", html)
+            @test occursin("Paste", html)
+        end
+
+        @testset "Trigger renders as span" begin
+            html = Therapy.render_to_string(SuiteContextMenuTrigger(Div("Area")))
+            @test occursin("<span", html)
+            @test occursin("Area", html)
+        end
+
+        @testset "MenuItem" begin
+            html = Therapy.render_to_string(SuiteContextMenuItem("Cut"))
+            @test occursin("data-suite-menu-item", html)
+            @test occursin("role=\"menuitem\"", html)
+            @test occursin("Cut", html)
+        end
+
+        @testset "MenuItem with shortcut" begin
+            html = Therapy.render_to_string(SuiteContextMenuItem("Cut", shortcut="⌘X"))
+            @test occursin("⌘X", html)
+            @test occursin("data-suite-menu-shortcut", html)
+        end
+
+        @testset "MenuItem disabled" begin
+            html = Therapy.render_to_string(SuiteContextMenuItem("Disabled", disabled=true))
+            @test occursin("data-disabled", html)
+        end
+
+        @testset "CheckboxItem" begin
+            html = Therapy.render_to_string(SuiteContextMenuCheckboxItem("Show Grid", checked=true))
+            @test occursin("data-suite-menu-checkbox-item", html)
+            @test occursin("role=\"menuitemcheckbox\"", html)
+            @test occursin("aria-checked=\"true\"", html)
+            @test occursin("data-state=\"checked\"", html)
+        end
+
+        @testset "RadioGroup and RadioItem" begin
+            html = Therapy.render_to_string(SuiteContextMenuRadioGroup(value="light",
+                SuiteContextMenuRadioItem(value="light", checked=true, "Light"),
+                SuiteContextMenuRadioItem(value="dark", "Dark"),
+            ))
+            @test occursin("data-suite-menu-radio-group", html)
+            @test occursin("role=\"menuitemradio\"", html)
+            @test occursin("aria-checked=\"true\"", html)
+        end
+
+        @testset "Label" begin
+            html = Therapy.render_to_string(SuiteContextMenuLabel("Actions"))
+            @test occursin("Actions", html)
+            @test occursin("font-medium", html)
+        end
+
+        @testset "Label with stronger text" begin
+            html = Therapy.render_to_string(SuiteContextMenuLabel("Actions"))
+            @test occursin("text-warm-800", html)
+        end
+
+        @testset "Separator" begin
+            html = Therapy.render_to_string(SuiteContextMenuSeparator())
+            @test occursin("role=\"separator\"", html)
+            @test occursin("h-px", html)
+        end
+
+        @testset "SubMenu structure" begin
+            html = Therapy.render_to_string(SuiteContextMenuSub(
+                SuiteContextMenuSubTrigger("Share"),
+                SuiteContextMenuSubContent(
+                    SuiteContextMenuItem("Email"),
+                    SuiteContextMenuItem("Link"),
+                )
+            ))
+            @test occursin("data-suite-menu-sub", html)
+            @test occursin("data-suite-menu-sub-trigger", html)
+            @test occursin("data-suite-menu-sub-content", html)
+            @test occursin("Email", html)
+            @test occursin("Link", html)
+        end
+
+        @testset "Content styling" begin
+            html = Therapy.render_to_string(SuiteContextMenuContent(
+                SuiteContextMenuItem("A")
+            ))
+            @test occursin("rounded-md", html)
+            @test occursin("shadow-md", html)
+            @test occursin("bg-warm-50", html)
+            @test occursin("dark:bg-warm-900", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteContextMenuContent(class="w-64",
+                SuiteContextMenuItem("A")
+            ))
+            @test occursin("w-64", html)
+        end
+
+        @testset "Full composition" begin
+            html = Therapy.render_to_string(SuiteContextMenu(
+                SuiteContextMenuTrigger(
+                    Div(:class => "h-[150px] w-[300px]", "Right click here")
+                ),
+                SuiteContextMenuContent(
+                    SuiteContextMenuLabel("Edit"),
+                    SuiteContextMenuSeparator(),
+                    SuiteContextMenuItem("Cut", shortcut="⌘X"),
+                    SuiteContextMenuItem("Copy", shortcut="⌘C"),
+                    SuiteContextMenuItem("Paste", shortcut="⌘V"),
+                    SuiteContextMenuSeparator(),
+                    SuiteContextMenuCheckboxItem("Show Grid", checked=true),
+                    SuiteContextMenuSeparator(),
+                    SuiteContextMenuSub(
+                        SuiteContextMenuSubTrigger("Share"),
+                        SuiteContextMenuSubContent(
+                            SuiteContextMenuItem("Email"),
+                        )
+                    ),
+                )
+            ))
+            @test occursin("data-suite-context-menu=", html)
+            @test occursin("Edit", html)
+            @test occursin("Cut", html)
+            @test occursin("Show Grid", html)
+            @test occursin("Email", html)
+        end
+
+        @testset "Shortcut standalone" begin
+            html = Therapy.render_to_string(SuiteContextMenuShortcut("⌘Z"))
+            @test occursin("⌘Z", html)
+            @test occursin("data-suite-menu-shortcut", html)
+        end
+
+        @testset "ItemIndicator" begin
+            html = Therapy.render_to_string(SuiteContextMenuItemIndicator(Span("•")))
+            @test occursin("data-suite-menu-item-indicator", html)
+        end
+
+        @testset "Group" begin
+            html = Therapy.render_to_string(SuiteContextMenuGroup(
+                SuiteContextMenuItem("A"),
+            ))
+            @test occursin("role=\"group\"", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(SuiteContextMenuContent(
+                SuiteContextMenuItem("A"),
+            ))
+            @test occursin("dark:bg-warm-900", html)
+            @test occursin("dark:text-warm-300", html)
+            @test occursin("dark:border-warm-700", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :ContextMenu)
+            meta = Suite.COMPONENT_REGISTRY[:ContextMenu]
+            @test meta.tier == :js_runtime
+            @test :SuiteContextMenu in meta.exports
+            @test :SuiteContextMenuTrigger in meta.exports
+            @test :SuiteContextMenuContent in meta.exports
+            @test :SuiteContextMenuItem in meta.exports
+            @test :SuiteContextMenuCheckboxItem in meta.exports
+            @test :SuiteContextMenuRadioGroup in meta.exports
+            @test :SuiteContextMenuRadioItem in meta.exports
+            @test :SuiteContextMenuSeparator in meta.exports
+            @test :SuiteContextMenuLabel in meta.exports
+            @test :SuiteContextMenuSub in meta.exports
+            @test :SuiteContextMenuSubTrigger in meta.exports
+            @test :SuiteContextMenuSubContent in meta.exports
+            @test :Menu in meta.js_modules
+            @test :ContextMenu in meta.js_modules
+            @test :Floating in meta.js_modules
+            @test :DismissLayer in meta.js_modules
+        end
+    end
 end

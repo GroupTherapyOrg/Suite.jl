@@ -246,67 +246,89 @@
         Floating: {
             /**
              * Position a floating element relative to a reference element.
-             * Minimal implementation — covers top/bottom/left/right with flip.
-             * @param {HTMLElement} reference - The anchor element
-             * @param {HTMLElement} floating - The floating element to position
-             * @param {Object} options - { placement: 'bottom', offset: 8 }
-             * @returns {Function} cleanup
+             * Supports side/align/sideOffset with flip and shift.
+             * Sets data-side and data-align for CSS animation targeting.
              */
             position(reference, floating, options = {}) {
-                const placement = options.placement || 'bottom';
-                const offset = options.offset || 8;
+                const side = options.side || 'bottom';
+                const align = options.align || 'center';
+                const sideOffset = options.sideOffset || 0;
+                const alignOffset = options.alignOffset || 0;
+                const avoidCollisions = options.avoidCollisions !== false;
 
                 function update() {
-                    const refRect = reference.getBoundingClientRect();
-                    const floatRect = floating.getBoundingClientRect();
-                    const viewport = {
-                        width: window.innerWidth,
-                        height: window.innerHeight
-                    };
+                    const ref = reference.getBoundingClientRect();
+                    const flt = floating.getBoundingClientRect();
+                    const vw = window.innerWidth;
+                    const vh = window.innerHeight;
+                    const pad = 4;
 
-                    let top, left;
-
-                    switch (placement) {
-                        case 'top':
-                            top = refRect.top - floatRect.height - offset;
-                            left = refRect.left + (refRect.width - floatRect.width) / 2;
-                            // Flip to bottom if no space
-                            if (top < 0) top = refRect.bottom + offset;
-                            break;
-                        case 'bottom':
-                            top = refRect.bottom + offset;
-                            left = refRect.left + (refRect.width - floatRect.width) / 2;
-                            // Flip to top if no space
-                            if (top + floatRect.height > viewport.height) {
-                                top = refRect.top - floatRect.height - offset;
-                            }
-                            break;
-                        case 'left':
-                            top = refRect.top + (refRect.height - floatRect.height) / 2;
-                            left = refRect.left - floatRect.width - offset;
-                            if (left < 0) left = refRect.right + offset;
-                            break;
-                        case 'right':
-                            top = refRect.top + (refRect.height - floatRect.height) / 2;
-                            left = refRect.right + offset;
-                            if (left + floatRect.width > viewport.width) {
-                                left = refRect.left - floatRect.width - offset;
-                            }
-                            break;
+                    // Calculate align offset based on alignment
+                    function alignPos(refStart, refSize, fltSize) {
+                        if (align === 'start') return refStart + alignOffset;
+                        if (align === 'end') return refStart + refSize - fltSize + alignOffset;
+                        return refStart + (refSize - fltSize) / 2 + alignOffset;
                     }
 
-                    // Clamp to viewport
-                    left = Math.max(4, Math.min(left, viewport.width - floatRect.width - 4));
-                    top = Math.max(4, Math.min(top, viewport.height - floatRect.height - 4));
+                    let top, left, actualSide = side;
+
+                    // Initial position
+                    if (side === 'bottom') {
+                        top = ref.bottom + sideOffset;
+                        left = alignPos(ref.left, ref.width, flt.width);
+                    } else if (side === 'top') {
+                        top = ref.top - flt.height - sideOffset;
+                        left = alignPos(ref.left, ref.width, flt.width);
+                    } else if (side === 'right') {
+                        left = ref.right + sideOffset;
+                        top = alignPos(ref.top, ref.height, flt.height);
+                    } else {
+                        left = ref.left - flt.width - sideOffset;
+                        top = alignPos(ref.top, ref.height, flt.height);
+                    }
+
+                    // Flip if collision
+                    if (avoidCollisions) {
+                        if (actualSide === 'bottom' && top + flt.height > vh - pad) {
+                            const flipped = ref.top - flt.height - sideOffset;
+                            if (flipped >= pad) { top = flipped; actualSide = 'top'; }
+                        } else if (actualSide === 'top' && top < pad) {
+                            const flipped = ref.bottom + sideOffset;
+                            if (flipped + flt.height <= vh - pad) { top = flipped; actualSide = 'bottom'; }
+                        } else if (actualSide === 'right' && left + flt.width > vw - pad) {
+                            const flipped = ref.left - flt.width - sideOffset;
+                            if (flipped >= pad) { left = flipped; actualSide = 'left'; }
+                        } else if (actualSide === 'left' && left < pad) {
+                            const flipped = ref.right + sideOffset;
+                            if (flipped + flt.width <= vw - pad) { left = flipped; actualSide = 'right'; }
+                        }
+
+                        // Shift to keep within viewport
+                        left = Math.max(pad, Math.min(left, vw - flt.width - pad));
+                        top = Math.max(pad, Math.min(top, vh - flt.height - pad));
+                    }
 
                     floating.style.position = 'fixed';
                     floating.style.top = top + 'px';
                     floating.style.left = left + 'px';
+                    floating.setAttribute('data-side', actualSide);
+                    floating.setAttribute('data-align', align);
+
+                    // CSS custom properties
+                    floating.style.setProperty('--radix-popper-anchor-width', ref.width + 'px');
+                    floating.style.setProperty('--radix-popper-anchor-height', ref.height + 'px');
+                    floating.style.setProperty('--radix-popper-available-width', (vw - pad * 2) + 'px');
+                    floating.style.setProperty('--radix-popper-available-height', (vh - pad * 2) + 'px');
                 }
 
-                update();
+                // Make visible for measurement, position, then show
+                floating.style.visibility = 'hidden';
+                floating.style.display = '';
+                requestAnimationFrame(() => {
+                    update();
+                    floating.style.visibility = '';
+                });
 
-                // Reposition on scroll/resize
                 window.addEventListener('scroll', update, true);
                 window.addEventListener('resize', update);
 
@@ -1214,6 +1236,820 @@
             }
         },
 
+        // --- Popover --------------------------------------------------------------
+        Popover: {
+            init() {
+                const triggers = document.querySelectorAll('[data-suite-popover-trigger]');
+                triggers.forEach(trigger => {
+                    if (trigger._suitePopover) return;
+                    trigger._suitePopover = true;
+
+                    const popId = trigger.getAttribute('data-suite-popover-trigger');
+                    const root = document.querySelector('[data-suite-popover="' + popId + '"]');
+                    if (!root) return;
+
+                    const content = root.querySelector('[data-suite-popover-content]');
+                    if (!content) return;
+
+                    const side = content.getAttribute('data-side-preference') || 'bottom';
+                    const sideOffset = parseInt(content.getAttribute('data-side-offset') || '0', 10);
+                    const align = content.getAttribute('data-align-preference') || 'center';
+
+                    let cleanupFloat, cleanupDismiss, cleanupFocusTrap;
+
+                    function open() {
+                        root.style.display = '';
+                        content.setAttribute('data-state', 'open');
+                        trigger.setAttribute('data-state', 'open');
+                        trigger.setAttribute('aria-expanded', 'true');
+
+                        cleanupFloat = Suite.Floating.position(trigger, content, {
+                            side: side, sideOffset: sideOffset, align: align
+                        });
+
+                        Suite.ScrollLock.lock();
+                        Suite.FocusGuards.install();
+                        cleanupFocusTrap = Suite.FocusTrap.activate(content);
+                        cleanupDismiss = Suite.DismissLayer.activate(content, {
+                            disableOutsidePointerEvents: true,
+                            onDismiss: close,
+                        });
+                    }
+
+                    function close() {
+                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
+                        if (cleanupFocusTrap) { cleanupFocusTrap(); cleanupFocusTrap = null; }
+                        if (cleanupFloat) { cleanupFloat(); cleanupFloat = null; }
+
+                        content.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('aria-expanded', 'false');
+
+                        Suite.ScrollLock.unlock();
+                        Suite.FocusGuards.uninstall();
+
+                        const hide = () => { root.style.display = 'none'; };
+                        content.addEventListener('animationend', hide, { once: true });
+                        setTimeout(hide, 250);
+                    }
+
+                    trigger.addEventListener('click', () => {
+                        const isOpen = content.getAttribute('data-state') === 'open';
+                        if (isOpen) close(); else open();
+                    });
+
+                    root.querySelectorAll('[data-suite-popover-close]').forEach(btn => {
+                        btn.addEventListener('click', close);
+                    });
+                });
+            }
+        },
+
+        // --- Tooltip --------------------------------------------------------------
+        Tooltip: {
+            // Provider-level delay state (shared across all tooltips)
+            _isOpenDelayed: true,
+            _skipTimer: null,
+            _DEFAULT_DELAY: 700,
+            _SKIP_DELAY: 300,
+
+            init() {
+                const roots = document.querySelectorAll('[data-suite-tooltip]');
+                roots.forEach(root => {
+                    if (root._suiteTooltip) return;
+                    root._suiteTooltip = true;
+
+                    const trigger = root.querySelector('[data-suite-tooltip-trigger]');
+                    const content = root.querySelector('[data-suite-tooltip-content]');
+                    if (!trigger || !content) return;
+
+                    const side = content.getAttribute('data-side-preference') || 'top';
+                    const sideOffset = parseInt(content.getAttribute('data-side-offset') || '4', 10);
+                    const align = content.getAttribute('data-align-preference') || 'center';
+                    const delay = parseInt(root.getAttribute('data-delay') || String(Suite.Tooltip._DEFAULT_DELAY), 10);
+
+                    let openTimer = null;
+                    let cleanupFloat = null;
+                    let isOpen = false;
+
+                    function show() {
+                        if (isOpen) return;
+                        isOpen = true;
+
+                        root.style.display = '';
+                        content.setAttribute('data-state', 'instant-open');
+                        trigger.setAttribute('data-state', 'open');
+
+                        cleanupFloat = Suite.Floating.position(trigger, content, {
+                            side: side, sideOffset: sideOffset, align: align
+                        });
+
+                        // Set describedby
+                        const contentId = content.id || ('suite-tooltip-' + Math.random().toString(36).slice(2, 8));
+                        content.id = contentId;
+                        trigger.setAttribute('aria-describedby', contentId);
+
+                        // Tooltip Provider: mark as not delayed for quick subsequent tooltips
+                        Suite.Tooltip._isOpenDelayed = false;
+                        clearTimeout(Suite.Tooltip._skipTimer);
+                    }
+
+                    function hide() {
+                        if (!isOpen) return;
+                        isOpen = false;
+                        clearTimeout(openTimer);
+
+                        content.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('data-state', 'closed');
+                        trigger.removeAttribute('aria-describedby');
+
+                        if (cleanupFloat) { cleanupFloat(); cleanupFloat = null; }
+
+                        const doHide = () => { root.style.display = 'none'; };
+                        content.addEventListener('animationend', doHide, { once: true });
+                        setTimeout(doHide, 200);
+
+                        // Provider: start skip delay timer
+                        Suite.Tooltip._skipTimer = setTimeout(() => {
+                            Suite.Tooltip._isOpenDelayed = true;
+                        }, Suite.Tooltip._SKIP_DELAY);
+                    }
+
+                    // Hover handlers
+                    trigger.addEventListener('pointerenter', (e) => {
+                        if (e.pointerType === 'touch') return;
+                        clearTimeout(openTimer);
+                        if (Suite.Tooltip._isOpenDelayed) {
+                            openTimer = setTimeout(show, delay);
+                        } else {
+                            show();
+                        }
+                    });
+
+                    trigger.addEventListener('pointerleave', (e) => {
+                        if (e.pointerType === 'touch') return;
+                        clearTimeout(openTimer);
+                        hide();
+                    });
+
+                    // Keep tooltip open when hovering content
+                    content.addEventListener('pointerenter', () => { clearTimeout(openTimer); });
+                    content.addEventListener('pointerleave', () => { hide(); });
+
+                    // Focus handlers — instant open (no delay)
+                    trigger.addEventListener('focus', (e) => {
+                        // Don't open on focus from pointer (already handled by pointer)
+                        if (e.sourceCapabilities) return; // pointer-originated focus
+                        show();
+                    });
+                    trigger.addEventListener('blur', () => { hide(); });
+
+                    // Escape dismisses
+                    trigger.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && isOpen) hide();
+                    });
+
+                    // Click closes
+                    trigger.addEventListener('pointerdown', () => {
+                        if (isOpen) hide();
+                    });
+                });
+            }
+        },
+
+        // --- HoverCard ------------------------------------------------------------
+        HoverCard: {
+            init() {
+                const roots = document.querySelectorAll('[data-suite-hover-card]');
+                roots.forEach(root => {
+                    if (root._suiteHoverCard) return;
+                    root._suiteHoverCard = true;
+
+                    const trigger = root.querySelector('[data-suite-hover-card-trigger]');
+                    const content = root.querySelector('[data-suite-hover-card-content]');
+                    if (!trigger || !content) return;
+
+                    const side = content.getAttribute('data-side-preference') || 'bottom';
+                    const sideOffset = parseInt(content.getAttribute('data-side-offset') || '4', 10);
+                    const align = content.getAttribute('data-align-preference') || 'center';
+                    const openDelay = parseInt(root.getAttribute('data-open-delay') || '700', 10);
+                    const closeDelay = parseInt(root.getAttribute('data-close-delay') || '300', 10);
+
+                    let openTimer = null;
+                    let closeTimer = null;
+                    let cleanupFloat = null;
+                    let cleanupDismiss = null;
+                    let isOpen = false;
+
+                    function open() {
+                        if (isOpen) return;
+                        isOpen = true;
+
+                        root.style.display = '';
+                        content.setAttribute('data-state', 'open');
+                        trigger.setAttribute('data-state', 'open');
+
+                        cleanupFloat = Suite.Floating.position(trigger, content, {
+                            side: side, sideOffset: sideOffset, align: align
+                        });
+                        cleanupDismiss = Suite.DismissLayer.activate(content, {
+                            onDismiss: close,
+                        });
+                    }
+
+                    function close() {
+                        if (!isOpen) return;
+                        isOpen = false;
+                        clearTimeout(openTimer);
+                        clearTimeout(closeTimer);
+
+                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
+                        if (cleanupFloat) { cleanupFloat(); cleanupFloat = null; }
+
+                        content.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('data-state', 'closed');
+
+                        const doHide = () => { root.style.display = 'none'; };
+                        content.addEventListener('animationend', doHide, { once: true });
+                        setTimeout(doHide, 250);
+                    }
+
+                    function startOpen() {
+                        clearTimeout(closeTimer);
+                        openTimer = setTimeout(open, openDelay);
+                    }
+
+                    function startClose() {
+                        clearTimeout(openTimer);
+                        closeTimer = setTimeout(close, closeDelay);
+                    }
+
+                    // Trigger hover
+                    trigger.addEventListener('pointerenter', (e) => {
+                        if (e.pointerType === 'touch') return;
+                        startOpen();
+                    });
+                    trigger.addEventListener('pointerleave', (e) => {
+                        if (e.pointerType === 'touch') return;
+                        startClose();
+                    });
+
+                    // Content hover — keep open
+                    content.addEventListener('pointerenter', () => { clearTimeout(closeTimer); });
+                    content.addEventListener('pointerleave', () => { startClose(); });
+
+                    // Focus
+                    trigger.addEventListener('focus', () => { startOpen(); });
+                    trigger.addEventListener('blur', () => { startClose(); });
+
+                    // Touch prevention
+                    trigger.addEventListener('touchstart', (e) => { e.preventDefault(); });
+                });
+            }
+        },
+
+        // --- Menu (shared base) ---------------------------------------------------
+        Menu: {
+            /**
+             * Shared menu behavior for DropdownMenu, ContextMenu, Menubar.
+             * Handles keyboard navigation, typeahead, item highlighting,
+             * checkbox/radio items, sub-menus, and grace area.
+             */
+
+            /**
+             * Activate menu behavior on a content element.
+             * @param {HTMLElement} content - The menu content container (role=menu)
+             * @param {Object} options - { onClose, isSubmenu }
+             * @returns {Function} cleanup
+             */
+            activate(content, options = {}) {
+                const onClose = options.onClose || (() => {});
+                const isSubmenu = options.isSubmenu || false;
+
+                // Typeahead state
+                let searchBuffer = '';
+                let searchTimer = null;
+
+                function getItems() {
+                    return Array.from(content.querySelectorAll(
+                        '[data-suite-menu-item], [data-suite-menu-checkbox-item], [data-suite-menu-radio-item], [data-suite-menu-sub-trigger]'
+                    )).filter(el => !el.hasAttribute('data-disabled') && !el.closest('[data-suite-menu-sub-content]'));
+                }
+
+                function focusItem(item) {
+                    // Remove highlight from all
+                    getItems().forEach(i => i.removeAttribute('data-highlighted'));
+                    if (item) {
+                        item.setAttribute('data-highlighted', '');
+                        item.focus({ preventScroll: true });
+                    }
+                }
+
+                function focusFirst() {
+                    const items = getItems();
+                    if (items.length > 0) focusItem(items[0]);
+                }
+
+                function focusLast() {
+                    const items = getItems();
+                    if (items.length > 0) focusItem(items[items.length - 1]);
+                }
+
+                // Typeahead search
+                function getNextMatch(values, search, currentMatch) {
+                    // Normalize repeated chars: 'aaa' → 'a'
+                    const chars = search.split('');
+                    const allSame = chars.every(c => c === chars[0]);
+                    const normalized = allSame ? chars[0] : search;
+
+                    let candidates = values;
+                    if (currentMatch) {
+                        const idx = values.indexOf(currentMatch);
+                        if (idx >= 0) {
+                            // Wrap array from current position + 1
+                            candidates = [...values.slice(idx + 1), ...values.slice(0, idx + 1)];
+                        }
+                    }
+
+                    if (normalized.length === 1) {
+                        // Single char: exclude current match to cycle
+                        return candidates.find(v =>
+                            v.toLowerCase().startsWith(normalized.toLowerCase()) &&
+                            v !== currentMatch
+                        ) || candidates.find(v =>
+                            v.toLowerCase().startsWith(normalized.toLowerCase())
+                        );
+                    }
+                    return candidates.find(v =>
+                        v.toLowerCase().startsWith(normalized.toLowerCase())
+                    );
+                }
+
+                function handleTypeahead(key) {
+                    searchBuffer += key;
+                    clearTimeout(searchTimer);
+                    searchTimer = setTimeout(() => { searchBuffer = ''; }, 1000);
+
+                    const items = getItems();
+                    const textValues = items.map(el =>
+                        el.getAttribute('data-text-value') || el.textContent.trim()
+                    );
+                    const currentItem = content.querySelector('[data-highlighted]');
+                    const currentText = currentItem
+                        ? (currentItem.getAttribute('data-text-value') || currentItem.textContent.trim())
+                        : undefined;
+                    const match = getNextMatch(textValues, searchBuffer, currentText);
+                    if (match) {
+                        const idx = textValues.indexOf(match);
+                        if (idx >= 0) focusItem(items[idx]);
+                    }
+                }
+
+                function selectItem(item) {
+                    if (!item || item.hasAttribute('data-disabled')) return;
+
+                    // CheckboxItem toggle
+                    if (item.hasAttribute('data-suite-menu-checkbox-item')) {
+                        const checked = item.getAttribute('data-state') === 'checked';
+                        const newState = checked ? 'unchecked' : 'checked';
+                        item.setAttribute('data-state', newState);
+                        item.setAttribute('aria-checked', String(!checked));
+                        const indicator = item.querySelector('[data-suite-menu-item-indicator]');
+                        if (indicator) indicator.style.display = checked ? 'none' : '';
+                        return; // Don't close menu for checkbox
+                    }
+
+                    // RadioItem select
+                    if (item.hasAttribute('data-suite-menu-radio-item')) {
+                        const group = item.closest('[data-suite-menu-radio-group]');
+                        if (group) {
+                            group.querySelectorAll('[data-suite-menu-radio-item]').forEach(ri => {
+                                ri.setAttribute('data-state', 'unchecked');
+                                ri.setAttribute('aria-checked', 'false');
+                                const ind = ri.querySelector('[data-suite-menu-item-indicator]');
+                                if (ind) ind.style.display = 'none';
+                            });
+                        }
+                        item.setAttribute('data-state', 'checked');
+                        item.setAttribute('aria-checked', 'true');
+                        const indicator = item.querySelector('[data-suite-menu-item-indicator]');
+                        if (indicator) indicator.style.display = '';
+                        return; // Don't close menu for radio
+                    }
+
+                    // SubTrigger — open sub-menu instead of selecting
+                    if (item.hasAttribute('data-suite-menu-sub-trigger')) {
+                        openSubmenu(item);
+                        return;
+                    }
+
+                    // Regular item — close menu after selection
+                    setTimeout(() => onClose(), 0);
+                }
+
+                function openSubmenu(subTrigger) {
+                    const subContent = subTrigger.parentElement &&
+                        subTrigger.parentElement.querySelector('[data-suite-menu-sub-content]');
+                    if (!subContent) return;
+
+                    subTrigger.setAttribute('data-state', 'open');
+                    subContent.style.display = '';
+                    subContent.setAttribute('data-state', 'open');
+
+                    // Position sub-menu
+                    Suite.Floating.position(subTrigger, subContent, {
+                        side: 'right', sideOffset: -4, align: 'start'
+                    });
+
+                    // Activate sub-menu behavior
+                    const subCleanup = Suite.Menu.activate(subContent, {
+                        onClose: () => {
+                            closeSubmenu(subTrigger, subContent);
+                            subCleanup();
+                        },
+                        isSubmenu: true,
+                    });
+
+                    // Focus first item in sub-menu
+                    requestAnimationFrame(() => {
+                        const subItems = Array.from(subContent.querySelectorAll(
+                            '[data-suite-menu-item], [data-suite-menu-checkbox-item], [data-suite-menu-radio-item]'
+                        )).filter(el => !el.hasAttribute('data-disabled'));
+                        if (subItems.length > 0) {
+                            subItems[0].setAttribute('data-highlighted', '');
+                            subItems[0].focus({ preventScroll: true });
+                        }
+                    });
+
+                    // Store cleanup for later
+                    subTrigger._subCleanup = subCleanup;
+                    subTrigger._subContent = subContent;
+                }
+
+                function closeSubmenu(subTrigger, subContent) {
+                    if (!subContent) return;
+                    subTrigger.setAttribute('data-state', 'closed');
+                    subContent.setAttribute('data-state', 'closed');
+                    subContent.style.display = 'none';
+                    // Remove highlights in sub-menu
+                    subContent.querySelectorAll('[data-highlighted]').forEach(el => el.removeAttribute('data-highlighted'));
+                    if (subTrigger._subCleanup) {
+                        subTrigger._subCleanup();
+                        subTrigger._subCleanup = null;
+                    }
+                }
+
+                // Keyboard handler
+                function onKeyDown(e) {
+                    const items = getItems();
+                    const currentItem = content.querySelector('[data-highlighted]');
+                    const idx = currentItem ? items.indexOf(currentItem) : -1;
+
+                    // Tab — prevent (menus never support Tab)
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Escape — close (handled by DismissLayer, but also close sub-menus)
+                    if (e.key === 'Escape') {
+                        if (isSubmenu) {
+                            e.stopPropagation();
+                            onClose();
+                        }
+                        return;
+                    }
+
+                    // Arrow navigation
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const next = idx < items.length - 1 ? idx + 1 : 0;
+                        focusItem(items[next]);
+                        return;
+                    }
+                    if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prev = idx > 0 ? idx - 1 : items.length - 1;
+                        focusItem(items[prev]);
+                        return;
+                    }
+                    if (e.key === 'Home' || e.key === 'PageUp') {
+                        e.preventDefault();
+                        focusFirst();
+                        return;
+                    }
+                    if (e.key === 'End' || e.key === 'PageDown') {
+                        e.preventDefault();
+                        focusLast();
+                        return;
+                    }
+
+                    // ArrowRight — open sub-menu
+                    if (e.key === 'ArrowRight' && currentItem && currentItem.hasAttribute('data-suite-menu-sub-trigger')) {
+                        e.preventDefault();
+                        openSubmenu(currentItem);
+                        return;
+                    }
+
+                    // ArrowLeft — close sub-menu (return to parent)
+                    if (e.key === 'ArrowLeft' && isSubmenu) {
+                        e.preventDefault();
+                        onClose();
+                        return;
+                    }
+
+                    // Enter/Space — select item
+                    if (e.key === 'Enter' || (e.key === ' ' && searchBuffer === '')) {
+                        e.preventDefault();
+                        if (currentItem) selectItem(currentItem);
+                        return;
+                    }
+
+                    // Typeahead — any printable character
+                    if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                        e.preventDefault();
+                        handleTypeahead(e.key);
+                    }
+                }
+
+                // Pointer handlers — highlight on hover
+                function onPointerMove(e) {
+                    if (e.pointerType === 'touch' || e.pointerType === 'pen') return;
+                    const item = e.target.closest(
+                        '[data-suite-menu-item], [data-suite-menu-checkbox-item], [data-suite-menu-radio-item], [data-suite-menu-sub-trigger]'
+                    );
+                    if (item && !item.hasAttribute('data-disabled') && content.contains(item) && !item.closest('[data-suite-menu-sub-content]')) {
+                        focusItem(item);
+                    }
+                }
+
+                function onPointerLeave(e) {
+                    if (e.pointerType === 'touch' || e.pointerType === 'pen') return;
+                    // Clear highlight, refocus content
+                    getItems().forEach(i => i.removeAttribute('data-highlighted'));
+                    content.focus({ preventScroll: true });
+                }
+
+                // Click handler — select on click
+                function onClick(e) {
+                    const item = e.target.closest(
+                        '[data-suite-menu-item], [data-suite-menu-checkbox-item], [data-suite-menu-radio-item], [data-suite-menu-sub-trigger]'
+                    );
+                    if (item && content.contains(item) && !item.closest('[data-suite-menu-sub-content]')) {
+                        selectItem(item);
+                    }
+                }
+
+                content.addEventListener('keydown', onKeyDown);
+                content.addEventListener('pointermove', onPointerMove);
+                content.addEventListener('pointerleave', onPointerLeave);
+                content.addEventListener('click', onClick);
+
+                return function cleanup() {
+                    content.removeEventListener('keydown', onKeyDown);
+                    content.removeEventListener('pointermove', onPointerMove);
+                    content.removeEventListener('pointerleave', onPointerLeave);
+                    content.removeEventListener('click', onClick);
+                    clearTimeout(searchTimer);
+                    searchBuffer = '';
+                    // Cleanup any open sub-menus
+                    content.querySelectorAll('[data-suite-menu-sub-trigger]').forEach(st => {
+                        if (st._subCleanup) { st._subCleanup(); st._subCleanup = null; }
+                    });
+                };
+            }
+        },
+
+        // --- DropdownMenu ---------------------------------------------------------
+        DropdownMenu: {
+            init() {
+                const roots = document.querySelectorAll('[data-suite-dropdown-menu]');
+                roots.forEach(root => {
+                    if (root._suiteDropdownMenu) return;
+                    root._suiteDropdownMenu = true;
+
+                    const trigger = root.querySelector('[data-suite-dropdown-menu-trigger]');
+                    const content = root.querySelector('[data-suite-dropdown-menu-content]');
+                    if (!trigger || !content) return;
+
+                    const side = content.getAttribute('data-side-preference') || 'bottom';
+                    const sideOffset = parseInt(content.getAttribute('data-side-offset') || '4', 10);
+                    const align = content.getAttribute('data-align-preference') || 'start';
+
+                    let cleanupFloat, cleanupDismiss, cleanupMenu;
+                    let isOpen = false;
+                    let wasKeyboardOpen = false;
+
+                    // Track keyboard vs pointer globally
+                    let isUsingKeyboard = false;
+                    function onDocKeyDown() { isUsingKeyboard = true; }
+                    function onDocPointer() { isUsingKeyboard = false; }
+                    document.addEventListener('keydown', onDocKeyDown, true);
+                    document.addEventListener('pointerdown', onDocPointer, true);
+
+                    function open(focusFirst) {
+                        if (isOpen) return;
+                        isOpen = true;
+                        wasKeyboardOpen = focusFirst;
+
+                        root.style.display = '';
+                        content.style.display = '';
+                        content.setAttribute('data-state', 'open');
+                        trigger.setAttribute('data-state', 'open');
+                        trigger.setAttribute('aria-expanded', 'true');
+
+                        cleanupFloat = Suite.Floating.position(trigger, content, {
+                            side: side, sideOffset: sideOffset, align: align
+                        });
+
+                        Suite.ScrollLock.lock();
+                        Suite.FocusGuards.install();
+
+                        cleanupMenu = Suite.Menu.activate(content, {
+                            onClose: close,
+                        });
+
+                        cleanupDismiss = Suite.DismissLayer.activate(content, {
+                            disableOutsidePointerEvents: true,
+                            onDismiss: close,
+                        });
+
+                        // Focus first item if keyboard-triggered
+                        if (focusFirst) {
+                            requestAnimationFrame(() => {
+                                const items = Array.from(content.querySelectorAll(
+                                    '[data-suite-menu-item], [data-suite-menu-checkbox-item], [data-suite-menu-radio-item], [data-suite-menu-sub-trigger]'
+                                )).filter(el => !el.hasAttribute('data-disabled') && !el.closest('[data-suite-menu-sub-content]'));
+                                if (items.length > 0) {
+                                    items[0].setAttribute('data-highlighted', '');
+                                    items[0].focus({ preventScroll: true });
+                                }
+                            });
+                        }
+                    }
+
+                    function close() {
+                        if (!isOpen) return;
+                        isOpen = false;
+
+                        if (cleanupMenu) { cleanupMenu(); cleanupMenu = null; }
+                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
+                        if (cleanupFloat) { cleanupFloat(); cleanupFloat = null; }
+
+                        content.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('data-state', 'closed');
+                        trigger.setAttribute('aria-expanded', 'false');
+
+                        Suite.ScrollLock.unlock();
+                        Suite.FocusGuards.uninstall();
+
+                        // Remove highlights
+                        content.querySelectorAll('[data-highlighted]').forEach(el => el.removeAttribute('data-highlighted'));
+
+                        const hide = () => {
+                            content.style.display = 'none';
+                        };
+                        content.addEventListener('animationend', hide, { once: true });
+                        setTimeout(hide, 250);
+
+                        // Return focus to trigger
+                        trigger.focus({ preventScroll: true });
+                    }
+
+                    // Trigger click
+                    trigger.addEventListener('pointerdown', (e) => {
+                        if (e.button !== 0) return; // left click only
+                        if (e.ctrlKey && navigator.platform.match(/Mac/)) return; // ctrl+click on Mac
+                        e.preventDefault();
+                        if (isOpen) close(); else open(false);
+                    });
+
+                    // Trigger keyboard
+                    trigger.addEventListener('keydown', (e) => {
+                        if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            if (!isOpen) open(true);
+                        } else if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (isOpen) close(); else open(true);
+                        }
+                    });
+                });
+            }
+        },
+
+        // --- ContextMenu ----------------------------------------------------------
+        ContextMenu: {
+            init() {
+                const roots = document.querySelectorAll('[data-suite-context-menu]');
+                roots.forEach(root => {
+                    if (root._suiteContextMenu) return;
+                    root._suiteContextMenu = true;
+
+                    const triggerEl = root.querySelector('[data-suite-context-menu-trigger]');
+                    const content = root.querySelector('[data-suite-context-menu-content]');
+                    if (!triggerEl || !content) return;
+
+                    let cleanupFloat, cleanupDismiss, cleanupMenu;
+                    let isOpen = false;
+                    let longPressTimer = null;
+
+                    function openAtPosition(x, y) {
+                        if (isOpen) close();
+                        isOpen = true;
+
+                        root.style.display = '';
+                        content.style.display = '';
+                        content.setAttribute('data-state', 'open');
+
+                        // Create virtual anchor at pointer position
+                        const virtualAnchor = {
+                            getBoundingClientRect() {
+                                return { width: 0, height: 0, top: y, right: x, bottom: y, left: x, x: x, y: y };
+                            }
+                        };
+
+                        cleanupFloat = Suite.Floating.position(virtualAnchor, content, {
+                            side: 'right', sideOffset: 2, align: 'start'
+                        });
+
+                        Suite.ScrollLock.lock();
+                        Suite.FocusGuards.install();
+
+                        cleanupMenu = Suite.Menu.activate(content, { onClose: close });
+
+                        cleanupDismiss = Suite.DismissLayer.activate(content, {
+                            disableOutsidePointerEvents: true,
+                            onDismiss: close,
+                        });
+
+                        // Focus first item
+                        requestAnimationFrame(() => {
+                            const items = Array.from(content.querySelectorAll(
+                                '[data-suite-menu-item], [data-suite-menu-checkbox-item], [data-suite-menu-radio-item], [data-suite-menu-sub-trigger]'
+                            )).filter(el => !el.hasAttribute('data-disabled') && !el.closest('[data-suite-menu-sub-content]'));
+                            if (items.length > 0) {
+                                items[0].setAttribute('data-highlighted', '');
+                                items[0].focus({ preventScroll: true });
+                            }
+                        });
+                    }
+
+                    function close() {
+                        if (!isOpen) return;
+                        isOpen = false;
+
+                        if (cleanupMenu) { cleanupMenu(); cleanupMenu = null; }
+                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
+                        if (cleanupFloat) { cleanupFloat(); cleanupFloat = null; }
+
+                        content.setAttribute('data-state', 'closed');
+
+                        Suite.ScrollLock.unlock();
+                        Suite.FocusGuards.uninstall();
+
+                        content.querySelectorAll('[data-highlighted]').forEach(el => el.removeAttribute('data-highlighted'));
+
+                        const hide = () => { content.style.display = 'none'; };
+                        content.addEventListener('animationend', hide, { once: true });
+                        setTimeout(hide, 250);
+                    }
+
+                    // Right-click handler
+                    triggerEl.addEventListener('contextmenu', (e) => {
+                        if (triggerEl.hasAttribute('data-disabled')) return;
+                        clearTimeout(longPressTimer);
+                        e.preventDefault();
+                        openAtPosition(e.clientX, e.clientY);
+                    });
+
+                    // Touch long-press (700ms)
+                    triggerEl.addEventListener('pointerdown', (e) => {
+                        if (e.pointerType === 'mouse') return;
+                        clearTimeout(longPressTimer);
+                        longPressTimer = setTimeout(() => {
+                            openAtPosition(e.clientX, e.clientY);
+                        }, 700);
+                    });
+
+                    triggerEl.addEventListener('pointermove', (e) => {
+                        if (e.pointerType === 'mouse') return;
+                        clearTimeout(longPressTimer);
+                    });
+                    triggerEl.addEventListener('pointerup', (e) => {
+                        if (e.pointerType === 'mouse') return;
+                        clearTimeout(longPressTimer);
+                    });
+                    triggerEl.addEventListener('pointercancel', () => {
+                        clearTimeout(longPressTimer);
+                    });
+
+                    // iOS: prevent native context menu
+                    triggerEl.style.webkitTouchCallout = 'none';
+                });
+            }
+        },
+
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
@@ -1228,6 +2064,11 @@
             this.AlertDialog.init();
             this.Sheet.init();
             this.Drawer.init();
+            this.Popover.init();
+            this.Tooltip.init();
+            this.HoverCard.init();
+            this.DropdownMenu.init();
+            this.ContextMenu.init();
         },
 
         // --- Init -----------------------------------------------------------------
