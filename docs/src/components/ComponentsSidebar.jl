@@ -58,7 +58,7 @@ const SUITE_COMPONENTS = [
         (slug = "separator",        title = "Separator",        implemented = true),
         (slug = "sheet",            title = "Sheet",            implemented = true),
         (slug = "skeleton",         title = "Skeleton",         implemented = true),
-        (slug = "slider",           title = "Slider",           implemented = false),
+        (slug = "slider",           title = "Slider",           implemented = true),
         (slug = "spinner",          title = "Spinner",          implemented = true),
         (slug = "status-bar",       title = "Status Bar",       implemented = true),
         (slug = "switch",           title = "Switch",           implemented = true),

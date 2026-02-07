@@ -61,7 +61,7 @@ include("components/ToggleGroup.jl")
 include("components/Switch.jl")
 # include("components/Checkbox.jl")
 # include("components/RadioGroup.jl")
-# include("components/Slider.jl")
+include("components/Slider.jl")
 
 # --- JS Runtime Components (implemented) ---
 include("components/ThemeToggle.jl")

@@ -5769,4 +5769,134 @@ using Test
             @test :FooterLink in meta.exports
         end
     end
+
+    @testset "Slider" begin
+        @testset "Basic structure" begin
+            html = Therapy.render_to_string(Slider())
+            @test occursin("data-suite-slider", html)
+            @test occursin("role=\"slider\"", html)
+            @test occursin("data-suite-slider-track", html)
+            @test occursin("data-suite-slider-range", html)
+            @test occursin("data-suite-slider-thumb", html)
+            @test occursin("<span", html)
+        end
+
+        @testset "Default ARIA attributes" begin
+            html = Therapy.render_to_string(Slider())
+            @test occursin("aria-valuenow=\"0\"", html)
+            @test occursin("aria-valuemin=\"0\"", html)
+            @test occursin("aria-valuemax=\"100\"", html)
+            @test occursin("aria-orientation=\"horizontal\"", html)
+            @test occursin("tabindex=\"0\"", html)
+        end
+
+        @testset "Custom min/max/step/value" begin
+            html = Therapy.render_to_string(Slider(min=10, max=50, step=5, default_value=25))
+            @test occursin("aria-valuenow=\"25\"", html)
+            @test occursin("aria-valuemin=\"10\"", html)
+            @test occursin("aria-valuemax=\"50\"", html)
+            @test occursin("data-min=\"10\"", html)
+            @test occursin("data-max=\"50\"", html)
+            @test occursin("data-step=\"5\"", html)
+            @test occursin("data-value=\"25\"", html)
+        end
+
+        @testset "Value clamping" begin
+            html = Therapy.render_to_string(Slider(min=0, max=100, default_value=200))
+            @test occursin("aria-valuenow=\"100\"", html)
+            @test occursin("data-value=\"100\"", html)
+
+            html2 = Therapy.render_to_string(Slider(min=10, max=50, default_value=5))
+            @test occursin("aria-valuenow=\"10\"", html2)
+            @test occursin("data-value=\"10\"", html2)
+        end
+
+        @testset "Horizontal orientation (default)" begin
+            html = Therapy.render_to_string(Slider())
+            @test occursin("data-orientation=\"horizontal\"", html)
+            @test occursin("w-full", html)
+            @test occursin("h-1.5", html)
+        end
+
+        @testset "Vertical orientation" begin
+            html = Therapy.render_to_string(Slider(orientation="vertical"))
+            @test occursin("data-orientation=\"vertical\"", html)
+            @test occursin("aria-orientation=\"vertical\"", html)
+            @test occursin("min-h-44", html)
+            @test occursin("flex-col", html)
+            @test occursin("w-1.5", html)
+        end
+
+        @testset "Disabled state" begin
+            html = Therapy.render_to_string(Slider(disabled=true))
+            @test occursin("data-disabled", html)
+            @test occursin("aria-disabled=\"true\"", html)
+            @test occursin("opacity-50", html)
+            @test occursin("pointer-events-none", html)
+            @test occursin("tabindex=\"-1\"", html)
+        end
+
+        @testset "Enabled tabindex" begin
+            html = Therapy.render_to_string(Slider())
+            @test occursin("tabindex=\"0\"", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(Slider(class="my-slider"))
+            @test occursin("my-slider", html)
+        end
+
+        @testset "Track styling" begin
+            html = Therapy.render_to_string(Slider())
+            @test occursin("rounded-full", html)
+            @test occursin("bg-accent-600/20", html)
+        end
+
+        @testset "Thumb styling" begin
+            html = Therapy.render_to_string(Slider())
+            @test occursin("border-accent-600", html)
+            @test occursin("cursor-pointer", html)
+            @test occursin("focus-visible:ring-4", html)
+        end
+
+        @testset "Range fill styling" begin
+            html = Therapy.render_to_string(Slider())
+            @test occursin("bg-accent-600", html)
+        end
+
+        @testset "Range percentage at 50%" begin
+            html = Therapy.render_to_string(Slider(default_value=50, min=0, max=100))
+            @test occursin("width: 50.0%", html)
+        end
+
+        @testset "Range percentage at 0%" begin
+            html = Therapy.render_to_string(Slider(default_value=0, min=0, max=100))
+            @test occursin("width: 0.0%", html)
+        end
+
+        @testset "Range percentage at 100%" begin
+            html = Therapy.render_to_string(Slider(default_value=100, min=0, max=100))
+            @test occursin("width: 100.0%", html)
+        end
+
+        @testset "Dark mode classes" begin
+            html = Therapy.render_to_string(Slider())
+            @test occursin("dark:bg-accent-600/30", html)
+            @test occursin("dark:bg-warm-950", html)
+        end
+
+        @testset "Touch/select prevention" begin
+            html = Therapy.render_to_string(Slider())
+            @test occursin("touch-none", html)
+            @test occursin("select-none", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Slider)
+            meta = Suite.COMPONENT_REGISTRY[:Slider]
+            @test meta.tier == :js_runtime
+            @test :Slider in meta.exports
+            @test :Slider in meta.js_modules
+        end
+    end
 end

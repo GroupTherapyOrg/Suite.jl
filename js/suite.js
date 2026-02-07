@@ -3419,6 +3419,141 @@
             info(title, opts = {})    { return this.show(title, { ...opts, type: 'info' }); }
         },
 
+        // --- Slider ---------------------------------------------------------------
+        Slider: {
+            init() {
+                document.querySelectorAll('[data-suite-slider]').forEach(root => {
+                    if (root._suiteSlider) return;
+                    root._suiteSlider = true;
+
+                    const thumb = root.querySelector('[data-suite-slider-thumb]');
+                    const track = root.querySelector('[data-suite-slider-track]');
+                    const range = root.querySelector('[data-suite-slider-range]');
+                    if (!thumb || !track || !range) return;
+
+                    const isVertical = root.getAttribute('data-orientation') === 'vertical';
+                    const min = parseFloat(root.getAttribute('data-min') || '0');
+                    const max = parseFloat(root.getAttribute('data-max') || '100');
+                    const step = parseFloat(root.getAttribute('data-step') || '1');
+
+                    const isDisabled = () => root.hasAttribute('data-disabled') || root.hasAttribute('aria-disabled');
+
+                    const snapToStep = (val) => {
+                        const stepped = Math.round((val - min) / step) * step + min;
+                        // Round to avoid floating point issues
+                        const decimals = (step.toString().split('.')[1] || '').length;
+                        return parseFloat(Math.min(max, Math.max(min, stepped)).toFixed(decimals));
+                    };
+
+                    const updateVisuals = (value) => {
+                        const pct = max > min ? ((value - min) / (max - min)) * 100 : 0;
+                        root.setAttribute('data-value', String(value));
+                        thumb.setAttribute('aria-valuenow', String(value));
+
+                        if (isVertical) {
+                            range.style.bottom = '0';
+                            range.style.height = pct + '%';
+                            thumb.style.bottom = pct + '%';
+                            thumb.style.left = '50%';
+                            thumb.style.transform = 'translate(-50%, 50%)';
+                            thumb.style.position = 'absolute';
+                            thumb.style.top = '';
+                        } else {
+                            range.style.left = '0';
+                            range.style.width = pct + '%';
+                            thumb.style.left = pct + '%';
+                            thumb.style.top = '50%';
+                            thumb.style.transform = 'translate(-50%, -50%)';
+                            thumb.style.position = 'absolute';
+                            thumb.style.bottom = '';
+                        }
+                    };
+
+                    const setValue = (newVal) => {
+                        const snapped = snapToStep(newVal);
+                        const current = parseFloat(root.getAttribute('data-value') || '0');
+                        if (snapped === current) return;
+                        updateVisuals(snapped);
+                        root.dispatchEvent(new CustomEvent('suite:slider:change', {
+                            detail: { value: snapped },
+                            bubbles: true
+                        }));
+                    };
+
+                    const getValueFromPointer = (e) => {
+                        const rect = track.getBoundingClientRect();
+                        let pct;
+                        if (isVertical) {
+                            pct = 1 - ((e.clientY - rect.top) / rect.height);
+                        } else {
+                            pct = (e.clientX - rect.left) / rect.width;
+                        }
+                        pct = Math.min(1, Math.max(0, pct));
+                        return min + pct * (max - min);
+                    };
+
+                    // Pointer drag via Pointer Capture API
+                    let dragging = false;
+
+                    root.addEventListener('pointerdown', (e) => {
+                        if (isDisabled()) return;
+                        e.preventDefault();
+                        dragging = true;
+                        root.setPointerCapture(e.pointerId);
+                        setValue(getValueFromPointer(e));
+                        thumb.focus();
+                    });
+
+                    root.addEventListener('pointermove', (e) => {
+                        if (!dragging) return;
+                        if (!root.hasPointerCapture(e.pointerId)) return;
+                        setValue(getValueFromPointer(e));
+                    });
+
+                    root.addEventListener('pointerup', (e) => {
+                        if (!dragging) return;
+                        dragging = false;
+                        root.releasePointerCapture(e.pointerId);
+                    });
+
+                    // Keyboard navigation on thumb
+                    thumb.addEventListener('keydown', (e) => {
+                        if (isDisabled()) return;
+                        const current = parseFloat(root.getAttribute('data-value') || '0');
+                        let newVal = current;
+                        const bigStep = step * 10;
+
+                        switch (e.key) {
+                            case 'ArrowRight':
+                            case 'ArrowUp':
+                                newVal = current + (e.shiftKey ? bigStep : step);
+                                break;
+                            case 'ArrowLeft':
+                            case 'ArrowDown':
+                                newVal = current - (e.shiftKey ? bigStep : step);
+                                break;
+                            case 'PageUp':
+                                newVal = current + bigStep;
+                                break;
+                            case 'PageDown':
+                                newVal = current - bigStep;
+                                break;
+                            case 'Home':
+                                newVal = min;
+                                break;
+                            case 'End':
+                                newVal = max;
+                                break;
+                            default:
+                                return; // Don't prevent default for other keys
+                        }
+                        e.preventDefault();
+                        setValue(newVal);
+                    });
+                });
+            }
+        },
+
         // --- Calendar -------------------------------------------------------------
         Calendar: {
             _initialized: new WeakSet(),
@@ -5220,6 +5355,7 @@
             this.Select.init();
             this.Command.init();
             this.Toast.init();
+            this.Slider.init();
             this.Calendar.init();
             this.DataTable.init();
             this.Form.init();
