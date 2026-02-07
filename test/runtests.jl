@@ -4860,4 +4860,168 @@ using Test
             @test occursin("100 row(s) total", html)
         end
     end
+
+    @testset "SuiteForm" begin
+        using Therapy
+        using Suite
+
+        @testset "SuiteForm container" begin
+            html = Therapy.render_to_string(SuiteForm(Span("content")))
+            @test occursin("<form", html)
+            @test occursin("data-suite-form", html)
+            @test occursin("data-suite-form-validate-on=\"submit\"", html)
+            @test occursin("space-y-6", html)
+
+            html2 = Therapy.render_to_string(SuiteForm(Span("x"), action="/api/test", method="get"))
+            @test occursin("action=\"/api/test\"", html2)
+            @test occursin("method=\"get\"", html2)
+
+            html3 = Therapy.render_to_string(SuiteForm(Span("x"), validate_on="change"))
+            @test occursin("data-suite-form-validate-on=\"change\"", html3)
+        end
+
+        @testset "SuiteFormField with name" begin
+            html = Therapy.render_to_string(SuiteFormField(Span("child"), name="username"))
+            @test occursin("data-suite-form-field=\"username\"", html)
+            @test occursin("data-suite-form-field-id=", html)
+        end
+
+        @testset "SuiteFormField validation attributes" begin
+            html = Therapy.render_to_string(SuiteFormField(Span("x"),
+                name="email",
+                required=true,
+                required_message="Email is required",
+                min_length=5,
+                min_length_message="Too short",
+                max_length=100,
+                pattern="[^@]+@[^@]+",
+                pattern_message="Invalid email",
+            ))
+            @test occursin("data-suite-form-required=\"Email is required\"", html)
+            @test occursin("data-suite-form-min-length=\"5\"", html)
+            @test occursin("data-suite-form-min-length-message=\"Too short\"", html)
+            @test occursin("data-suite-form-max-length=\"100\"", html)
+            @test occursin("data-suite-form-pattern", html)
+            @test occursin("data-suite-form-pattern-message=\"Invalid email\"", html)
+        end
+
+        @testset "SuiteFormField required default message" begin
+            html = Therapy.render_to_string(SuiteFormField(Span("x"), name="test", required=true))
+            @test occursin("data-suite-form-required=\"This field is required\"", html)
+        end
+
+        @testset "SuiteFormField min/max numeric" begin
+            html = Therapy.render_to_string(SuiteFormField(Span("x"), name="age",
+                min="0", max="120"))
+            @test occursin("data-suite-form-min=\"0\"", html)
+            @test occursin("data-suite-form-max=\"120\"", html)
+        end
+
+        @testset "SuiteFormItem layout" begin
+            html = Therapy.render_to_string(SuiteFormItem(Span("content")))
+            @test occursin("grid gap-2", html)
+            @test occursin("data-suite-form-item", html)
+        end
+
+        @testset "SuiteFormLabel" begin
+            html = Therapy.render_to_string(SuiteFormLabel("Email"))
+            @test occursin("<label", html)
+            @test occursin("data-suite-form-label", html)
+            @test occursin("font-medium", html)
+            @test occursin("data-[error=true]:text-accent-secondary-600", html)
+            @test occursin("Email", html)
+        end
+
+        @testset "SuiteFormControl" begin
+            html = Therapy.render_to_string(SuiteFormControl(Input(:type => "text")))
+            @test occursin("data-suite-form-control", html)
+            @test occursin("display:contents", html)
+            @test occursin("<input", html)
+        end
+
+        @testset "SuiteFormDescription" begin
+            html = Therapy.render_to_string(SuiteFormDescription("Helper text"))
+            @test occursin("<p", html)
+            @test occursin("data-suite-form-description", html)
+            @test occursin("text-warm-600", html)
+            @test occursin("Helper text", html)
+        end
+
+        @testset "SuiteFormMessage" begin
+            html = Therapy.render_to_string(SuiteFormMessage())
+            @test occursin("<p", html)
+            @test occursin("data-suite-form-message", html)
+            @test occursin("hidden", html)
+            @test occursin("text-accent-secondary-600", html)
+            @test occursin("role=\"alert\"", html)
+            @test occursin("aria-live=\"polite\"", html)
+        end
+
+        @testset "Full form composition" begin
+            html = Therapy.render_to_string(
+                SuiteForm(action="/submit",
+                    SuiteFormField(name="username",
+                        SuiteFormItem(
+                            SuiteFormLabel("Username"),
+                            SuiteFormControl(
+                                Input(:type => "text", :placeholder => "Enter username"),
+                            ),
+                            SuiteFormDescription("Your public display name."),
+                            SuiteFormMessage(),
+                        ),
+                        required=true,
+                        min_length=2,
+                    ),
+                    Button(:type => "submit", "Submit"),
+                )
+            )
+            @test occursin("<form", html)
+            @test occursin("data-suite-form-field=\"username\"", html)
+            @test occursin("<label", html)
+            @test occursin("Username", html)
+            @test occursin("data-suite-form-control", html)
+            @test occursin("placeholder=\"Enter username\"", html)
+            @test occursin("Your public display name.", html)
+            @test occursin("data-suite-form-message", html)
+            @test occursin("data-suite-form-required", html)
+            @test occursin("data-suite-form-min-length=\"2\"", html)
+            @test occursin("Submit", html)
+        end
+
+        @testset "Theme support" begin
+            html = Therapy.render_to_string(SuiteFormLabel("Test", theme=:ocean))
+            @test occursin("blue-", html) || occursin("warm-", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(SuiteForm(Span("x"), class="max-w-md"))
+            @test occursin("max-w-md", html)
+
+            html2 = Therapy.render_to_string(SuiteFormItem(Span("x"), class="mt-4"))
+            @test occursin("mt-4", html2)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :Form)
+            meta = Suite.COMPONENT_REGISTRY[:Form]
+            @test meta.tier == :js_runtime
+            @test :SuiteForm in meta.exports
+            @test :SuiteFormField in meta.exports
+            @test :SuiteFormItem in meta.exports
+            @test :SuiteFormLabel in meta.exports
+            @test :SuiteFormControl in meta.exports
+            @test :SuiteFormDescription in meta.exports
+            @test :SuiteFormMessage in meta.exports
+        end
+
+        @testset "No validation attrs when not set" begin
+            html = Therapy.render_to_string(SuiteFormField(Span("x"), name="basic"))
+            @test !occursin("data-suite-form-required", html)
+            @test !occursin("data-suite-form-min-length", html)
+            @test !occursin("data-suite-form-max-length", html)
+            @test !occursin("data-suite-form-pattern", html)
+            @test !occursin("data-suite-form-min=", html)
+            @test !occursin("data-suite-form-max=", html)
+        end
+    end
 end

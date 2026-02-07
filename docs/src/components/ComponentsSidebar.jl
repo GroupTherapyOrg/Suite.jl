@@ -33,7 +33,7 @@ const SUITE_COMPONENTS = [
         (slug = "dialog",           title = "Dialog",           implemented = true),
         (slug = "drawer",           title = "Drawer",           implemented = true),
         (slug = "dropdown-menu",    title = "Dropdown Menu",    implemented = true),
-        (slug = "form",             title = "Form",             implemented = false),
+        (slug = "form",             title = "Form",             implemented = true),
         (slug = "hover-card",       title = "Hover Card",       implemented = true),
         (slug = "input",            title = "Input",            implemented = true),
         (slug = "label",            title = "Label",            implemented = true),

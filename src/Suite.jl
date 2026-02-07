@@ -66,7 +66,7 @@ include("components/Toast.jl")
 # --- Phase 4: Complex Components ---
 include("components/Calendar.jl")
 include("components/DataTable.jl")
-# include("components/Form.jl")
+include("components/Form.jl")
 # include("components/Carousel.jl")
 # include("components/Resizable.jl")
 

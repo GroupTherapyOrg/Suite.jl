@@ -4020,6 +4020,166 @@
             }
         },
 
+        // --- Form -----------------------------------------------------------------
+        Form: {
+            _initialized: new WeakSet(),
+
+            init() {
+                document.querySelectorAll('[data-suite-form]').forEach(form => {
+                    if (this._initialized.has(form)) return;
+                    this._initialized.add(form);
+                    this._setup(form);
+                });
+            },
+
+            _setup(form) {
+                const validateOn = form.getAttribute('data-suite-form-validate-on') || 'submit';
+
+                // Link IDs: label → control, description, message
+                this._linkIds(form);
+
+                // Wire validation events
+                const fields = form.querySelectorAll('[data-suite-form-field]');
+                fields.forEach(field => {
+                    const control = this._getControl(field);
+                    if (!control) return;
+
+                    if (validateOn === 'change' || validateOn === 'all') {
+                        control.addEventListener('input', () => this._validateField(field));
+                    }
+                    if (validateOn === 'blur' || validateOn === 'all') {
+                        control.addEventListener('blur', () => this._validateField(field));
+                    }
+                });
+
+                // Submit handler
+                form.addEventListener('submit', (e) => {
+                    let valid = true;
+                    fields.forEach(field => {
+                        if (!this._validateField(field)) valid = false;
+                    });
+                    if (!valid) {
+                        e.preventDefault();
+                        const firstError = form.querySelector('[aria-invalid="true"]');
+                        if (firstError) firstError.focus();
+                    }
+                });
+            },
+
+            _linkIds(form) {
+                form.querySelectorAll('[data-suite-form-field]').forEach(field => {
+                    const fieldId = field.getAttribute('data-suite-form-field-id');
+                    if (!fieldId) return;
+
+                    const controlId = fieldId + '-control';
+                    const descId = fieldId + '-description';
+                    const msgId = fieldId + '-message';
+
+                    const controlWrapper = field.querySelector('[data-suite-form-control]');
+                    const control = controlWrapper ? controlWrapper.querySelector('input, select, textarea') : null;
+                    const label = field.querySelector('[data-suite-form-label]');
+                    const desc = field.querySelector('[data-suite-form-description]');
+                    const msg = field.querySelector('[data-suite-form-message]');
+
+                    if (control) control.id = controlId;
+                    if (desc) desc.id = descId;
+                    if (msg) msg.id = msgId;
+                    if (label) label.setAttribute('for', controlId);
+
+                    if (control) {
+                        const describedBy = [];
+                        if (desc) describedBy.push(descId);
+                        if (describedBy.length) control.setAttribute('aria-describedby', describedBy.join(' '));
+                    }
+                });
+            },
+
+            _getControl(field) {
+                const wrapper = field.querySelector('[data-suite-form-control]');
+                return wrapper ? wrapper.querySelector('input, select, textarea') : null;
+            },
+
+            _validateField(field) {
+                const control = this._getControl(field);
+                if (!control) return true;
+
+                const value = control.value || '';
+                const errors = [];
+
+                const required = field.getAttribute('data-suite-form-required');
+                if (required !== null && value.trim() === '') {
+                    errors.push(required || 'This field is required');
+                }
+
+                const minLen = field.getAttribute('data-suite-form-min-length');
+                if (minLen && value.length > 0 && value.length < parseInt(minLen)) {
+                    const msg = field.getAttribute('data-suite-form-min-length-message') ||
+                                'Must be at least ' + minLen + ' characters';
+                    errors.push(msg);
+                }
+
+                const maxLen = field.getAttribute('data-suite-form-max-length');
+                if (maxLen && value.length > parseInt(maxLen)) {
+                    const msg = field.getAttribute('data-suite-form-max-length-message') ||
+                                'Must be at most ' + maxLen + ' characters';
+                    errors.push(msg);
+                }
+
+                const pattern = field.getAttribute('data-suite-form-pattern');
+                if (pattern && value.length > 0) {
+                    const regex = new RegExp('^(?:' + pattern + ')$');
+                    if (!regex.test(value)) {
+                        const msg = field.getAttribute('data-suite-form-pattern-message') ||
+                                    'Invalid format';
+                        errors.push(msg);
+                    }
+                }
+
+                const min = field.getAttribute('data-suite-form-min');
+                if (min && value.length > 0 && parseFloat(value) < parseFloat(min)) {
+                    errors.push('Must be at least ' + min);
+                }
+                const max = field.getAttribute('data-suite-form-max');
+                if (max && value.length > 0 && parseFloat(value) > parseFloat(max)) {
+                    errors.push('Must be at most ' + max);
+                }
+
+                const hasError = errors.length > 0;
+                const label = field.querySelector('[data-suite-form-label]');
+                const msg = field.querySelector('[data-suite-form-message]');
+                const fieldId = field.getAttribute('data-suite-form-field-id');
+                const desc = field.querySelector('[data-suite-form-description]');
+
+                control.setAttribute('aria-invalid', hasError ? 'true' : 'false');
+
+                if (label) label.setAttribute('data-error', hasError ? 'true' : 'false');
+
+                if (msg) {
+                    if (hasError) {
+                        msg.textContent = errors[0];
+                        msg.classList.remove('hidden');
+                        const descId = fieldId + '-description';
+                        const msgId = fieldId + '-message';
+                        const parts = [];
+                        if (desc) parts.push(descId);
+                        parts.push(msgId);
+                        control.setAttribute('aria-describedby', parts.join(' '));
+                    } else {
+                        msg.textContent = '';
+                        msg.classList.add('hidden');
+                        const descId = fieldId + '-description';
+                        if (desc) {
+                            control.setAttribute('aria-describedby', descId);
+                        } else {
+                            control.removeAttribute('aria-describedby');
+                        }
+                    }
+                }
+
+                return !hasError;
+            },
+        },
+
         // --- DataTable -------------------------------------------------------------
         DataTable: {
             _initialized: new WeakSet(),
@@ -4389,6 +4549,7 @@
             this.Toast.init();
             this.Calendar.init();
             this.DataTable.init();
+            this.Form.init();
         },
 
         // --- Init -----------------------------------------------------------------
