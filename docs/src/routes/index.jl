@@ -19,9 +19,9 @@ function Index()
                     "web app with ",
                     Span(:class => "text-accent-600 dark:text-accent-400", "Suite"),
                     Span(:class => "text-warm-400 dark:text-warm-600 text-4xl sm:text-5xl lg:text-6xl font-light",
-                        Span(:class => "text-[#4063d8]/30 dark:text-[#4063d8]/45", "."),
-                        Span(:class => "text-[#389826]/30 dark:text-[#389826]/45", "j"),
-                        Span(:class => "text-[#cb3c33]/30 dark:text-[#cb3c33]/45", "l")
+                        Span(:class => "text-[#4063d8] dark:text-[#4063d8]", "."),
+                        Span(:class => "text-[#389826] dark:text-[#389826]", "j"),
+                        Span(:class => "text-[#cb3c33] dark:text-[#cb3c33]", "l")
                     )
                 ),
                 P(:class => "mt-8 text-lg sm:text-xl text-warm-600 dark:text-warm-400 max-w-2xl mx-auto leading-relaxed",

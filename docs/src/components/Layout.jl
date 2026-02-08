@@ -22,9 +22,9 @@ function SuiteLogo()
     A(:href => "./", :class => "flex items-center",
         Span(:class => "text-2xl font-bold text-warm-800 dark:text-warm-300", "Suite"),
         Span(:class => "text-2xl font-light",
-            Span(:class => "text-[#4063d8]/30 dark:text-[#4063d8]/40", "."),
-            Span(:class => "text-[#389826]/30 dark:text-[#389826]/40", "j"),
-            Span(:class => "text-[#cb3c33]/30 dark:text-[#cb3c33]/40", "l")
+            Span(:class => "text-[#4063d8] dark:text-[#4063d8]", "."),
+            Span(:class => "text-[#389826] dark:text-[#389826]", "j"),
+            Span(:class => "text-[#cb3c33] dark:text-[#cb3c33]", "l")
         )
     )
 end
