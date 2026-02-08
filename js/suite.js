@@ -840,6 +840,106 @@
             }
         },
 
+        // --- Theme Switcher -------------------------------------------------------
+        ThemeSwitcher: {
+            /**
+             * Initialize theme switcher dropdowns.
+             * Discovers elements with data-suite-theme-switcher attribute.
+             * Sets data-theme on <html> and persists to localStorage('suite-active-theme').
+             */
+            init() {
+                const roots = document.querySelectorAll('[data-suite-theme-switcher]');
+                roots.forEach(root => {
+                    if (root._suiteThemeSwitcher) return;
+                    root._suiteThemeSwitcher = true;
+
+                    const trigger = root.querySelector('[data-suite-theme-switcher-trigger]');
+                    const content = root.querySelector('[data-suite-theme-switcher-content]');
+                    if (!trigger || !content) return;
+
+                    // Show active theme check mark on init
+                    this._updateChecks(root);
+
+                    // Toggle dropdown
+                    trigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isOpen = !content.classList.contains('hidden');
+                        if (isOpen) {
+                            this._close(trigger, content);
+                        } else {
+                            this._open(trigger, content);
+                            // Update checks when opening
+                            this._updateChecks(root);
+                        }
+                    });
+
+                    // Theme option clicks
+                    const options = root.querySelectorAll('[data-suite-theme-option]');
+                    options.forEach(option => {
+                        option.addEventListener('click', () => {
+                            const theme = option.getAttribute('data-suite-theme-option');
+                            this._applyTheme(theme);
+                            this._updateChecks(root);
+                            this._close(trigger, content);
+                        });
+                    });
+
+                    // Click outside to close
+                    document.addEventListener('pointerdown', (e) => {
+                        if (!root.contains(e.target) && !content.classList.contains('hidden')) {
+                            this._close(trigger, content);
+                        }
+                    });
+
+                    // Escape to close
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && !content.classList.contains('hidden')) {
+                            this._close(trigger, content);
+                            trigger.focus();
+                        }
+                    });
+                });
+
+                // Also update checks on all switchers (in case theme changed externally)
+                roots.forEach(root => this._updateChecks(root));
+            },
+
+            _open(trigger, content) {
+                content.classList.remove('hidden');
+                trigger.setAttribute('aria-expanded', 'true');
+            },
+
+            _close(trigger, content) {
+                content.classList.add('hidden');
+                trigger.setAttribute('aria-expanded', 'false');
+            },
+
+            _applyTheme(theme) {
+                const html = document.documentElement;
+                if (theme === 'default') {
+                    html.removeAttribute('data-theme');
+                } else {
+                    html.setAttribute('data-theme', theme);
+                }
+                try {
+                    localStorage.setItem('suite-active-theme', theme);
+                } catch (e) {}
+            },
+
+            _updateChecks(root) {
+                const current = document.documentElement.getAttribute('data-theme') || 'default';
+                const checks = root.querySelectorAll('[data-suite-theme-check]');
+                checks.forEach(check => {
+                    const key = check.getAttribute('data-suite-theme-check');
+                    if (key === current) {
+                        check.classList.remove('hidden');
+                    } else {
+                        check.classList.add('hidden');
+                    }
+                });
+            },
+        },
+
         // --- Dialog ---------------------------------------------------------------
         Dialog: {
             init() {
@@ -5339,6 +5439,7 @@
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
             this.ThemeToggle.init();
+            this.ThemeSwitcher.init();
             this.Collapsible.init();
             this.Accordion.init();
             this.Tabs.init();

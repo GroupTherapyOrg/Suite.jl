@@ -65,6 +65,7 @@ include("components/Slider.jl")
 
 # --- JS Runtime Components (implemented) ---
 include("components/ThemeToggle.jl")
+include("components/ThemeSwitcher.jl")
 
 # --- Phase 3: JS Runtime Components ---
 include("components/Dialog.jl")

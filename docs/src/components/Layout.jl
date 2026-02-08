@@ -138,6 +138,7 @@ function MobileNav()
                       :target => "_blank",
                       _GITHUB_SVG
                     ),
+                    Main.ThemeSwitcher(),
                     Main.ThemeToggle(),
                 ),
             ),
@@ -167,13 +168,14 @@ function Layout(children...; title="Suite.jl")
                     # Desktop: NavigationMenu + utilities
                     Div(:class => "hidden md:flex md:items-center md:gap-2",
                         DesktopNav(),
-                        # GitHub + Theme toggle
+                        # GitHub + Theme switcher + Theme toggle
                         Div(:class => "flex items-center gap-2 ml-4",
                             A(:href => "https://github.com/GroupTherapyOrg/Suite.jl",
                               :class => "text-warm-600 hover:text-warm-800 dark:text-warm-400 dark:hover:text-warm-200 transition-colors",
                               :target => "_blank",
                               _GITHUB_SVG
                             ),
+                            Main.ThemeSwitcher(),
                             Main.ThemeToggle(),
                         ),
                     ),

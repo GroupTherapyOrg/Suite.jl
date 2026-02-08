@@ -1005,12 +1005,73 @@ using Test
         end
     end
 
+    @testset "ThemeSwitcher" begin
+        @testset "Default rendering" begin
+            html = Therapy.render_to_string(ThemeSwitcher())
+            @test occursin("data-suite-theme-switcher", html)
+            @test occursin("data-suite-theme-switcher-trigger", html)
+            @test occursin("data-suite-theme-switcher-content", html)
+            @test occursin("aria-label=\"Switch theme\"", html)
+            @test occursin("aria-haspopup=\"true\"", html)
+            @test occursin("role=\"menu\"", html)
+        end
+
+        @testset "Theme options" begin
+            html = Therapy.render_to_string(ThemeSwitcher())
+            @test occursin("data-suite-theme-option=\"default\"", html)
+            @test occursin("data-suite-theme-option=\"ocean\"", html)
+            @test occursin("data-suite-theme-option=\"minimal\"", html)
+            @test occursin("data-suite-theme-option=\"nature\"", html)
+            @test occursin("Default", html)
+            @test occursin("Ocean", html)
+            @test occursin("Minimal", html)
+            @test occursin("Nature", html)
+        end
+
+        @testset "Color swatches" begin
+            html = Therapy.render_to_string(ThemeSwitcher())
+            @test occursin("#9558b2", html)  # Default purple
+            @test occursin("#2563eb", html)  # Ocean blue
+            @test occursin("#71717a", html)  # Minimal zinc
+            @test occursin("#059669", html)  # Nature emerald
+        end
+
+        @testset "Check marks" begin
+            html = Therapy.render_to_string(ThemeSwitcher())
+            @test occursin("data-suite-theme-check=\"default\"", html)
+            @test occursin("data-suite-theme-check=\"ocean\"", html)
+            @test occursin("data-suite-theme-check=\"minimal\"", html)
+            @test occursin("data-suite-theme-check=\"nature\"", html)
+        end
+
+        @testset "Dropdown hidden by default" begin
+            html = Therapy.render_to_string(ThemeSwitcher())
+            @test occursin("hidden absolute", html)
+            @test occursin("aria-expanded=\"false\"", html)
+        end
+
+        @testset "Custom class" begin
+            html = Therapy.render_to_string(ThemeSwitcher(class="ml-4"))
+            @test occursin("ml-4", html)
+        end
+
+        @testset "Registry" begin
+            @test haskey(Suite.COMPONENT_REGISTRY, :ThemeSwitcher)
+            meta = Suite.COMPONENT_REGISTRY[:ThemeSwitcher]
+            @test meta.tier == :js_runtime
+            @test :ThemeSwitcher in meta.exports
+            @test :ThemeSwitcher in meta.js_modules
+        end
+    end
+
     @testset "suite_theme_script" begin
         html = Therapy.render_to_string(suite_theme_script())
         @test occursin("<script", html)
         @test occursin("therapy-theme", html)
         @test occursin("prefers-color-scheme", html)
         @test occursin("classList.add", html)
+        @test occursin("suite-active-theme", html)
+        @test occursin("data-theme", html)
     end
 
     @testset "suite_script" begin
@@ -1019,6 +1080,8 @@ using Test
         @test occursin("Suite", html)
         @test occursin("ThemeToggle", html)
         @test occursin("data-suite-theme-toggle", html)
+        @test occursin("ThemeSwitcher", html)
+        @test occursin("data-suite-theme-switcher", html)
         # Verify new modules are in suite.js
         @test occursin("Collapsible", html)
         @test occursin("Accordion", html)

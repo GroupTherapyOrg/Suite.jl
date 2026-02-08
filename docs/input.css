@@ -101,6 +101,87 @@
   }
 }
 
+/* Theme switcher — override accent palette via data-theme attribute on <html> */
+@layer base {
+  /* Ocean theme — Blue accent, Rose secondary */
+  [data-theme="ocean"] {
+    --color-accent-50: #eff6ff;
+    --color-accent-100: #dbeafe;
+    --color-accent-200: #bfdbfe;
+    --color-accent-300: #93c5fd;
+    --color-accent-400: #60a5fa;
+    --color-accent-500: #3b82f6;
+    --color-accent-600: #2563eb;
+    --color-accent-700: #1d4ed8;
+    --color-accent-800: #1e40af;
+    --color-accent-900: #1e3a8a;
+    --color-accent-950: #172554;
+    --color-accent-secondary-50: #fff1f2;
+    --color-accent-secondary-100: #ffe4e6;
+    --color-accent-secondary-200: #fecdd3;
+    --color-accent-secondary-300: #fda4af;
+    --color-accent-secondary-400: #fb7185;
+    --color-accent-secondary-500: #f43f5e;
+    --color-accent-secondary-600: #e11d48;
+    --color-accent-secondary-700: #be123c;
+    --color-accent-secondary-800: #9f1239;
+    --color-accent-secondary-900: #881337;
+    --color-accent-secondary-950: #4c0519;
+  }
+
+  /* Minimal theme — Zinc accent, Red secondary */
+  [data-theme="minimal"] {
+    --color-accent-50: #fafafa;
+    --color-accent-100: #f4f4f5;
+    --color-accent-200: #e4e4e7;
+    --color-accent-300: #d4d4d8;
+    --color-accent-400: #a1a1aa;
+    --color-accent-500: #71717a;
+    --color-accent-600: #52525b;
+    --color-accent-700: #3f3f46;
+    --color-accent-800: #27272a;
+    --color-accent-900: #18181b;
+    --color-accent-950: #09090b;
+    --color-accent-secondary-50: #fef2f2;
+    --color-accent-secondary-100: #fee2e2;
+    --color-accent-secondary-200: #fecaca;
+    --color-accent-secondary-300: #fca5a5;
+    --color-accent-secondary-400: #f87171;
+    --color-accent-secondary-500: #ef4444;
+    --color-accent-secondary-600: #dc2626;
+    --color-accent-secondary-700: #b91c1c;
+    --color-accent-secondary-800: #991b1b;
+    --color-accent-secondary-900: #7f1d1d;
+    --color-accent-secondary-950: #450a0a;
+  }
+
+  /* Nature theme — Emerald accent, Amber secondary */
+  [data-theme="nature"] {
+    --color-accent-50: #ecfdf5;
+    --color-accent-100: #d1fae5;
+    --color-accent-200: #a7f3d0;
+    --color-accent-300: #6ee7b7;
+    --color-accent-400: #34d399;
+    --color-accent-500: #10b981;
+    --color-accent-600: #059669;
+    --color-accent-700: #047857;
+    --color-accent-800: #065f46;
+    --color-accent-900: #064e3b;
+    --color-accent-950: #022c22;
+    --color-accent-secondary-50: #fffbeb;
+    --color-accent-secondary-100: #fef3c7;
+    --color-accent-secondary-200: #fde68a;
+    --color-accent-secondary-300: #fcd34d;
+    --color-accent-secondary-400: #fbbf24;
+    --color-accent-secondary-500: #f59e0b;
+    --color-accent-secondary-600: #d97706;
+    --color-accent-secondary-700: #b45309;
+    --color-accent-secondary-800: #92400e;
+    --color-accent-secondary-900: #78350f;
+    --color-accent-secondary-950: #451a03;
+  }
+}
+
 /* Calendar selection states */
 @layer components {
   .suite-cal-selected {
