@@ -66,22 +66,23 @@ function Drawer(children...; class::String="", kwargs...)
     end
 
     Div(:class => cn(class),
-        Symbol("data-suite-drawer") => id,
-        :style => "display:none",
         kwargs...,
         [_drawer_set_trigger_id(t, id) for t in trigger_nodes]...,
-        content_nodes...,
+        Div(Symbol("data-suite-drawer") => id,
+            :style => "display:none",
+            content_nodes...,
+        ),
     )
 end
 
 function _drawer_set_trigger_id(node, id)
     if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-drawer-trigger-wrapper"))
-        inner_props = copy(node.children[1].props)
-        inner_props[Symbol("data-suite-drawer-trigger")] = id
-        inner_props[Symbol("aria-haspopup")] = "dialog"
-        inner_props[Symbol("aria-expanded")] = "false"
-        inner_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.children[1].tag, inner_props, node.children[1].children)
+        new_props = copy(node.props)
+        new_props[Symbol("data-suite-drawer-trigger")] = id
+        new_props[Symbol("aria-haspopup")] = "dialog"
+        new_props[Symbol("aria-expanded")] = "false"
+        new_props[Symbol("data-state")] = "closed"
+        return Therapy.VNode(node.tag, new_props, node.children)
     end
     node
 end
@@ -92,12 +93,11 @@ end
 The button that opens the drawer.
 """
 function DrawerTrigger(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-drawer-trigger-wrapper") => "",
-        :style => "display:contents",
-        Therapy.Button(:type => "button",
-               :class => cn("cursor-pointer", class),
-               kwargs...,
-               children...))
+    Span(Symbol("data-suite-drawer-trigger-wrapper") => "",
+         :style => "display:contents",
+         :class => cn("cursor-pointer", class),
+         kwargs...,
+         children...)
 end
 
 """

@@ -25,7 +25,7 @@ export H1, H2, H3, H4,
 Large heading (h1). For page titles.
 """
 function H1(children...; class::String="", kwargs...)
-    classes = cn("scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl", class)
+    classes = cn("scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-warm-800 dark:text-warm-300", class)
     Therapy.H1(:class => classes, kwargs..., children...)
 end
 
@@ -35,7 +35,7 @@ end
 Section heading (h2) with bottom border.
 """
 function H2(children...; class::String="", theme::Symbol=:default, kwargs...)
-    classes = cn("scroll-m-20 border-b border-warm-200 dark:border-warm-700 pb-2 text-3xl font-semibold tracking-tight first:mt-0", class)
+    classes = cn("scroll-m-20 border-b border-warm-200 dark:border-warm-700 pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-warm-800 dark:text-warm-300", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Therapy.H2(:class => classes, kwargs..., children...)
 end
@@ -46,7 +46,7 @@ end
 Sub-section heading (h3).
 """
 function H3(children...; class::String="", kwargs...)
-    classes = cn("scroll-m-20 text-2xl font-semibold tracking-tight", class)
+    classes = cn("scroll-m-20 text-2xl font-semibold tracking-tight text-warm-800 dark:text-warm-300", class)
     Therapy.H3(:class => classes, kwargs..., children...)
 end
 
@@ -56,7 +56,7 @@ end
 Minor heading (h4).
 """
 function H4(children...; class::String="", kwargs...)
-    classes = cn("scroll-m-20 text-xl font-semibold tracking-tight", class)
+    classes = cn("scroll-m-20 text-xl font-semibold tracking-tight text-warm-800 dark:text-warm-300", class)
     Therapy.H4(:class => classes, kwargs..., children...)
 end
 
@@ -66,7 +66,7 @@ end
 Paragraph text with spacing.
 """
 function P(children...; class::String="", kwargs...)
-    classes = cn("leading-7 [&:not(:first-child)]:mt-6", class)
+    classes = cn("leading-7 [&:not(:first-child)]:mt-6 text-warm-800 dark:text-warm-300", class)
     Therapy.P(:class => classes, kwargs..., children...)
 end
 
@@ -109,7 +109,7 @@ end
 Large emphasized text.
 """
 function Large(children...; class::String="", kwargs...)
-    classes = cn("text-lg font-semibold", class)
+    classes = cn("text-lg font-semibold text-warm-800 dark:text-warm-300", class)
     Div(:class => classes, kwargs..., children...)
 end
 
@@ -119,7 +119,7 @@ end
 Small text with medium weight.
 """
 function Small(children...; class::String="", kwargs...)
-    classes = cn("text-sm font-medium leading-none", class)
+    classes = cn("text-sm font-medium leading-none text-warm-800 dark:text-warm-300", class)
     Span(:class => classes, kwargs..., children...)
 end
 

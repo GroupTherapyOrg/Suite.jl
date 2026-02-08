@@ -63,12 +63,12 @@ end
 
 function _popover_set_trigger_id(node, id)
     if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-popover-trigger-wrapper"))
-        inner_props = copy(node.children[1].props)
-        inner_props[Symbol("data-suite-popover-trigger")] = id
-        inner_props[Symbol("aria-haspopup")] = "dialog"
-        inner_props[Symbol("aria-expanded")] = "false"
-        inner_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.children[1].tag, inner_props, node.children[1].children)
+        new_props = copy(node.props)
+        new_props[Symbol("data-suite-popover-trigger")] = id
+        new_props[Symbol("aria-haspopup")] = "dialog"
+        new_props[Symbol("aria-expanded")] = "false"
+        new_props[Symbol("data-state")] = "closed"
+        return Therapy.VNode(node.tag, new_props, node.children)
     end
     node
 end
@@ -79,12 +79,11 @@ end
 The button that opens the popover.
 """
 function PopoverTrigger(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-popover-trigger-wrapper") => "",
-        :style => "display:contents",
-        Therapy.Button(:type => "button",
-               :class => cn("cursor-pointer", class),
-               kwargs...,
-               children...))
+    Span(Symbol("data-suite-popover-trigger-wrapper") => "",
+         :style => "display:contents",
+         :class => cn("cursor-pointer", class),
+         kwargs...,
+         children...)
 end
 
 """

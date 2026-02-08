@@ -84,12 +84,12 @@ end
 
 function _dropdown_set_trigger_id(node, id)
     if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-dropdown-menu-trigger-wrapper"))
-        inner_props = copy(node.children[1].props)
-        inner_props[Symbol("data-suite-dropdown-menu-trigger")] = id
-        inner_props[Symbol("aria-haspopup")] = "menu"
-        inner_props[Symbol("aria-expanded")] = "false"
-        inner_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.children[1].tag, inner_props, node.children[1].children)
+        new_props = copy(node.props)
+        new_props[Symbol("data-suite-dropdown-menu-trigger")] = id
+        new_props[Symbol("aria-haspopup")] = "menu"
+        new_props[Symbol("aria-expanded")] = "false"
+        new_props[Symbol("data-state")] = "closed"
+        return Therapy.VNode(node.tag, new_props, node.children)
     end
     node
 end
@@ -100,12 +100,11 @@ end
 The button that opens the dropdown menu.
 """
 function DropdownMenuTrigger(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-dropdown-menu-trigger-wrapper") => "",
-        :style => "display:contents",
-        Therapy.Button(:type => "button",
-               :class => cn(class),
-               kwargs...,
-               children...))
+    Span(Symbol("data-suite-dropdown-menu-trigger-wrapper") => "",
+         :style => "display:contents",
+         :class => cn(class),
+         kwargs...,
+         children...)
 end
 
 """

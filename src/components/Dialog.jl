@@ -61,25 +61,29 @@ function Dialog(children...; class::String="", kwargs...)
         end
     end
 
+    # Trigger is rendered OUTSIDE the hidden dialog container so it's always visible.
+    # Dialog content wrapper is hidden (display:none) until JS opens it.
     Div(:class => cn(class),
-        Symbol("data-suite-dialog") => id,
-        :style => "display:none",
         kwargs...,
-        # Re-emit trigger with the dialog ID
+        # Triggers — visible, outside the hidden container
         [_dialog_set_trigger_id(t, id) for t in trigger_nodes]...,
-        content_nodes...,
+        # Dialog root — hidden until opened by JS
+        Div(Symbol("data-suite-dialog") => id,
+            :style => "display:none",
+            content_nodes...,
+        ),
     )
 end
 
 function _dialog_set_trigger_id(node, id)
     if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-dialog-trigger-wrapper"))
-        # Find the actual trigger button inside and set its data-suite-dialog-trigger
-        inner_props = copy(node.children[1].props)
-        inner_props[Symbol("data-suite-dialog-trigger")] = id
-        inner_props[Symbol("aria-haspopup")] = "dialog"
-        inner_props[Symbol("aria-expanded")] = "false"
-        inner_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.children[1].tag, inner_props, node.children[1].children)
+        # Set data-suite-dialog-trigger on the wrapper span itself
+        new_props = copy(node.props)
+        new_props[Symbol("data-suite-dialog-trigger")] = id
+        new_props[Symbol("aria-haspopup")] = "dialog"
+        new_props[Symbol("aria-expanded")] = "false"
+        new_props[Symbol("data-state")] = "closed"
+        return Therapy.VNode(node.tag, new_props, node.children)
     end
     node
 end
@@ -90,13 +94,13 @@ end
 The button that opens the dialog. Wrap around a Button or any clickable element.
 """
 function DialogTrigger(children...; class::String="", kwargs...)
-    # Wrap in a marker div so Dialog can find and wire it
-    Div(Symbol("data-suite-dialog-trigger-wrapper") => "",
-        :style => "display:contents",
-        Therapy.Button(:type => "button",
-               :class => cn("cursor-pointer", class),
-               kwargs...,
-               children...))
+    # Marker span with display:contents — the user's Button is the visible element.
+    # Avoids nested <button> which is invalid HTML.
+    Span(Symbol("data-suite-dialog-trigger-wrapper") => "",
+         :style => "display:contents",
+         :class => cn("cursor-pointer", class),
+         kwargs...,
+         children...)
 end
 
 """

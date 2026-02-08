@@ -79,9 +79,9 @@ end
 
 function _context_set_trigger_id(node, id)
     if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-context-menu-trigger-wrapper"))
-        inner_props = copy(node.children[1].props)
-        inner_props[Symbol("data-suite-context-menu-trigger")] = id
-        return Therapy.VNode(node.children[1].tag, inner_props, node.children[1].children)
+        new_props = copy(node.props)
+        new_props[Symbol("data-suite-context-menu-trigger")] = id
+        return Therapy.VNode(node.tag, new_props, node.children)
     end
     node
 end
@@ -93,11 +93,11 @@ The area that responds to right-click. Can wrap any content.
 Renders as a `<span>` (not a button — any content can be right-clicked).
 """
 function ContextMenuTrigger(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-context-menu-trigger-wrapper") => "",
-        :style => "display:contents",
-        Span(:class => cn(class),
-             kwargs...,
-             children...))
+    Span(Symbol("data-suite-context-menu-trigger-wrapper") => "",
+         :style => "display:contents",
+         :class => cn(class),
+         kwargs...,
+         children...)
 end
 
 """

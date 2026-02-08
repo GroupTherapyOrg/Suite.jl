@@ -43,7 +43,7 @@ Table(
 ```
 """
 function Table(children...; class::String="", kwargs...)
-    table_classes = cn("w-full caption-bottom text-sm", class)
+    table_classes = cn("w-full caption-bottom text-sm text-warm-800 dark:text-warm-300", class)
 
     Div(:class => "relative w-full overflow-x-auto",
         Therapy.Table(:class => table_classes, kwargs..., children...),
@@ -77,7 +77,7 @@ end
 Table footer section (`<tfoot>`).
 """
 function TableFooter(children...; class::String="", theme::Symbol=:default, kwargs...)
-    classes = cn("bg-warm-100/50 dark:bg-warm-900/50 border-t border-warm-200 dark:border-warm-700 font-medium", class)
+    classes = cn("bg-warm-100/50 dark:bg-warm-900/50 border-t border-warm-200 dark:border-warm-700 font-medium text-warm-800 dark:text-warm-300", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Tfoot(:class => classes, kwargs..., children...)
 end

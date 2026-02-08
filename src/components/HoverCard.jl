@@ -77,10 +77,10 @@ end
 
 function _hover_card_set_trigger_id(node, id)
     if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-hover-card-trigger-wrapper"))
-        inner_props = copy(node.children[1].props)
-        inner_props[Symbol("data-suite-hover-card-trigger")] = id
-        inner_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.children[1].tag, inner_props, node.children[1].children)
+        new_props = copy(node.props)
+        new_props[Symbol("data-suite-hover-card-trigger")] = id
+        new_props[Symbol("data-state")] = "closed"
+        return Therapy.VNode(node.tag, new_props, node.children)
     end
     node
 end
@@ -92,11 +92,11 @@ The element that triggers the hover card on hover.
 Typically wraps a link or anchor element.
 """
 function HoverCardTrigger(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-hover-card-trigger-wrapper") => "",
-        :style => "display:contents",
-        Span(:class => cn("cursor-pointer", class),
-             kwargs...,
-             children...))
+    Span(Symbol("data-suite-hover-card-trigger-wrapper") => "",
+         :style => "display:contents",
+         :class => cn("cursor-pointer", class),
+         kwargs...,
+         children...)
 end
 
 """

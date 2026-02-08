@@ -1736,10 +1736,10 @@ using Test
             @test occursin("Open", html)
         end
 
-        @testset "Trigger is a button" begin
+        @testset "Trigger is a span wrapper" begin
             html = Therapy.render_to_string(DialogTrigger("Click"))
-            @test occursin("<button", html)
-            @test occursin("type=\"button\"", html)
+            @test occursin("<span", html)
+            @test occursin("display:contents", html)
             @test occursin("Click", html)
         end
 
@@ -1879,10 +1879,10 @@ using Test
             @test occursin("data-state=\"closed\"", html)
         end
 
-        @testset "Trigger is a button" begin
+        @testset "Trigger is a span wrapper" begin
             html = Therapy.render_to_string(AlertDialogTrigger("Click"))
-            @test occursin("<button", html)
-            @test occursin("type=\"button\"", html)
+            @test occursin("<span", html)
+            @test occursin("display:contents", html)
         end
 
         @testset "Content uses alertdialog role" begin
@@ -2006,10 +2006,10 @@ using Test
             @test occursin("data-state=\"closed\"", html)
         end
 
-        @testset "Trigger is a button" begin
+        @testset "Trigger is a span wrapper" begin
             html = Therapy.render_to_string(SheetTrigger("Click"))
-            @test occursin("<button", html)
-            @test occursin("type=\"button\"", html)
+            @test occursin("<span", html)
+            @test occursin("display:contents", html)
         end
 
         @testset "Content — right side (default)" begin
@@ -2182,10 +2182,10 @@ using Test
             @test occursin("data-state=\"closed\"", html)
         end
 
-        @testset "Trigger is a button" begin
+        @testset "Trigger is a span wrapper" begin
             html = Therapy.render_to_string(DrawerTrigger("Click"))
-            @test occursin("<button", html)
-            @test occursin("type=\"button\"", html)
+            @test occursin("<span", html)
+            @test occursin("display:contents", html)
         end
 
         @testset "Content — bottom (default)" begin
@@ -2325,10 +2325,10 @@ using Test
             @test occursin("data-state=\"closed\"", html)
         end
 
-        @testset "Trigger is a button" begin
+        @testset "Trigger is a span wrapper" begin
             html = Therapy.render_to_string(PopoverTrigger("Click"))
-            @test occursin("<button", html)
-            @test occursin("type=\"button\"", html)
+            @test occursin("<span", html)
+            @test occursin("display:contents", html)
         end
 
         @testset "Content structure" begin

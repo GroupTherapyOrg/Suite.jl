@@ -130,6 +130,7 @@ The button that opens a menu within the menubar.
 function MenubarTrigger(children...; disabled::Bool=false, theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "flex items-center rounded-sm px-2 py-1 text-sm font-medium",
+        "text-warm-800 dark:text-warm-300",
         "outline-hidden select-none cursor-pointer",
         "data-[state=open]:bg-warm-100 data-[state=open]:dark:bg-warm-800",
         "data-[highlighted]:bg-warm-100 data-[highlighted]:dark:bg-warm-800",
