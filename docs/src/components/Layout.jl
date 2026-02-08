@@ -29,68 +29,19 @@ function SuiteLogo()
     )
 end
 
-# --- Desktop NavigationMenu ---
+# --- Desktop Nav (flat links) ---
+
+const _NAV_LINK_CLASS = "text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors"
+const _NAV_LINK_ACTIVE = "text-accent-700 dark:text-accent-400"
 
 function DesktopNav()
-    Main.NavigationMenu(
-        Main.NavigationMenuList(
-            # Getting Started — trigger with dropdown
-            Main.NavigationMenuItem(
-                Main.NavigationMenuTrigger("Getting Started"),
-                Main.NavigationMenuContent(
-                    Main.NavigationMenuLink(
-                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Introduction"),
-                        href="./getting-started/",
-                        description="Overview of Suite.jl component library"
-                    ),
-                    Main.NavigationMenuLink(
-                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Installation"),
-                        href="./getting-started/installation/",
-                        description="How to add Suite.jl to your project"
-                    ),
-                    Main.NavigationMenuLink(
-                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Theming"),
-                        href="./getting-started/theming/",
-                        description="Customize colors, fonts, and dark mode"
-                    ),
-                ),
-            ),
-
-            # Components — trigger with dropdown
-            Main.NavigationMenuItem(
-                Main.NavigationMenuTrigger("Components"),
-                Main.NavigationMenuContent(
-                    Main.NavigationMenuLink(
-                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "All Components"),
-                        href="./components/",
-                        description="Browse the full component catalog"
-                    ),
-                    Main.NavigationMenuLink(
-                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Button"),
-                        href="./components/button/",
-                        description="Primary interactive element"
-                    ),
-                    Main.NavigationMenuLink(
-                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Dialog"),
-                        href="./components/dialog/",
-                        description="Modal overlay for content and actions"
-                    ),
-                    Main.NavigationMenuLink(
-                        Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Card"),
-                        href="./components/card/",
-                        description="Container for grouped content"
-                    ),
-                ),
-            ),
-
-            # Examples — direct link
-            Main.NavigationMenuItem(
-                Main.NavigationMenuLink(
-                    Span(:class => "font-medium text-warm-800 dark:text-warm-300", "Examples"),
-                    href="./examples/",
-                ),
-            ),
-        ),
+    Nav(:class => "flex items-center gap-6",
+        NavLink("./getting-started/", "Getting Started",
+            class=_NAV_LINK_CLASS, active_class=_NAV_LINK_ACTIVE),
+        NavLink("./components/", "Components",
+            class=_NAV_LINK_CLASS, active_class=_NAV_LINK_ACTIVE),
+        NavLink("./examples/", "Examples",
+            class=_NAV_LINK_CLASS, active_class=_NAV_LINK_ACTIVE),
     )
 end
 
