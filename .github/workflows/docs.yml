@@ -26,6 +26,7 @@ jobs:
         with:
           repository: GroupTherapyOrg/Therapy.jl
           path: Therapy.jl
+          token: ${{ secrets.ORG_PAT }}
 
       - name: Checkout WasmTarget.jl
         uses: actions/checkout@v4
