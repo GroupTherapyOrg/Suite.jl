@@ -45,14 +45,11 @@ function NavigationMenuPage()
                             ),
                         ),
 
-                        # Direct link
+                        # Direct link (no content panel — inline link)
                         Main.NavigationMenuItem(
-                            Main.NavigationMenuLink(href="/docs", title="Documentation",
-                                "Browse the full documentation."
-                            ),
+                            Main.NavigationMenuLink(href="/docs", "Documentation"),
                         ),
                     ),
-                    Main.NavigationMenuViewport(),
                 )
             )
         ),
@@ -71,12 +68,9 @@ NavigationMenu(
             ),
         ),
         NavigationMenuItem(
-            NavigationMenuLink(href="/docs", title="Documentation",
-                "Browse the full docs."
-            ),
+            NavigationMenuLink(href="/docs", "Documentation"),
         ),
     ),
-    NavigationMenuViewport(),
 )"""),
 
         # Keyboard shortcuts
