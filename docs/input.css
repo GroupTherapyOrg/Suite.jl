@@ -77,6 +77,11 @@
     /* Suite.jl accent overrides */
     --accent: var(--julia-purple);
     --accent-secondary: var(--julia-red);
+
+    /* .jl wordmark tri-colors (exclude the active accent color) */
+    --jl-dot: #4063d8;  /* Blue */
+    --jl-j: #389826;    /* Green */
+    --jl-l: #cb3c33;    /* Red */
   }
 
   html {
@@ -135,6 +140,10 @@
     /* Deeper shadows */
     --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.15), 0 2px 4px -2px rgb(0 0 0 / 0.15);
+    /* .jl wordmark: exclude Blue (accent), use Purple instead */
+    --jl-dot: #9558b2;
+    --jl-j: #389826;
+    --jl-l: #cb3c33;
   }
 
   /* Minimal theme — Zinc accent, Red secondary, no radius, no shadows, slate neutrals */
@@ -227,6 +236,10 @@
     --radius-md: 0.75rem;
     --radius-lg: 1rem;
     --radius-xl: 1.5rem;
+    /* .jl wordmark: exclude Green (close to emerald accent), use Purple instead */
+    --jl-dot: #4063d8;
+    --jl-j: #9558b2;
+    --jl-l: #cb3c33;
     /* Stone neutrals (warmer earth tones) */
     --color-warm-50: #fafaf9;
     --color-warm-100: #f5f5f4;
