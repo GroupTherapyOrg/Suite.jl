@@ -37,7 +37,7 @@ Badge(variant="outline", "v2.0")
 ```
 """
 function Badge(children...; variant::String="default", class::String="", theme::Symbol=:default, kwargs...)
-    base = "inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 rounded-full border border-transparent px-2 py-0.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600"
+    base = "inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 rounded-xl border border-transparent px-2 py-0.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600"
 
     variant_classes = Dict(
         "default"     => "bg-accent-600 text-white hover:bg-accent-700",

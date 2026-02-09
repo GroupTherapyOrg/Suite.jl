@@ -173,7 +173,7 @@ using Test
             @test occursin("New", html)
             @test occursin("bg-accent-600", html)
             @test occursin("text-white", html)
-            @test occursin("rounded-full", html)
+            @test occursin("rounded-xl", html)
             @test occursin("text-xs", html)
         end
 
