@@ -92,6 +92,7 @@ include("components/Resizable.jl")
 
 # --- Composite Components ---
 include("components/Footer.jl")
+include("components/SiteNav.jl")
 
 # --- Sessions.jl Components (SUITE-0904) ---
 include("components/Kbd.jl")
