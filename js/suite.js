@@ -29,6 +29,12 @@
     const Suite = {
         version: '0.1.0',
 
+        // Helper: get namespaced localStorage key based on data-base-path
+        _themeKey(name) {
+            const bp = document.documentElement.getAttribute('data-base-path') || '';
+            return bp ? name + ':' + bp : name;
+        },
+
         // --- Focus Guards ---------------------------------------------------------
         FocusGuards: {
             _count: 0,
@@ -833,7 +839,7 @@
                     toggle.addEventListener('click', () => {
                         const isDark = document.documentElement.classList.toggle('dark');
                         try {
-                            localStorage.setItem('therapy-theme', isDark ? 'dark' : 'light');
+                            localStorage.setItem(Suite._themeKey('therapy-theme'), isDark ? 'dark' : 'light');
                         } catch (e) {}
                     });
                 });
@@ -922,7 +928,7 @@
                     html.setAttribute('data-theme', theme);
                 }
                 try {
-                    localStorage.setItem('suite-active-theme', theme);
+                    localStorage.setItem(Suite._themeKey('suite-active-theme'), theme);
                 } catch (e) {}
             },
 

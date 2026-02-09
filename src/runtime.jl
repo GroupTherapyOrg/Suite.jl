@@ -65,5 +65,5 @@ end
 ```
 """
 function suite_theme_script()
-    Therapy.Script("""(function(){try{var s=localStorage.getItem('therapy-theme');if(s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}var t=localStorage.getItem('suite-active-theme');if(t&&t!=='default'){document.documentElement.setAttribute('data-theme',t)}}catch(e){}})();""")
+    Therapy.Script("""(function(){try{var bp=document.documentElement.getAttribute('data-base-path')||'';var sk=bp?'therapy-theme:'+bp:'therapy-theme';var tk=bp?'suite-active-theme:'+bp:'suite-active-theme';var s=localStorage.getItem(sk);if(s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}var t=localStorage.getItem(tk);if(t&&t!=='default'){document.documentElement.setAttribute('data-theme',t)}}catch(e){}})();""")
 end
