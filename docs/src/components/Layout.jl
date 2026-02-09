@@ -31,17 +31,18 @@ end
 
 # --- Desktop Nav (flat links) ---
 
-const _NAV_LINK_CLASS = "text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors"
-const _NAV_LINK_ACTIVE = "text-accent-700 dark:text-accent-400"
+const _NAV_LINK_CLASS = "text-sm font-medium transition-colors"
+const _NAV_LINK_ACTIVE = "text-accent-700 dark:text-accent-400 font-semibold"
+const _NAV_LINK_INACTIVE = "text-warm-600 dark:text-warm-400 hover:text-accent-600 dark:hover:text-accent-400"
 
 function DesktopNav()
     Nav(:class => "flex items-center gap-6",
         NavLink("./getting-started/", "Getting Started",
-            class=_NAV_LINK_CLASS, active_class=_NAV_LINK_ACTIVE),
+            class=_NAV_LINK_CLASS, active_class=_NAV_LINK_ACTIVE, inactive_class=_NAV_LINK_INACTIVE),
         NavLink("./components/", "Components",
-            class=_NAV_LINK_CLASS, active_class=_NAV_LINK_ACTIVE),
+            class=_NAV_LINK_CLASS, active_class=_NAV_LINK_ACTIVE, inactive_class=_NAV_LINK_INACTIVE),
         NavLink("./examples/", "Examples",
-            class=_NAV_LINK_CLASS, active_class=_NAV_LINK_ACTIVE),
+            class=_NAV_LINK_CLASS, active_class=_NAV_LINK_ACTIVE, inactive_class=_NAV_LINK_INACTIVE),
     )
 end
 

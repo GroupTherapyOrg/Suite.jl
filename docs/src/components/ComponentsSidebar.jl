@@ -82,8 +82,9 @@ function ComponentSidebarLink(slug, title; base_path="components")
     # "index" slug links to the section root, all others to slug subdirectory
     href = slug == "index" ? "./$(base_path)/" : "./$(base_path)/$(slug)/"
     NavLink(href, title;
-        class = "block px-3 py-1.5 text-sm text-warm-600 dark:text-warm-400 hover:text-warm-800 dark:hover:text-white hover:bg-warm-50 dark:hover:bg-warm-900 rounded transition-colors",
+        class = "block px-3 py-1.5 text-sm rounded transition-colors",
         active_class = "text-accent-700 dark:text-accent-400 bg-warm-100 dark:bg-warm-900 border-l-2 border-accent-600 -ml-0.5 pl-[calc(0.75rem+2px)]",
+        inactive_class = "text-warm-600 dark:text-warm-400 hover:text-warm-800 dark:hover:text-white hover:bg-warm-50 dark:hover:bg-warm-900",
         exact = true
     )
 end
