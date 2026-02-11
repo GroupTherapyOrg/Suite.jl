@@ -35,9 +35,10 @@ const _SITENAV_HAMBURGER_SVG = Svg(:class => "h-5 w-5", :fill => "none", :viewBo
          :d => "M4 6h16M4 12h16M4 18h16")
 )
 
-# CSS class constants
-const _SITENAV_LINK_CLASS = "text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors"
-const _SITENAV_LINK_ACTIVE = "text-accent-700 dark:text-accent-400"
+# CSS class constants — three-class model for NavLink
+const _SITENAV_LINK_CLASS = "text-sm font-medium transition-colors"
+const _SITENAV_LINK_ACTIVE = "text-accent-700 dark:text-accent-400 font-semibold"
+const _SITENAV_LINK_INACTIVE = "text-warm-600 dark:text-warm-400 hover:text-accent-600 dark:hover:text-accent-400"
 const _SITENAV_MOBILE_LINK_CLASS = "text-sm text-warm-700 dark:text-warm-300 hover:text-accent-600 dark:hover:text-accent-400 py-1.5 px-2 rounded-md hover:bg-warm-100 dark:hover:bg-warm-800 transition-colors"
 const _SITENAV_GITHUB_CLASS = "text-warm-600 hover:text-warm-800 dark:text-warm-400 dark:hover:text-warm-200 transition-colors"
 const _SITENAV_SECTION_CLASS = "text-xs font-semibold text-warm-500 dark:text-warm-500 uppercase tracking-wider"
@@ -87,11 +88,13 @@ Suite.SiteNav(
 function SiteNav(brand, links::Vector, github_url::String;
                  mobile_title::String="Navigation",
                  mobile_sections=nothing,
+                 themes=nothing,
                  class::String="",
                  kwargs...)
 
     desktop = _sitenav_desktop(brand, links, github_url)
-    mobile = _sitenav_mobile(links, github_url, mobile_title, mobile_sections)
+    mobile = _sitenav_mobile(links, github_url, mobile_title, mobile_sections, themes)
+    theme_switcher = themes !== nothing ? ThemeSwitcher(themes=themes) : ThemeSwitcher()
 
     Header(:class => cn("bg-warm-100 dark:bg-warm-900 border-b border-warm-200 dark:border-warm-700 transition-colors duration-200", class), kwargs...,
         Div(:class => "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
@@ -109,7 +112,7 @@ function SiteNav(brand, links::Vector, github_url::String;
                           :target => "_blank",
                           _SITENAV_GITHUB_SVG
                         ),
-                        ThemeSwitcher(),
+                        theme_switcher,
                         ThemeToggle(),
                     ),
                 ),
@@ -130,12 +133,13 @@ function _sitenav_desktop(brand, links::Vector, github_url::String)
         Therapy.NavLink(link.href, link.label,
             class=_SITENAV_LINK_CLASS,
             active_class=_SITENAV_LINK_ACTIVE,
+            inactive_class=_SITENAV_LINK_INACTIVE,
             exact=exact)
     end
     Nav(:class => "flex items-center gap-6", navlinks...)
 end
 
-function _sitenav_mobile(links::Vector, github_url::String, title::String, sections)
+function _sitenav_mobile(links::Vector, github_url::String, title::String, sections, themes)
     # Build mobile link list
     mobile_content = if sections !== nothing
         _sitenav_mobile_sections(sections)
@@ -173,7 +177,7 @@ function _sitenav_mobile(links::Vector, github_url::String, title::String, secti
                       :target => "_blank",
                       _SITENAV_GITHUB_SVG
                     ),
-                    ThemeSwitcher(),
+                    themes !== nothing ? ThemeSwitcher(themes=themes) : ThemeSwitcher(),
                     ThemeToggle(),
                 ),
             ),
