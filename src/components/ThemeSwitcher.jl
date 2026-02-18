@@ -9,7 +9,7 @@
 #
 # Behavior:
 #   - Renders a button with a palette icon
-#   - Clicking opens a dropdown with 4 theme options
+#   - Clicking opens a dropdown with 5 theme options
 #   - Each option shows name, description, and color swatch
 #   - Selecting a theme sets data-theme on <html> + persists to localStorage
 #   - JS discovers via data-suite-theme-switcher attribute
@@ -28,12 +28,13 @@ const _THEME_OPTIONS = [
     (name="Ocean", key="ocean", description="Blue — professional and confident", swatch="#2563eb"),
     (name="Minimal", key="minimal", description="Zinc — sharp and clean", swatch="#71717a"),
     (name="Nature", key="nature", description="Emerald — organic and earthy", swatch="#059669"),
+    (name="Islands", key="islands", description="Glass panels — floating, blue-gray, modern", swatch="#548af7"),
 ]
 
 """
     ThemeSwitcher(; themes, class, kwargs...) -> VNode
 
-A theme switcher dropdown that lets users preview all 4 Suite.jl themes.
+A theme switcher dropdown that lets users preview all 5 Suite.jl themes.
 
 Sets `data-theme` attribute on `<html>` and persists to `localStorage('suite-active-theme')`.
 Requires `suite_script()` in your layout for JS behavior.
