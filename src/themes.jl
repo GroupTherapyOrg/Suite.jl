@@ -53,6 +53,13 @@ const SUITE_THEMES = Dict{Symbol, SuiteTheme}(
         "emerald-500", "font-medium", "shadow-sm", "border",
         "Organic earthy tones — green and stone, generous curves",
     ),
+    :islands => SuiteTheme(
+        :islands, :auto,
+        "accent", "accent-secondary", "warm",
+        "rounded-xl", "rounded-lg",
+        "accent-600", "font-medium", "shadow-md", "border",
+        "Islands — floating glass panels, blue-gray canvas, warm accents",
+    ),
 )
 
 """

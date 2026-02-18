@@ -3637,7 +3637,8 @@ using Test
             @test haskey(Suite.SUITE_THEMES, :ocean)
             @test haskey(Suite.SUITE_THEMES, :minimal)
             @test haskey(Suite.SUITE_THEMES, :nature)
-            @test length(Suite.SUITE_THEMES) == 4
+            @test haskey(Suite.SUITE_THEMES, :islands)
+            @test length(Suite.SUITE_THEMES) == 5
 
             default = Suite.SUITE_THEMES[:default]
             @test default.name === :default
@@ -3666,6 +3667,16 @@ using Test
             @test nature.accent_secondary == "amber"
             @test nature.neutral == "stone"
             @test nature.radius == "rounded-xl"
+
+            islands = Suite.SUITE_THEMES[:islands]
+            @test islands.name === :islands
+            @test islands.accent == "accent"
+            @test islands.accent_secondary == "accent-secondary"
+            @test islands.neutral == "warm"
+            @test islands.radius == "rounded-xl"
+            @test islands.radius_sm == "rounded-lg"
+            @test islands.shadow == "shadow-md"
+            @test islands.ring == "accent-600"
         end
 
         @testset "get_theme" begin
