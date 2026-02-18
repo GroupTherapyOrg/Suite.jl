@@ -355,6 +355,51 @@
   }
 }
 
+/* ====================================================================
+   ISLANDS GLASS PANEL UTILITIES
+   Directional borders + shadow simulate floating glass panels.
+   Scoped to [data-theme='islands'] — NO-OP for all other themes.
+   ==================================================================== */
+
+/* Dark mode glass — bright top/left borders, deep shadow */
+.dark[data-theme='islands'] .glass-panel {
+    border-top: 1px solid rgba(255,255,255,0.10);
+    border-left: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.02);
+    border-right: 1px solid rgba(255,255,255,0.02);
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.3);
+}
+
+.dark[data-theme='islands'] .glass-panel-elevated {
+    border-top: 1px solid rgba(255,255,255,0.12);
+    border-left: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.02);
+    border-right: 1px solid rgba(255,255,255,0.02);
+    box-shadow: 0 4px 12px 0 rgba(0,0,0,0.4);
+}
+
+/* Light mode glass — subtle shadow borders */
+[data-theme='islands']:not(.dark) .glass-panel {
+    border-top: 1px solid rgba(0,0,0,0.04);
+    border-left: 1px solid rgba(0,0,0,0.03);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-right: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+}
+
+[data-theme='islands']:not(.dark) .glass-panel-elevated {
+    border-top: 1px solid rgba(0,0,0,0.06);
+    border-left: 1px solid rgba(0,0,0,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    border-right: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px 0 rgba(0,0,0,0.12);
+}
+
+/* Glass hover-reveal transition */
+[data-theme='islands'] .glass-hover {
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Calendar selection states */
 @layer components {
   .suite-cal-selected {
