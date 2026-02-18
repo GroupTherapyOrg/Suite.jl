@@ -3,6 +3,11 @@
 #
 # Each non-default theme uses Tailwind built-in color scales that must appear
 # in source files for Tailwind v4 tree-shaking to include them.
+#
+# NOTE: :islands theme uses CSS custom properties (like :default), NOT string
+# substitution for colors. Its accent/accent-secondary/warm tokens are already
+# compiled via component source files. Only its structural tokens (rounded-xl,
+# rounded-lg, shadow-md) need safelisting — and they're already present below.
 
 const _THEME_SAFELIST = """
 bg-blue-50 bg-blue-100 bg-blue-200 bg-blue-300 bg-blue-400 bg-blue-500 bg-blue-600 bg-blue-700 bg-blue-800 bg-blue-900 bg-blue-950
