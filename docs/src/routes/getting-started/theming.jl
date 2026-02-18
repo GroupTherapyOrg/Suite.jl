@@ -23,7 +23,7 @@ function ThemingPage()
             # Pre-built themes
             SectionH2("Pre-built Themes"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Suite.jl ships with 4 pre-built themes:"
+                "Suite.jl ships with 5 pre-built themes:"
             ),
             Main.Table(
                 Main.TableHeader(
@@ -63,6 +63,13 @@ function ThemingPage()
                         Main.TableCell("Stone"),
                         Main.TableCell("rounded-xl"),
                         Main.TableCell("Organic earthy tones")
+                    ),
+                    Main.TableRow(
+                        Main.TableCell(class="font-medium", Main.Badge(variant="secondary", ":islands")),
+                        Main.TableCell("Blue"),
+                        Main.TableCell("Blue-gray"),
+                        Main.TableCell("rounded-xl"),
+                        Main.TableCell("Glass panels — floating, modern")
                     )
                 )
             ),
@@ -89,6 +96,12 @@ Button(theme=:minimal, variant="outline", "Minimal Theme")
 Card(theme=:nature,
     CardHeader(CardTitle("Nature Theme")),
     CardContent("Emerald accents with stone neutrals")
+)
+
+# Islands theme (blue accent, glass panels, rounded-xl)
+Card(theme=:islands,
+    CardHeader(CardTitle("Islands Theme")),
+    CardContent("Blue accents with glass-panel effects")
 )""")
             ),
 
