@@ -114,6 +114,7 @@ The floating menu content panel. Positioned relative to the trigger.
 """
 function DropdownMenuContent(children...; side::String="bottom", side_offset::Int=4, align::String="start", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
+        "glass-panel",
         "z-50 max-h-[var(--radix-popper-available-height,300px)] min-w-[8rem]",
         "overflow-x-hidden overflow-y-auto rounded-md p-1 shadow-md",
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",

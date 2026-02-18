@@ -63,6 +63,7 @@ function Command(children...; should_filter::Bool=true, loop::Bool=true,
     id = "suite-command-" * string(rand(UInt32), base=16)
 
     classes = cn(
+        "glass-panel-elevated",
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
         "flex h-full w-full flex-col overflow-hidden rounded-md",
         class

@@ -111,6 +111,7 @@ Renders with overlay backdrop. Hidden by default, shown by JS.
 """
 function DialogContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
+        "glass-panel-elevated",
         "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",

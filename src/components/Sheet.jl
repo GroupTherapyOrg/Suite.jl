@@ -116,6 +116,7 @@ function SheetContent(children...; side::String="right", theme::Symbol=:default,
     side_classes = get(SHEET_SIDE_CLASSES, side, SHEET_SIDE_CLASSES["right"])
 
     classes = cn(
+        "glass-panel",
         "bg-warm-50 dark:bg-warm-950 text-warm-800 dark:text-warm-300",
         "fixed z-50 gap-4 p-6 shadow-lg outline-none",
         "transition ease-in-out",

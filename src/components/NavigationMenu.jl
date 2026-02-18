@@ -143,6 +143,7 @@ Renders as an inline dropdown (no viewport).
 """
 function NavigationMenuContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
+        "glass-panel",
         # Inline dropdown positioning (no viewport)
         "absolute top-full left-0 mt-1.5 z-50",
         # Sizing and layout

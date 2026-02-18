@@ -98,6 +98,7 @@ The floating content panel. Positioned relative to the trigger.
 """
 function PopoverContent(children...; side::String="bottom", side_offset::Int=0, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
+        "glass-panel",
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",

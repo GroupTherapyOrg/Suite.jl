@@ -117,6 +117,7 @@ The tooltip content popup. Positioned relative to the trigger.
 """
 function TooltipContent(children...; side::String="top", side_offset::Int=4, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
+        "glass-panel",
         "bg-warm-800 dark:bg-warm-300 text-warm-50 dark:text-warm-950",
         "animate-in fade-in-0 zoom-in-95",
         "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
