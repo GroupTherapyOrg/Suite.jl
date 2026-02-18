@@ -108,6 +108,8 @@ end
 
 function Layout(children...; title="Suite.jl")
     Div(:class => "min-h-screen flex flex-col bg-warm-50 dark:bg-warm-950 transition-colors duration-200",
+        # Default theme: Islands (if no user preference saved in localStorage)
+        Therapy.Script("""(function(){try{if(!document.documentElement.getAttribute('data-theme')){document.documentElement.setAttribute('data-theme','islands')}}catch(e){}})();"""),
         # Navigation bar
         Header(:class => "bg-warm-100 dark:bg-warm-900 border-b border-warm-200 dark:border-warm-700 transition-colors duration-200",
             Div(:class => "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",

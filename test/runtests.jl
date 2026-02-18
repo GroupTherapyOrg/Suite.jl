@@ -1072,6 +1072,13 @@ using Test
         @test occursin("classList.add", html)
         @test occursin("suite-active-theme", html)
         @test occursin("data-theme", html)
+        # No default theme → dt is empty string
+        @test occursin("var dt=''", html)
+
+        # With default_theme parameter
+        html2 = Therapy.render_to_string(suite_theme_script(default_theme="islands"))
+        @test occursin("var dt='islands'", html2)
+        @test occursin("data-theme", html2)
     end
 
     @testset "suite_script" begin
