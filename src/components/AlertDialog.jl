@@ -1,8 +1,8 @@
 # AlertDialog.jl — Suite.jl Alert Dialog Component
 #
-# Tier: js_runtime (requires suite.js)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: FocusGuards, FocusTrap, DismissLayer, ScrollLock, AlertDialog
+# JS Modules: none
 #
 # Usage via package: using Suite; AlertDialog(...)
 # Usage via extract: include("components/AlertDialog.jl"); AlertDialog(...)
@@ -14,6 +14,10 @@
 #   - Focus auto-moves to Cancel button on open (not first tabbable)
 #   - Can only be closed via Action or Cancel button
 #   - role="alertdialog" (not "dialog")
+#   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
+#   - BindModal mode=1 handles modal lifecycle without Escape/outside dismiss
+#
+# Reference: Radix UI AlertDialog — https://www.radix-ui.com/primitives/docs/components/alert-dialog
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -25,64 +29,73 @@ export AlertDialog, AlertDialogTrigger, AlertDialogContent,
        AlertDialogHeader, AlertDialogFooter, AlertDialogTitle,
        AlertDialogDescription, AlertDialogAction, AlertDialogCancel
 
-"""
-    AlertDialog(children...; class, kwargs...) -> VNode
+#   AlertDialog(children...; class, kwargs...) -> IslandVNode
+#
+# A modal alert dialog that requires explicit user action to dismiss.
+# Cannot be dismissed by Escape key or clicking outside.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# AlertDialogTrigger and AlertDialogContent children are auto-detected and
+# injected with signal bindings for data-state, aria-expanded, and modal behavior.
+#
+# Examples:
+#   AlertDialog(
+#       AlertDialogTrigger(Button(variant="destructive", "Delete")),
+#       AlertDialogContent(AlertDialogHeader(AlertDialogTitle("Sure?")), AlertDialogFooter(...))
+#   )
+@island function AlertDialog(children...; class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
-A modal alert dialog that requires explicit user action to dismiss.
-Cannot be dismissed by Escape key or clicking outside.
-
-# Examples
-```julia
-AlertDialog(
-    AlertDialogTrigger(Button(variant="destructive", "Delete Account")),
-    AlertDialogContent(
-        AlertDialogHeader(
-            AlertDialogTitle("Are you absolutely sure?"),
-            AlertDialogDescription("This action cannot be undone.")
-        ),
-        AlertDialogFooter(
-            AlertDialogCancel(Button(variant="outline", "Cancel")),
-            AlertDialogAction(Button(variant="destructive", "Delete"))
-        )
-    )
-)
-```
-"""
-function AlertDialog(children...; class::String="", kwargs...)
-    id = "suite-alert-dialog-" * string(rand(UInt32), base=16)
-
-    # Separate trigger from content children
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject signal bindings
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-alert-dialog-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-alert-dialog-trigger-wrapper"))
+                # Inject reactive bindings on trigger wrapper
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
+                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
+            else
+                # Content wrapper — walk into it
+                _alert_dialog_inject_content_bindings!(child, is_open, set_open)
+            end
         end
     end
 
-    # Trigger is rendered OUTSIDE the hidden container so it's always visible.
-    Div(:class => cn(class),
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(1)),  # mode 1 = alert_dialog (no Escape/outside dismiss)
+        :class => cn("", class),
         kwargs...,
-        [_alert_dialog_set_trigger_id(t, id) for t in trigger_nodes]...,
-        Div(Symbol("data-suite-alert-dialog") => id,
-            :style => "display:none",
-            content_nodes...,
-        ),
-    )
+        children...)
 end
 
-function _alert_dialog_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-alert-dialog-trigger-wrapper"))
-        new_props = copy(node.props)
-        new_props[Symbol("data-suite-alert-dialog-trigger")] = id
-        new_props[Symbol("aria-haspopup")] = "dialog"
-        new_props[Symbol("aria-expanded")] = "false"
-        new_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.tag, new_props, node.children)
+# Walk the content wrapper to find overlay, content, and action/cancel buttons
+function _alert_dialog_inject_content_bindings!(node::VNode, is_open, set_open)
+    for child in node.children
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-alert-dialog-overlay"))
+                # Overlay: bind data-state (no click-to-close for AlertDialog)
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+            elseif haskey(child.props, Symbol("data-suite-alert-dialog-content"))
+                # Content: bind data-state
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                # Walk content for action/cancel buttons
+                _alert_dialog_inject_close_buttons!(child, set_open)
+            end
+        end
     end
-    node
+end
+
+# Recursively inject close handler on action and cancel elements
+function _alert_dialog_inject_close_buttons!(node::VNode, set_open)
+    if haskey(node.props, Symbol("data-suite-alert-dialog-action")) ||
+       haskey(node.props, Symbol("data-suite-alert-dialog-cancel"))
+        node.props[:on_click] = () -> set_open(Int32(0))
+    end
+    for child in node.children
+        if child isa VNode
+            _alert_dialog_inject_close_buttons!(child, set_open)
+        end
+    end
 end
 
 """
@@ -94,6 +107,9 @@ function AlertDialogTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-alert-dialog-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
+         Symbol("data-state") => "closed",
+         :aria_haspopup => "dialog",
+         :aria_expanded => "false",
          kwargs...,
          children...)
 end
@@ -213,10 +229,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :AlertDialog,
         "AlertDialog.jl",
-        :js_runtime,
+        :island,
         "Modal alert dialog requiring explicit user action to dismiss",
         Symbol[],
-        [:FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :AlertDialog],
+        Symbol[],
         [:AlertDialog, :AlertDialogTrigger, :AlertDialogContent,
          :AlertDialogHeader, :AlertDialogFooter, :AlertDialogTitle,
          :AlertDialogDescription, :AlertDialogAction, :AlertDialogCancel],

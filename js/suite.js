@@ -546,156 +546,8 @@
             },
         },
 
-        // --- Dialog ---------------------------------------------------------------
-        Dialog: {
-            init() {
-                const triggers = document.querySelectorAll('[data-suite-dialog-trigger]');
-                triggers.forEach(trigger => {
-                    if (trigger._suiteDialog) return;
-                    trigger._suiteDialog = true;
-
-                    const dialogId = trigger.getAttribute('data-suite-dialog-trigger');
-                    const root = document.querySelector('[data-suite-dialog="' + dialogId + '"]');
-                    if (!root) return;
-
-                    const overlay = root.querySelector('[data-suite-dialog-overlay]');
-                    const content = root.querySelector('[data-suite-dialog-content]');
-                    if (!content) return;
-
-                    let cleanupFocusTrap, cleanupDismiss;
-
-                    function open() {
-                        root.style.display = '';
-                        if (overlay) {
-                            overlay.setAttribute('data-state', 'open');
-                            overlay.style.display = '';
-                        }
-                        content.setAttribute('data-state', 'open');
-                        trigger.setAttribute('data-state', 'open');
-                        trigger.setAttribute('aria-expanded', 'true');
-
-                        Suite.ScrollLock.lock();
-                        Suite.FocusGuards.install();
-
-                        cleanupFocusTrap = Suite.FocusTrap.activate(content);
-                        cleanupDismiss = Suite.DismissLayer.activate(content, {
-                            disableOutsidePointerEvents: true,
-                            onDismiss: close,
-                        });
-                    }
-
-                    function close() {
-                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
-                        if (cleanupFocusTrap) { cleanupFocusTrap(); cleanupFocusTrap = null; }
-
-                        if (overlay) overlay.setAttribute('data-state', 'closed');
-                        content.setAttribute('data-state', 'closed');
-                        trigger.setAttribute('data-state', 'closed');
-                        trigger.setAttribute('aria-expanded', 'false');
-
-                        Suite.ScrollLock.unlock();
-                        Suite.FocusGuards.uninstall();
-
-                        // Wait for close animation before hiding
-                        const hide = () => {
-                            root.style.display = 'none';
-                            if (overlay) overlay.style.display = 'none';
-                        };
-                        content.addEventListener('animationend', hide, { once: true });
-                        setTimeout(hide, 250); // fallback
-                    }
-
-                    trigger.addEventListener('click', () => {
-                        const isOpen = content.getAttribute('data-state') === 'open';
-                        if (isOpen) close(); else open();
-                    });
-
-                    // Close buttons inside dialog
-                    root.querySelectorAll('[data-suite-dialog-close]').forEach(btn => {
-                        btn.addEventListener('click', close);
-                    });
-                });
-            }
-        },
-
-        // --- AlertDialog ----------------------------------------------------------
-        AlertDialog: {
-            init() {
-                const triggers = document.querySelectorAll('[data-suite-alert-dialog-trigger]');
-                triggers.forEach(trigger => {
-                    if (trigger._suiteAlertDialog) return;
-                    trigger._suiteAlertDialog = true;
-
-                    const dialogId = trigger.getAttribute('data-suite-alert-dialog-trigger');
-                    const root = document.querySelector('[data-suite-alert-dialog="' + dialogId + '"]');
-                    if (!root) return;
-
-                    const overlay = root.querySelector('[data-suite-alert-dialog-overlay]');
-                    const content = root.querySelector('[data-suite-alert-dialog-content]');
-                    if (!content) return;
-
-                    let cleanupFocusTrap, cleanupDismiss;
-
-                    function open() {
-                        root.style.display = '';
-                        if (overlay) {
-                            overlay.setAttribute('data-state', 'open');
-                            overlay.style.display = '';
-                        }
-                        content.setAttribute('data-state', 'open');
-                        trigger.setAttribute('data-state', 'open');
-                        trigger.setAttribute('aria-expanded', 'true');
-
-                        Suite.ScrollLock.lock();
-                        Suite.FocusGuards.install();
-
-                        // Auto-focus Cancel button (not first tabbable)
-                        const cancelBtn = content.querySelector('[data-suite-alert-dialog-cancel]');
-                        cleanupFocusTrap = Suite.FocusTrap.activate(content, {
-                            initialFocus: cancelBtn || undefined
-                        });
-
-                        // AlertDialog: Escape and click-outside do NOT dismiss
-                        cleanupDismiss = Suite.DismissLayer.activate(content, {
-                            disableOutsidePointerEvents: true,
-                            onEscapeKeyDown: (e) => e.preventDefault(),
-                            onPointerDownOutside: (e) => e.preventDefault(),
-                            onDismiss: () => {}, // never auto-dismisses
-                        });
-                    }
-
-                    function close() {
-                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
-                        if (cleanupFocusTrap) { cleanupFocusTrap(); cleanupFocusTrap = null; }
-
-                        if (overlay) overlay.setAttribute('data-state', 'closed');
-                        content.setAttribute('data-state', 'closed');
-                        trigger.setAttribute('data-state', 'closed');
-                        trigger.setAttribute('aria-expanded', 'false');
-
-                        Suite.ScrollLock.unlock();
-                        Suite.FocusGuards.uninstall();
-
-                        const hide = () => {
-                            root.style.display = 'none';
-                            if (overlay) overlay.style.display = 'none';
-                        };
-                        content.addEventListener('animationend', hide, { once: true });
-                        setTimeout(hide, 250);
-                    }
-
-                    trigger.addEventListener('click', () => {
-                        const isOpen = content.getAttribute('data-state') === 'open';
-                        if (isOpen) close(); else open();
-                    });
-
-                    // Action and Cancel both close
-                    root.querySelectorAll('[data-suite-alert-dialog-action], [data-suite-alert-dialog-cancel]').forEach(btn => {
-                        btn.addEventListener('click', close);
-                    });
-                });
-            }
-        },
+        // Dialog: removed (now @island — SUITE-906)
+        // AlertDialog: removed (now @island — SUITE-906)
 
         // --- Sheet ----------------------------------------------------------------
         Sheet: {
@@ -5050,8 +4902,8 @@
             // Accordion: removed (now @island)
             // Tabs: removed (now @island)
             // ToggleGroup: removed (now @island)
-            this.Dialog.init();
-            this.AlertDialog.init();
+            // Dialog: removed (now @island)
+            // AlertDialog: removed (now @island)
             this.Sheet.init();
             this.Drawer.init();
             this.Popover.init();

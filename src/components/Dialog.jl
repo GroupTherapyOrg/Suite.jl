@@ -1,8 +1,8 @@
 # Dialog.jl — Suite.jl Dialog Component
 #
-# Tier: js_runtime (requires suite.js for focus trap, dismiss layer, scroll lock)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: FocusGuards, FocusTrap, DismissLayer, ScrollLock, Dialog
+# JS Modules: none
 #
 # Usage via package: using Suite; Dialog(DialogTrigger(Button("Open")), DialogContent(...))
 # Usage via extract: include("components/Dialog.jl"); Dialog(...)
@@ -10,9 +10,13 @@
 # Behavior (matches Radix Dialog):
 #   - Modal by default: focus trapped, scroll locked, outside pointer disabled
 #   - Escape key dismisses
-#   - Click outside dismisses
+#   - Click outside overlay dismisses
 #   - Focus auto-moves to first tabbable non-link element on open
 #   - Focus returns to trigger on close
+#   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
+#   - BindModal handles scroll lock, focus trap, dismiss, show/hide with animation
+#
+# Reference: Radix UI Dialog — https://www.radix-ui.com/primitives/docs/components/dialog
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -24,68 +28,69 @@ export Dialog, DialogTrigger, DialogContent,
        DialogHeader, DialogFooter, DialogTitle,
        DialogDescription, DialogClose
 
-"""
-    Dialog(children...; class, kwargs...) -> VNode
+#   Dialog(children...; class, kwargs...) -> IslandVNode
+#
+# A modal dialog overlay. Contains trigger, overlay, and content.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# DialogTrigger and DialogContent children are auto-detected and injected
+# with signal bindings for data-state, aria-expanded, and modal behavior.
+#
+# Examples:
+#   Dialog(DialogTrigger(Button("Open")), DialogContent(DialogHeader(DialogTitle("Title"))))
+@island function Dialog(children...; class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
-A modal dialog overlay. Contains trigger, overlay, and content.
-
-# Examples
-```julia
-Dialog(
-    DialogTrigger(Button("Open Dialog")),
-    DialogContent(
-        DialogHeader(
-            DialogTitle("Edit Profile"),
-            DialogDescription("Make changes to your profile here.")
-        ),
-        # ... form fields
-        DialogFooter(
-            DialogClose(Button(variant="outline", "Cancel")),
-            Button("Save changes")
-        )
-    )
-)
-```
-"""
-function Dialog(children...; class::String="", kwargs...)
-    id = "suite-dialog-" * string(rand(UInt32), base=16)
-
-    # Separate trigger from content children
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject signal bindings
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-dialog-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-dialog-trigger-wrapper"))
+                # Inject reactive bindings on trigger wrapper
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
+                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
+            else
+                # Content wrapper — walk into it
+                _dialog_inject_content_bindings!(child, is_open, set_open)
+            end
         end
     end
 
-    # Trigger is rendered OUTSIDE the hidden dialog container so it's always visible.
-    # Dialog content wrapper is hidden (display:none) until JS opens it.
-    Div(:class => cn(class),
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(0)),  # mode 0 = dialog
+        :class => cn("", class),
         kwargs...,
-        # Triggers — visible, outside the hidden container
-        [_dialog_set_trigger_id(t, id) for t in trigger_nodes]...,
-        # Dialog root — hidden until opened by JS
-        Div(Symbol("data-suite-dialog") => id,
-            :style => "display:none",
-            content_nodes...,
-        ),
-    )
+        children...)
 end
 
-function _dialog_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-dialog-trigger-wrapper"))
-        # Set data-suite-dialog-trigger on the wrapper span itself
-        new_props = copy(node.props)
-        new_props[Symbol("data-suite-dialog-trigger")] = id
-        new_props[Symbol("aria-haspopup")] = "dialog"
-        new_props[Symbol("aria-expanded")] = "false"
-        new_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.tag, new_props, node.children)
+# Walk the content wrapper to find overlay, content, and close buttons
+function _dialog_inject_content_bindings!(node::VNode, is_open, set_open)
+    for child in node.children
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-dialog-overlay"))
+                # Overlay: bind data-state, add click-to-close
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:on_click] = () -> set_open(Int32(0))
+            elseif haskey(child.props, Symbol("data-suite-dialog-content"))
+                # Content: bind data-state
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                # Walk content for close buttons
+                _dialog_inject_close_buttons!(child, set_open)
+            end
+        end
     end
-    node
+end
+
+# Recursively inject close handler on all [data-suite-dialog-close] elements
+function _dialog_inject_close_buttons!(node::VNode, set_open)
+    if haskey(node.props, Symbol("data-suite-dialog-close"))
+        node.props[:on_click] = () -> set_open(Int32(0))
+    end
+    for child in node.children
+        if child isa VNode
+            _dialog_inject_close_buttons!(child, set_open)
+        end
+    end
 end
 
 """
@@ -94,11 +99,12 @@ end
 The button that opens the dialog. Wrap around a Button or any clickable element.
 """
 function DialogTrigger(children...; class::String="", kwargs...)
-    # Marker span with display:contents — the user's Button is the visible element.
-    # Avoids nested <button> which is invalid HTML.
     Span(Symbol("data-suite-dialog-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
+         Symbol("data-state") => "closed",
+         :aria_haspopup => "dialog",
+         :aria_expanded => "false",
          kwargs...,
          children...)
 end
@@ -107,7 +113,7 @@ end
     DialogContent(children...; class, kwargs...) -> VNode
 
 The dialog content panel. Contains header, body, footer, and close button.
-Renders with overlay backdrop. Hidden by default, shown by JS.
+Renders with overlay backdrop. Hidden by default, shown by Wasm island.
 """
 function DialogContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
@@ -217,10 +223,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Dialog,
         "Dialog.jl",
-        :js_runtime,
+        :island,
         "Modal dialog overlay with focus trap, scroll lock, and dismiss layer",
         Symbol[],
-        [:FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :Dialog],
+        Symbol[],
         [:Dialog, :DialogTrigger, :DialogContent,
          :DialogHeader, :DialogFooter, :DialogTitle,
          :DialogDescription, :DialogClose],

@@ -1751,6 +1751,7 @@ using Test
                     )
                 )
             ))
+            @test occursin("therapy-island", html)
             @test occursin("data-suite-dialog", html)
             @test occursin("Title", html)
             @test occursin("Description", html)
@@ -1870,15 +1871,12 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Dialog)
             meta = Suite.COMPONENT_REGISTRY[:Dialog]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Dialog in meta.exports
             @test :DialogTrigger in meta.exports
             @test :DialogContent in meta.exports
             @test :DialogClose in meta.exports
-            @test :Dialog in meta.js_modules
-            @test :FocusTrap in meta.js_modules
-            @test :DismissLayer in meta.js_modules
-            @test :ScrollLock in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 
@@ -1897,6 +1895,7 @@ using Test
                     )
                 )
             ))
+            @test occursin("therapy-island", html)
             @test occursin("data-suite-alert-dialog", html)
             @test occursin("Are you sure?", html)
             @test occursin("This cannot be undone.", html)
@@ -1996,14 +1995,13 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :AlertDialog)
             meta = Suite.COMPONENT_REGISTRY[:AlertDialog]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :AlertDialog in meta.exports
             @test :AlertDialogTrigger in meta.exports
             @test :AlertDialogContent in meta.exports
             @test :AlertDialogAction in meta.exports
             @test :AlertDialogCancel in meta.exports
-            @test :AlertDialog in meta.js_modules
-            @test :FocusTrap in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 
