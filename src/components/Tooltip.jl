@@ -1,20 +1,19 @@
 # Tooltip.jl — Suite.jl Tooltip Component
 #
-# Tier: js_runtime (requires suite.js)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Floating, DismissLayer, Tooltip
+# JS Modules: none
 #
 # Usage via package: using Suite; Tooltip(...)
 # Usage via extract: include("components/Tooltip.jl"); Tooltip(...)
 #
 # Behavior (matches Radix Tooltip):
 #   - Hover/focus-triggered informational popup
-#   - Provider-level delay state machine (700ms open, 300ms skip)
+#   - Provider-level delay (700ms default)
 #   - Escape key dismisses
 #   - No focus trap (tooltip content is not interactive)
-#   - Touch events ignored
-#   - aria-describedby wiring for accessibility
-#   - Grace area keeps tooltip open while pointer transits to content
+#   - Floating positioning with flip/shift collision avoidance
+#   - Signal-driven: BindModal(mode=4) handles hover timing + floating positioning
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -44,51 +43,35 @@ function TooltipProvider(children...; delay_duration::Int=700, skip_delay_durati
         children...)
 end
 
-"""
-    Tooltip(children...; class, kwargs...) -> VNode
+#   Tooltip(children...; class, kwargs...) -> IslandVNode
+#
+# A hover/focus-triggered informational popup.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# BindModal(mode=4) handles hover timing, floating positioning, Escape dismiss,
+# and pointerdown dismiss. Data-state updates are managed by the modal_state JS handler.
+#
+# Examples:
+#   TooltipProvider(Tooltip(TooltipTrigger(Button("Hover me")), TooltipContent(P("Tip"))))
+@island function Tooltip(children...; class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
-A hover/focus-triggered informational popup.
-
-# Examples
-```julia
-TooltipProvider(
-    Tooltip(
-        TooltipTrigger(Button(variant="outline", "Hover me")),
-        TooltipContent(P("Tooltip text"))
-    )
-)
-```
-"""
-function Tooltip(children...; class::String="", kwargs...)
-    id = "suite-tooltip-" * string(rand(UInt32), base=16)
-
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject hover handlers on trigger wrapper
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-tooltip-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode && haskey(child.props, Symbol("data-suite-tooltip-trigger-wrapper"))
+            # Trigger wrapper: hover events toggle the signal
+            child.props[:on_pointerenter] = () -> set_open(Int32(1))
+            child.props[:on_pointerleave] = () -> set_open(Int32(0))
+            child.props[Symbol("data-state")] = "closed"
         end
     end
 
-    Div(:class => cn(class),
-        Symbol("data-suite-tooltip") => id,
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(4)),  # mode 4 = tooltip (hover + floating)
+        :class => cn("", class),
         :style => "display:contents",
         kwargs...,
-        [_tooltip_set_trigger_id(t, id) for t in trigger_nodes]...,
-        content_nodes...,
-    )
-end
-
-function _tooltip_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-tooltip-trigger-wrapper"))
-        inner_props = copy(node.children[1].props)
-        inner_props[Symbol("data-suite-tooltip-trigger")] = id
-        inner_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.children[1].tag, inner_props, node.children[1].children)
-    end
-    node
+        children...)
 end
 
 """
@@ -149,10 +132,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Tooltip,
         "Tooltip.jl",
-        :js_runtime,
+        :island,
         "Hover/focus-triggered informational popup with delay state machine",
         Symbol[],
-        [:Floating, :DismissLayer, :Tooltip],
+        Symbol[],
         [:TooltipProvider, :Tooltip, :TooltipTrigger, :TooltipContent],
     ))
 end

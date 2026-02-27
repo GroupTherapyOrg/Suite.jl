@@ -2459,7 +2459,7 @@ using Test
                 )
             ))
             @test occursin("data-suite-tooltip-provider", html)
-            @test occursin("data-suite-tooltip", html)
+            @test occursin("therapy-island", html)
             @test occursin("Tooltip text", html)
         end
 
@@ -2483,7 +2483,7 @@ using Test
                 TooltipTrigger("Hover"),
                 TooltipContent(P("Tip"))
             ))
-            @test occursin("data-suite-tooltip-trigger", html)
+            @test occursin("data-suite-tooltip-trigger-wrapper", html)
             @test occursin("data-state=\"closed\"", html)
         end
 
@@ -2569,14 +2569,12 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Tooltip)
             meta = Suite.COMPONENT_REGISTRY[:Tooltip]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :TooltipProvider in meta.exports
             @test :Tooltip in meta.exports
             @test :TooltipTrigger in meta.exports
             @test :TooltipContent in meta.exports
-            @test :Tooltip in meta.js_modules
-            @test :Floating in meta.js_modules
-            @test :DismissLayer in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 
@@ -2588,7 +2586,7 @@ using Test
                     P("User bio here")
                 )
             ))
-            @test occursin("data-suite-hover-card", html)
+            @test occursin("therapy-island", html)
             @test occursin("User bio here", html)
             @test occursin("@user", html)
         end
@@ -2598,7 +2596,7 @@ using Test
                 HoverCardTrigger(Span("Hover")),
                 HoverCardContent(P("Card"))
             ))
-            @test occursin("data-suite-hover-card-trigger", html)
+            @test occursin("data-suite-hover-card-trigger-wrapper", html)
             @test occursin("data-state=\"closed\"", html)
         end
 
@@ -2692,13 +2690,11 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :HoverCard)
             meta = Suite.COMPONENT_REGISTRY[:HoverCard]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :HoverCard in meta.exports
             @test :HoverCardTrigger in meta.exports
             @test :HoverCardContent in meta.exports
-            @test :HoverCard in meta.js_modules
-            @test :Floating in meta.js_modules
-            @test :DismissLayer in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 

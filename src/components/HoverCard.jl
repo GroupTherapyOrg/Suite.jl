@@ -1,20 +1,20 @@
 # HoverCard.jl — Suite.jl HoverCard Component
 #
-# Tier: js_runtime (requires suite.js)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Floating, DismissLayer, HoverCard
+# JS Modules: none
 #
 # Usage via package: using Suite; HoverCard(...)
 # Usage via extract: include("components/HoverCard.jl"); HoverCard(...)
 #
 # Behavior (matches Radix HoverCard):
 #   - Hover-triggered preview card for links/anchors
-#   - Open delay 700ms, close delay 300ms
-#   - Hovering content keeps card open
-#   - Touch events ignored (mouse/keyboard only)
-#   - Escape key dismisses
-#   - Click outside dismisses
+#   - Open delay 700ms, close delay 300ms (configurable)
+#   - Hovering content keeps card open (cancels close timer)
+#   - Escape key dismisses, click outside dismisses
 #   - No focus trap (preview content, not interactive)
+#   - Floating positioning with flip/shift collision avoidance
+#   - Signal-driven: BindModal(mode=5) handles hover timing + floating positioning
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -24,65 +24,41 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export HoverCard, HoverCardTrigger, HoverCardContent
 
-"""
-    HoverCard(children...; open_delay, close_delay, class, kwargs...) -> VNode
+#   HoverCard(children...; open_delay, close_delay, class, kwargs...) -> IslandVNode
+#
+# A hover-triggered preview card. Shows rich content when hovering a trigger.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# BindModal(mode=5) handles hover timing (delayed open + delayed close),
+# floating positioning, content hover (cancel close), Escape + click-outside dismiss.
+#
+# Arguments:
+# - open_delay::Int=700: Milliseconds before card opens on hover
+# - close_delay::Int=300: Milliseconds before card closes after leaving
+#
+# Examples:
+#   HoverCard(HoverCardTrigger(A(:href => "#", "@user")), HoverCardContent(P("Bio")))
+@island function HoverCard(children...; open_delay::Int=700, close_delay::Int=300, class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
-A hover-triggered preview card. Shows rich content when hovering a trigger.
-
-# Arguments
-- `open_delay::Int=700`: Milliseconds before card opens on hover
-- `close_delay::Int=300`: Milliseconds before card closes after leaving
-
-# Examples
-```julia
-HoverCard(
-    HoverCardTrigger(
-        A(:href => "#", :class => "underline", "@juliahub")
-    ),
-    HoverCardContent(
-        Div(:class => "flex gap-4",
-            Avatar(src="/avatar.png", fallback="JH"),
-            Div(
-                H4(:class => "text-sm font-semibold", "@juliahub"),
-                P(:class => "text-sm", "The Julia Computing platform.")
-            )
-        )
-    )
-)
-```
-"""
-function HoverCard(children...; open_delay::Int=700, close_delay::Int=300, class::String="", kwargs...)
-    id = "suite-hover-card-" * string(rand(UInt32), base=16)
-
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject hover handlers on trigger wrapper
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-hover-card-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode && haskey(child.props, Symbol("data-suite-hover-card-trigger-wrapper"))
+            # Trigger wrapper: hover events toggle the signal
+            child.props[:on_pointerenter] = () -> set_open(Int32(1))
+            child.props[:on_pointerleave] = () -> set_open(Int32(0))
+            child.props[Symbol("data-state")] = "closed"
         end
     end
 
-    Div(:class => cn(class),
-        Symbol("data-suite-hover-card") => id,
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(5)),  # mode 5 = hover_card (hover + floating + dismiss)
         Symbol("data-suite-hover-card-open-delay") => string(open_delay),
         Symbol("data-suite-hover-card-close-delay") => string(close_delay),
+        :class => cn("", class),
         :style => "display:contents",
         kwargs...,
-        [_hover_card_set_trigger_id(t, id) for t in trigger_nodes]...,
-        content_nodes...,
-    )
-end
-
-function _hover_card_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-hover-card-trigger-wrapper"))
-        new_props = copy(node.props)
-        new_props[Symbol("data-suite-hover-card-trigger")] = id
-        new_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.tag, new_props, node.children)
-    end
-    node
+        children...)
 end
 
 """
@@ -143,10 +119,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :HoverCard,
         "HoverCard.jl",
-        :js_runtime,
+        :island,
         "Hover-triggered preview card with open/close delay",
         Symbol[],
-        [:Floating, :DismissLayer, :HoverCard],
+        Symbol[],
         [:HoverCard, :HoverCardTrigger, :HoverCardContent],
     ))
 end
