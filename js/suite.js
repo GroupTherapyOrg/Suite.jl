@@ -438,108 +438,7 @@
 
         // --- Collapsible: REMOVED (converted to @island in SUITE-903) ----------
 
-        // --- Accordion ------------------------------------------------------------
-        Accordion: {
-            /**
-             * Initialize accordion components.
-             * Discovers [data-suite-accordion] roots. Handles single/multiple mode,
-             * collapsible flag, and keyboard navigation between triggers.
-             */
-            init() {
-                const roots = document.querySelectorAll('[data-suite-accordion]');
-                roots.forEach(root => {
-                    if (root._suiteAccordion) return;
-                    root._suiteAccordion = true;
-
-                    const type = root.getAttribute('data-suite-accordion') || 'single';
-                    const collapsible = root.hasAttribute('data-collapsible');
-                    const orientation = root.getAttribute('data-orientation') || 'vertical';
-
-                    function getItems() {
-                        return Array.from(root.querySelectorAll('[data-suite-accordion-item]'));
-                    }
-
-                    function getTriggers() {
-                        return Array.from(root.querySelectorAll('[data-suite-accordion-trigger]'))
-                            .filter(t => !t.disabled && !t.closest('[data-suite-accordion-item]').hasAttribute('data-disabled'));
-                    }
-
-                    function toggleItem(item, open) {
-                        const state = open ? 'open' : 'closed';
-                        item.setAttribute('data-state', state);
-                        const trigger = item.querySelector('[data-suite-accordion-trigger]');
-                        const content = item.querySelector('[data-suite-accordion-content]');
-                        if (trigger) {
-                            trigger.setAttribute('data-state', state);
-                            trigger.setAttribute('aria-expanded', String(open));
-                            if (type === 'single' && open && !collapsible) {
-                                trigger.setAttribute('aria-disabled', 'true');
-                            } else {
-                                trigger.removeAttribute('aria-disabled');
-                            }
-                        }
-                        if (content) {
-                            content.setAttribute('data-state', state);
-                            content.hidden = !open;
-                        }
-                    }
-
-                    // Trigger click handlers
-                    root.addEventListener('click', (e) => {
-                        const trigger = e.target.closest('[data-suite-accordion-trigger]');
-                        if (!trigger || trigger.disabled) return;
-                        const item = trigger.closest('[data-suite-accordion-item]');
-                        if (!item || item.hasAttribute('data-disabled')) return;
-
-                        const isOpen = item.getAttribute('data-state') === 'open';
-
-                        if (type === 'single') {
-                            if (isOpen) {
-                                if (collapsible) toggleItem(item, false);
-                                // If not collapsible, do nothing (can't close last open)
-                            } else {
-                                // Close all others, open this one
-                                getItems().forEach(i => toggleItem(i, false));
-                                toggleItem(item, true);
-                            }
-                        } else {
-                            // Multiple mode — always toggle
-                            toggleItem(item, !isOpen);
-                        }
-                    });
-
-                    // Keyboard navigation between triggers
-                    root.addEventListener('keydown', (e) => {
-                        const trigger = e.target.closest('[data-suite-accordion-trigger]');
-                        if (!trigger) return;
-
-                        const triggers = getTriggers();
-                        const idx = triggers.indexOf(trigger);
-                        if (idx === -1) return;
-
-                        const isVert = orientation === 'vertical';
-                        const nextKey = isVert ? 'ArrowDown' : 'ArrowRight';
-                        const prevKey = isVert ? 'ArrowUp' : 'ArrowLeft';
-                        let target;
-
-                        if (e.key === nextKey) {
-                            target = triggers[(idx + 1) % triggers.length];
-                        } else if (e.key === prevKey) {
-                            target = triggers[(idx - 1 + triggers.length) % triggers.length];
-                        } else if (e.key === 'Home') {
-                            target = triggers[0];
-                        } else if (e.key === 'End') {
-                            target = triggers[triggers.length - 1];
-                        }
-
-                        if (target) {
-                            e.preventDefault();
-                            target.focus();
-                        }
-                    });
-                });
-            }
-        },
+        // --- Accordion: REMOVED (converted to @island in SUITE-904) ----------------
 
         // --- Tabs -----------------------------------------------------------------
         Tabs: {
@@ -5342,7 +5241,7 @@
             // ThemeToggle: removed (now @island)
             this.ThemeSwitcher.init();
             // Collapsible: removed (now @island)
-            this.Accordion.init();
+            // Accordion: removed (now @island)
             this.Tabs.init();
             this.ToggleGroup.init();
             this.Dialog.init();

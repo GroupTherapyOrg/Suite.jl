@@ -1084,11 +1084,10 @@ using Test
         html = Therapy.render_to_string(suite_script())
         @test occursin("<script", html)
         @test occursin("Suite", html)
-        # ThemeToggle + Collapsible removed from suite.js (now @island)
+        # ThemeToggle + Collapsible + Accordion removed from suite.js (now @island)
         @test occursin("ThemeSwitcher", html)
         @test occursin("data-suite-theme-switcher", html)
         # Verify remaining modules are in suite.js
-        @test occursin("Accordion", html)
         @test occursin("Tabs", html)
     end
 
@@ -1193,6 +1192,7 @@ using Test
                     AccordionContent(Div("Content 2")),
                 ),
             ))
+            @test occursin("therapy-island", html)
             @test occursin("data-suite-accordion=\"single\"", html)
             @test occursin("data-orientation=\"vertical\"", html)
             @test occursin("Section 1", html)
@@ -1221,14 +1221,17 @@ using Test
             @test occursin("data-collapsible", html)
         end
 
-        @testset "Default value" begin
+        @testset "Default value (signal-driven)" begin
             html = Therapy.render_to_string(Accordion(default_value="item-1",
                 AccordionItem(value="item-1",
                     AccordionTrigger("Open"),
                     AccordionContent(Div("Visible")),
                 ),
             ))
-            @test occursin("data-default-value=\"item-1\"", html)
+            # Default item renders with data-state="open" via signal + BindBool
+            @test occursin("data-state=\"open\"", html)
+            # Trigger aria-expanded is "true" for default open item
+            @test occursin("aria-expanded=\"true\"", html)
         end
 
         @testset "Disabled accordion" begin
@@ -1272,13 +1275,25 @@ using Test
             @test occursin("rotate-180", html)
         end
 
-        @testset "AccordionContent structure" begin
+        @testset "AccordionContent structure (standalone)" begin
+            # Standalone AccordionContent retains hidden attr (island doesn't process it)
             html = Therapy.render_to_string(AccordionContent(Div("Inner")))
             @test occursin("data-suite-accordion-content", html)
             @test occursin("role=\"region\"", html)
             @test occursin("hidden", html)
             @test occursin("overflow-hidden", html)
             @test occursin("Inner", html)
+        end
+
+        @testset "Content inside Accordion (island removes hidden)" begin
+            html = Therapy.render_to_string(Accordion(
+                AccordionItem(value="x",
+                    AccordionTrigger("T"),
+                    AccordionContent(Div("Inner")),
+                ),
+            ))
+            # Inside Accordion, hidden is replaced with CSS visibility class
+            @test occursin("data-[state=closed]:hidden", html)
         end
 
         @testset "Styling" begin
@@ -1327,12 +1342,11 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Accordion)
             meta = Suite.COMPONENT_REGISTRY[:Accordion]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Accordion in meta.exports
             @test :AccordionItem in meta.exports
             @test :AccordionTrigger in meta.exports
             @test :AccordionContent in meta.exports
-            @test :Accordion in meta.js_modules
         end
     end
 
