@@ -1,17 +1,18 @@
 # Tabs.jl — Suite.jl Tabs Component
 #
-# Tier: js_runtime (requires suite.js for tab selection + roving tabindex)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none
-# JS Modules: Tabs
+# JS Modules: none
 #
 # Usage via package: using Suite; Tabs(...)
 # Usage via extract: include("components/Tabs.jl"); Tabs(...)
 #
 # Behavior:
-#   - TabsList with roving tabindex (arrow keys move focus)
-#   - Automatic mode: focus selects tab. Manual mode: Enter/Space selects.
-#   - ARIA: role=tablist, role=tab, role=tabpanel
-#   - aria-selected, aria-controls, aria-labelledby, tabindex
+#   - Signal-driven: BindBool maps per-tab active signal to data-state and aria-selected
+#   - @island Tabs injects signal bindings into TabsTrigger/TabsContent children
+#   - Content visibility via CSS data-[state=inactive]:hidden (no JS hidden toggling)
+#   - Click on trigger selects tab (deselects all others)
+#   - ARIA: role=tablist, role=tab, role=tabpanel, aria-selected
 #
 # Reference: Radix UI Tabs — https://www.radix-ui.com/primitives/docs/components/tabs
 # Reference: WAI-ARIA Tabs — https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
@@ -24,44 +25,101 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export Tabs, TabsList, TabsTrigger, TabsContent
 
-"""
-    Tabs(children...; default_value, orientation, activation, class, kwargs...) -> VNode
-
-A set of layered panels, each associated with a tab trigger.
-
-Requires `suite_script()` in your layout for JS behavior.
-
-# Props
-- `default_value`: the value of the initially selected tab (required)
-- `orientation`: `"horizontal"` (default) or `"vertical"` — affects arrow key directions
-- `activation`: `"automatic"` (default, focus selects) or `"manual"` (Enter/Space selects)
-
-# Examples
-```julia
-Tabs(default_value="tab1",
-    TabsList(
-        TabsTrigger("Account", value="tab1"),
-        TabsTrigger("Password", value="tab2"),
-    ),
-    TabsContent(value="tab1",
-        P("Account settings content"),
-    ),
-    TabsContent(value="tab2",
-        P("Password settings content"),
-    ),
-)
-```
-"""
-function Tabs(children...; default_value::String="",
+#   Tabs(children...; default_value, orientation, activation, class, kwargs...) -> IslandVNode
+#
+# A set of layered panels, each associated with a tab trigger.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# TabsTrigger children (inside TabsList) and TabsContent children are auto-detected
+# and injected with signal bindings for data-state, aria-selected, and click handlers.
+#
+# Props:
+#   default_value: the value of the initially selected tab
+#   orientation: "horizontal" (default) or "vertical" — affects arrow key directions
+#   activation: "automatic" (default) or "manual"
+#
+# Examples:
+#   Tabs(default_value="tab1",
+#       TabsList(TabsTrigger("Account", value="tab1"), TabsTrigger("Password", value="tab2")),
+#       TabsContent(value="tab1", P("Account settings")),
+#       TabsContent(value="tab2", P("Password settings")),
+#   )
+@island function Tabs(children...; default_value::String="",
                    orientation::String="horizontal", activation::String="automatic",
                    class::String="", kwargs...)
-    id = "suite-tabs-" * string(rand(UInt32), base=16)
+    # Collect triggers and content panels from children
+    triggers = VNode[]
+    contents = VNode[]
+
+    for child in children
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-tabslist"))
+                # Walk TabsList children to find triggers
+                for trigger_child in child.children
+                    if trigger_child isa VNode && haskey(trigger_child.props, Symbol("data-suite-tabs-trigger"))
+                        push!(triggers, trigger_child)
+                    end
+                end
+            elseif haskey(child.props, Symbol("data-suite-tabs-content"))
+                push!(contents, child)
+            end
+        end
+    end
+
+    # Create per-trigger signals (Int32: 0=inactive, 1=active)
+    trigger_signals = Tuple{Any, Any}[]
+    for trigger in triggers
+        value = string(trigger.props[Symbol("data-suite-tabs-trigger")])
+        is_active = value == default_value
+        sig, set_sig = create_signal(Int32(is_active ? 1 : 0))
+        push!(trigger_signals, (sig, set_sig))
+    end
+
+    # Inject BindBool and click handlers on triggers
+    for (i, trigger) in enumerate(triggers)
+        sig = trigger_signals[i][1]
+        trigger.props[Symbol("data-state")] = BindBool(sig, "inactive", "active")
+        trigger.props[:aria_selected] = BindBool(sig, "false", "true")
+        # Set initial tabindex correctly (active=0, inactive=-1)
+        value = string(trigger.props[Symbol("data-suite-tabs-trigger")])
+        is_active = value == default_value
+        trigger.props[:tabindex] = is_active ? "0" : "-1"
+
+        # Click handler (unless disabled)
+        if !haskey(trigger.props, :disabled) && !haskey(trigger.props, Symbol("data-disabled"))
+            let all_sigs = trigger_signals, my_idx = i
+                trigger.props[:on_click] = function()
+                    for (j, (_, setter)) in enumerate(all_sigs)
+                        setter(j == my_idx ? Int32(1) : Int32(0))
+                    end
+                end
+            end
+        end
+    end
+
+    # Match content panels to triggers by value and inject BindBool
+    for content in contents
+        content_value = string(content.props[Symbol("data-suite-tabs-content")])
+        for (i, trigger) in enumerate(triggers)
+            trigger_value = string(trigger.props[Symbol("data-suite-tabs-trigger")])
+            if trigger_value == content_value
+                sig = trigger_signals[i][1]
+                content.props[Symbol("data-state")] = BindBool(sig, "inactive", "active")
+                # Remove HTML hidden attr — CSS handles visibility via data-state
+                delete!(content.props, :hidden)
+                # Add CSS class to hide when inactive
+                current_class = get(content.props, :class, "")
+                content.props[:class] = cn(current_class, "data-[state=inactive]:hidden")
+                break
+            end
+        end
+    end
+
     classes = cn("", class)
 
-    Div(Symbol("data-suite-tabs") => id,
+    Div(Symbol("data-suite-tabs") => "",
         Symbol("data-orientation") => orientation,
         Symbol("data-activation") => activation,
-        Symbol("data-default-value") => default_value,
         :class => classes,
         kwargs...,
         children...)
@@ -150,51 +208,15 @@ function TabsContent(children...; value::String="", theme::Symbol=:default,
         children...)
 end
 
-# --- Initial state script ---
-
-"""
-    suite_tabs_init_script() -> VNode
-
-Inline script that applies initial tab selection based on data-default-value.
-The suite.js Tabs.init() handles ongoing interaction.
-"""
-function suite_tabs_init_script()
-    Therapy.Script("""
-    (function(){
-        document.querySelectorAll('[data-suite-tabs][data-default-value]').forEach(function(root) {
-            if (root._suiteTabsDefaultApplied) return;
-            root._suiteTabsDefaultApplied = true;
-            var val = root.getAttribute('data-default-value');
-            if (!val) return;
-            var list = root.querySelector('[data-suite-tabslist]');
-            if (!list) return;
-            // Activate matching trigger
-            list.querySelectorAll('[data-suite-tabs-trigger]').forEach(function(t) {
-                var isActive = t.getAttribute('data-suite-tabs-trigger') === val;
-                t.setAttribute('data-state', isActive ? 'active' : 'inactive');
-                t.setAttribute('aria-selected', String(isActive));
-                t.setAttribute('tabindex', isActive ? '0' : '-1');
-            });
-            // Show matching content
-            root.querySelectorAll('[data-suite-tabs-content]').forEach(function(p) {
-                var isActive = p.getAttribute('data-suite-tabs-content') === val;
-                p.setAttribute('data-state', isActive ? 'active' : 'inactive');
-                p.hidden = !isActive;
-            });
-        });
-    })();
-    """)
-end
-
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Tabs,
         "Tabs.jl",
-        :js_runtime,
+        :island,
         "Tabbed interface with keyboard navigation and roving tabindex",
         Symbol[],
-        [:Tabs],
+        Symbol[],
         [:Tabs, :TabsList, :TabsTrigger, :TabsContent],
     ))
 end

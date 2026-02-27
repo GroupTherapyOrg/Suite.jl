@@ -1,18 +1,19 @@
 # ToggleGroup.jl — Suite.jl Toggle Group Component
 #
-# Tier: js_runtime (requires suite.js for selection management + roving focus)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (contains own toggle item rendering)
-# JS Modules: ToggleGroup
+# JS Modules: none
 #
 # Usage via package: using Suite; ToggleGroup(...)
 # Usage via extract: include("components/ToggleGroup.jl"); ToggleGroup(...)
 #
 # Behavior:
+#   - Signal-driven: BindBool maps per-item signal to data-state and ARIA attributes
+#   - @island ToggleGroup injects signal bindings into ToggleGroupItem children
 #   - Single mode: one item selected at a time, deselection allowed
 #   - Multiple mode: any combination of items selected
-#   - Single mode: items use role=radio + aria-checked (NOT aria-pressed!)
-#   - Multiple mode: items use aria-pressed
-#   - Optional roving focus: arrow keys move focus between items
+#   - Single mode: items get role=radio + aria-checked via BindBool
+#   - Multiple mode: items get aria-pressed via BindBool
 #
 # Reference: Radix UI ToggleGroup — https://www.radix-ui.com/primitives/docs/components/toggle-group
 
@@ -24,42 +25,99 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export ToggleGroup, ToggleGroupItem
 
-"""
-    ToggleGroup(children...; type, default_value, variant, size, orientation, disabled, class, kwargs...) -> VNode
-
-A group of toggle buttons where selection is managed collectively.
-
-Requires `suite_script()` in your layout for JS behavior.
-
-# Props
-- `type`: `"single"` (default) or `"multiple"` — selection mode
-- `default_value`: initially selected value(s) — String for single, Vector{String} for multiple
-- `variant`: `"default"` or `"outline"` — passed to items
-- `size`: `"default"`, `"sm"`, or `"lg"` — passed to items
-- `orientation`: `"horizontal"` (default) or `"vertical"` — affects arrow key directions
-- `disabled`: disable all items
-
-# Examples
-```julia
-# Single selection
-ToggleGroup(type="single", default_value="center",
-    ToggleGroupItem(value="left", "Left"),
-    ToggleGroupItem(value="center", "Center"),
-    ToggleGroupItem(value="right", "Right"),
-)
-
-# Multiple selection, outline variant
-ToggleGroup(type="multiple", variant="outline",
-    ToggleGroupItem(value="bold", "B"),
-    ToggleGroupItem(value="italic", "I"),
-    ToggleGroupItem(value="underline", "U"),
-)
-```
-"""
-function ToggleGroup(children...; type::String="single", default_value=nothing,
+#   ToggleGroup(children...; type, default_value, variant, size, orientation, disabled, class, kwargs...) -> IslandVNode
+#
+# A group of toggle buttons where selection is managed collectively.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# ToggleGroupItem children are auto-detected and injected with signal bindings
+# for data-state, aria-checked/aria-pressed, and click handlers.
+#
+# Props:
+#   type: "single" (default) or "multiple" — selection mode
+#   default_value: initially selected value(s) — String for single, Vector{String} for multiple
+#   variant: "default" or "outline"
+#   size: "default", "sm", or "lg"
+#   orientation: "horizontal" (default) or "vertical"
+#   disabled: disable all items
+#
+# Examples:
+#   ToggleGroup(default_value="center",
+#       ToggleGroupItem(value="left", "Left"),
+#       ToggleGroupItem(value="center", "Center"),
+#       ToggleGroupItem(value="right", "Right"),
+#   )
+@island function ToggleGroup(children...; type::String="single", default_value=nothing,
                           variant::String="default", size::String="default",
                           orientation::String="horizontal", disabled::Bool=false,
                           theme::Symbol=:default, class::String="", kwargs...)
+    # Compute which items are initially on
+    on_values = Set{String}()
+    if default_value !== nothing
+        if default_value isa AbstractString
+            push!(on_values, default_value)
+        elseif default_value isa AbstractVector
+            for v in default_value
+                push!(on_values, string(v))
+            end
+        end
+    end
+
+    # Collect item signals for coordination
+    item_signals = Tuple{Any, Any}[]
+    items = VNode[]
+
+    for child in children
+        if child isa VNode && haskey(child.props, Symbol("data-suite-toggle-group-item"))
+            item_value = string(child.props[Symbol("data-suite-toggle-group-item")])
+            is_on = item_value in on_values
+
+            # Create signal for this item (Int32: 0=off, 1=on)
+            item_sig, set_item_sig = create_signal(Int32(is_on ? 1 : 0))
+            push!(item_signals, (item_sig, set_item_sig))
+            push!(items, child)
+            item_idx = length(item_signals)
+
+            # Inject BindBool for data-state (off/on)
+            child.props[Symbol("data-state")] = BindBool(item_sig, "off", "on")
+
+            # Inject ARIA attributes based on type
+            if type == "single"
+                child.props[:role] = "radio"
+                child.props[:aria_checked] = BindBool(item_sig, "false", "true")
+            else
+                child.props[:aria_pressed] = BindBool(item_sig, "false", "true")
+            end
+
+            # Click handler (unless disabled)
+            item_is_disabled = haskey(child.props, Symbol("data-disabled"))
+            if !disabled && !item_is_disabled
+                let all_sigs = item_signals, my_get = item_sig, my_set = set_item_sig, my_idx = item_idx
+                    child.props[:on_click] = function()
+                        current = my_get()
+                        if type == "single"
+                            if current == Int32(1)
+                                # Already on — deselect
+                                my_set(Int32(0))
+                            else
+                                # Deselect all, select this
+                                for (j, (_, setter)) in enumerate(all_sigs)
+                                    if j != my_idx
+                                        setter(Int32(0))
+                                    end
+                                end
+                                my_set(Int32(1))
+                            end
+                        else
+                            # Multiple mode — toggle
+                            my_set(Int32(1) - current)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
     base = "inline-flex items-center justify-center gap-1 rounded-lg"
     classes = cn(base, class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
@@ -74,15 +132,6 @@ function ToggleGroup(children...; type::String="single", default_value=nothing,
     ]
     if disabled
         push!(attrs, Symbol("data-disabled") => "")
-    end
-
-    # Pass default value info for JS init
-    if default_value !== nothing
-        if default_value isa AbstractString
-            push!(attrs, Symbol("data-default-value") => default_value)
-        elseif default_value isa AbstractVector
-            push!(attrs, Symbol("data-default-value") => join(default_value, ","))
-        end
     end
 
     Div(attrs..., kwargs..., children...)
@@ -139,10 +188,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :ToggleGroup,
         "ToggleGroup.jl",
-        :js_runtime,
+        :island,
         "Group of toggle buttons with single/multiple selection",
         Symbol[],
-        [:ToggleGroup],
+        Symbol[],
         [:ToggleGroup, :ToggleGroupItem],
     ))
 end

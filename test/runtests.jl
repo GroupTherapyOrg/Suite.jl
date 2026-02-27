@@ -1084,11 +1084,9 @@ using Test
         html = Therapy.render_to_string(suite_script())
         @test occursin("<script", html)
         @test occursin("Suite", html)
-        # ThemeToggle + Collapsible + Accordion removed from suite.js (now @island)
+        # ThemeToggle + Collapsible + Accordion + Tabs + ToggleGroup removed from suite.js (now @island)
         @test occursin("ThemeSwitcher", html)
         @test occursin("data-suite-theme-switcher", html)
-        # Verify remaining modules are in suite.js
-        @test occursin("Tabs", html)
     end
 
     # ==========================================================================
@@ -1360,12 +1358,14 @@ using Test
                 TabsContent(value="tab1", Div("Account settings")),
                 TabsContent(value="tab2", Div("Password settings")),
             ))
+            @test occursin("therapy-island", html)
             @test occursin("data-suite-tabs", html)
-            @test occursin("data-default-value=\"tab1\"", html)
             @test occursin("Account", html)
             @test occursin("Password", html)
             @test occursin("Account settings", html)
             @test occursin("Password settings", html)
+            # Default tab should be active (BindBool initial state)
+            @test occursin("data-state=\"active\"", html)
         end
 
         @testset "TabsList structure" begin
@@ -1482,12 +1482,11 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Tabs)
             meta = Suite.COMPONENT_REGISTRY[:Tabs]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Tabs in meta.exports
             @test :TabsList in meta.exports
             @test :TabsTrigger in meta.exports
             @test :TabsContent in meta.exports
-            @test :Tabs in meta.js_modules
         end
     end
 
@@ -1559,11 +1558,15 @@ using Test
                 ToggleGroupItem(value="a", "A"),
                 ToggleGroupItem(value="b", "B"),
             ))
+            @test occursin("therapy-island", html)
             @test occursin("data-suite-toggle-group=\"single\"", html)
             @test occursin("data-orientation=\"horizontal\"", html)
             @test occursin("role=\"group\"", html)
             @test occursin("A", html)
             @test occursin("B", html)
+            # Single mode items get role=radio + aria-checked
+            @test occursin("role=\"radio\"", html)
+            @test occursin("aria-checked=\"false\"", html)
         end
 
         @testset "Multiple type" begin
@@ -1571,6 +1574,8 @@ using Test
                 ToggleGroupItem(value="x", "X"),
             ))
             @test occursin("data-suite-toggle-group=\"multiple\"", html)
+            # Multiple mode items get aria-pressed (not aria-checked)
+            @test occursin("aria-pressed=\"false\"", html)
         end
 
         @testset "Default value - single" begin
@@ -1579,7 +1584,9 @@ using Test
                 ToggleGroupItem(value="center", "C"),
                 ToggleGroupItem(value="right", "R"),
             ))
-            @test occursin("data-default-value=\"center\"", html)
+            # Default item should be on (BindBool initial state)
+            @test occursin("data-state=\"on\"", html)
+            @test occursin("aria-checked=\"true\"", html)
         end
 
         @testset "Default value - multiple" begin
@@ -1587,7 +1594,9 @@ using Test
                 ToggleGroupItem(value="bold", "B"),
                 ToggleGroupItem(value="italic", "I"),
             ))
-            @test occursin("data-default-value=\"bold,italic\"", html)
+            # Default items should be on
+            @test occursin("data-state=\"on\"", html)
+            @test occursin("aria-pressed=\"true\"", html)
         end
 
         @testset "Vertical orientation" begin
@@ -1651,10 +1660,9 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :ToggleGroup)
             meta = Suite.COMPONENT_REGISTRY[:ToggleGroup]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :ToggleGroup in meta.exports
             @test :ToggleGroupItem in meta.exports
-            @test :ToggleGroup in meta.js_modules
         end
     end
 
