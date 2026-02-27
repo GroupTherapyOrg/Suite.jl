@@ -1,8 +1,8 @@
 # ContextMenu.jl — Suite.jl Context Menu Component
 #
-# Tier: js_runtime (requires suite.js for menu behavior, floating, dismiss)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Menu, ContextMenu, Floating, DismissLayer, ScrollLock, FocusGuards
+# JS Modules: none
 #
 # Usage via package: using Suite; ContextMenu(ContextMenuTrigger(...), ContextMenuContent(...))
 # Usage via extract: include("components/ContextMenu.jl"); ContextMenu(...)
@@ -13,6 +13,8 @@
 #   - Same keyboard navigation as DropdownMenu
 #   - Escape/click-outside dismiss
 #   - Sub-menu support
+#   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
+#   - BindModal(mode=7) handles contextmenu positioning + menu behavior + dismiss
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -33,57 +35,54 @@ const _CONTEXT_CHEVRON_RIGHT = """<svg xmlns="http://www.w3.org/2000/svg" width=
 const _CONTEXT_CHECK_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M20 6L9 17l-5-5"/></svg>"""
 const _CONTEXT_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="h-2 w-2"><circle cx="12" cy="12" r="6"/></svg>"""
 
-"""
-    ContextMenu(children...; class, kwargs...) -> VNode
+#   ContextMenu(children...; class, kwargs...) -> IslandVNode
+#
+# A context menu triggered by right-click (or long-press on touch).
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# ContextMenuTrigger and ContextMenuContent children are auto-detected and injected
+# with signal bindings for data-state and modal+menu behavior.
+#
+# Examples:
+#   ContextMenu(
+#       ContextMenuTrigger(Div("Right click here")),
+#       ContextMenuContent(ContextMenuItem("Cut"), ContextMenuItem("Copy"))
+#   )
+@island function ContextMenu(children...; class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
-A context menu triggered by right-click (or long-press on touch).
-
-# Examples
-```julia
-ContextMenu(
-    ContextMenuTrigger(
-        Div(:class => "flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed border-warm-200 dark:border-warm-700 text-sm",
-            "Right click here")
-    ),
-    ContextMenuContent(
-        ContextMenuLabel("Actions"),
-        ContextMenuSeparator(),
-        ContextMenuItem("Cut", shortcut="⌘X"),
-        ContextMenuItem("Copy", shortcut="⌘C"),
-        ContextMenuItem("Paste", shortcut="⌘V"),
-    )
-)
-```
-"""
-function ContextMenu(children...; class::String="", kwargs...)
-    id = "suite-context-menu-" * string(rand(UInt32), base=16)
-
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject signal bindings
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-context-menu-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-context-menu-trigger-wrapper"))
+                # Inject reactive bindings on trigger wrapper
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
+            else
+                # Content — inject data-state binding
+                _context_inject_content_bindings!(child, is_open)
+            end
         end
     end
 
-    Div(:class => cn(class),
-        Symbol("data-suite-context-menu") => id,
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(7)),  # mode 7 = context_menu
+        :class => cn("", class),
         :style => "display:contents",
         kwargs...,
-        [_context_set_trigger_id(t, id) for t in trigger_nodes]...,
-        content_nodes...,
-    )
+        children...)
 end
 
-function _context_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-context-menu-trigger-wrapper"))
-        new_props = copy(node.props)
-        new_props[Symbol("data-suite-context-menu-trigger")] = id
-        return Therapy.VNode(node.tag, new_props, node.children)
+# Walk children to find content and inject data-state binding
+function _context_inject_content_bindings!(node::VNode, is_open)
+    if haskey(node.props, Symbol("data-suite-context-menu-content"))
+        node.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
     end
-    node
+    for child in node.children
+        if child isa VNode
+            _context_inject_content_bindings!(child, is_open)
+        end
+    end
 end
 
 """
@@ -400,10 +399,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :ContextMenu,
         "ContextMenu.jl",
-        :js_runtime,
+        :island,
         "Right-click context menu with keyboard nav, typeahead, and sub-menus",
         Symbol[],
-        [:Menu, :ContextMenu, :Floating, :DismissLayer, :ScrollLock, :FocusGuards],
+        Symbol[],
         [:ContextMenu, :ContextMenuTrigger, :ContextMenuContent,
          :ContextMenuGroup, :ContextMenuLabel, :ContextMenuItem,
          :ContextMenuCheckboxItem, :ContextMenuRadioGroup,

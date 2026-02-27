@@ -1,8 +1,8 @@
 # Menubar.jl — Suite.jl Menubar Component
 #
-# Tier: js_runtime (requires suite.js for menu behavior, roving focus, floating, dismiss)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Menu, Menubar, Floating, DismissLayer, ScrollLock, FocusGuards
+# JS Modules: none
 #
 # Usage via package: using Suite; Menubar(MenubarMenu(MenubarTrigger("File"), MenubarContent(...)), ...)
 # Usage via extract: include("components/Menubar.jl"); Menubar(...)
@@ -15,6 +15,8 @@
 #   - ArrowDown on trigger opens and focuses first item
 #   - Arrow Left/Right within content navigates between menus
 #   - Same item keyboard nav, typeahead, sub-menus as DropdownMenu
+#   - Signal-driven: Int32 signal (0=none, N=menu N open)
+#   - BindModal(mode=8) handles multi-menu state + floating + dismiss
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -35,34 +37,39 @@ const _MENUBAR_CHEVRON_RIGHT = """<svg xmlns="http://www.w3.org/2000/svg" width=
 const _MENUBAR_CHECK_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M20 6L9 17l-5-5"/></svg>"""
 const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="h-2 w-2"><circle cx="12" cy="12" r="6"/></svg>"""
 
-"""
-    Menubar(children...; loop, class, kwargs...) -> VNode
+#   Menubar(children...; loop, theme, class, kwargs...) -> IslandVNode
+#
+# A horizontal menu bar containing multiple menu triggers.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# MenubarMenu children are auto-detected and injected with signal bindings.
+# Each menu trigger gets an on_click that toggles the active menu index.
+# BindModal(mode=8) handles floating positioning, dismiss, hover-switch, and keyboard nav.
+#
+# Examples:
+#   Menubar(
+#       MenubarMenu(
+#           MenubarTrigger("File"),
+#           MenubarContent(MenubarItem("New Tab"), MenubarItem("New Window"))
+#       ),
+#       MenubarMenu(
+#           MenubarTrigger("Edit"),
+#           MenubarContent(MenubarItem("Undo"), MenubarItem("Redo"))
+#       ),
+#   )
+@island function Menubar(children...; loop::Bool=true, theme::Symbol=:default, class::String="", kwargs...)
+    # Signal for active menu index (Int32: 0=none, N=menu N is open)
+    active_menu, set_active = create_signal(Int32(0))
 
-A horizontal menu bar containing multiple menu triggers.
+    # Walk children to find MenubarMenu elements and assign indices
+    menu_idx = Int32(0)
+    for child in children
+        if child isa VNode && haskey(child.props, Symbol("data-suite-menubar-menu"))
+            menu_idx += Int32(1)
+            _menubar_inject_menu_bindings!(child, active_menu, set_active, menu_idx)
+        end
+    end
 
-# Examples
-```julia
-Menubar(
-    MenubarMenu(
-        MenubarTrigger("File"),
-        MenubarContent(
-            MenubarItem("New Tab", shortcut="⌘T"),
-            MenubarItem("New Window", shortcut="⌘N"),
-            MenubarSeparator(),
-            MenubarItem("Print...", shortcut="⌘P"),
-        )
-    ),
-    MenubarMenu(
-        MenubarTrigger("Edit"),
-        MenubarContent(
-            MenubarItem("Undo", shortcut="⌘Z"),
-            MenubarItem("Redo", shortcut="⇧⌘Z"),
-        )
-    ),
-)
-```
-"""
-function Menubar(children...; loop::Bool=true, theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "flex h-9 items-center gap-1 rounded-md p-1 shadow-xs",
         "bg-warm-50 dark:bg-warm-950",
@@ -72,11 +79,36 @@ function Menubar(children...; loop::Bool=true, theme::Symbol=:default, class::St
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-suite-menubar") => "",
+        Symbol("data-modal") => BindModal(active_menu, Int32(8)),  # mode 8 = menubar
         Symbol("data-loop") => string(loop),
         :role => "menubar",
         :class => classes,
         kwargs...,
         children...)
+end
+
+# Walk a MenubarMenu's children to inject on_click on trigger markers
+# and data-suite-menubar-trigger on inner buttons
+function _menubar_inject_menu_bindings!(menu_node::VNode, active_menu, set_active, idx)
+    for child in menu_node.children
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-menubar-trigger-marker"))
+                # Put on_click on the marker div — toggles this menu open/closed
+                let i = idx
+                    child.props[:on_click] = () -> set_active(i * (Int32(1) - Int32(active_menu() == i)))
+                end
+                # Find inner button and add trigger identification
+                for inner in child.children
+                    if inner isa VNode
+                        inner.props[Symbol("data-suite-menubar-trigger")] = ""
+                        inner.props[Symbol("aria-haspopup")] = "menu"
+                        inner.props[Symbol("aria-expanded")] = "false"
+                        inner.props[Symbol("data-state")] = "closed"
+                    end
+                end
+            end
+        end
+    end
 end
 
 """
@@ -85,41 +117,12 @@ end
 An individual menu within the menubar. Contains a trigger and content.
 """
 function MenubarMenu(children...; value::String="", class::String="", kwargs...)
-    id = "suite-menubar-menu-" * string(rand(UInt32), base=16)
-
-    trigger_nodes = []
-    content_nodes = []
-    for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-menubar-trigger-marker"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
-        end
-    end
-
-    menu_value = isempty(value) ? id : value
-
-    Div(Symbol("data-suite-menubar-menu") => id,
-        Symbol("data-value") => menu_value,
+    Div(Symbol("data-suite-menubar-menu") => "",
+        Symbol("data-value") => value,
         :class => cn("relative", class),
         :style => "display:contents",
         kwargs...,
-        [_menubar_set_trigger_id(t, id) for t in trigger_nodes]...,
-        content_nodes...,
-    )
-end
-
-function _menubar_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-menubar-trigger-marker"))
-        inner = node.children[1]
-        inner_props = copy(inner.props)
-        inner_props[Symbol("data-suite-menubar-trigger")] = id
-        inner_props[Symbol("aria-haspopup")] = "menu"
-        inner_props[Symbol("aria-expanded")] = "false"
-        inner_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(inner.tag, inner_props, inner.children)
-    end
-    node
+        children...)
 end
 
 """
@@ -454,10 +457,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Menubar,
         "Menubar.jl",
-        :js_runtime,
+        :island,
         "Horizontal menu bar with multiple dropdown menus and inter-menu navigation",
         Symbol[],
-        [:Menu, :Menubar, :Floating, :DismissLayer, :ScrollLock, :FocusGuards],
+        Symbol[],
         [:Menubar, :MenubarMenu, :MenubarTrigger, :MenubarContent,
          :MenubarGroup, :MenubarLabel, :MenubarItem,
          :MenubarCheckboxItem, :MenubarRadioGroup,

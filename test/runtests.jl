@@ -2971,8 +2971,8 @@ using Test
                     ContextMenuItem("Paste"),
                 )
             ))
-            @test occursin("data-suite-context-menu=", html)
-            @test occursin("data-suite-context-menu-trigger=", html)
+            @test occursin("therapy-island", html)  # @island wrapper
+            @test occursin("data-suite-context-menu-trigger-wrapper", html)
             @test occursin("data-suite-context-menu-content", html)
             @test occursin("role=\"menu\"", html)
             @test occursin("Cut", html)
@@ -3093,7 +3093,7 @@ using Test
                     ),
                 )
             ))
-            @test occursin("data-suite-context-menu=", html)
+            @test occursin("therapy-island", html)
             @test occursin("Edit", html)
             @test occursin("Cut", html)
             @test occursin("Show Grid", html)
@@ -3130,7 +3130,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :ContextMenu)
             meta = Suite.COMPONENT_REGISTRY[:ContextMenu]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :ContextMenu in meta.exports
             @test :ContextMenuTrigger in meta.exports
             @test :ContextMenuContent in meta.exports
@@ -3143,10 +3143,7 @@ using Test
             @test :ContextMenuSub in meta.exports
             @test :ContextMenuSubTrigger in meta.exports
             @test :ContextMenuSubContent in meta.exports
-            @test :Menu in meta.js_modules
-            @test :ContextMenu in meta.js_modules
-            @test :Floating in meta.js_modules
-            @test :DismissLayer in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 
@@ -3912,9 +3909,11 @@ using Test
                     )
                 ),
             ))
+            @test occursin("therapy-island", html)  # @island wrapper
             @test occursin("data-suite-menubar", html)
             @test occursin("role=\"menubar\"", html)
-            @test occursin("data-suite-menubar-trigger=", html)
+            @test occursin("data-suite-menubar-trigger-marker", html)
+            @test occursin("data-suite-menubar-trigger", html)
             @test occursin("data-suite-menubar-content", html)
             @test occursin("aria-haspopup=\"menu\"", html)
             @test occursin("aria-expanded=\"false\"", html)
@@ -4052,13 +4051,20 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Menubar)
             meta = Suite.COMPONENT_REGISTRY[:Menubar]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Menubar in meta.exports
+            @test :MenubarMenu in meta.exports
             @test :MenubarTrigger in meta.exports
             @test :MenubarContent in meta.exports
             @test :MenubarItem in meta.exports
-            @test :Menu in meta.js_modules
-            @test :Menubar in meta.js_modules
+            @test :MenubarCheckboxItem in meta.exports
+            @test :MenubarRadioGroup in meta.exports
+            @test :MenubarRadioItem in meta.exports
+            @test :MenubarSeparator in meta.exports
+            @test :MenubarSub in meta.exports
+            @test :MenubarSubTrigger in meta.exports
+            @test :MenubarSubContent in meta.exports
+            @test isempty(meta.js_modules)
         end
     end
 
