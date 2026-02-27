@@ -1475,7 +1475,7 @@ using Test
     @testset "Toggle" begin
         @testset "Basic structure" begin
             html = Therapy.render_to_string(Toggle("Bold"))
-            @test occursin("data-suite-toggle", html)
+            @test occursin("therapy-island", html)
             @test occursin("data-state=\"off\"", html)
             @test occursin("aria-pressed=\"false\"", html)
             @test occursin("<button", html)
@@ -1527,9 +1527,8 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Toggle)
             meta = Suite.COMPONENT_REGISTRY[:Toggle]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Toggle in meta.exports
-            @test :Toggle in meta.js_modules
         end
     end
 
@@ -1642,7 +1641,7 @@ using Test
         @testset "Basic structure" begin
             html = Therapy.render_to_string(Switch())
             @test occursin("role=\"switch\"", html)
-            @test occursin("data-suite-switch", html)
+            @test occursin("therapy-island", html)
             @test occursin("data-state=\"unchecked\"", html)
             @test occursin("aria-checked=\"false\"", html)
             @test occursin("<button", html)
@@ -1703,9 +1702,8 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Switch)
             meta = Suite.COMPONENT_REGISTRY[:Switch]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Switch in meta.exports
-            @test :Switch in meta.js_modules
         end
     end
 

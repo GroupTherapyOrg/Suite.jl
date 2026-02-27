@@ -671,29 +671,6 @@
             }
         },
 
-        // --- Toggle ---------------------------------------------------------------
-        Toggle: {
-            /**
-             * Initialize standalone toggle buttons.
-             * Discovers [data-suite-toggle] elements and wires click→state toggle.
-             */
-            init() {
-                const toggles = document.querySelectorAll('[data-suite-toggle]');
-                toggles.forEach(btn => {
-                    if (btn._suiteToggle) return;
-                    btn._suiteToggle = true;
-
-                    btn.addEventListener('click', () => {
-                        if (btn.disabled || btn.hasAttribute('data-disabled')) return;
-                        const isOn = btn.getAttribute('data-state') === 'on';
-                        const newState = isOn ? 'off' : 'on';
-                        btn.setAttribute('data-state', newState);
-                        btn.setAttribute('aria-pressed', String(!isOn));
-                    });
-                });
-            }
-        },
-
         // --- Toggle Group ---------------------------------------------------------
         ToggleGroup: {
             /**
@@ -792,33 +769,6 @@
                             e.preventDefault();
                             target.focus();
                         }
-                    });
-                });
-            }
-        },
-
-        // --- Switch ---------------------------------------------------------------
-        Switch: {
-            /**
-             * Initialize switch components.
-             * Discovers [data-suite-switch] buttons and wires click→state toggle.
-             * Thumb animation handled purely via CSS data-[state] selectors.
-             */
-            init() {
-                const switches = document.querySelectorAll('[data-suite-switch]');
-                switches.forEach(btn => {
-                    if (btn._suiteSwitch) return;
-                    btn._suiteSwitch = true;
-
-                    btn.addEventListener('click', () => {
-                        if (btn.disabled || btn.hasAttribute('data-disabled')) return;
-                        const isChecked = btn.getAttribute('data-state') === 'checked';
-                        const newState = isChecked ? 'unchecked' : 'checked';
-                        btn.setAttribute('data-state', newState);
-                        btn.setAttribute('aria-checked', String(!isChecked));
-                        // Update thumb data-state
-                        const thumb = btn.querySelector('span');
-                        if (thumb) thumb.setAttribute('data-state', newState);
                     });
                 });
             }
@@ -5449,9 +5399,7 @@
             this.Collapsible.init();
             this.Accordion.init();
             this.Tabs.init();
-            this.Toggle.init();
             this.ToggleGroup.init();
-            this.Switch.init();
             this.Dialog.init();
             this.AlertDialog.init();
             this.Sheet.init();

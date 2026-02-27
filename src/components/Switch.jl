@@ -1,18 +1,19 @@
 # Switch.jl — Suite.jl Switch Component
 #
-# Tier: js_runtime (requires suite.js for checked state toggle)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none
-# JS Modules: Switch
+# JS Modules: none
 #
 # Usage via package: using Suite; Switch()
 # Usage via extract: include("components/Switch.jl"); Switch()
 #
 # Behavior:
 #   - A toggle switch (role=switch) with sliding thumb
-#   - JS discovers via data-suite-switch attribute
-#   - Clicking toggles aria-checked and data-state
+#   - Signal-driven: BindBool maps checked signal to data-state and aria-checked
+#   - Clicking toggles checked state via Wasm handler
 #   - Thumb animation via CSS translateX (no JS animation)
 #   - Native <button> provides Enter/Space keyboard support
+#   - Thumb data-state is auto-updated by set_data_state_bool (switch mode)
 #
 # Reference: Radix UI Switch — https://www.radix-ui.com/primitives/docs/components/switch
 # Reference: WAI-ARIA Switch — https://www.w3.org/WAI/ARIA/apg/patterns/switch/
@@ -25,29 +26,18 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export Switch
 
-"""
-    Switch(; checked, disabled, size, class, kwargs...) -> VNode
-
-A toggle switch with sliding thumb animation.
-
-Requires `suite_script()` in your layout for JS behavior.
-
-# Props
-- `checked`: initial checked state (default `false`)
-- `disabled`: disable the switch
-- `size`: `"default"` or `"sm"`
-
-# Examples
-```julia
-Switch()
-Switch(checked=true)
-Switch(size="sm", disabled=true)
-```
-"""
-function Switch(; checked::Bool=false, disabled::Bool=false,
+#   Switch(; checked, disabled, size, class, kwargs...) -> IslandVNode
+#
+# A toggle switch with sliding thumb animation.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# Props: checked (default false), disabled, size ("default" or "sm")
+# Examples: Switch(), Switch(checked=true), Switch(size="sm", disabled=true)
+@island function Switch(; checked::Bool=false, disabled::Bool=false,
                      size::String="default", theme::Symbol=:default,
                      class::String="", kwargs...)
-    state = checked ? "checked" : "unchecked"
+    # Signal for checked state (Int32: 0=unchecked, 1=checked)
+    is_checked, set_checked = create_signal(Int32(checked ? 1 : 0))
 
     # Track dimensions
     track_sizes = Dict(
@@ -77,10 +67,10 @@ function Switch(; checked::Bool=false, disabled::Bool=false,
     attrs = Pair{Symbol,Any}[
         :type => "button",
         :role => "switch",
-        Symbol("data-suite-switch") => "",
-        Symbol("data-state") => state,
-        :aria_checked => string(checked),
+        Symbol("data-state") => BindBool(is_checked, "unchecked", "checked"),
+        :aria_checked => BindBool(is_checked, "false", "true"),
         :class => track_classes,
+        :on_click => () -> set_checked(Int32(1) - is_checked()),
     ]
     if disabled
         push!(attrs, :disabled => true)
@@ -88,7 +78,7 @@ function Switch(; checked::Bool=false, disabled::Bool=false,
     end
 
     Therapy.Button(attrs..., kwargs...,
-        Span(Symbol("data-state") => state, :class => thumb_classes))
+        Span(Symbol("data-state") => BindBool(is_checked, "unchecked", "checked"), :class => thumb_classes))
 end
 
 # --- Registry ---
@@ -96,10 +86,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Switch,
         "Switch.jl",
-        :js_runtime,
+        :island,
         "Toggle switch with sliding thumb",
         Symbol[],
-        [:Switch],
+        Symbol[],
         [:Switch],
     ))
 end
