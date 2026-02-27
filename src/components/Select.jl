@@ -1,8 +1,8 @@
 # Select.jl — Suite.jl Select Component
 #
-# Tier: js_runtime (requires suite.js for typeahead, keyboard nav, floating)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Floating, DismissLayer, ScrollLock, FocusGuards, Select
+# JS Modules: none
 #
 # Usage via package: using Suite; Select(...)
 # Usage via extract: include("components/Select.jl"); Select(...)
@@ -17,6 +17,7 @@
 #   - Check indicator on selected item
 #   - Groups, labels, separators support
 #   - Popper positioning mode with flip/shift
+#   - Signal-driven: BindModal(mode=10) handles floating positioning + item nav + dismiss
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -37,76 +38,54 @@ const _SELECT_SCROLL_UP_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="
 
 const _SELECT_SCROLL_DOWN_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="m6 9 6 6 6-6"/></svg>"""
 
-"""
-    Select(children...; value, default_value, name, disabled, required, class, kwargs...) -> VNode
-
-A custom styled select dropdown replacing native `<select>`.
-
-# Arguments
-- `value::String=""`: Currently selected value (controlled)
-- `default_value::String=""`: Initial value (uncontrolled)
-- `name::String=""`: Form field name
-- `disabled::Bool=false`: Disable the entire select
-- `required::Bool=false`: Mark as required for form validation
-
-# Examples
-```julia
-Select(
-    SelectTrigger(SelectValue(placeholder="Select a fruit...")),
-    SelectContent(
-        SelectGroup(
-            SelectLabel("Fruits"),
-            SelectItem("Apple", value="apple"),
-            SelectItem("Banana", value="banana"),
-            SelectItem("Orange", value="orange"),
-        )
-    )
-)
-```
-"""
-function Select(children...; value::String="", default_value::String="",
+#   Select(children...; value, default_value, name, disabled, required, class, kwargs...) -> IslandVNode
+#
+# A custom styled select dropdown replacing native `<select>`.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# SelectTrigger and SelectContent children are auto-detected and injected
+# with signal bindings for data-state, aria-expanded, and select behavior.
+#
+# Examples:
+#   Select(
+#       SelectTrigger(SelectValue(placeholder="Select a fruit...")),
+#       SelectContent(SelectItem("Apple", value="apple"), SelectItem("Banana", value="banana"))
+#   )
+@island function Select(children...; value::String="", default_value::String="",
                      name::String="", disabled::Bool=false, required::Bool=false,
                      class::String="", kwargs...)
-    id = "suite-select-" * string(rand(UInt32), base=16)
+    is_open, set_open = create_signal(Int32(0))
 
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject signal bindings on trigger
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-select-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode && haskey(child.props, Symbol("data-suite-select-trigger-wrapper"))
+            # Inject on_click toggle on trigger wrapper
+            child.props[:on_click] = () -> set_open(Int32(1) - is_open())
+            # Set inner button ARIA props
+            if !isempty(child.children)
+                inner = child.children[1]
+                if inner isa VNode
+                    inner.props[:role] = "combobox"
+                    inner.props[Symbol("aria-expanded")] = "false"
+                    inner.props[Symbol("aria-autocomplete")] = "none"
+                    inner.props[Symbol("data-state")] = "closed"
+                end
+            end
         end
     end
 
-    # Determine initial value
     initial_value = !isempty(value) ? value : default_value
 
-    Div(:class => cn(class),
-        Symbol("data-suite-select") => id,
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(10)),  # mode 10 = select
         Symbol("data-suite-select-value") => initial_value,
         Symbol("data-suite-select-name") => name,
+        :class => cn(class),
         :style => "display:contents",
         (disabled ? (Symbol("data-disabled") => "",) : ())...,
         (required ? (Symbol("data-required") => "",) : ())...,
         kwargs...,
-        [_select_set_trigger_id(t, id) for t in trigger_nodes]...,
-        content_nodes...,
+        children...,
     )
-end
-
-function _select_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-select-trigger-wrapper"))
-        inner = node.children[1]
-        inner_props = copy(inner.props)
-        inner_props[Symbol("data-suite-select-trigger")] = id
-        inner_props[:role] = "combobox"
-        inner_props[Symbol("aria-expanded")] = "false"
-        inner_props[Symbol("aria-autocomplete")] = "none"
-        inner_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(inner.tag, inner_props, inner.children)
-    end
-    node
 end
 
 """
@@ -317,10 +296,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Select,
         "Select.jl",
-        :js_runtime,
+        :island,
         "Custom styled select dropdown with typeahead, keyboard navigation, and floating positioning",
         Symbol[],
-        [:Floating, :DismissLayer, :ScrollLock, :FocusGuards, :Select],
+        Symbol[],
         [:Select, :SelectTrigger, :SelectValue, :SelectContent,
          :SelectItem, :SelectGroup, :SelectLabel,
          :SelectSeparator, :SelectScrollUpButton, :SelectScrollDownButton],

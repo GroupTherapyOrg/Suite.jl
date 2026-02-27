@@ -1,8 +1,8 @@
 # Command.jl — Suite.jl Command Component (cmdk-style command palette)
 #
-# Tier: js_runtime (requires suite.js for filtering, scoring, keyboard nav)
-# Suite Dependencies: Dialog (for CommandDialog variant)
-# JS Modules: Command
+# Tier: island (Wasm — no JavaScript required)
+# Suite Dependencies: none
+# JS Modules: none
 #
 # Usage via package: using Suite; Command(...)
 # Usage via extract: include("components/Command.jl"); Command(...)
@@ -13,7 +13,8 @@
 #   - Enter key selects highlighted item
 #   - Groups auto-hide when no matching items
 #   - Empty state shown when no results
-#   - CommandDialog wraps Command inside a Dialog
+#   - CommandDialog wraps Command inside a modal overlay
+#   - Signal-driven: BindModal(mode=11) handles filtering/nav, BindModal(mode=12) handles dialog
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -28,39 +29,23 @@ export Command, CommandInput, CommandList,
 # --- SVG Icons ---
 const _COMMAND_SEARCH_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 size-4 shrink-0 opacity-50"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>"""
 
-"""
-    Command(children...; should_filter, loop, class, kwargs...) -> VNode
-
-A command palette / search interface for filtering and selecting items.
-
-# Arguments
-- `should_filter::Bool=true`: Whether to enable fuzzy filtering on search
-- `loop::Bool=true`: Whether keyboard navigation wraps around
-
-# Examples
-```julia
-Command(
-    CommandInput(placeholder="Type a command or search..."),
-    CommandList(
-        CommandEmpty("No results found."),
-        CommandGroup(heading="Suggestions",
-            CommandItem("Calendar", value="calendar"),
-            CommandItem("Search Emoji", value="emoji"),
-            CommandItem("Calculator", value="calculator"),
-        ),
-        CommandSeparator(),
-        CommandGroup(heading="Settings",
-            CommandItem("Profile", value="profile"),
-            CommandItem("Billing", value="billing"),
-            CommandItem("Settings", value="settings"),
-        ),
-    )
-)
-```
-"""
-function Command(children...; should_filter::Bool=true, loop::Bool=true,
+#   Command(children...; should_filter, loop, class, kwargs...) -> IslandVNode
+#
+# A command palette / search interface for filtering and selecting items.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# BindModal(mode=11) handles fuzzy filtering, keyboard navigation, and item highlighting.
+#
+# Examples:
+#   Command(
+#       CommandInput(placeholder="Type a command or search..."),
+#       CommandList(CommandEmpty("No results."), CommandGroup(heading="Suggestions",
+#           CommandItem("Calendar", value="calendar")))
+#   )
+@island function Command(children...; should_filter::Bool=true, loop::Bool=true,
                       theme::Symbol=:default, class::String="", kwargs...)
-    id = "suite-command-" * string(rand(UInt32), base=16)
+    # Signal starts at 1 = "activated" — mode=11 installs behaviors immediately
+    activated, _set_activated = create_signal(Int32(1))
 
     classes = cn(
         "glass-panel-elevated",
@@ -70,7 +55,8 @@ function Command(children...; should_filter::Bool=true, loop::Bool=true,
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-command") => id,
+    Div(Symbol("data-modal") => BindModal(activated, Int32(11)),  # mode 11 = command
+        Symbol("data-suite-command") => "",
         Symbol("data-suite-command-filter") => should_filter ? "true" : "false",
         Symbol("data-suite-command-loop") => loop ? "true" : "false",
         :class => classes,
@@ -246,16 +232,21 @@ function CommandShortcut(children...; theme::Symbol=:default, class::String="", 
          children...)
 end
 
-"""
-    CommandDialog(children...; class, kwargs...) -> VNode
+#   CommandDialog(children...; class, kwargs...) -> IslandVNode
+#
+# A command palette inside a dialog overlay. Useful for ⌘K command palette pattern.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# BindModal(mode=12) handles dialog open/close, scroll lock, Escape/overlay dismiss.
+# The embedded Command @island (mode=11) handles filtering and keyboard navigation.
+#
+# To open programmatically, click the trigger marker or use island._suiteOpen().
+@island function CommandDialog(children...; theme::Symbol=:default, class::String="", kwargs...)
+    is_open, set_open = create_signal(Int32(0))
 
-A command palette inside a dialog overlay. Useful for ⌘K command palette pattern.
-
-The dialog is triggered externally (e.g. via keyboard shortcut).
-Uses Dialog internally.
-"""
-function CommandDialog(children...; theme::Symbol=:default, class::String="", kwargs...)
-    id = "suite-command-dialog-" * string(rand(UInt32), base=16)
+    function toggle_dialog()
+        set_open(Int32(1) - is_open())
+    end
 
     overlay_classes = "fixed inset-0 bg-warm-950/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
     content_classes = cn(
@@ -274,19 +265,25 @@ function CommandDialog(children...; theme::Symbol=:default, class::String="", kw
         content_classes = apply_theme(content_classes, t)
     end
 
-    # Overlay + centered command palette
-    Div(Symbol("data-suite-command-dialog") => id,
-        Symbol("data-state") => "closed",
-        :style => "display:none",
-        :class => "fixed inset-0 z-50",
-        # Overlay
-        Div(:class => overlay_classes,
-            Symbol("data-suite-command-dialog-overlay") => id),
-        # Content
-        Div(:class => content_classes,
-            Symbol("data-suite-command-dialog-content") => id,
-            kwargs...,
-            Command(children...; theme=theme),
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(12)),  # mode 12 = command_dialog
+        # Hidden trigger marker for programmatic toggling
+        Span(Symbol("data-suite-command-dialog-trigger-marker") => "",
+             :style => "display:none",
+             :on_click => toggle_dialog),
+        # Dialog overlay + content (initially hidden)
+        Div(Symbol("data-suite-command-dialog") => "",
+            Symbol("data-state") => "closed",
+            :style => "display:none",
+            :class => "fixed inset-0 z-50",
+            # Overlay
+            Div(:class => overlay_classes,
+                Symbol("data-suite-command-dialog-overlay") => ""),
+            # Content with embedded Command
+            Div(:class => content_classes,
+                Symbol("data-suite-command-dialog-content") => "",
+                kwargs...,
+                Command(children...; theme=theme),
+            ),
         ),
     )
 end
@@ -296,10 +293,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Command,
         "Command.jl",
-        :js_runtime,
+        :island,
         "Command palette with fuzzy search, keyboard navigation, and item filtering",
-        Symbol[:Dialog],
-        [:Command],
+        Symbol[],
+        Symbol[],
         [:Command, :CommandInput, :CommandList,
          :CommandEmpty, :CommandGroup, :CommandItem,
          :CommandSeparator, :CommandShortcut, :CommandDialog],

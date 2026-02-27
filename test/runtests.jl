@@ -3157,8 +3157,7 @@ using Test
                     SelectItem("Banana", value="banana"),
                 )
             ))
-            @test occursin("data-suite-select=", html)
-            @test occursin("data-suite-select-trigger=", html)
+            @test occursin("therapy-island", html)
             @test occursin("data-suite-select-content", html)
             @test occursin("role=\"combobox\"", html)
             @test occursin("aria-expanded=\"false\"", html)
@@ -3361,7 +3360,7 @@ using Test
                     ),
                 )
             ))
-            @test occursin("data-suite-select=", html)
+            @test occursin("therapy-island", html)
             @test occursin("Select a fruit...", html)
             @test occursin("Fruits", html)
             @test occursin("Apple", html)
@@ -3374,7 +3373,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Select)
             meta = Suite.COMPONENT_REGISTRY[:Select]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Select in meta.exports
             @test :SelectTrigger in meta.exports
             @test :SelectValue in meta.exports
@@ -3383,8 +3382,7 @@ using Test
             @test :SelectGroup in meta.exports
             @test :SelectLabel in meta.exports
             @test :SelectSeparator in meta.exports
-            @test :Select in meta.js_modules
-            @test :Floating in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 
@@ -3401,6 +3399,7 @@ using Test
                     ),
                 )
             ))
+            @test occursin("therapy-island", html)
             @test occursin("data-suite-command=", html)
             @test occursin("data-suite-command-input", html)
             @test occursin("data-suite-command-list", html)
@@ -3565,6 +3564,8 @@ using Test
                     CommandItem("Test", value="test"),
                 )
             ))
+            @test occursin("therapy-island", html)
+            @test occursin("data-suite-command-dialog-trigger-marker", html)
             @test occursin("data-suite-command-dialog=", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("display:none", html)
@@ -3629,7 +3630,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Command)
             meta = Suite.COMPONENT_REGISTRY[:Command]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Command in meta.exports
             @test :CommandInput in meta.exports
             @test :CommandList in meta.exports
@@ -3639,7 +3640,7 @@ using Test
             @test :CommandSeparator in meta.exports
             @test :CommandShortcut in meta.exports
             @test :CommandDialog in meta.exports
-            @test :Command in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 
