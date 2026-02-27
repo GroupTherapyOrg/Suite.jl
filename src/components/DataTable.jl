@@ -1,8 +1,8 @@
 # DataTable.jl — Suite.jl DataTable Component
 #
-# Tier: js_runtime (requires suite.js for sorting, filtering, pagination)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: Table (renders via Table sub-components)
-# JS Modules: DataTable
+# JS Modules: none
 #
 # Usage via package: using Suite; DataTable(data, columns)
 # Usage via extract: include("components/DataTable.jl"); DataTable(...)
@@ -13,7 +13,7 @@
 #   - Pagination (page navigation, configurable page size)
 #   - Row selection (checkbox column, select all)
 #   - Column visibility (toggle column display)
-#   - All state managed client-side via suite.js
+#   - Signal-driven: BindModal(mode=16) handles all interaction via Wasm
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -73,47 +73,27 @@ function DataTableColumn(pair::Pair{String,String}; kwargs...)
     DataTableColumn(pair.first, pair.second; kwargs...)
 end
 
-"""
-    DataTable(data, columns; kwargs...) -> VNode
-
-A full-featured data table with sorting, filtering, pagination, row selection,
-and column visibility. Built on Table sub-components with suite.js runtime.
-
-Follows the shadcn/ui DataTable pattern (TanStack Table equivalent for Julia).
-
-# Arguments
-- `data`: Vector of NamedTuples, Dicts, or any objects with property access
-- `columns`: Vector of DataTableColumn definitions
-- `filterable::Bool=true`: Show filter input
-- `filter_placeholder::String="Filter..."`: Placeholder text for filter input
-- `filter_columns::Vector{String}=String[]`: Columns to filter on (empty = all)
-- `sortable::Bool=true`: Enable column sorting
-- `paginated::Bool=true`: Enable pagination
-- `page_size::Int=10`: Rows per page
-- `selectable::Bool=false`: Show row selection checkboxes
-- `column_visibility::Bool=false`: Show column visibility toggle
-- `caption::String=""`: Table caption
-- `class::String=""`: Additional CSS classes
-- `theme::Symbol=:default`: Theme name
-
-# Examples
-```julia
-data = [
-    (name="Alice", email="alice@example.com", status="Active", amount=250.00),
-    (name="Bob", email="bob@example.com", status="Inactive", amount=150.00),
-]
-
-columns = [
-    DataTableColumn("name", "Name"),
-    DataTableColumn("email", "Email"),
-    DataTableColumn("status", "Status"),
-    DataTableColumn("amount", "Amount", align="right"),
-]
-
-DataTable(data, columns, paginated=true, page_size=5, selectable=true)
-```
-"""
-function DataTable(data::Vector, columns::Vector{DataTableColumn};
+#   DataTable(data, columns; kwargs...) -> IslandVNode
+#
+# A full-featured data table with sorting, filtering, pagination, row selection,
+# and column visibility. Built on Table sub-components.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# Props:
+# - `data`: Vector of NamedTuples, Dicts, or any objects with property access
+# - `columns`: Vector of DataTableColumn definitions
+# - `filterable::Bool=true`: Show filter input
+# - `filter_placeholder::String="Filter..."`: Placeholder text for filter input
+# - `filter_columns::Vector{String}=String[]`: Columns to filter on (empty = all)
+# - `sortable::Bool=true`: Enable column sorting
+# - `paginated::Bool=true`: Enable pagination
+# - `page_size::Int=10`: Rows per page
+# - `selectable::Bool=false`: Show row selection checkboxes
+# - `column_visibility::Bool=false`: Show column visibility toggle
+# - `caption::String=""`: Table caption
+# - `class::String=""`: Additional CSS classes
+# - `theme::Symbol=:default`: Theme name
+@island function DataTable(data::Vector, columns::Vector{DataTableColumn};
     filterable::Bool=true,
     filter_placeholder::String="Filter...",
     filter_columns::Vector{String}=String[],
@@ -127,12 +107,14 @@ function DataTable(data::Vector, columns::Vector{DataTableColumn};
     theme::Symbol=:default,
     kwargs...)
 
+    is_active, set_active = create_signal(Int32(1))
+
     id = "suite-dt-" * string(rand(UInt32), base=16)
 
-    # Serialize data to JSON for JS consumption
+    # Serialize data to JSON for hydration consumption
     data_json = _dt_serialize_data(data, columns)
 
-    # Column metadata JSON for JS
+    # Column metadata JSON
     col_meta = _dt_serialize_columns(columns)
 
     # Build initial table render (page 1, no sort, no filter)
@@ -144,6 +126,7 @@ function DataTable(data::Vector, columns::Vector{DataTableColumn};
     theme !== :default && (wrapper_classes = apply_theme(wrapper_classes, get_theme(theme)))
 
     Div(:class => wrapper_classes,
+        Symbol("data-modal") => BindModal(is_active, Int32(16)),
         Symbol("data-suite-datatable") => id,
         Symbol("data-suite-datatable-page-size") => string(page_size),
         Symbol("data-suite-datatable-sortable") => string(sortable),
@@ -152,13 +135,13 @@ function DataTable(data::Vector, columns::Vector{DataTableColumn};
         Symbol("data-suite-datatable-column-visibility") => string(column_visibility),
         kwargs...,
 
-        # Hidden data store
-        Script(:type => "application/json",
-               Symbol("data-suite-datatable-store") => id,
-               data_json),
-        Script(:type => "application/json",
-               Symbol("data-suite-datatable-columns") => id,
-               col_meta),
+        # Hidden data stores (no <script> — zero JS rule)
+        Span(:style => "display:none",
+             Symbol("data-suite-datatable-store") => id,
+             data_json),
+        Span(:style => "display:none",
+             Symbol("data-suite-datatable-columns") => id,
+             col_meta),
 
         # Toolbar: filter + column visibility
         _dt_toolbar(id, filterable, filter_placeholder, filter_columns,
@@ -437,10 +420,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :DataTable,
         "DataTable.jl",
-        :js_runtime,
+        :island,
         "Full-featured data table with sorting, filtering, pagination, row selection",
         [:Table],
-        [:DataTable],
+        Symbol[],
         [:DataTable, :DataTableColumn],
     ))
 end

@@ -4701,6 +4701,7 @@ using Test
 
         @testset "Default rendering" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns))
+            @test occursin("therapy-island", html)  # @island wrapper
             @test occursin("data-suite-datatable", html)
             @test occursin("<table", html)
             @test occursin("<thead", html)
@@ -4714,10 +4715,10 @@ using Test
             html = Therapy.render_to_string(DataTable(test_data, test_columns))
             @test occursin("data-suite-datatable-store", html)
             @test occursin("data-suite-datatable-columns", html)
-            @test occursin("application/json", html)
-            # All data should be in JSON store
-            @test occursin("\"name\":\"Alice\"", html)
-            @test occursin("\"name\":\"Eve\"", html)
+            @test occursin("display:none", html)  # hidden data store spans
+            # All data in JSON store (HTML-escaped in span elements)
+            @test occursin("&quot;name&quot;:&quot;Alice&quot;", html)
+            @test occursin("&quot;name&quot;:&quot;Eve&quot;", html)
         end
 
         @testset "Column headers" begin
@@ -4934,7 +4935,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :DataTable)
             meta = Suite.COMPONENT_REGISTRY[:DataTable]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :DataTable in meta.exports
             @test :DataTableColumn in meta.exports
             @test :Table in meta.suite_deps
@@ -4960,6 +4961,7 @@ using Test
 
         @testset "Form container" begin
             html = Therapy.render_to_string(Form(Span("content")))
+            @test occursin("therapy-island", html)  # @island wrapper
             @test occursin("<form", html)
             @test occursin("data-suite-form", html)
             @test occursin("data-suite-form-validate-on=\"submit\"", html)
@@ -5097,7 +5099,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Form)
             meta = Suite.COMPONENT_REGISTRY[:Form]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Form in meta.exports
             @test :FormField in meta.exports
             @test :FormItem in meta.exports

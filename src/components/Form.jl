@@ -1,8 +1,8 @@
 # Form.jl — Suite.jl Form Component
 #
-# Tier: js_runtime (requires suite.js for validation)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Form
+# JS Modules: none
 #
 # Usage via package: using Suite; Form(...)
 # Usage via extract: include("components/Form.jl"); Form(...)
@@ -13,6 +13,7 @@
 #   - Label → Control → Description → Message ID linking
 #   - Submit prevention when invalid
 #   - Validation modes: onSubmit, onChange, onBlur
+#   - Signal-driven: BindModal(mode=17) handles all validation via Wasm
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -31,46 +32,28 @@ function _form_next_id()
     "suite-form-$(string(_FORM_ID_COUNTER[], base=16))"
 end
 
-"""
-    Form(children...; action, method, validate_on, class, theme, kwargs...) -> VNode
-
-A form container with client-side validation support.
-
-# Arguments
-- `action::String=""`: Form action URL
-- `method::String="post"`: Form method
-- `validate_on::String="submit"`: Validation mode — "submit", "change", or "blur"
-- `class::String=""`: Additional CSS classes
-- `theme::Symbol=:default`: Theme name
-
-# Examples
-```julia
-Form(action="/api/submit",
-    FormField(name="email",
-        FormItem(
-            FormLabel("Email"),
-            FormControl(
-                Input(type="email", placeholder="Enter your email"),
-            ),
-            FormDescription("We'll never share your email."),
-            FormMessage(),
-        ),
-        required=true,
-        pattern="[^@]+@[^@]+",
-        pattern_message="Please enter a valid email address",
-    ),
-    Button(type="submit", "Submit"),
-)
-```
-"""
-function Form(children...; action::String="", method::String="post",
+#   Form(children...; action, method, validate_on, class, theme, kwargs...) -> IslandVNode
+#
+# A form container with client-side validation support.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# Props:
+# - `action::String=""`: Form action URL
+# - `method::String="post"`: Form method
+# - `validate_on::String="submit"`: Validation mode — "submit", "change", or "blur"
+# - `class::String=""`: Additional CSS classes
+# - `theme::Symbol=:default`: Theme name
+@island function Form(children...; action::String="", method::String="post",
                    validate_on::String="submit", class::String="",
                    theme::Symbol=:default, kwargs...)
+    is_active, set_active = create_signal(Int32(1))
+
     id = "suite-form-" * string(rand(UInt32), base=16)
     form_classes = cn("space-y-6", class)
     theme !== :default && (form_classes = apply_theme(form_classes, get_theme(theme)))
 
     Therapy.Form(:class => form_classes,
+         Symbol("data-modal") => BindModal(is_active, Int32(17)),
          :action => action,
          :method => method,
          Symbol("data-suite-form") => id,
@@ -213,10 +196,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Form,
         "Form.jl",
-        :js_runtime,
+        :island,
         "Form with per-field validation, error messages, and accessibility",
         Symbol[],
-        [:Form],
+        Symbol[],
         [:Form, :FormField, :FormItem, :FormLabel,
          :FormControl, :FormDescription, :FormMessage],
     ))
