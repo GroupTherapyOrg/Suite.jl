@@ -969,8 +969,8 @@ using Test
     @testset "ThemeToggle" begin
         @testset "Default" begin
             html = Therapy.render_to_string(ThemeToggle())
+            @test occursin("therapy-island", html)
             @test occursin("<button", html)
-            @test occursin("data-suite-theme-toggle", html)
             @test occursin("aria-label=\"Toggle dark mode\"", html)
             @test occursin("type=\"button\"", html)
         end
@@ -999,9 +999,8 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :ThemeToggle)
             meta = Suite.COMPONENT_REGISTRY[:ThemeToggle]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :ThemeToggle in meta.exports
-            @test :ThemeToggle in meta.js_modules
         end
     end
 
@@ -1085,12 +1084,10 @@ using Test
         html = Therapy.render_to_string(suite_script())
         @test occursin("<script", html)
         @test occursin("Suite", html)
-        @test occursin("ThemeToggle", html)
-        @test occursin("data-suite-theme-toggle", html)
+        # ThemeToggle + Collapsible removed from suite.js (now @island)
         @test occursin("ThemeSwitcher", html)
         @test occursin("data-suite-theme-switcher", html)
-        # Verify new modules are in suite.js
-        @test occursin("Collapsible", html)
+        # Verify remaining modules are in suite.js
         @test occursin("Accordion", html)
         @test occursin("Tabs", html)
     end
@@ -1105,6 +1102,7 @@ using Test
                 CollapsibleTrigger("Toggle"),
                 CollapsibleContent(Div("Content")),
             ))
+            @test occursin("therapy-island", html)
             @test occursin("data-suite-collapsible", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("Toggle", html)
@@ -1140,13 +1138,23 @@ using Test
             @test occursin("cursor-pointer", html)
         end
 
-        @testset "Content structure" begin
+        @testset "Content structure (standalone)" begin
+            # Standalone CollapsibleContent retains hidden attr (island doesn't process it)
             html = Therapy.render_to_string(CollapsibleContent(Div("Inner")))
             @test occursin("data-suite-collapsible-content", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("hidden", html)
             @test occursin("overflow-hidden", html)
             @test occursin("Inner", html)
+        end
+
+        @testset "Content inside Collapsible (island removes hidden)" begin
+            html = Therapy.render_to_string(Collapsible(
+                CollapsibleTrigger("T"),
+                CollapsibleContent(Div("Inner")),
+            ))
+            # Inside Collapsible, hidden is replaced with CSS visibility class
+            @test occursin("data-[state=closed]:hidden", html)
         end
 
         @testset "Custom class" begin
@@ -1166,11 +1174,10 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Collapsible)
             meta = Suite.COMPONENT_REGISTRY[:Collapsible]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Collapsible in meta.exports
             @test :CollapsibleTrigger in meta.exports
             @test :CollapsibleContent in meta.exports
-            @test :Collapsible in meta.js_modules
         end
     end
 

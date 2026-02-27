@@ -1,18 +1,18 @@
 # Collapsible.jl — Suite.jl Collapsible Component
 #
-# Tier: js_runtime (requires suite.js for toggle behavior)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none
-# JS Modules: Collapsible
+# JS Modules: none
 #
 # Usage via package: using Suite; Collapsible(...)
 # Usage via extract: include("components/Collapsible.jl"); Collapsible(...)
 #
 # Behavior:
 #   - Renders a container with trigger button and collapsible content
-#   - JS discovers via data-suite-collapsible attribute
-#   - Clicking trigger toggles content visibility
-#   - CSS grid-template-rows animation for smooth expand/collapse
-#   - ARIA: aria-controls, aria-expanded on trigger; hidden on content
+#   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
+#   - @island Collapsible injects signal bindings into trigger/content children
+#   - Content visibility via CSS data-[state=closed]:hidden (no JS hidden toggling)
+#   - ARIA: aria-expanded on trigger via BindBool
 #
 # Reference: Radix UI Collapsible — https://www.radix-ui.com/primitives/docs/components/collapsible
 
@@ -24,37 +24,47 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export Collapsible, CollapsibleTrigger, CollapsibleContent
 
-"""
-    Collapsible(children...; open, disabled, class, kwargs...) -> VNode
-
-A container that can expand/collapse its content.
-
-Requires `suite_script()` in your layout for JS behavior.
-
-# Examples
-```julia
-Collapsible(
-    CollapsibleTrigger("Toggle"),
-    CollapsibleContent(
-        Div("Hidden content here")
-    ),
-)
-
-# Initially open
-Collapsible(open=true,
-    CollapsibleTrigger("Close"),
-    CollapsibleContent(Div("Visible content")),
-)
-```
-"""
-function Collapsible(children...; open::Bool=false, disabled::Bool=false,
+#   Collapsible(children...; open, disabled, class, kwargs...) -> IslandVNode
+#
+# A container that can expand/collapse its content.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# CollapsibleTrigger and CollapsibleContent children are auto-detected and
+# injected with signal bindings for data-state and aria-expanded.
+#
+# Examples:
+#   Collapsible(CollapsibleTrigger("Toggle"), CollapsibleContent(Div("Content")))
+#   Collapsible(open=true, CollapsibleTrigger("Close"), CollapsibleContent(Div("Visible")))
+@island function Collapsible(children...; open::Bool=false, disabled::Bool=false,
                           class::String="", kwargs...)
-    id = "suite-collapsible-" * string(rand(UInt32), base=16)
-    state = open ? "open" : "closed"
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(open ? 1 : 0))
+
+    # Walk children to inject signal bindings into trigger/content VNodes
+    for child in children
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-collapsible-trigger"))
+                # Inject reactive bindings into trigger
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
+                if !disabled
+                    child.props[:on_click] = () -> set_open(Int32(1) - is_open())
+                end
+            elseif haskey(child.props, Symbol("data-suite-collapsible-content"))
+                # Inject reactive bindings into content
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                # Remove HTML hidden attr — CSS handles visibility via data-state
+                delete!(child.props, :hidden)
+                # Add CSS class to hide when closed
+                current_class = get(child.props, :class, "")
+                child.props[:class] = cn(current_class, "data-[state=closed]:hidden")
+            end
+        end
+    end
 
     attrs = Pair{Symbol,Any}[
-        Symbol("data-suite-collapsible") => id,
-        Symbol("data-state") => state,
+        Symbol("data-suite-collapsible") => "",
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
         :class => cn("", class),
     ]
     if disabled
@@ -69,7 +79,8 @@ end
 
 The button that toggles the collapsible open/closed state.
 
-Must be a direct child of `Collapsible`.
+Must be a direct child of `Collapsible`. The parent @island injects
+signal bindings (data-state, aria-expanded, on_click) at render time.
 """
 function CollapsibleTrigger(children...; theme::Symbol=:default,
                                 class::String="", kwargs...)
@@ -89,9 +100,8 @@ end
 
 The content that is shown/hidden when the collapsible is toggled.
 
-Must be a direct child of `Collapsible`.
-
-Uses CSS grid-template-rows animation for smooth expand/collapse.
+Must be a direct child of `Collapsible`. The parent @island injects
+signal bindings (data-state) and CSS visibility class at render time.
 """
 function CollapsibleContent(children...; class::String="", force_mount::Bool=false, kwargs...)
     classes = cn("overflow-hidden", class)
@@ -109,10 +119,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Collapsible,
         "Collapsible.jl",
-        :js_runtime,
+        :island,
         "Expandable/collapsible content container",
         Symbol[],
-        [:Collapsible],
+        Symbol[],
         [:Collapsible, :CollapsibleTrigger, :CollapsibleContent],
     ))
 end

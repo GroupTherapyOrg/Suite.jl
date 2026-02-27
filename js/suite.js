@@ -436,42 +436,7 @@
             }
         },
 
-        // --- Collapsible ----------------------------------------------------------
-        Collapsible: {
-            /**
-             * Initialize collapsible components.
-             * Discovers [data-suite-collapsible] roots and wires trigger→content toggle.
-             */
-            init() {
-                const roots = document.querySelectorAll('[data-suite-collapsible]');
-                roots.forEach(root => {
-                    if (root._suiteCollapsible) return;
-                    root._suiteCollapsible = true;
-
-                    const trigger = root.querySelector('[data-suite-collapsible-trigger]');
-                    const content = root.querySelector('[data-suite-collapsible-content]');
-                    if (!trigger || !content) return;
-
-                    // Sync initial state from root
-                    const initialState = root.getAttribute('data-state') || 'closed';
-                    trigger.setAttribute('data-state', initialState);
-                    trigger.setAttribute('aria-expanded', String(initialState === 'open'));
-                    content.setAttribute('data-state', initialState);
-                    content.hidden = initialState !== 'open';
-
-                    trigger.addEventListener('click', () => {
-                        if (root.hasAttribute('data-disabled')) return;
-                        const isOpen = root.getAttribute('data-state') === 'open';
-                        const newState = isOpen ? 'closed' : 'open';
-                        root.setAttribute('data-state', newState);
-                        trigger.setAttribute('data-state', newState);
-                        trigger.setAttribute('aria-expanded', String(!isOpen));
-                        content.setAttribute('data-state', newState);
-                        content.hidden = isOpen;
-                    });
-                });
-            }
-        },
+        // --- Collapsible: REMOVED (converted to @island in SUITE-903) ----------
 
         // --- Accordion ------------------------------------------------------------
         Accordion: {
@@ -774,27 +739,7 @@
             }
         },
 
-        // --- Theme Toggle ---------------------------------------------------------
-        ThemeToggle: {
-            /**
-             * Initialize theme toggle buttons.
-             * Discovers elements with data-suite-theme-toggle attribute.
-             * Toggles `dark` class on <html> and persists to localStorage.
-             */
-            init() {
-                const toggles = document.querySelectorAll('[data-suite-theme-toggle]');
-                toggles.forEach(toggle => {
-                    if (toggle._suiteThemeToggle) return; // Already initialized
-                    toggle._suiteThemeToggle = true;
-                    toggle.addEventListener('click', () => {
-                        const isDark = document.documentElement.classList.toggle('dark');
-                        try {
-                            localStorage.setItem(Suite._themeKey('therapy-theme'), isDark ? 'dark' : 'light');
-                        } catch (e) {}
-                    });
-                });
-            }
-        },
+        // --- Theme Toggle: REMOVED (converted to @island in SUITE-903) ---------
 
         // --- Theme Switcher -------------------------------------------------------
         ThemeSwitcher: {
@@ -5394,9 +5339,9 @@
         // --- Auto-Discovery -------------------------------------------------------
         discover() {
             // Scan for data-suite-* attributes and initialize behaviors
-            this.ThemeToggle.init();
+            // ThemeToggle: removed (now @island)
             this.ThemeSwitcher.init();
-            this.Collapsible.init();
+            // Collapsible: removed (now @island)
             this.Accordion.init();
             this.Tabs.init();
             this.ToggleGroup.init();
