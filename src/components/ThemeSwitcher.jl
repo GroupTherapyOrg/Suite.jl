@@ -1,8 +1,8 @@
 # ThemeSwitcher.jl — Suite.jl Theme Switcher Component
 #
-# Tier: js_runtime (requires suite.js for dropdown toggle + theme application)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: ThemeSwitcher
+# JS Modules: none
 #
 # Usage via package: using Suite; ThemeSwitcher()
 # Usage via extract: include("components/ThemeSwitcher.jl"); ThemeSwitcher()
@@ -12,7 +12,7 @@
 #   - Clicking opens a dropdown with 5 theme options
 #   - Each option shows name, description, and color swatch
 #   - Selecting a theme sets data-theme on <html> + persists to localStorage
-#   - JS discovers via data-suite-theme-switcher attribute
+#   - Signal-driven: BindModal(mode=23) handles all interaction via Wasm
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -31,36 +31,19 @@ const _THEME_OPTIONS = [
     (name="Islands", key="islands", description="Glass panels — floating, blue-gray, modern", swatch="#548af7"),
 ]
 
-"""
-    ThemeSwitcher(; themes, class, kwargs...) -> VNode
+#   ThemeSwitcher(; themes, class, kwargs...) -> VNode
+#
+# A theme switcher dropdown that lets users preview all 5 Suite.jl themes.
+# Sets data-theme on <html> and persists to localStorage('suite-active-theme').
+# Also requires theme CSS overrides in input.css for non-default themes.
+# Examples: ThemeSwitcher(), ThemeSwitcher(class="ml-2")
+@island function ThemeSwitcher(; themes=_THEME_OPTIONS, class::String="", kwargs...)
+    is_active, set_active = create_signal(Int32(1))
 
-A theme switcher dropdown that lets users preview all 5 Suite.jl themes.
-
-Sets `data-theme` attribute on `<html>` and persists to `localStorage('suite-active-theme')`.
-Requires `suite_script()` in your layout for JS behavior.
-Also requires theme CSS overrides in `input.css` for non-default themes.
-
-# Examples
-```julia
-# In navbar, next to ThemeToggle:
-ThemeSwitcher()
-
-# With custom class:
-ThemeSwitcher(class="ml-2")
-
-# With custom theme options (e.g. for a site where minimal is the default):
-ThemeSwitcher(themes=[
-    (name="Minimal", key="default", description="Zinc — sharp and clean", swatch="#71717a"),
-    (name="Classic", key="classic", description="Purple — warm scholarly tones", swatch="#9558b2"),
-    (name="Ocean", key="ocean", description="Blue — professional and confident", swatch="#2563eb"),
-    (name="Nature", key="nature", description="Emerald — organic and earthy", swatch="#059669"),
-])
-```
-"""
-function ThemeSwitcher(; themes=_THEME_OPTIONS, class::String="", kwargs...)
     trigger_classes = cn("inline-flex items-center justify-center rounded-md p-2 hover:bg-warm-200 dark:hover:bg-warm-800 transition-colors cursor-pointer relative", class)
 
     Div(:class => "relative",
+        Symbol("data-modal") => BindModal(is_active, Int32(23)),
         Symbol("data-suite-theme-switcher") => "",
         kwargs...,
         # Trigger button — palette icon
@@ -119,7 +102,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :ThemeSwitcher,
         "ThemeSwitcher.jl",
-        :js_runtime,
+        :island,
         "Theme switcher dropdown for previewing Suite.jl themes",
         Symbol[],
         [:ThemeSwitcher],

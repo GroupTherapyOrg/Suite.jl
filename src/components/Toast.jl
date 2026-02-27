@@ -1,8 +1,8 @@
 # Toaster.jl — Suite.jl Toast Notification Component (Sonner-style)
 #
-# Tier: js_runtime (requires suite.js for toast queue, auto-dismiss, stacking, swipe)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Toast
+# JS Modules: none
 #
 # Usage via package: using Suite; Toaster()
 # Usage via extract: include("components/Toast.jl"); Toaster()
@@ -10,11 +10,11 @@
 # Architecture:
 #   - Toaster() renders an invisible container (placed once in layout)
 #   - Toasts are triggered from client JS: Suite.toast("Hello")
-#   - JS manages queue, stacking, auto-dismiss timers, swipe-to-dismiss
+#   - Signal-driven: BindModal(mode=22) handles queue, stacking, auto-dismiss, swipe
 #   - Variants: default, success, error, warning, info
 #   - Positions: top-left, top-center, top-right, bottom-left, bottom-center, bottom-right
 #
-# Client-side API (in browser JS):
+# Client-side API (in browser JS — exposed by Therapy.jl hydration):
 #   Suite.toast("Hello")                           — default toast
 #   Suite.toast.success("Saved!")                   — success variant
 #   Suite.toast.error("Failed", {description: "..."})  — error with description
@@ -29,56 +29,14 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export Toaster
 
-"""
-    Toaster(; position, duration, visible_toasts, class, kwargs...) -> VNode
-
-A toast notification container. Place once in your layout (typically at the end of `<body>`).
-
-Toasts are triggered from client-side JavaScript via `Suite.toast()`.
-
-# Arguments
-- `position::String="bottom-right"`: Where toasts appear. Options: "top-left", "top-center",
-  "top-right", "bottom-left", "bottom-center", "bottom-right"
-- `duration::Int=4000`: Default auto-dismiss duration in milliseconds. Use `Inf` for persistent.
-- `visible_toasts::Int=3`: Maximum visible toasts in the stack.
-- `class::String=""`: Additional CSS classes.
-- `theme::Symbol=:default`: Theme preset.
-
-# Examples
-```julia
-# In your Layout (place once):
-function Layout(children...)
-    Div(
-        Nav(...),
-        Main(children...),
-        Footer(...),
-        Toaster(),           # Default: bottom-right, 4s duration
-        suite_script()
-    )
-end
-
-# With custom position:
-Toaster(position="top-center", duration=5000)
-```
-
-# Client-side API (JavaScript)
-```javascript
-// Show toasts from browser JS:
-Suite.toast("File saved")
-Suite.toast.success("Upload complete")
-Suite.toast.error("Connection lost", { description: "Please try again" })
-Suite.toast.warning("Low disk space")
-Suite.toast.info("New version available", {
-    action: { label: "Update", onClick: () => location.reload() }
-})
-
-// Dismiss:
-const id = Suite.toast("Processing...")
-Suite.toast.dismiss(id)
-Suite.toast.dismissAll()
-```
-"""
-function Toaster(;
+#   Toaster(; position, duration, visible_toasts, class, kwargs...) -> VNode
+#
+# A toast notification container. Place once in your layout.
+# Toasts are triggered via Suite.toast() (exposed by Therapy.jl hydration mode=22).
+# Args: position ("bottom-right" etc.), duration (4000ms), visible_toasts (3)
+# Client API: Suite.toast("msg"), Suite.toast.success("msg"), .error, .warning, .info
+# Dismiss: Suite.toast.dismiss(id), Suite.toast.dismissAll()
+@island function Toaster(;
     theme::Symbol=:default,
     position::String="bottom-right",
     duration::Int=4000,
@@ -86,12 +44,15 @@ function Toaster(;
     class::String="",
     kwargs...
 )
+    is_active, set_active = create_signal(Int32(1))
+
     classes = cn("", class)
     if theme !== :default
         t = get_theme(theme)
         classes = apply_theme(classes, t)
     end
     Section(
+        Symbol("data-modal") => BindModal(is_active, Int32(22)),
         :aria_label => "Notifications",
         :tabindex => "-1",
         Symbol("data-suite-toaster") => "",
@@ -108,7 +69,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Toast,
         "Toast.jl",
-        :js_runtime,
+        :island,
         "Sonner-style toast notification system",
         Symbol[],
         [:Toast],

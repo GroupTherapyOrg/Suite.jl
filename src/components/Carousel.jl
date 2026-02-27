@@ -1,16 +1,17 @@
 # Carousel.jl — Suite.jl Carousel Component
 #
-# Tier: js_runtime (scroll, navigation, keyboard nav need JS)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none
-# JS Modules: Carousel
+# JS Modules: none
 #
 # Usage via package: using Suite; Carousel(CarouselContent(CarouselItem("Slide 1"), ...))
 # Usage via extract: include("components/Carousel.jl"); Carousel(...)
 #
 # Scrollable content slider with snap points, previous/next buttons,
 # dot indicators, and keyboard navigation.
+# Signal-driven: BindModal(mode=20) handles all interaction via Wasm
 #
-# Reference: shadcn/ui Carousel (Embla Carousel) — simplified to CSS scroll-snap + JS
+# Reference: shadcn/ui Carousel (Embla Carousel) — simplified to CSS scroll-snap
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -24,45 +25,26 @@ const _CAROUSEL_NEXT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16"
 
 export Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 
-"""
-    Carousel(children...; orientation, loop, autoplay, autoplay_interval, class, kwargs...) -> VNode
-
-A scrollable content slider with snap-point navigation.
-
-# Options
-- `orientation`: `"horizontal"` (default) or `"vertical"`
-- `loop`: Whether to loop back to start (default: `false`)
-- `autoplay`: Whether to auto-advance slides (default: `false`)
-- `autoplay_interval`: Milliseconds between auto-advance (default: `4000`)
-
-# Examples
-```julia
-Carousel(
-    CarouselContent(
-        CarouselItem(Card(CardContent(P("Slide 1")))),
-        CarouselItem(Card(CardContent(P("Slide 2")))),
-        CarouselItem(Card(CardContent(P("Slide 3")))),
-    ),
-    CarouselPrevious(),
-    CarouselNext(),
-)
-```
-"""
-function Carousel(children...; orientation::String="horizontal",
+#   Carousel(children...; orientation, loop, autoplay, autoplay_interval, class, kwargs...) -> VNode
+#
+# A scrollable content slider with snap-point navigation.
+# Options: orientation ("horizontal"/"vertical"), loop (Bool), autoplay (Bool), autoplay_interval (Int ms)
+# Examples: Carousel(CarouselContent(CarouselItem("1"), ...), CarouselPrevious(), CarouselNext())
+@island function Carousel(children...; orientation::String="horizontal",
                   loop::Bool=false, autoplay::Bool=false,
                   autoplay_interval::Int=4000,
                   class::String="", theme::Symbol=:default, kwargs...)
-    id = "suite-carousel-" * string(rand(UInt32), base=16)
+    is_active, set_active = create_signal(Int32(1))
 
     classes = cn("relative group", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(:class => classes,
-        :data_suite_carousel => id,
-        :data_suite_carousel_orientation => orientation,
-        :data_suite_carousel_loop => string(loop),
-        :data_suite_carousel_autoplay => string(autoplay),
-        :data_suite_carousel_autoplay_interval => string(autoplay_interval),
+        Symbol("data-modal") => BindModal(is_active, Int32(20)),
+        Symbol("data-suite-carousel-orientation") => orientation,
+        Symbol("data-suite-carousel-loop") => string(loop),
+        Symbol("data-suite-carousel-autoplay") => string(autoplay),
+        Symbol("data-suite-carousel-autoplay-interval") => string(autoplay_interval),
         :role => "region",
         Symbol("aria-roledescription") => "carousel",
         Symbol("aria-label") => "Carousel",
@@ -169,7 +151,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Carousel,
         "Carousel.jl",
-        :js_runtime,
+        :island,
         "Scrollable content slider with snap navigation",
         Symbol[],
         [:Carousel],

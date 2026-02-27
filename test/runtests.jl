@@ -1057,7 +1057,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :ThemeSwitcher)
             meta = Suite.COMPONENT_REGISTRY[:ThemeSwitcher]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :ThemeSwitcher in meta.exports
             @test :ThemeSwitcher in meta.js_modules
         end
@@ -1084,9 +1084,7 @@ using Test
         html = Therapy.render_to_string(suite_script())
         @test occursin("<script", html)
         @test occursin("Suite", html)
-        # ThemeToggle + Collapsible + Accordion + Tabs + ToggleGroup removed from suite.js (now @island)
-        @test occursin("ThemeSwitcher", html)
-        @test occursin("data-suite-theme-switcher", html)
+        # All components removed from suite.js (now @island)
     end
 
     # ==========================================================================
@@ -4304,67 +4302,13 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Toast)
             meta = Suite.COMPONENT_REGISTRY[:Toast]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Toaster in meta.exports
             @test :Toast in meta.js_modules
         end
 
-        @testset "JS runtime includes Toast module" begin
-            js = Suite.suite_js_source()
-            @test occursin("Toast:", js)
-            @test occursin("Suite.toast", js)
-            @test occursin("data-suite-toaster", js)
-            @test occursin("Suite.Toast.show", js)
-            @test occursin("Suite.Toast.success", js)
-            @test occursin("Suite.Toast.error", js)
-            @test occursin("Suite.Toast.warning", js)
-            @test occursin("Suite.Toast.info", js)
-            @test occursin("Suite.Toast.dismiss", js)
-            @test occursin("Suite.Toast.dismissAll", js)
-        end
-
-        @testset "JS toast variants have icons" begin
-            js = Suite.suite_js_source()
-            # Success icon (checkmark)
-            @test occursin("success:", js)
-            # Error icon (X circle)
-            @test occursin("error:", js)
-            # Warning icon (triangle)
-            @test occursin("warning:", js)
-            # Info icon (info circle)
-            @test occursin("info:", js)
-        end
-
-        @testset "JS swipe-to-dismiss" begin
-            js = Suite.suite_js_source()
-            @test occursin("_setupSwipe", js)
-            @test occursin("pointerdown", js)
-            @test occursin("pointermove", js)
-            @test occursin("pointerup", js)
-            @test occursin("swipeThreshold", js)
-        end
-
-        @testset "JS auto-dismiss timer" begin
-            js = Suite.suite_js_source()
-            @test occursin("_startTimer", js)
-            @test occursin("_pauseTimer", js)
-            @test occursin("_resumeTimer", js)
-            @test occursin("duration: 4000", js)
-        end
-
-        @testset "JS stacking" begin
-            js = Suite.suite_js_source()
-            @test occursin("_updatePositions", js)
-            @test occursin("visibleToasts", js)
-            @test occursin("gap: 14", js)
-        end
-
-        @testset "ARIA attributes" begin
-            js = Suite.suite_js_source()
-            @test occursin("role", js)
-            @test occursin("aria-live", js)
-            @test occursin("aria-atomic", js)
-        end
+        # Toast JS tests removed — Toast is now @island with BindModal mode=22 (SUITE-917)
+        # All toast behavior (queue, stacking, auto-dismiss, swipe, icons) is in Therapy.jl Hydration.jl
     end
 
     @testset "Calendar" begin
@@ -5714,7 +5658,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Carousel)
             meta = Suite.COMPONENT_REGISTRY[:Carousel]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Carousel in meta.exports
             @test :CarouselContent in meta.exports
             @test :CarouselItem in meta.exports
@@ -5730,7 +5674,6 @@ using Test
                 Suite.ResizableHandle(),
                 Suite.ResizablePanel(Div("Right")),
             ))
-            @test occursin("data-suite-resizable-group", html)
             @test occursin("data-suite-resizable-direction=\"horizontal\"", html)
             @test occursin("flex", html)
         end
@@ -5793,7 +5736,7 @@ using Test
             ))
             @test occursin("Left", html)
             @test occursin("Right", html)
-            @test occursin("data-suite-resizable-group", html)
+            @test occursin("data-suite-resizable-direction", html)
             @test occursin("data-suite-resizable-handle", html)
             @test occursin("flex-grow:30", html)
             @test occursin("flex-grow:70", html)
@@ -5814,7 +5757,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Resizable)
             meta = Suite.COMPONENT_REGISTRY[:Resizable]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :ResizablePanelGroup in meta.exports
             @test :ResizablePanel in meta.exports
             @test :ResizableHandle in meta.exports

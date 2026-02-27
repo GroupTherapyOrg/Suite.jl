@@ -1,14 +1,15 @@
 # Resizable.jl — Suite.jl Resizable Panel Component
 #
-# Tier: js_runtime (drag-to-resize needs JS)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none
-# JS Modules: Resizable
+# JS Modules: none
 #
 # Usage via package: using Suite; ResizablePanelGroup(ResizablePanel(...), ResizableHandle(), ResizablePanel(...))
 # Usage via extract: include("components/Resizable.jl"); ResizablePanelGroup(...)
 #
 # Draggable panel resizing with flex-grow layout, min/max constraints,
 # keyboard arrow key support, and ARIA separator semantics.
+# Signal-driven: BindModal(mode=21) handles all interaction via Wasm
 #
 # Reference: react-resizable-panels by bvaughn + shadcn/ui Resizable
 
@@ -24,34 +25,23 @@ const _RESIZABLE_GRIP_H_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="
 
 export ResizablePanelGroup, ResizablePanel, ResizableHandle
 
-"""
-    ResizablePanelGroup(children...; direction, class, kwargs...) -> VNode
-
-A container for resizable panels arranged horizontally or vertically.
-
-# Options
-- `direction`: `"horizontal"` (default) or `"vertical"`
-
-# Examples
-```julia
-ResizablePanelGroup(direction="horizontal",
-    ResizablePanel(default_size=30, Div("Left")),
-    ResizableHandle(),
-    ResizablePanel(default_size=70, Div("Right")),
-)
-```
-"""
-function ResizablePanelGroup(children...; direction::String="horizontal",
+#   ResizablePanelGroup(children...; direction, class, kwargs...) -> VNode
+#
+# A container for resizable panels arranged horizontally or vertically.
+# Options: direction ("horizontal"/"vertical")
+# Examples: ResizablePanelGroup(direction="horizontal", ResizablePanel(default_size=30, ...), ResizableHandle(), ...)
+@island function ResizablePanelGroup(children...; direction::String="horizontal",
                              class::String="", theme::Symbol=:default, kwargs...)
-    id = "suite-resizable-" * string(rand(UInt32), base=16)
+    is_active, set_active = create_signal(Int32(1))
+
     flex_dir = direction == "vertical" ? "flex-col" : "flex-row"
 
     classes = cn("flex w-full h-full overflow-hidden", flex_dir, class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(:class => classes,
-        :data_suite_resizable_group => id,
-        :data_suite_resizable_direction => direction,
+        Symbol("data-modal") => BindModal(is_active, Int32(21)),
+        Symbol("data-suite-resizable-direction") => direction,
         :style => "flex-wrap:nowrap;",
         kwargs...,
         children...,
@@ -139,7 +129,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Resizable,
         "Resizable.jl",
-        :js_runtime,
+        :island,
         "Draggable panel resizing with min/max constraints",
         Symbol[],
         [:Resizable],
