@@ -2020,7 +2020,7 @@ using Test
                     )
                 )
             ))
-            @test occursin("data-suite-sheet", html)
+            @test occursin("therapy-island", html)
             @test occursin("Title", html)
             @test occursin("Description", html)
             @test occursin("Cancel", html)
@@ -2032,7 +2032,7 @@ using Test
                 SheetTrigger("Open"),
                 SheetContent(SheetTitle("T"))
             ))
-            @test occursin("data-suite-sheet-trigger", html)
+            @test occursin("data-suite-sheet-trigger-wrapper", html)
             @test occursin("aria-haspopup=\"dialog\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -2168,15 +2168,12 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Sheet)
             meta = Suite.COMPONENT_REGISTRY[:Sheet]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Sheet in meta.exports
             @test :SheetTrigger in meta.exports
             @test :SheetContent in meta.exports
             @test :SheetClose in meta.exports
-            @test :Sheet in meta.js_modules
-            @test :FocusTrap in meta.js_modules
-            @test :DismissLayer in meta.js_modules
-            @test :ScrollLock in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 
@@ -2196,7 +2193,7 @@ using Test
                     )
                 )
             ))
-            @test occursin("data-suite-drawer", html)
+            @test occursin("therapy-island", html)
             @test occursin("Goal", html)
             @test occursin("Set your goal.", html)
             @test occursin("Cancel", html)
@@ -2208,7 +2205,7 @@ using Test
                 DrawerTrigger("Open"),
                 DrawerContent(DrawerTitle("T"))
             ))
-            @test occursin("data-suite-drawer-trigger", html)
+            @test occursin("data-suite-drawer-trigger-wrapper", html)
             @test occursin("aria-haspopup=\"dialog\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -2323,14 +2320,13 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Drawer)
             meta = Suite.COMPONENT_REGISTRY[:Drawer]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Drawer in meta.exports
             @test :DrawerTrigger in meta.exports
             @test :DrawerContent in meta.exports
             @test :DrawerClose in meta.exports
             @test :DrawerHandle in meta.exports
-            @test :Drawer in meta.js_modules
-            @test :FocusTrap in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 

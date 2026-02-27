@@ -1,18 +1,20 @@
 # Sheet.jl — Suite.jl Sheet Component
 #
-# Tier: js_runtime (requires suite.js)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: FocusGuards, FocusTrap, DismissLayer, ScrollLock, Sheet
+# JS Modules: none
 #
 # Usage via package: using Suite; Sheet(...)
 # Usage via extract: include("components/Sheet.jl"); Sheet(...)
 #
 # Behavior (matches shadcn Sheet = Radix Dialog + slide animation):
-#   - Modal: focus trapped, scroll locked
+#   - Modal by default: focus trapped, scroll locked, outside pointer disabled
 #   - Escape key dismisses
-#   - Click outside dismisses
+#   - Click outside overlay dismisses
 #   - Slides from edge (top/right/bottom/left)
-#   - Same JS behavior as Dialog, different CSS
+#   - Same behavior as Dialog, different CSS (slide vs zoom)
+#   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
+#   - BindModal handles scroll lock, focus trap, dismiss, show/hide with animation
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -32,63 +34,70 @@ const SHEET_SIDE_CLASSES = Dict{String, String}(
     "right" => "inset-y-0 right-0 h-full w-3/4 border-l border-warm-200 dark:border-warm-700 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
 )
 
-"""
-    Sheet(children...; class, kwargs...) -> VNode
+#   Sheet(children...; class, kwargs...) -> IslandVNode
+#
+# A slide-in panel from the edge of the screen. Modal with focus trap,
+# scroll lock, and dismiss on Escape/click-outside.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# SheetTrigger and SheetContent children are auto-detected and injected
+# with signal bindings for data-state, aria-expanded, and modal behavior.
+#
+# Examples:
+#   Sheet(SheetTrigger(Button("Open")), SheetContent(side="right", SheetHeader(SheetTitle("Title"))))
+@island function Sheet(children...; class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
-A slide-in panel from the edge of the screen. Uses the same focus trap,
-dismiss layer, and scroll lock as Dialog.
-
-# Examples
-```julia
-Sheet(
-    SheetTrigger(Button("Open Sheet")),
-    SheetContent(side="right",
-        SheetHeader(
-            SheetTitle("Edit Profile"),
-            SheetDescription("Make changes to your profile.")
-        ),
-        # ... content
-        SheetFooter(
-            SheetClose(Button(variant="outline", "Cancel")),
-            Button("Save")
-        )
-    )
-)
-```
-"""
-function Sheet(children...; class::String="", kwargs...)
-    id = "suite-sheet-" * string(rand(UInt32), base=16)
-
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject signal bindings
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-sheet-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-sheet-trigger-wrapper"))
+                # Inject reactive bindings on trigger wrapper
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
+                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
+            else
+                # Content wrapper — walk into it
+                _sheet_inject_content_bindings!(child, is_open, set_open)
+            end
         end
     end
 
-    Div(:class => cn(class),
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(0)),  # mode 0 = dialog behavior
+        :class => cn("", class),
         kwargs...,
-        [_sheet_set_trigger_id(t, id) for t in trigger_nodes]...,
-        Div(Symbol("data-suite-sheet") => id,
-            :style => "display:none",
-            content_nodes...,
-        ),
-    )
+        children...)
 end
 
-function _sheet_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-sheet-trigger-wrapper"))
-        new_props = copy(node.props)
-        new_props[Symbol("data-suite-sheet-trigger")] = id
-        new_props[Symbol("aria-haspopup")] = "dialog"
-        new_props[Symbol("aria-expanded")] = "false"
-        new_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.tag, new_props, node.children)
+# Walk the content wrapper to find overlay, content, and close buttons
+function _sheet_inject_content_bindings!(node::VNode, is_open, set_open)
+    for child in node.children
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-sheet-overlay"))
+                # Overlay: bind data-state, add click-to-close
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:on_click] = () -> set_open(Int32(0))
+            elseif haskey(child.props, Symbol("data-suite-sheet-content"))
+                # Content: bind data-state
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                # Walk content for close buttons
+                _sheet_inject_close_buttons!(child, set_open)
+            end
+        end
     end
-    node
+end
+
+# Recursively inject close handler on all [data-suite-sheet-close] elements
+function _sheet_inject_close_buttons!(node::VNode, set_open)
+    if haskey(node.props, Symbol("data-suite-sheet-close"))
+        node.props[:on_click] = () -> set_open(Int32(0))
+    end
+    for child in node.children
+        if child isa VNode
+            _sheet_inject_close_buttons!(child, set_open)
+        end
+    end
 end
 
 """
@@ -100,6 +109,9 @@ function SheetTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-sheet-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
+         Symbol("data-state") => "closed",
+         :aria_haspopup => "dialog",
+         :aria_expanded => "false",
          kwargs...,
          children...)
 end
@@ -219,10 +231,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Sheet,
         "Sheet.jl",
-        :js_runtime,
+        :island,
         "Slide-in panel from screen edge with focus trap and dismiss layer",
         Symbol[],
-        [:FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :Sheet],
+        Symbol[],
         [:Sheet, :SheetTrigger, :SheetContent,
          :SheetHeader, :SheetFooter, :SheetTitle,
          :SheetDescription, :SheetClose],

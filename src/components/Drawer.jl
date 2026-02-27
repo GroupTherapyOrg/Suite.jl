@@ -1,8 +1,8 @@
 # Drawer.jl — Suite.jl Drawer Component
 #
-# Tier: js_runtime (requires suite.js)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: FocusGuards, FocusTrap, DismissLayer, ScrollLock, Drawer
+# JS Modules: none
 #
 # Usage via package: using Suite; Drawer(...)
 # Usage via extract: include("components/Drawer.jl"); Drawer(...)
@@ -16,6 +16,8 @@
 #   - Drag distance > 25% height → close
 #   - Logarithmic damping when dragging past open position
 #   - Supports 4 directions: bottom (default), top, left, right
+#   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
+#   - BindModal mode=2 handles modal lifecycle + drag-to-dismiss
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -27,64 +29,70 @@ export Drawer, DrawerTrigger, DrawerContent,
        DrawerHeader, DrawerFooter, DrawerTitle,
        DrawerDescription, DrawerClose, DrawerHandle
 
-"""
-    Drawer(children...; class, kwargs...) -> VNode
+#   Drawer(children...; class, kwargs...) -> IslandVNode
+#
+# A draggable bottom sheet overlay. Supports drag-to-dismiss with velocity
+# and distance thresholds. Interactive behavior is compiled to WebAssembly —
+# no JavaScript required.
+#
+# DrawerTrigger and DrawerContent children are auto-detected and injected
+# with signal bindings for data-state, aria-expanded, and modal+drag behavior.
+#
+# Examples:
+#   Drawer(DrawerTrigger(Button("Open")), DrawerContent(DrawerHandle(), DrawerTitle("Goal")))
+@island function Drawer(children...; class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
-A draggable bottom sheet overlay. Supports drag-to-dismiss with velocity
-and distance thresholds.
-
-# Examples
-```julia
-Drawer(
-    DrawerTrigger(Button(variant="outline", "Open Drawer")),
-    DrawerContent(
-        DrawerHandle(),
-        DrawerHeader(
-            DrawerTitle("Move Goal"),
-            DrawerDescription("Set your daily activity goal.")
-        ),
-        # ... content
-        DrawerFooter(
-            DrawerClose(Button(variant="outline", "Cancel")),
-            Button("Submit")
-        )
-    )
-)
-```
-"""
-function Drawer(children...; class::String="", kwargs...)
-    id = "suite-drawer-" * string(rand(UInt32), base=16)
-
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject signal bindings
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-drawer-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-drawer-trigger-wrapper"))
+                # Inject reactive bindings on trigger wrapper
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
+                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
+            else
+                # Content wrapper — walk into it
+                _drawer_inject_content_bindings!(child, is_open, set_open)
+            end
         end
     end
 
-    Div(:class => cn(class),
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(2)),  # mode 2 = drawer (dialog + drag-to-dismiss)
+        :class => cn("", class),
         kwargs...,
-        [_drawer_set_trigger_id(t, id) for t in trigger_nodes]...,
-        Div(Symbol("data-suite-drawer") => id,
-            :style => "display:none",
-            content_nodes...,
-        ),
-    )
+        children...)
 end
 
-function _drawer_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-drawer-trigger-wrapper"))
-        new_props = copy(node.props)
-        new_props[Symbol("data-suite-drawer-trigger")] = id
-        new_props[Symbol("aria-haspopup")] = "dialog"
-        new_props[Symbol("aria-expanded")] = "false"
-        new_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.tag, new_props, node.children)
+# Walk the content wrapper to find overlay, content, and close buttons
+function _drawer_inject_content_bindings!(node::VNode, is_open, set_open)
+    for child in node.children
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-drawer-overlay"))
+                # Overlay: bind data-state, add click-to-close
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:on_click] = () -> set_open(Int32(0))
+            elseif haskey(child.props, Symbol("data-suite-drawer-content"))
+                # Content: bind data-state
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                # Walk content for close buttons
+                _drawer_inject_close_buttons!(child, set_open)
+            end
+        end
     end
-    node
+end
+
+# Recursively inject close handler on all [data-suite-drawer-close] elements
+function _drawer_inject_close_buttons!(node::VNode, set_open)
+    if haskey(node.props, Symbol("data-suite-drawer-close"))
+        node.props[:on_click] = () -> set_open(Int32(0))
+    end
+    for child in node.children
+        if child isa VNode
+            _drawer_inject_close_buttons!(child, set_open)
+        end
+    end
 end
 
 """
@@ -96,6 +104,9 @@ function DrawerTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-drawer-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
+         Symbol("data-state") => "closed",
+         :aria_haspopup => "dialog",
+         :aria_expanded => "false",
          kwargs...,
          children...)
 end
@@ -228,10 +239,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Drawer,
         "Drawer.jl",
-        :js_runtime,
+        :island,
         "Draggable bottom sheet with velocity-based dismiss",
         Symbol[],
-        [:FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :Drawer],
+        Symbol[],
         [:Drawer, :DrawerTrigger, :DrawerContent,
          :DrawerHeader, :DrawerFooter, :DrawerTitle,
          :DrawerDescription, :DrawerClose, :DrawerHandle],
