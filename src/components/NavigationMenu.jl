@@ -1,8 +1,8 @@
 # NavigationMenu.jl — Suite.jl Navigation Menu Component
 #
-# Tier: js_runtime (requires suite.js for hover timers, animation)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: NavigationMenu, DismissLayer
+# JS Modules: none
 #
 # Usage via package: using Suite; NavigationMenu(NavigationMenuList(...))
 # Usage via extract: include("components/NavigationMenu.jl"); NavigationMenu(...)
@@ -15,6 +15,8 @@
 #   - Inline content panels (no viewport — matches shadcn viewport=false)
 #   - Escape to dismiss
 #   - Motion attributes for directional slide animation
+#   - Signal-driven: Int32 signal (0=none, N=item N is open)
+#   - BindModal(mode=9) handles hover timers, motion, indicator, dismiss
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -30,31 +32,40 @@ export NavigationMenu, NavigationMenuList, NavigationMenuItem,
 # --- Chevron Down SVG ---
 const _NAV_CHEVRON_DOWN = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="relative top-[1px] ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
 
-"""
-    NavigationMenu(children...; class, kwargs...) -> VNode
+#   NavigationMenu(children...; orientation, delay_duration, skip_delay_duration, theme, class, kwargs...) -> IslandVNode
+#
+# A site navigation menu with hover-triggered content panels.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# NavigationMenuItem children with triggers are auto-detected and injected
+# with signal bindings for hover-to-open behavior.
+# BindModal(mode=9) handles hover timers, motion direction, indicator, and dismiss.
+#
+# Examples:
+#   NavigationMenu(
+#       NavigationMenuList(
+#           NavigationMenuItem(
+#               NavigationMenuTrigger("Getting Started"),
+#               NavigationMenuContent(
+#                   NavigationMenuLink("Introduction", href="/docs/"),
+#               )
+#           ),
+#           NavigationMenuItem(
+#               NavigationMenuLink("Documentation", href="/docs/")
+#           ),
+#       ),
+#   )
+@island function NavigationMenu(children...; orientation::String="horizontal", delay_duration::Int=200, skip_delay_duration::Int=300, theme::Symbol=:default, class::String="", kwargs...)
+    # Signal for active item index (Int32: 0=none, N=item N is open)
+    active_item, set_active = create_signal(Int32(0))
 
-A site navigation menu with hover-triggered content panels.
-
-# Examples
-```julia
-NavigationMenu(
-    NavigationMenuList(
-        NavigationMenuItem(
-            NavigationMenuTrigger("Getting Started"),
-            NavigationMenuContent(
-                NavigationMenuLink("Introduction", href="/docs/", description="Learn about Suite.jl"),
-                NavigationMenuLink("Installation", href="/docs/install/", description="How to install"),
-            )
-        ),
-        NavigationMenuItem(
-            NavigationMenuLink("Documentation", href="/docs/")
-        ),
-    ),
-)
-```
-"""
-function NavigationMenu(children...; orientation::String="horizontal", delay_duration::Int=200, skip_delay_duration::Int=300, theme::Symbol=:default, class::String="", kwargs...)
-    id = "suite-nav-menu-" * string(rand(UInt32), base=16)
+    # Walk children to find items with triggers and inject on_click handlers
+    idx_ref = Ref(Int32(0))
+    for child in children
+        if child isa VNode
+            _nav_walk_and_inject!(child, active_item, set_active, idx_ref)
+        end
+    end
 
     classes = cn(
         "relative flex max-w-max flex-1 items-center justify-center",
@@ -62,7 +73,8 @@ function NavigationMenu(children...; orientation::String="horizontal", delay_dur
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-nav-menu") => id,
+    Div(Symbol("data-suite-nav-menu") => "",
+        Symbol("data-modal") => BindModal(active_item, Int32(9)),  # mode 9 = nav_menu
         Symbol("data-orientation") => orientation,
         Symbol("data-delay-duration") => string(delay_duration),
         Symbol("data-skip-delay-duration") => string(skip_delay_duration),
@@ -70,6 +82,41 @@ function NavigationMenu(children...; orientation::String="horizontal", delay_dur
         kwargs...,
         children...,
     )
+end
+
+# Walk VNode tree to find NavigationMenuItems with triggers
+function _nav_walk_and_inject!(node::VNode, active_item, set_active, idx_ref)
+    if haskey(node.props, Symbol("data-suite-nav-menu-item"))
+        # Check if this item has a trigger marker
+        has_trigger = false
+        for child in node.children
+            if child isa VNode && haskey(child.props, Symbol("data-suite-nav-menu-trigger-marker"))
+                has_trigger = true
+                break
+            end
+        end
+        if has_trigger
+            idx_ref[] += Int32(1)
+            _nav_inject_item_bindings!(node, active_item, set_active, idx_ref[])
+        end
+        return  # Don't recurse into items
+    end
+    for child in node.children
+        if child isa VNode
+            _nav_walk_and_inject!(child, active_item, set_active, idx_ref)
+        end
+    end
+end
+
+# Inject on_click on a trigger marker within an item
+function _nav_inject_item_bindings!(item::VNode, active_item, set_active, idx)
+    for child in item.children
+        if child isa VNode && haskey(child.props, Symbol("data-suite-nav-menu-trigger-marker"))
+            let i = idx
+                child.props[:on_click] = () -> set_active(i * (Int32(1) - Int32(active_item() == i)))
+            end
+        end
+    end
 end
 
 """
@@ -94,10 +141,8 @@ end
 A single item within the navigation menu. Can contain a trigger + content or just a link.
 """
 function NavigationMenuItem(children...; value::String="", class::String="", kwargs...)
-    item_value = isempty(value) ? "nav-item-" * string(rand(UInt32), base=16) : value
-
     Li(Symbol("data-suite-nav-menu-item") => "",
-       Symbol("data-value") => item_value,
+       (isempty(value) ? Pair{Symbol,String}[] : [Symbol("data-value") => value])...,
        :class => cn("relative", class),
        kwargs...,
        children...,
@@ -123,15 +168,18 @@ function NavigationMenuTrigger(children...; disabled::Bool=false, theme::Symbol=
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Therapy.Button(Symbol("data-suite-nav-menu-trigger") => "",
-           Symbol("data-state") => "closed",
-           Symbol("aria-expanded") => "false",
-           :type => "button",
-           :class => classes,
-           (disabled ? [:disabled => ""] : Pair{Symbol,String}[])...,
-           kwargs...,
-           children...,
-           Therapy.RawHtml(_NAV_CHEVRON_DOWN),
+    Span(Symbol("data-suite-nav-menu-trigger-marker") => "",
+         :style => "display:contents",
+         Therapy.Button(Symbol("data-suite-nav-menu-trigger") => "",
+                Symbol("data-state") => "closed",
+                Symbol("aria-expanded") => "false",
+                :type => "button",
+                :class => classes,
+                (disabled ? [:disabled => ""] : Pair{Symbol,String}[])...,
+                kwargs...,
+                children...,
+                Therapy.RawHtml(_NAV_CHEVRON_DOWN),
+         ),
     )
 end
 
@@ -249,10 +297,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :NavigationMenu,
         "NavigationMenu.jl",
-        :js_runtime,
+        :island,
         "Site navigation menu with hover-triggered inline content panels",
         Symbol[],
-        [:NavigationMenu, :DismissLayer],
+        Symbol[],
         [:NavigationMenu, :NavigationMenuList, :NavigationMenuItem,
          :NavigationMenuTrigger, :NavigationMenuContent,
          :NavigationMenuLink, :NavigationMenuViewport,

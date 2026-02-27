@@ -4083,9 +4083,11 @@ using Test
                     ),
                 ),
             ))
-            @test occursin("data-suite-nav-menu=", html)
+            @test occursin("therapy-island", html)
+            @test occursin("data-suite-nav-menu", html)
             @test occursin("data-suite-nav-menu-list", html)
             @test occursin("data-suite-nav-menu-item", html)
+            @test occursin("data-suite-nav-menu-trigger-marker", html)
             @test occursin("data-suite-nav-menu-trigger", html)
             @test occursin("data-suite-nav-menu-content", html)
             @test occursin("data-suite-nav-menu-link", html)
@@ -4121,8 +4123,9 @@ using Test
             @test occursin("data-suite-nav-menu-item", html)
         end
 
-        @testset "Trigger is a button with chevron" begin
+        @testset "Trigger is a button with chevron in marker" begin
             html = Therapy.render_to_string(NavigationMenuTrigger("Products"))
+            @test occursin("data-suite-nav-menu-trigger-marker", html)
             @test occursin("<button", html)
             @test occursin("type=\"button\"", html)
             @test occursin("data-suite-nav-menu-trigger", html)
@@ -4220,14 +4223,14 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :NavigationMenu)
             meta = Suite.COMPONENT_REGISTRY[:NavigationMenu]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :NavigationMenu in meta.exports
             @test :NavigationMenuList in meta.exports
             @test :NavigationMenuTrigger in meta.exports
             @test :NavigationMenuContent in meta.exports
             @test :NavigationMenuLink in meta.exports
             @test :NavigationMenuViewport in meta.exports
-            @test :NavigationMenu in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 
