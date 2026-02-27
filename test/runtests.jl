@@ -2708,12 +2708,13 @@ using Test
                     DropdownMenuItem("Settings"),
                 )
             ))
-            @test occursin("data-suite-dropdown-menu=", html)
-            @test occursin("data-suite-dropdown-menu-trigger=", html)
+            @test occursin("therapy-island", html)  # @island wrapper
+            @test occursin("data-suite-dropdown-menu-trigger-wrapper", html)
             @test occursin("data-suite-dropdown-menu-content", html)
             @test occursin("role=\"menu\"", html)
             @test occursin("aria-haspopup=\"menu\"", html)
             @test occursin("aria-expanded=\"false\"", html)
+            @test occursin("data-state=\"closed\"", html)
             @test occursin("Profile", html)
             @test occursin("Settings", html)
         end
@@ -2928,7 +2929,7 @@ using Test
                     DropdownMenuItem("Log out", shortcut="⇧⌘Q"),
                 )
             ))
-            @test occursin("data-suite-dropdown-menu=", html)
+            @test occursin("therapy-island", html)  # @island wrapper
             @test occursin("Account", html)
             @test occursin("Profile", html)
             @test occursin("Status Bar", html)
@@ -2939,7 +2940,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :DropdownMenu)
             meta = Suite.COMPONENT_REGISTRY[:DropdownMenu]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :DropdownMenu in meta.exports
             @test :DropdownMenuTrigger in meta.exports
             @test :DropdownMenuContent in meta.exports
@@ -2955,10 +2956,7 @@ using Test
             @test :DropdownMenuSubContent in meta.exports
             @test :DropdownMenuItemIndicator in meta.exports
             @test :DropdownMenuGroup in meta.exports
-            @test :Menu in meta.js_modules
-            @test :DropdownMenu in meta.js_modules
-            @test :Floating in meta.js_modules
-            @test :DismissLayer in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 

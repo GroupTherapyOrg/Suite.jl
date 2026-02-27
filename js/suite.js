@@ -888,123 +888,7 @@
             }
         },
 
-        // --- DropdownMenu ---------------------------------------------------------
-        DropdownMenu: {
-            init() {
-                const roots = document.querySelectorAll('[data-suite-dropdown-menu]');
-                roots.forEach(root => {
-                    if (root._suiteDropdownMenu) return;
-                    root._suiteDropdownMenu = true;
-
-                    const trigger = root.querySelector('[data-suite-dropdown-menu-trigger]');
-                    const content = root.querySelector('[data-suite-dropdown-menu-content]');
-                    if (!trigger || !content) return;
-
-                    const side = content.getAttribute('data-side-preference') || 'bottom';
-                    const sideOffset = parseInt(content.getAttribute('data-side-offset') || '4', 10);
-                    const align = content.getAttribute('data-align-preference') || 'start';
-
-                    let cleanupFloat, cleanupDismiss, cleanupMenu;
-                    let isOpen = false;
-                    let wasKeyboardOpen = false;
-
-                    // Track keyboard vs pointer globally
-                    let isUsingKeyboard = false;
-                    function onDocKeyDown() { isUsingKeyboard = true; }
-                    function onDocPointer() { isUsingKeyboard = false; }
-                    document.addEventListener('keydown', onDocKeyDown, true);
-                    document.addEventListener('pointerdown', onDocPointer, true);
-
-                    function open(focusFirst) {
-                        if (isOpen) return;
-                        isOpen = true;
-                        wasKeyboardOpen = focusFirst;
-
-                        root.style.display = '';
-                        content.style.display = '';
-                        content.setAttribute('data-state', 'open');
-                        trigger.setAttribute('data-state', 'open');
-                        trigger.setAttribute('aria-expanded', 'true');
-
-                        cleanupFloat = Suite.Floating.position(trigger, content, {
-                            side: side, sideOffset: sideOffset, align: align
-                        });
-
-                        Suite.ScrollLock.lock();
-                        Suite.FocusGuards.install();
-
-                        cleanupMenu = Suite.Menu.activate(content, {
-                            onClose: close,
-                        });
-
-                        cleanupDismiss = Suite.DismissLayer.activate(content, {
-                            disableOutsidePointerEvents: true,
-                            onDismiss: close,
-                        });
-
-                        // Focus first item if keyboard-triggered
-                        if (focusFirst) {
-                            requestAnimationFrame(() => {
-                                const items = Array.from(content.querySelectorAll(
-                                    '[data-suite-menu-item], [data-suite-menu-checkbox-item], [data-suite-menu-radio-item], [data-suite-menu-sub-trigger]'
-                                )).filter(el => !el.hasAttribute('data-disabled') && !el.closest('[data-suite-menu-sub-content]'));
-                                if (items.length > 0) {
-                                    items[0].setAttribute('data-highlighted', '');
-                                    items[0].focus({ preventScroll: true });
-                                }
-                            });
-                        }
-                    }
-
-                    function close() {
-                        if (!isOpen) return;
-                        isOpen = false;
-
-                        if (cleanupMenu) { cleanupMenu(); cleanupMenu = null; }
-                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
-                        if (cleanupFloat) { cleanupFloat(); cleanupFloat = null; }
-
-                        content.setAttribute('data-state', 'closed');
-                        trigger.setAttribute('data-state', 'closed');
-                        trigger.setAttribute('aria-expanded', 'false');
-
-                        Suite.ScrollLock.unlock();
-                        Suite.FocusGuards.uninstall();
-
-                        // Remove highlights
-                        content.querySelectorAll('[data-highlighted]').forEach(el => el.removeAttribute('data-highlighted'));
-
-                        const hide = () => {
-                            content.style.display = 'none';
-                        };
-                        content.addEventListener('animationend', hide, { once: true });
-                        setTimeout(hide, 250);
-
-                        // Return focus to trigger
-                        trigger.focus({ preventScroll: true });
-                    }
-
-                    // Trigger click
-                    trigger.addEventListener('pointerdown', (e) => {
-                        if (e.button !== 0) return; // left click only
-                        if (e.ctrlKey && navigator.platform.match(/Mac/)) return; // ctrl+click on Mac
-                        e.preventDefault();
-                        if (isOpen) close(); else open(false);
-                    });
-
-                    // Trigger keyboard
-                    trigger.addEventListener('keydown', (e) => {
-                        if (e.key === 'ArrowDown') {
-                            e.preventDefault();
-                            if (!isOpen) open(true);
-                        } else if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            if (isOpen) close(); else open(true);
-                        }
-                    });
-                });
-            }
-        },
+        // --- DropdownMenu (removed — now @island with BindModal mode=6) ---
 
         // --- ContextMenu ----------------------------------------------------------
         ContextMenu: {
@@ -4389,7 +4273,7 @@
 
             // Tooltip: removed (now @island)
             // HoverCard: removed (now @island)
-            this.DropdownMenu.init();
+            // DropdownMenu: removed (now @island)
             this.ContextMenu.init();
             this.Menubar.init();
             this.NavigationMenu.init();

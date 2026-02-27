@@ -1,8 +1,8 @@
 # DropdownMenu.jl — Suite.jl Dropdown Menu Component
 #
-# Tier: js_runtime (requires suite.js for menu behavior, floating, dismiss)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Menu, DropdownMenu, Floating, DismissLayer, ScrollLock, FocusGuards
+# JS Modules: none
 #
 # Usage via package: using Suite; DropdownMenu(DropdownMenuTrigger(...), DropdownMenuContent(...))
 # Usage via extract: include("components/DropdownMenu.jl"); DropdownMenu(...)
@@ -16,6 +16,8 @@
 #   - CheckboxItem and RadioGroup support
 #   - Sub-menu support with ArrowRight/ArrowLeft
 #   - Focus returns to trigger on close
+#   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
+#   - BindModal(mode=6) handles floating positioning + menu behavior + dismiss
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -40,58 +42,55 @@ const _DROPDOWN_CHECK_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16
 # --- Radio Dot SVG ---
 const _DROPDOWN_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="h-2 w-2"><circle cx="12" cy="12" r="6"/></svg>"""
 
-"""
-    DropdownMenu(children...; class, kwargs...) -> VNode
+#   DropdownMenu(children...; class, kwargs...) -> IslandVNode
+#
+# A dropdown menu triggered by a button click.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# DropdownMenuTrigger and DropdownMenuContent children are auto-detected and injected
+# with signal bindings for data-state, aria-expanded, and modal+menu behavior.
+#
+# Examples:
+#   DropdownMenu(
+#       DropdownMenuTrigger(Button(variant="outline", "Open")),
+#       DropdownMenuContent(DropdownMenuItem("Profile"), DropdownMenuItem("Settings"))
+#   )
+@island function DropdownMenu(children...; class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
-A dropdown menu triggered by a button click.
-
-# Examples
-```julia
-DropdownMenu(
-    DropdownMenuTrigger(Button(variant="outline", "Open")),
-    DropdownMenuContent(
-        DropdownMenuLabel("My Account"),
-        DropdownMenuSeparator(),
-        DropdownMenuItem("Profile", shortcut="⇧⌘P"),
-        DropdownMenuItem("Settings", shortcut="⌘S"),
-        DropdownMenuSeparator(),
-        DropdownMenuItem("Log out", shortcut="⇧⌘Q"),
-    )
-)
-```
-"""
-function DropdownMenu(children...; class::String="", kwargs...)
-    id = "suite-dropdown-menu-" * string(rand(UInt32), base=16)
-
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject signal bindings
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-dropdown-menu-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-dropdown-menu-trigger-wrapper"))
+                # Inject reactive bindings on trigger wrapper
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
+                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
+            else
+                # Content — inject data-state binding
+                _dropdown_inject_content_bindings!(child, is_open)
+            end
         end
     end
 
-    Div(:class => cn(class),
-        Symbol("data-suite-dropdown-menu") => id,
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(6)),  # mode 6 = dropdown_menu
+        :class => cn("", class),
         :style => "display:contents",
         kwargs...,
-        [_dropdown_set_trigger_id(t, id) for t in trigger_nodes]...,
-        content_nodes...,
-    )
+        children...)
 end
 
-function _dropdown_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-dropdown-menu-trigger-wrapper"))
-        new_props = copy(node.props)
-        new_props[Symbol("data-suite-dropdown-menu-trigger")] = id
-        new_props[Symbol("aria-haspopup")] = "menu"
-        new_props[Symbol("aria-expanded")] = "false"
-        new_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.tag, new_props, node.children)
+# Walk children to find content and inject data-state binding
+function _dropdown_inject_content_bindings!(node::VNode, is_open)
+    if haskey(node.props, Symbol("data-suite-dropdown-menu-content"))
+        node.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
     end
-    node
+    for child in node.children
+        if child isa VNode
+            _dropdown_inject_content_bindings!(child, is_open)
+        end
+    end
 end
 
 """
@@ -102,7 +101,10 @@ The button that opens the dropdown menu.
 function DropdownMenuTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-dropdown-menu-trigger-wrapper") => "",
          :style => "display:contents",
-         :class => cn(class),
+         :class => cn("cursor-pointer", class),
+         Symbol("data-state") => "closed",
+         :aria_haspopup => "menu",
+         :aria_expanded => "false",
          kwargs...,
          children...)
 end
@@ -413,10 +415,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :DropdownMenu,
         "DropdownMenu.jl",
-        :js_runtime,
+        :island,
         "Click-triggered dropdown menu with keyboard nav, typeahead, and sub-menus",
         Symbol[],
-        [:Menu, :DropdownMenu, :Floating, :DismissLayer, :ScrollLock, :FocusGuards],
+        Symbol[],
         [:DropdownMenu, :DropdownMenuTrigger, :DropdownMenuContent,
          :DropdownMenuGroup, :DropdownMenuLabel, :DropdownMenuItem,
          :DropdownMenuCheckboxItem, :DropdownMenuRadioGroup,
