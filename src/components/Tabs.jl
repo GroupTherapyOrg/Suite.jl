@@ -80,6 +80,7 @@ export Tabs, TabsList, TabsTrigger, TabsContent
         sig = trigger_signals[i][1]
         trigger.props[Symbol("data-state")] = BindBool(sig, "inactive", "active")
         trigger.props[:aria_selected] = BindBool(sig, "false", "true")
+        trigger.props[Symbol("data-index")] = string(i - 1)  # 0-indexed for hydration
         # Set initial tabindex correctly (active=0, inactive=-1)
         value = string(trigger.props[Symbol("data-tabs-trigger")])
         is_active = value == default_value
@@ -206,6 +207,61 @@ function TabsContent(children...; value::String="", theme::Symbol=:default,
         :class => classes,
         kwargs...,
         children...)
+end
+
+# --- Hydration Support ---
+
+const _TABS_PROPS_TRANSFORM = (props, args) -> begin
+    triggers = Therapy.VNode[]
+    for arg in args
+        if arg isa Therapy.VNode && haskey(arg.props, Symbol("data-tabslist"))
+            for child in arg.children
+                if child isa Therapy.VNode && haskey(child.props, Symbol("data-tabs-trigger"))
+                    push!(triggers, child)
+                end
+            end
+        end
+    end
+    n = length(triggers)
+    dv = string(get(props, :default_value, ""))
+    active_idx = 0
+    for (i, t) in enumerate(triggers)
+        if string(t.props[Symbol("data-tabs-trigger")]) == dv
+            active_idx = i - 1  # 0-indexed
+            break
+        end
+    end
+    props[:_a] = active_idx
+    props[:_n] = n
+end
+
+const _TABS_HYDRATION_BODY = quote
+    active, set_active = create_signal(compiled_get_prop_i32(Int32(0)))
+    n = compiled_get_prop_i32(Int32(1))
+    Div(
+        Div(
+            begin
+                i = Int32(0)
+                while i < n
+                    Button(
+                        Symbol("data-state") => MatchBindBool(active, i, "inactive", "active"),
+                        :aria_selected => MatchBindBool(active, i, "false", "true"),
+                        :on_click => (e) -> set_active(compiled_get_event_data_index()),
+                    )
+                    i = i + Int32(1)
+                end
+            end
+        ),
+        begin
+            j = Int32(0)
+            while j < n
+                Div(
+                    Symbol("data-state") => MatchBindBool(active, j, "inactive", "active"),
+                )
+                j = j + Int32(1)
+            end
+        end
+    )
 end
 
 # --- Registry ---

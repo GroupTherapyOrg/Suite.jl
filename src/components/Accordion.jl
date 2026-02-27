@@ -88,6 +88,7 @@ export Accordion, AccordionItem, AccordionTrigger, AccordionContent
                                 # Inject reactive bindings on trigger
                                 btn.props[Symbol("data-state")] = BindBool(item_open, "closed", "open")
                                 btn.props[:aria_expanded] = BindBool(item_open, "false", "true")
+                                btn.props[Symbol("data-index")] = string(item_idx - 1)  # 0-indexed for hydration
                                 # Inject click handler (unless disabled)
                                 item_is_disabled = haskey(child.props, Symbol("data-disabled"))
                                 if !disabled && !item_is_disabled
@@ -239,6 +240,104 @@ function AccordionContent(children...; class::String="", kwargs...)
         :class => classes,
         kwargs...,
         Div(:class => inner_class, children...))
+end
+
+# --- Hydration Support ---
+
+const _ACCORDION_PROPS_TRANSFORM = (props, args) -> begin
+    mode = get(props, :type, "single") == "single" ? 0 : 1
+    c_flag = (mode == 0 && get(props, :collapsible, false)) ? 1 : 0
+
+    dv = get(props, :default_value, nothing)
+    open_values = Set{String}()
+    if dv !== nothing
+        if dv isa AbstractString
+            push!(open_values, dv)
+        elseif dv isa AbstractVector
+            for v in dv; push!(open_values, string(v)); end
+        end
+    end
+
+    active_idx = -1
+    mask = 0
+    item_idx = 0
+    for arg in args
+        if arg isa Therapy.VNode && haskey(arg.props, Symbol("data-accordion-item"))
+            val = string(arg.props[Symbol("data-accordion-item")])
+            if val in open_values
+                if mode == 0
+                    active_idx = item_idx
+                else
+                    mask |= (1 << item_idx)
+                end
+            end
+            item_idx += 1
+        end
+    end
+
+    props[:_a] = mode == 0 ? active_idx : mask
+    props[:_c] = c_flag
+    props[:_m] = mode
+    props[:_n] = item_idx
+end
+
+const _ACCORDION_HYDRATION_BODY = quote
+    active, set_active = create_signal(compiled_get_prop_i32(Int32(0)))
+    c_flag = compiled_get_prop_i32(Int32(1))
+    m_flag = compiled_get_prop_i32(Int32(2))
+    n = compiled_get_prop_i32(Int32(3))
+    Div(
+        begin
+            i = Int32(0)
+            while i < n
+                Div(
+                    if m_flag == Int32(0)
+                        Symbol("data-state") => MatchBindBool(active, i, "closed", "open")
+                    else
+                        Symbol("data-state") => BitBindBool(active, i, "closed", "open")
+                    end,
+                    H3(
+                        Button(
+                            if m_flag == Int32(0)
+                                Symbol("data-state") => MatchBindBool(active, i, "closed", "open")
+                            else
+                                Symbol("data-state") => BitBindBool(active, i, "closed", "open")
+                            end,
+                            if m_flag == Int32(0)
+                                :aria_expanded => MatchBindBool(active, i, "false", "true")
+                            else
+                                :aria_expanded => BitBindBool(active, i, "false", "true")
+                            end,
+                            :on_click => (e) -> begin
+                                idx = compiled_get_event_data_index()
+                                if m_flag == Int32(0)
+                                    if idx == active()
+                                        if c_flag == Int32(1)
+                                            set_active(Int32(-1))
+                                        end
+                                    else
+                                        set_active(idx)
+                                    end
+                                else
+                                    set_active(active() ⊻ (Int32(1) << idx))
+                                end
+                            end,
+                            Svg(Path())
+                        )
+                    ),
+                    Div(
+                        if m_flag == Int32(0)
+                            Symbol("data-state") => MatchBindBool(active, i, "closed", "open")
+                        else
+                            Symbol("data-state") => BitBindBool(active, i, "closed", "open")
+                        end,
+                        Div()
+                    )
+                )
+                i = i + Int32(1)
+            end
+        end
+    )
 end
 
 # --- Registry ---

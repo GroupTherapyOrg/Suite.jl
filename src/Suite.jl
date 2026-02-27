@@ -119,6 +119,14 @@ function __init__()
             Therapy.ISLAND_REGISTRY[val.name] = val
         end
     end
+
+    # Register hydration bodies and props transforms for Wasm compilation
+    Therapy.register_island_props_transform!(:Tabs, _TABS_PROPS_TRANSFORM)
+    Therapy.register_hydration_body!(:Tabs, _TABS_HYDRATION_BODY)
+    Therapy.register_island_props_transform!(:Accordion, _ACCORDION_PROPS_TRANSFORM)
+    Therapy.register_hydration_body!(:Accordion, _ACCORDION_HYDRATION_BODY)
+    Therapy.register_island_props_transform!(:ToggleGroup, _TOGGLEGROUP_PROPS_TRANSFORM)
+    Therapy.register_hydration_body!(:ToggleGroup, _TOGGLEGROUP_HYDRATION_BODY)
 end
 
 end # module Suite
