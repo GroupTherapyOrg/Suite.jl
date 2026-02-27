@@ -5369,7 +5369,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :CodeBlock)
             meta = Suite.COMPONENT_REGISTRY[:CodeBlock]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :CodeBlock in meta.exports
         end
     end
@@ -5515,7 +5515,7 @@ using Test
             html = Therapy.render_to_string(TreeView())
             @test occursin("<ul", html)
             @test occursin("role=\"tree\"", html)
-            @test occursin("data-suite-treeview", html)
+            @test occursin("data-modal", html)
         end
 
         @testset "File item" begin
@@ -5611,7 +5611,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :TreeView)
             meta = Suite.COMPONENT_REGISTRY[:TreeView]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :TreeView in meta.exports
             @test :TreeViewItem in meta.exports
         end

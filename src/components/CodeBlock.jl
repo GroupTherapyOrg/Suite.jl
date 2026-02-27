@@ -1,14 +1,19 @@
 # CodeBlock.jl — Suite.jl CodeBlock Component
 #
-# Tier: js_runtime (copy-to-clipboard needs JS)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none
-# JS Modules: CodeBlock
+# JS Modules: none
 #
 # Usage via package: using Suite; CodeBlock("println(\"Hello\")", language="julia")
 # Usage via extract: include("components/CodeBlock.jl"); CodeBlock(...)
 #
-# Styled code display container with optional copy-to-clipboard, language badge,
-# and line numbers. Sessions.jl uses this for cell code display and output rendering.
+# Behavior:
+#   - Styled code display container with optional copy-to-clipboard, language badge,
+#     and line numbers.
+#   - Signal-driven: BindModal(mode=18) handles copy button + Julia syntax highlighting
+#   - Copy button: copies code text to clipboard, shows checkmark feedback for 2s
+#   - Julia/jl language: auto-highlighted with keyword/string/comment/number colors
+#   - Sessions.jl uses this for cell code display and output rendering.
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -20,27 +25,26 @@ export CodeBlock
 
 # Copy icon SVG
 const _CODEBLOCK_COPY_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>"""
-const _CODEBLOCK_CHECK_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>"""
 
-"""
-    CodeBlock(code; language, show_line_numbers, show_copy, class, kwargs...) -> VNode
-
-A styled code display block with optional copy button, line numbers, and language badge.
-
-# Options
-- `language`: Language name to display as badge (e.g., "julia", "javascript")
-- `show_line_numbers`: Whether to display line numbers (default: `false`)
-- `show_copy`: Whether to show copy-to-clipboard button (default: `true`)
-
-# Examples
-```julia
-CodeBlock("using Suite\\nButton(\\"Click\\")", language="julia")
-CodeBlock("npm install", language="bash", show_copy=true)
-CodeBlock(read("script.jl", String), language="julia", show_line_numbers=true)
-```
-"""
-function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool=false,
+#   CodeBlock(code; language, show_line_numbers, show_copy, class, kwargs...) -> IslandVNode
+#
+# A styled code display block with optional copy button, line numbers, and language badge.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# Options:
+# - `language`: Language name to display as badge (e.g., "julia", "javascript")
+# - `show_line_numbers`: Whether to display line numbers (default: `false`)
+# - `show_copy`: Whether to show copy-to-clipboard button (default: `true`)
+#
+# Examples:
+#   CodeBlock("using Suite\nButton(\"Click\")", language="julia")
+#   CodeBlock("npm install", language="bash", show_copy=true)
+#   CodeBlock(read("script.jl", String), language="julia", show_line_numbers=true)
+@island function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool=false,
                    show_copy::Bool=true, class::String="", theme::Symbol=:default, kwargs...)
+    # Fire-and-forget signal — triggers BindModal(mode=18) once on hydration
+    is_active, set_active = create_signal(Int32(1))
+
     wrapper_classes = cn("group relative overflow-hidden rounded-lg border border-warm-200 dark:border-warm-700 bg-warm-950 dark:bg-warm-950", class)
     theme !== :default && (wrapper_classes = apply_theme(wrapper_classes, get_theme(theme)))
 
@@ -57,7 +61,7 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
         push!(header_items,
             Therapy.Button(
                 :class => "cursor-pointer ml-auto inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs text-warm-400 hover:text-warm-200 hover:bg-warm-800 transition-colors",
-                :data_suite_codeblock_copy => "true",
+                Symbol("data-suite-codeblock-copy") => "true",
                 RawHtml(_CODEBLOCK_COPY_SVG),
             ))
     end
@@ -86,7 +90,9 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
     end
 
     lang_attr = isempty(language) ? Pair{Symbol,String}[] : [Symbol("data-suite-codeblock-lang") => language]
-    Div(:class => wrapper_classes, :data_suite_codeblock => "true", lang_attr..., kwargs...,
+    Div(:class => wrapper_classes,
+        Symbol("data-modal") => BindModal(is_active, Int32(18)),
+        lang_attr..., kwargs...,
         has_header ? Div(:class => "flex items-center gap-2 border-b border-warm-800 px-4 py-2",
             header_items...
         ) : nothing,
@@ -99,10 +105,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :CodeBlock,
         "CodeBlock.jl",
-        :js_runtime,
+        :island,
         "Styled code display with copy button, line numbers, and language badge",
         Symbol[],
-        [:CodeBlock],
+        Symbol[],
         [:CodeBlock],
     ))
 end

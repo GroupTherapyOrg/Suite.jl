@@ -1,15 +1,21 @@
 # TreeView.jl — Suite.jl TreeView Component
 #
-# Tier: js_runtime (expand/collapse + keyboard navigation needs JS)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none
-# JS Modules: TreeView
+# JS Modules: none
 #
 # Usage via package: using Suite; TreeView(TreeViewItem(label="src", ...))
 # Usage via extract: include("components/TreeView.jl"); TreeView(...)
 #
-# File browser tree component with expand/collapse folders, keyboard navigation,
-# and selected state highlighting.
-# Sessions.jl uses this for the file browser sidebar.
+# Behavior:
+#   - File browser tree component with expand/collapse folders, keyboard navigation,
+#     and selected state highlighting.
+#   - Signal-driven: BindModal(mode=19) handles all interaction via Wasm
+#   - Click on folder toggles expand/collapse
+#   - Click on item selects it (deselects others)
+#   - Keyboard: ArrowDown/Up move focus, ArrowRight expand/enter child,
+#     ArrowLeft collapse/go to parent, Enter/Space toggle+select, Home/End
+#   - Sessions.jl uses this for the file browser sidebar.
 #
 # Reference: VS Code file explorer, WAI-ARIA Tree View pattern
 
@@ -26,39 +32,40 @@ const _TREE_FILE_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" hei
 
 export TreeView, TreeViewItem
 
-"""
-    TreeView(children...; class, kwargs...) -> VNode
+#   TreeView(children...; class, kwargs...) -> IslandVNode
+#
+# A tree view container for hierarchical data (e.g., file browser).
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# Keyboard navigation:
+# - ArrowDown/Up: Move between visible items
+# - ArrowRight: Expand collapsed folder / move to first child
+# - ArrowLeft: Collapse expanded folder / move to parent
+# - Enter/Space: Select item / toggle folder
+# - Home/End: Jump to first/last visible item
+#
+# Examples:
+#   TreeView(
+#       TreeViewItem(label="src", is_folder=true,
+#           TreeViewItem(label="main.jl"),
+#           TreeViewItem(label="utils.jl"),
+#       ),
+#       TreeViewItem(label="test", is_folder=true, expanded=true,
+#           TreeViewItem(label="runtests.jl"),
+#       ),
+#       TreeViewItem(label="Project.toml"),
+#   )
+@island function TreeView(children...; class::String="", theme::Symbol=:default, kwargs...)
+    # Fire-and-forget signal — triggers BindModal(mode=19) once on hydration
+    is_active, set_active = create_signal(Int32(1))
 
-A tree view container for hierarchical data (e.g., file browser).
-
-Keyboard navigation:
-- ArrowDown/Up: Move between visible items
-- ArrowRight: Expand collapsed folder / move to first child
-- ArrowLeft: Collapse expanded folder / move to parent
-- Enter/Space: Select item / toggle folder
-- Home/End: Jump to first/last visible item
-
-# Examples
-```julia
-TreeView(
-    TreeViewItem(label="src", is_folder=true,
-        TreeViewItem(label="main.jl"),
-        TreeViewItem(label="utils.jl"),
-    ),
-    TreeViewItem(label="test", is_folder=true, expanded=true,
-        TreeViewItem(label="runtests.jl"),
-    ),
-    TreeViewItem(label="Project.toml"),
-)
-```
-"""
-function TreeView(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-sm", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Ul(:class => classes, :role => "tree",
-       :data_suite_treeview => "true",
-       kwargs..., children...)
+    Div(Symbol("data-modal") => BindModal(is_active, Int32(19)),
+        Ul(:class => classes, :role => "tree",
+           kwargs..., children...)
+    )
 end
 
 """
@@ -97,7 +104,7 @@ function TreeViewItem(children...; label::String="", is_folder::Union{Bool,Nothi
     # Chevron for folders
     chevron = if folder
         Span(:class => cn("inline-flex shrink-0 transition-transform duration-200", expanded ? "rotate-90" : ""),
-             :data_suite_treeview_chevron => "true",
+             Symbol("data-suite-treeview-chevron") => "true",
              RawHtml(_TREE_CHEVRON_SVG))
     else
         # Spacer to align with folder items that have chevrons
@@ -113,20 +120,10 @@ function TreeViewItem(children...; label::String="", is_folder::Union{Bool,Nothi
         Span(:class => "inline-flex shrink-0 text-warm-500 dark:text-warm-400", RawHtml(_TREE_FILE_SVG))
     end
 
-    # Increment depth for children
-    nested_children = map(children) do child
-        if child isa VNode && child.tag == :li
-            # Already a TreeViewItem — update depth via wrapper
-            child
-        else
-            child
-        end
-    end
-
     # Build the item
     li_attrs = Dict{Symbol,Any}(
         :class => class,
-        :role => folder ? "treeitem" : "treeitem",
+        :role => "treeitem",
         Symbol("aria-expanded") => folder ? string(expanded) : nothing,
         Symbol("aria-selected") => string(selected),
         Symbol("data-suite-treeview-item") => "true",
@@ -154,7 +151,7 @@ function TreeViewItem(children...; label::String="", is_folder::Union{Bool,Nothi
         ),
         folder && has_children ? Ul(:class => cn("", expanded ? "" : "hidden"),
             :role => "group",
-            :data_suite_treeview_children => "true",
+            Symbol("data-suite-treeview-children") => "true",
             # Re-render children with incremented depth
             map(children) do child
                 _treeview_increment_depth(child, depth + 1)
@@ -167,8 +164,6 @@ end
 Internal helper to increment depth on nested TreeViewItem children.
 """
 function _treeview_increment_depth(child, new_depth)
-    # For simplicity, we pass depth through data attributes
-    # and let JS handle the visual nesting
     child
 end
 
@@ -177,10 +172,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :TreeView,
         "TreeView.jl",
-        :js_runtime,
+        :island,
         "File browser tree component with expand/collapse and keyboard navigation",
         Symbol[],
-        [:TreeView],
+        Symbol[],
         [:TreeView, :TreeViewItem],
     ))
 end
