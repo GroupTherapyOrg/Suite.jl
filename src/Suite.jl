@@ -107,4 +107,18 @@ include("components/TreeView.jl")
 # --- Theme Script (FOUC prevention) ---
 include("runtime.jl")
 
+# --- Module init: re-register @island components after precompilation ---
+# Julia precompilation preserves module variables but NOT mutations to other
+# modules' mutable globals (like Therapy.ISLAND_REGISTRY). This __init__
+# re-registers all IslandDef variables at load time.
+function __init__()
+    for name in names(@__MODULE__; all=false)
+        isdefined(@__MODULE__, name) || continue
+        val = getfield(@__MODULE__, name)
+        if val isa Therapy.IslandDef
+            Therapy.ISLAND_REGISTRY[val.name] = val
+        end
+    end
+end
+
 end # module Suite
