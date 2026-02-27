@@ -258,3 +258,16 @@ const _TOGGLEGROUP_HYDRATION_BODY = quote
         end
     )
 end
+
+# --- Registry ---
+if @isdefined(register_component!)
+    register_component!(ComponentMeta(
+        :ToggleGroup,
+        "ToggleGroup.jl",
+        :island,
+        "Group of toggle buttons with single or multiple selection",
+        Symbol[],
+        Symbol[],
+        [:ToggleGroup, :ToggleGroupItem],
+    ))
+end
