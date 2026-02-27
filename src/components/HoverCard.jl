@@ -44,7 +44,7 @@ export HoverCard, HoverCardTrigger, HoverCardContent
 
     # Walk children to inject hover handlers on trigger wrapper
     for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-suite-hover-card-trigger-wrapper"))
+        if child isa VNode && haskey(child.props, Symbol("data-hover-card-trigger-wrapper"))
             # Trigger wrapper: hover events toggle the signal
             child.props[:on_pointerenter] = () -> set_open(Int32(1))
             child.props[:on_pointerleave] = () -> set_open(Int32(0))
@@ -53,8 +53,8 @@ export HoverCard, HoverCardTrigger, HoverCardContent
     end
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(5)),  # mode 5 = hover_card (hover + floating + dismiss)
-        Symbol("data-suite-hover-card-open-delay") => string(open_delay),
-        Symbol("data-suite-hover-card-close-delay") => string(close_delay),
+        Symbol("data-hover-card-open-delay") => string(open_delay),
+        Symbol("data-hover-card-close-delay") => string(close_delay),
         :class => cn("", class),
         :style => "display:contents",
         kwargs...,
@@ -68,7 +68,7 @@ The element that triggers the hover card on hover.
 Typically wraps a link or anchor element.
 """
 function HoverCardTrigger(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-hover-card-trigger-wrapper") => "",
+    Span(Symbol("data-hover-card-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
          kwargs...,
@@ -101,10 +101,10 @@ function HoverCardContent(children...; side::String="bottom", side_offset::Int=4
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-hover-card-content") => "",
-        Symbol("data-suite-hover-card-side") => side,
-        Symbol("data-suite-hover-card-side-offset") => string(side_offset),
-        Symbol("data-suite-hover-card-align") => align,
+    Div(Symbol("data-hover-card-content") => "",
+        Symbol("data-hover-card-side") => side,
+        Symbol("data-hover-card-side-offset") => string(side_offset),
+        Symbol("data-hover-card-align") => align,
         Symbol("data-state") => "closed",
         :tabindex => "-1",
         :style => "display:none",

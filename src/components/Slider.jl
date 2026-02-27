@@ -107,7 +107,7 @@ export Slider
     # Root data attributes
     root_attrs = Pair{Symbol,Any}[
         Symbol("data-modal") => BindModal(is_active, Int32(13)),
-        Symbol("data-suite-slider") => "",
+        Symbol("data-slider") => "",
         Symbol("data-orientation") => orientation,
         Symbol("data-min") => string(min),
         Symbol("data-max") => string(max),
@@ -122,17 +122,17 @@ export Slider
 
     Span(root_attrs..., kwargs...,
         # Track
-        Span(Symbol("data-suite-slider-track") => "",
+        Span(Symbol("data-slider-track") => "",
              Symbol("data-orientation") => orientation,
              :class => track_classes,
             # Range (fill)
-            Span(Symbol("data-suite-slider-range") => "",
+            Span(Symbol("data-slider-range") => "",
                  Symbol("data-orientation") => orientation,
                  :class => range_classes,
                  :style => range_style),
         ),
         # Thumb
-        Span(Symbol("data-suite-slider-thumb") => "",
+        Span(Symbol("data-slider-thumb") => "",
              Symbol("data-orientation") => orientation,
              :role => "slider",
              :tabindex => disabled ? "-1" : "0",

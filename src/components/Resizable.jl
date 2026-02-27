@@ -41,7 +41,7 @@ export ResizablePanelGroup, ResizablePanel, ResizableHandle
 
     Div(:class => classes,
         Symbol("data-modal") => BindModal(is_active, Int32(21)),
-        Symbol("data-suite-resizable-direction") => direction,
+        Symbol("data-resizable-direction") => direction,
         :style => "flex-wrap:nowrap;",
         kwargs...,
         children...,
@@ -69,10 +69,10 @@ function ResizablePanel(children...; default_size::Int=0, min_size::Int=10,
     grow = default_size > 0 ? string(default_size) : "1"
 
     Div(:class => classes,
-        :data_suite_resizable_panel => id,
-        :data_suite_resizable_default_size => string(default_size),
-        :data_suite_resizable_min_size => string(min_size),
-        :data_suite_resizable_max_size => string(max_size),
+        :data_resizable_panel => id,
+        :data_resizable_default_size => string(default_size),
+        :data_resizable_min_size => string(min_size),
+        :data_resizable_max_size => string(max_size),
         :style => "display:flex;flex-basis:0;flex-shrink:1;flex-grow:$(grow);",
         kwargs...,
         children...,
@@ -114,11 +114,11 @@ function ResizableHandle(; with_handle::Bool=false, class::String="",
 
     # ARIA: separator role, inverse orientation
     Div(:class => classes,
-        :data_suite_resizable_handle => "inactive",
+        :data_resizable_handle => "inactive",
         :role => "separator",
         :tabindex => "0",
         Symbol("aria-orientation") => "vertical",
-        :data_suite_resizable_direction => "horizontal",
+        :data_resizable_direction => "horizontal",
         kwargs...,
         handle_content === nothing ? "" : handle_content,
     )

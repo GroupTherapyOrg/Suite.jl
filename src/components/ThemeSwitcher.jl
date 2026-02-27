@@ -44,12 +44,12 @@ const _THEME_OPTIONS = [
 
     Div(:class => "relative",
         Symbol("data-modal") => BindModal(is_active, Int32(23)),
-        Symbol("data-suite-theme-switcher") => "",
+        Symbol("data-theme-switcher") => "",
         kwargs...,
         # Trigger button — palette icon
         Therapy.Button(:type => "button",
             :class => trigger_classes,
-            Symbol("data-suite-theme-switcher-trigger") => "",
+            Symbol("data-theme-switcher-trigger") => "",
             :aria_label => "Switch theme",
             :aria_haspopup => "true",
             :aria_expanded => "false",
@@ -63,7 +63,7 @@ const _THEME_OPTIONS = [
         ),
         # Dropdown panel (hidden by default, positioned below trigger)
         Div(:class => "hidden absolute right-0 top-full mt-2 z-50 w-56 rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900 shadow-lg",
-            Symbol("data-suite-theme-switcher-content") => "",
+            Symbol("data-theme-switcher-content") => "",
             :role => "menu",
             :aria_label => "Theme options",
             Div(:class => "p-1",
@@ -76,7 +76,7 @@ end
 function _ThemeOption(opt)
     Therapy.Button(:type => "button",
         :class => "flex items-center gap-3 w-full rounded-sm px-2 py-2 text-sm cursor-pointer hover:bg-warm-100 dark:hover:bg-warm-800 transition-colors text-left",
-        Symbol("data-suite-theme-option") => opt.key,
+        Symbol("data-theme-option") => opt.key,
         :role => "menuitem",
         # Color swatch
         Span(:class => "w-4 h-4 rounded-full shrink-0 border border-warm-200 dark:border-warm-700",
@@ -89,7 +89,7 @@ function _ThemeOption(opt)
         ),
         # Check mark for active theme (hidden by default, shown via JS)
         Svg(:class => "w-4 h-4 ml-auto text-accent-600 dark:text-accent-400 hidden",
-            Symbol("data-suite-theme-check") => opt.key,
+            Symbol("data-theme-check") => opt.key,
             :fill => "none", :viewBox => "0 0 24 24", :stroke => "currentColor", :stroke_width => "2",
             Path(:stroke_linecap => "round", :stroke_linejoin => "round",
                  :d => "M5 13l4 4L19 7")

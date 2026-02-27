@@ -62,7 +62,7 @@ const _DROPDOWN_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
     # Walk children to inject signal bindings
     for child in children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-dropdown-menu-trigger-wrapper"))
+            if haskey(child.props, Symbol("data-dropdown-menu-trigger-wrapper"))
                 # Inject reactive bindings on trigger wrapper
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 child.props[:aria_expanded] = BindBool(is_open, "false", "true")
@@ -83,7 +83,7 @@ end
 
 # Walk children to find content and inject data-state binding
 function _dropdown_inject_content_bindings!(node::VNode, is_open)
-    if haskey(node.props, Symbol("data-suite-dropdown-menu-content"))
+    if haskey(node.props, Symbol("data-dropdown-menu-content"))
         node.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
     end
     for child in node.children
@@ -99,7 +99,7 @@ end
 The button that opens the dropdown menu.
 """
 function DropdownMenuTrigger(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-dropdown-menu-trigger-wrapper") => "",
+    Span(Symbol("data-dropdown-menu-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
          Symbol("data-state") => "closed",
@@ -132,7 +132,7 @@ function DropdownMenuContent(children...; side::String="bottom", side_offset::In
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-dropdown-menu-content") => "",
+    Div(Symbol("data-dropdown-menu-content") => "",
         Symbol("data-side-preference") => side,
         Symbol("data-side-offset") => string(side_offset),
         Symbol("data-align-preference") => align,
@@ -183,7 +183,7 @@ function DropdownMenuItem(children...; shortcut::String="", disabled::Bool=false
     item_children = collect(Any, children)
     if !isempty(shortcut)
         push!(item_children, Span(:class => "ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500",
-                                   Symbol("data-suite-menu-shortcut") => "",
+                                   Symbol("data-menu-shortcut") => "",
                                    shortcut))
     end
 
@@ -200,7 +200,7 @@ function DropdownMenuItem(children...; shortcut::String="", disabled::Bool=false
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-item") => "",
+    Div(Symbol("data-menu-item") => "",
         :role => "menuitem",
         :tabindex => "-1",
         :class => classes,
@@ -226,7 +226,7 @@ function DropdownMenuCheckboxItem(children...; checked::Bool=false, disabled::Bo
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-checkbox-item") => "",
+    Div(Symbol("data-menu-checkbox-item") => "",
         Symbol("data-state") => state,
         :role => "menuitemcheckbox",
         Symbol("aria-checked") => string(checked),
@@ -236,7 +236,7 @@ function DropdownMenuCheckboxItem(children...; checked::Bool=false, disabled::Bo
         kwargs...,
         # Indicator
         Span(:class => "pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
-             Symbol("data-suite-menu-item-indicator") => "",
+             Symbol("data-menu-item-indicator") => "",
              :style => checked ? "" : "display:none",
              Therapy.RawHtml(_DROPDOWN_CHECK_SVG)),
         children...,
@@ -249,7 +249,7 @@ end
 Container for radio menu items. Only one item can be checked at a time.
 """
 function DropdownMenuRadioGroup(children...; value::String="", class::String="", kwargs...)
-    Div(Symbol("data-suite-menu-radio-group") => "",
+    Div(Symbol("data-menu-radio-group") => "",
         Symbol("data-value") => value,
         :role => "group",
         :class => cn(class),
@@ -274,7 +274,7 @@ function DropdownMenuRadioItem(children...; value::String="", checked::Bool=fals
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-radio-item") => "",
+    Div(Symbol("data-menu-radio-item") => "",
         Symbol("data-value") => value,
         Symbol("data-state") => state,
         :role => "menuitemradio",
@@ -285,7 +285,7 @@ function DropdownMenuRadioItem(children...; value::String="", checked::Bool=fals
         kwargs...,
         # Indicator dot
         Span(:class => "pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
-             Symbol("data-suite-menu-item-indicator") => "",
+             Symbol("data-menu-item-indicator") => "",
              :style => checked ? "" : "display:none",
              Therapy.RawHtml(_DROPDOWN_DOT_SVG)),
         children...,
@@ -299,7 +299,7 @@ Custom indicator for checkbox/radio items. Replaces the default check/dot.
 """
 function DropdownMenuItemIndicator(children...; class::String="", kwargs...)
     Span(:class => cn("pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center", class),
-         Symbol("data-suite-menu-item-indicator") => "",
+         Symbol("data-menu-item-indicator") => "",
          kwargs...,
          children...)
 end
@@ -313,7 +313,7 @@ function DropdownMenuSeparator(; theme::Symbol=:default, class::String="", kwarg
     classes = cn("-mx-1 my-1 h-px bg-warm-200 dark:bg-warm-700", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-separator") => "",
+    Div(Symbol("data-menu-separator") => "",
         :role => "separator",
         :class => classes,
         kwargs...)
@@ -329,7 +329,7 @@ function DropdownMenuShortcut(children...; theme::Symbol=:default, class::String
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Span(:class => classes,
-         Symbol("data-suite-menu-shortcut") => "",
+         Symbol("data-menu-shortcut") => "",
          kwargs...,
          children...)
 end
@@ -340,7 +340,7 @@ end
 Container for a sub-menu. Contains a SubTrigger and SubContent.
 """
 function DropdownMenuSub(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-menu-sub") => "",
+    Div(Symbol("data-menu-sub") => "",
         :class => cn("relative", class),
         kwargs...,
         children...)
@@ -363,7 +363,7 @@ function DropdownMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=f
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-sub-trigger") => "",
+    Div(Symbol("data-menu-sub-trigger") => "",
         Symbol("data-state") => "closed",
         :role => "menuitem",
         Symbol("aria-haspopup") => "menu",
@@ -398,7 +398,7 @@ function DropdownMenuSubContent(children...; theme::Symbol=:default, class::Stri
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-sub-content") => "",
+    Div(Symbol("data-menu-sub-content") => "",
         Symbol("data-state") => "closed",
         :role => "menu",
         :aria_orientation => "vertical",

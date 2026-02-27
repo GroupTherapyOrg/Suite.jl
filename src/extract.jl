@@ -128,11 +128,11 @@ function list()
     println("=" ^ 60)
 
     # Group by tier
-    for tier in [:styling, :island, :js_runtime]
+    for tier in [:styling, :island]
         tier_comps = filter(p -> p.second.tier == tier, COMPONENT_REGISTRY)
         isempty(tier_comps) && continue
 
-        tier_label = Dict(:styling => "Pure Styling", :island => "Islands (Wasm)", :js_runtime => "JS Runtime")[tier]
+        tier_label = Dict(:styling => "Pure Styling", :island => "Islands (Wasm)")[tier]
         println("\n  $tier_label:")
         for (name, meta) in sort(collect(tier_comps), by=p -> string(p.first))
             deps_str = isempty(meta.suite_deps) ? "" : " [deps: $(join(meta.suite_deps, ", "))]"

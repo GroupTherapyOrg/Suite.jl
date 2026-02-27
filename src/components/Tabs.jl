@@ -53,14 +53,14 @@ export Tabs, TabsList, TabsTrigger, TabsContent
 
     for child in children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-tabslist"))
+            if haskey(child.props, Symbol("data-tabslist"))
                 # Walk TabsList children to find triggers
                 for trigger_child in child.children
-                    if trigger_child isa VNode && haskey(trigger_child.props, Symbol("data-suite-tabs-trigger"))
+                    if trigger_child isa VNode && haskey(trigger_child.props, Symbol("data-tabs-trigger"))
                         push!(triggers, trigger_child)
                     end
                 end
-            elseif haskey(child.props, Symbol("data-suite-tabs-content"))
+            elseif haskey(child.props, Symbol("data-tabs-content"))
                 push!(contents, child)
             end
         end
@@ -69,7 +69,7 @@ export Tabs, TabsList, TabsTrigger, TabsContent
     # Create per-trigger signals (Int32: 0=inactive, 1=active)
     trigger_signals = Tuple{Any, Any}[]
     for trigger in triggers
-        value = string(trigger.props[Symbol("data-suite-tabs-trigger")])
+        value = string(trigger.props[Symbol("data-tabs-trigger")])
         is_active = value == default_value
         sig, set_sig = create_signal(Int32(is_active ? 1 : 0))
         push!(trigger_signals, (sig, set_sig))
@@ -81,7 +81,7 @@ export Tabs, TabsList, TabsTrigger, TabsContent
         trigger.props[Symbol("data-state")] = BindBool(sig, "inactive", "active")
         trigger.props[:aria_selected] = BindBool(sig, "false", "true")
         # Set initial tabindex correctly (active=0, inactive=-1)
-        value = string(trigger.props[Symbol("data-suite-tabs-trigger")])
+        value = string(trigger.props[Symbol("data-tabs-trigger")])
         is_active = value == default_value
         trigger.props[:tabindex] = is_active ? "0" : "-1"
 
@@ -99,9 +99,9 @@ export Tabs, TabsList, TabsTrigger, TabsContent
 
     # Match content panels to triggers by value and inject BindBool
     for content in contents
-        content_value = string(content.props[Symbol("data-suite-tabs-content")])
+        content_value = string(content.props[Symbol("data-tabs-content")])
         for (i, trigger) in enumerate(triggers)
-            trigger_value = string(trigger.props[Symbol("data-suite-tabs-trigger")])
+            trigger_value = string(trigger.props[Symbol("data-tabs-trigger")])
             if trigger_value == content_value
                 sig = trigger_signals[i][1]
                 content.props[Symbol("data-state")] = BindBool(sig, "inactive", "active")
@@ -117,7 +117,7 @@ export Tabs, TabsList, TabsTrigger, TabsContent
 
     classes = cn("", class)
 
-    Div(Symbol("data-suite-tabs") => "",
+    Div(Symbol("data-tabs") => "",
         Symbol("data-orientation") => orientation,
         Symbol("data-activation") => activation,
         :class => classes,
@@ -140,7 +140,7 @@ function TabsList(children...; loop::Bool=true, theme::Symbol=:default,
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     attrs = Pair{Symbol,Any}[
-        Symbol("data-suite-tabslist") => "",
+        Symbol("data-tabslist") => "",
         :role => "tablist",
         :aria_orientation => "horizontal",
         :class => classes,
@@ -170,7 +170,7 @@ function TabsTrigger(children...; value::String="", disabled::Bool=false,
     attrs = Pair{Symbol,Any}[
         :type => "button",
         :role => "tab",
-        Symbol("data-suite-tabs-trigger") => value,
+        Symbol("data-tabs-trigger") => value,
         Symbol("data-state") => "inactive",
         :aria_selected => "false",
         :tabindex => "-1",
@@ -198,7 +198,7 @@ function TabsContent(children...; value::String="", theme::Symbol=:default,
     classes = cn(base, class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-tabs-content") => value,
+    Div(Symbol("data-tabs-content") => value,
         Symbol("data-state") => "inactive",
         :role => "tabpanel",
         :tabindex => "0",

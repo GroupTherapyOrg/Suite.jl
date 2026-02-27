@@ -50,7 +50,7 @@ export AlertDialog, AlertDialogTrigger, AlertDialogContent,
     # Walk children to inject signal bindings
     for child in children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-alert-dialog-trigger-wrapper"))
+            if haskey(child.props, Symbol("data-alert-dialog-trigger-wrapper"))
                 # Inject reactive bindings on trigger wrapper
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 child.props[:aria_expanded] = BindBool(is_open, "false", "true")
@@ -72,10 +72,10 @@ end
 function _alert_dialog_inject_content_bindings!(node::VNode, is_open, set_open)
     for child in node.children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-alert-dialog-overlay"))
+            if haskey(child.props, Symbol("data-alert-dialog-overlay"))
                 # Overlay: bind data-state (no click-to-close for AlertDialog)
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-            elseif haskey(child.props, Symbol("data-suite-alert-dialog-content"))
+            elseif haskey(child.props, Symbol("data-alert-dialog-content"))
                 # Content: bind data-state
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 # Walk content for action/cancel buttons
@@ -87,8 +87,8 @@ end
 
 # Recursively inject close handler on action and cancel elements
 function _alert_dialog_inject_close_buttons!(node::VNode, set_open)
-    if haskey(node.props, Symbol("data-suite-alert-dialog-action")) ||
-       haskey(node.props, Symbol("data-suite-alert-dialog-cancel"))
+    if haskey(node.props, Symbol("data-alert-dialog-action")) ||
+       haskey(node.props, Symbol("data-alert-dialog-cancel"))
         node.props[:on_click] = () -> set_open(Int32(0))
     end
     for child in node.children
@@ -104,7 +104,7 @@ end
 The button that opens the alert dialog.
 """
 function AlertDialogTrigger(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-alert-dialog-trigger-wrapper") => "",
+    Span(Symbol("data-alert-dialog-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
          Symbol("data-state") => "closed",
@@ -135,13 +135,13 @@ function AlertDialogContent(children...; theme::Symbol=:default, class::String="
 
     Div(
         # Overlay backdrop
-        Div(Symbol("data-suite-alert-dialog-overlay") => "",
+        Div(Symbol("data-alert-dialog-overlay") => "",
             Symbol("data-state") => "closed",
             :class => "fixed inset-0 z-50 bg-warm-950/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             :style => "display:none",
         ),
         # Content
-        Div(Symbol("data-suite-alert-dialog-content") => "",
+        Div(Symbol("data-alert-dialog-content") => "",
             Symbol("data-state") => "closed",
             :role => "alertdialog",
             :aria_modal => "true",
@@ -204,7 +204,7 @@ end
 Confirm action button. Clicking closes the alert dialog.
 """
 function AlertDialogAction(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-alert-dialog-action") => "",
+    Span(Symbol("data-alert-dialog-action") => "",
          :class => cn(class),
          :style => "display:contents",
          kwargs...,
@@ -217,7 +217,7 @@ end
 Cancel button. Clicking closes the alert dialog. Auto-focused on open.
 """
 function AlertDialogCancel(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-alert-dialog-cancel") => "",
+    Span(Symbol("data-alert-dialog-cancel") => "",
          :class => cn(class),
          :style => "display:contents",
          kwargs...,

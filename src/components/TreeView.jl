@@ -104,7 +104,7 @@ function TreeViewItem(children...; label::String="", is_folder::Union{Bool,Nothi
     # Chevron for folders
     chevron = if folder
         Span(:class => cn("inline-flex shrink-0 transition-transform duration-200", expanded ? "rotate-90" : ""),
-             Symbol("data-suite-treeview-chevron") => "true",
+             Symbol("data-treeview-chevron") => "true",
              RawHtml(_TREE_CHEVRON_SVG))
     else
         # Spacer to align with folder items that have chevrons
@@ -126,11 +126,11 @@ function TreeViewItem(children...; label::String="", is_folder::Union{Bool,Nothi
         :role => "treeitem",
         Symbol("aria-expanded") => folder ? string(expanded) : nothing,
         Symbol("aria-selected") => string(selected),
-        Symbol("data-suite-treeview-item") => "true",
-        Symbol("data-suite-treeview-folder") => folder ? "true" : nothing,
-        Symbol("data-suite-treeview-expanded") => expanded ? "true" : nothing,
-        Symbol("data-suite-treeview-selected") => selected ? "true" : nothing,
-        Symbol("data-suite-treeview-depth") => string(depth),
+        Symbol("data-treeview-item") => "true",
+        Symbol("data-treeview-folder") => folder ? "true" : nothing,
+        Symbol("data-treeview-expanded") => expanded ? "true" : nothing,
+        Symbol("data-treeview-selected") => selected ? "true" : nothing,
+        Symbol("data-treeview-depth") => string(depth),
     )
     if disabled
         li_attrs[Symbol("data-disabled")] = ""
@@ -151,7 +151,7 @@ function TreeViewItem(children...; label::String="", is_folder::Union{Bool,Nothi
         ),
         folder && has_children ? Ul(:class => cn("", expanded ? "" : "hidden"),
             :role => "group",
-            Symbol("data-suite-treeview-children") => "true",
+            Symbol("data-treeview-children") => "true",
             # Re-render children with incremented depth
             map(children) do child
                 _treeview_increment_depth(child, depth + 1)

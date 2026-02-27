@@ -11,10 +11,10 @@ Metadata for a Suite.jl component, used by the extraction system.
 # Fields
 - `name::Symbol`: Component identifier (e.g., `:Button`, `:Dialog`)
 - `file::String`: Filename relative to `src/components/` (e.g., `"Button.jl"`)
-- `tier::Symbol`: Implementation tier — `:styling`, `:island`, or `:js_runtime`
+- `tier::Symbol`: Implementation tier — `:styling` or `:island`
 - `description::String`: Brief description for `Suite.list()`
 - `suite_deps::Vector{Symbol}`: Other Suite components this depends on
-- `js_modules::Vector{Symbol}`: JS runtime modules needed (e.g., `[:FocusTrap]`)
+- `js_modules::Vector{Symbol}`: Unused (kept for API compat)
 - `exports::Vector{Symbol}`: Exported function names (e.g., `[:Button]`)
 """
 struct ComponentMeta

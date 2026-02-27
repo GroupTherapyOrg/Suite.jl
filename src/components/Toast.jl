@@ -55,7 +55,7 @@ export Toaster
         Symbol("data-modal") => BindModal(is_active, Int32(22)),
         :aria_label => "Notifications",
         :tabindex => "-1",
-        Symbol("data-suite-toaster") => "",
+        Symbol("data-toaster") => "",
         Symbol("data-position") => position,
         Symbol("data-duration") => string(duration),
         Symbol("data-visible-toasts") => string(visible_toasts),

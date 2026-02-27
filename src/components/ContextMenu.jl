@@ -55,7 +55,7 @@ const _CONTEXT_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     # Walk children to inject signal bindings
     for child in children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-context-menu-trigger-wrapper"))
+            if haskey(child.props, Symbol("data-context-menu-trigger-wrapper"))
                 # Inject reactive bindings on trigger wrapper
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 child.props[:on_click] = () -> set_open(Int32(1) - is_open())
@@ -75,7 +75,7 @@ end
 
 # Walk children to find content and inject data-state binding
 function _context_inject_content_bindings!(node::VNode, is_open)
-    if haskey(node.props, Symbol("data-suite-context-menu-content"))
+    if haskey(node.props, Symbol("data-context-menu-content"))
         node.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
     end
     for child in node.children
@@ -92,7 +92,7 @@ The area that responds to right-click. Can wrap any content.
 Renders as a `<span>` (not a button — any content can be right-clicked).
 """
 function ContextMenuTrigger(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-context-menu-trigger-wrapper") => "",
+    Span(Symbol("data-context-menu-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn(class),
          kwargs...,
@@ -121,7 +121,7 @@ function ContextMenuContent(children...; theme::Symbol=:default, class::String="
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-context-menu-content") => "",
+    Div(Symbol("data-context-menu-content") => "",
         Symbol("data-state") => "closed",
         :role => "menu",
         :aria_orientation => "vertical",
@@ -172,7 +172,7 @@ function ContextMenuItem(children...; shortcut::String="", disabled::Bool=false,
     item_children = collect(Any, children)
     if !isempty(shortcut)
         push!(item_children, Span(:class => "ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500",
-                                   Symbol("data-suite-menu-shortcut") => "",
+                                   Symbol("data-menu-shortcut") => "",
                                    shortcut))
     end
 
@@ -185,7 +185,7 @@ function ContextMenuItem(children...; shortcut::String="", disabled::Bool=false,
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-item") => "",
+    Div(Symbol("data-menu-item") => "",
         :role => "menuitem",
         :tabindex => "-1",
         :class => classes,
@@ -212,7 +212,7 @@ function ContextMenuCheckboxItem(children...; checked::Bool=false, disabled::Boo
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-checkbox-item") => "",
+    Div(Symbol("data-menu-checkbox-item") => "",
         Symbol("data-state") => state,
         :role => "menuitemcheckbox",
         Symbol("aria-checked") => string(checked),
@@ -221,7 +221,7 @@ function ContextMenuCheckboxItem(children...; checked::Bool=false, disabled::Boo
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         Span(:class => "pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
-             Symbol("data-suite-menu-item-indicator") => "",
+             Symbol("data-menu-item-indicator") => "",
              :style => checked ? "" : "display:none",
              Therapy.RawHtml(_CONTEXT_CHECK_SVG)),
         children...,
@@ -234,7 +234,7 @@ end
 Container for radio menu items.
 """
 function ContextMenuRadioGroup(children...; value::String="", class::String="", kwargs...)
-    Div(Symbol("data-suite-menu-radio-group") => "",
+    Div(Symbol("data-menu-radio-group") => "",
         Symbol("data-value") => value,
         :role => "group",
         :class => cn(class),
@@ -259,7 +259,7 @@ function ContextMenuRadioItem(children...; value::String="", checked::Bool=false
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-radio-item") => "",
+    Div(Symbol("data-menu-radio-item") => "",
         Symbol("data-value") => value,
         Symbol("data-state") => state,
         :role => "menuitemradio",
@@ -269,7 +269,7 @@ function ContextMenuRadioItem(children...; value::String="", checked::Bool=false
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         Span(:class => "pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
-             Symbol("data-suite-menu-item-indicator") => "",
+             Symbol("data-menu-item-indicator") => "",
              :style => checked ? "" : "display:none",
              Therapy.RawHtml(_CONTEXT_DOT_SVG)),
         children...,
@@ -283,7 +283,7 @@ Custom indicator for checkbox/radio items.
 """
 function ContextMenuItemIndicator(children...; class::String="", kwargs...)
     Span(:class => cn("pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center", class),
-         Symbol("data-suite-menu-item-indicator") => "",
+         Symbol("data-menu-item-indicator") => "",
          kwargs...,
          children...)
 end
@@ -297,7 +297,7 @@ function ContextMenuSeparator(; theme::Symbol=:default, class::String="", kwargs
     classes = cn("-mx-1 my-1 h-px bg-warm-200 dark:bg-warm-700", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-separator") => "",
+    Div(Symbol("data-menu-separator") => "",
         :role => "separator",
         :class => classes,
         kwargs...)
@@ -313,7 +313,7 @@ function ContextMenuShortcut(children...; theme::Symbol=:default, class::String=
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Span(:class => classes,
-         Symbol("data-suite-menu-shortcut") => "",
+         Symbol("data-menu-shortcut") => "",
          kwargs...,
          children...)
 end
@@ -324,7 +324,7 @@ end
 Container for a sub-menu.
 """
 function ContextMenuSub(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-menu-sub") => "",
+    Div(Symbol("data-menu-sub") => "",
         :class => cn("relative", class),
         kwargs...,
         children...)
@@ -347,7 +347,7 @@ function ContextMenuSubTrigger(children...; inset::Bool=false, disabled::Bool=fa
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-sub-trigger") => "",
+    Div(Symbol("data-menu-sub-trigger") => "",
         Symbol("data-state") => "closed",
         :role => "menuitem",
         Symbol("aria-haspopup") => "menu",
@@ -382,7 +382,7 @@ function ContextMenuSubContent(children...; theme::Symbol=:default, class::Strin
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-sub-content") => "",
+    Div(Symbol("data-menu-sub-content") => "",
         Symbol("data-state") => "closed",
         :role => "menu",
         :aria_orientation => "vertical",

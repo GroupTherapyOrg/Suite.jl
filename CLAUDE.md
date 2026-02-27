@@ -28,13 +28,11 @@ Suite.jl/
 │   ├── utils.jl              # cn() class merging utility
 │   ├── registry.jl           # ComponentMeta struct, COMPONENT_REGISTRY
 │   ├── extract.jl            # Suite.extract(), list(), info()
-│   ├── runtime.jl            # JS runtime loader (suite_script())
+│   ├── runtime.jl            # Theme script (FOUC prevention)
 │   └── components/           # One file per component
 │       ├── Button.jl         # Reference implementation
 │       ├── Card.jl           # (future)
 │       └── ...
-├── js/
-│   └── suite.js              # Behavioral JS (FocusTrap, DismissLayer, etc.)
 ├── docs/
 │   ├── app.jl                # Docs site entry point
 │   ├── input.css             # Tailwind v4 design tokens

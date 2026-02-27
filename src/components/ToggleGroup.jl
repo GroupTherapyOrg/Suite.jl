@@ -68,8 +68,8 @@ export ToggleGroup, ToggleGroupItem
     items = VNode[]
 
     for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-suite-toggle-group-item"))
-            item_value = string(child.props[Symbol("data-suite-toggle-group-item")])
+        if child isa VNode && haskey(child.props, Symbol("data-toggle-group-item"))
+            item_value = string(child.props[Symbol("data-toggle-group-item")])
             is_on = item_value in on_values
 
             # Create signal for this item (Int32: 0=off, 1=on)
@@ -123,7 +123,7 @@ export ToggleGroup, ToggleGroupItem
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     attrs = Pair{Symbol,Any}[
-        Symbol("data-suite-toggle-group") => type,
+        Symbol("data-toggle-group") => type,
         Symbol("data-orientation") => orientation,
         Symbol("data-variant") => variant,
         Symbol("data-size") => size,
@@ -171,7 +171,7 @@ function ToggleGroupItem(children...; value::String="", variant::String="default
 
     attrs = Pair{Symbol,Any}[
         :type => "button",
-        Symbol("data-suite-toggle-group-item") => value,
+        Symbol("data-toggle-group-item") => value,
         Symbol("data-state") => "off",
         :class => classes,
     ]

@@ -58,7 +58,7 @@ const _SELECT_SCROLL_DOWN_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width
 
     # Walk children to inject signal bindings on trigger
     for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-suite-select-trigger-wrapper"))
+        if child isa VNode && haskey(child.props, Symbol("data-select-trigger-wrapper"))
             # Inject on_click toggle on trigger wrapper
             child.props[:on_click] = () -> set_open(Int32(1) - is_open())
             # Set inner button ARIA props
@@ -77,8 +77,8 @@ const _SELECT_SCROLL_DOWN_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width
     initial_value = !isempty(value) ? value : default_value
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(10)),  # mode 10 = select
-        Symbol("data-suite-select-value") => initial_value,
-        Symbol("data-suite-select-name") => name,
+        Symbol("data-select-value") => initial_value,
+        Symbol("data-select-name") => name,
         :class => cn(class),
         :style => "display:contents",
         (disabled ? (Symbol("data-disabled") => "",) : ())...,
@@ -108,7 +108,7 @@ function SelectTrigger(children...; theme::Symbol=:default, class::String="", kw
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-select-trigger-wrapper") => "",
+    Div(Symbol("data-select-trigger-wrapper") => "",
         :style => "display:contents",
         Therapy.Button(:type => "button",
                :class => classes,
@@ -126,7 +126,7 @@ end
 Displays the currently selected value, or placeholder if none selected.
 """
 function SelectValue(; placeholder::String="", class::String="", kwargs...)
-    Span(Symbol("data-suite-select-display") => "",
+    Span(Symbol("data-select-display") => "",
          Symbol("data-placeholder") => "",
          :class => cn(class),
          kwargs...,
@@ -165,10 +165,10 @@ function SelectContent(children...; side::String="bottom", side_offset::Int=4,
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-select-content") => "",
-        Symbol("data-suite-select-side") => side,
-        Symbol("data-suite-select-side-offset") => string(side_offset),
-        Symbol("data-suite-select-align") => align,
+    Div(Symbol("data-select-content") => "",
+        Symbol("data-select-side") => side,
+        Symbol("data-select-side-offset") => string(side_offset),
+        Symbol("data-select-align") => align,
         Symbol("data-state") => "closed",
         :role => "listbox",
         :tabindex => "-1",
@@ -201,9 +201,9 @@ function SelectItem(children...; value::String="", disabled::Bool=false,
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-select-item") => "",
-        Symbol("data-suite-select-item-value") => value,
-        Symbol("data-suite-select-item-text") => text_value,
+    Div(Symbol("data-select-item") => "",
+        Symbol("data-select-item-value") => value,
+        Symbol("data-select-item-text") => text_value,
         :role => "option",
         Symbol("aria-selected") => "false",
         Symbol("data-state") => "unchecked",
@@ -213,10 +213,10 @@ function SelectItem(children...; value::String="", disabled::Bool=false,
         kwargs...,
         # Check indicator
         Span(:class => "absolute right-2 flex size-3.5 items-center justify-center",
-             Symbol("data-suite-select-item-indicator") => "",
+             Symbol("data-select-item-indicator") => "",
              :style => "display:none",
              Therapy.RawHtml(_SELECT_CHECK_SVG)),
-        Span(Symbol("data-suite-select-item-text-content") => "",
+        Span(Symbol("data-select-item-text-content") => "",
              children...),
     )
 end
@@ -228,7 +228,7 @@ Groups related select items together.
 """
 function SelectGroup(children...; class::String="", kwargs...)
     Div(:role => "group",
-        Symbol("data-suite-select-group") => "",
+        Symbol("data-select-group") => "",
         :class => cn("overflow-hidden p-1", class),
         kwargs...,
         children...)
@@ -244,7 +244,7 @@ function SelectLabel(children...; theme::Symbol=:default, class::String="", kwar
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(:role => "presentation",
-        Symbol("data-suite-select-label") => "",
+        Symbol("data-select-label") => "",
         :class => classes,
         kwargs...,
         children...)
@@ -259,7 +259,7 @@ function SelectSeparator(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("bg-warm-200 dark:bg-warm-700 -mx-1 my-1 h-px", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-select-separator") => "",
+    Div(Symbol("data-select-separator") => "",
         :role => "separator",
         :class => classes,
         kwargs...)
@@ -271,7 +271,7 @@ end
 A button at the top of the select content that scrolls items upward.
 """
 function SelectScrollUpButton(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-select-scroll-up") => "",
+    Div(Symbol("data-select-scroll-up") => "",
         Symbol("aria-hidden") => "true",
         :class => cn("flex cursor-pointer items-center justify-center py-1", class),
         kwargs...,
@@ -284,7 +284,7 @@ end
 A button at the bottom of the select content that scrolls items downward.
 """
 function SelectScrollDownButton(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-select-scroll-down") => "",
+    Div(Symbol("data-select-scroll-down") => "",
         Symbol("aria-hidden") => "true",
         :class => cn("flex cursor-pointer items-center justify-center py-1", class),
         kwargs...,

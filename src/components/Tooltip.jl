@@ -34,9 +34,9 @@ for coordinated delay behavior (instant-open for quick succession).
 - `skip_delay_duration::Int=300`: Milliseconds window for instant-open after close
 """
 function TooltipProvider(children...; delay_duration::Int=700, skip_delay_duration::Int=300, class::String="", kwargs...)
-    Div(Symbol("data-suite-tooltip-provider") => "",
-        Symbol("data-suite-tooltip-delay") => string(delay_duration),
-        Symbol("data-suite-tooltip-skip-delay") => string(skip_delay_duration),
+    Div(Symbol("data-tooltip-provider") => "",
+        Symbol("data-tooltip-delay") => string(delay_duration),
+        Symbol("data-tooltip-skip-delay") => string(skip_delay_duration),
         :class => cn(class),
         :style => "display:contents",
         kwargs...,
@@ -59,7 +59,7 @@ end
 
     # Walk children to inject hover handlers on trigger wrapper
     for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-suite-tooltip-trigger-wrapper"))
+        if child isa VNode && haskey(child.props, Symbol("data-tooltip-trigger-wrapper"))
             # Trigger wrapper: hover events toggle the signal
             child.props[:on_pointerenter] = () -> set_open(Int32(1))
             child.props[:on_pointerleave] = () -> set_open(Int32(0))
@@ -80,7 +80,7 @@ end
 The element that triggers the tooltip on hover/focus.
 """
 function TooltipTrigger(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-tooltip-trigger-wrapper") => "",
+    Div(Symbol("data-tooltip-trigger-wrapper") => "",
         :style => "display:contents",
         Therapy.Button(:type => "button",
                :class => cn("cursor-pointer", class),
@@ -113,10 +113,10 @@ function TooltipContent(children...; side::String="top", side_offset::Int=4, ali
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-tooltip-content") => "",
-        Symbol("data-suite-tooltip-side") => side,
-        Symbol("data-suite-tooltip-side-offset") => string(side_offset),
-        Symbol("data-suite-tooltip-align") => align,
+    Div(Symbol("data-tooltip-content") => "",
+        Symbol("data-tooltip-side") => side,
+        Symbol("data-tooltip-side-offset") => string(side_offset),
+        Symbol("data-tooltip-align") => align,
         Symbol("data-state") => "closed",
         :role => "tooltip",
         :tabindex => "-1",

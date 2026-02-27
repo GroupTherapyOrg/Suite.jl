@@ -127,26 +127,10 @@ Suite.info(:Dialog)""")
                 " guard pattern so they work both via ", Main.InlineCode("using Suite"), " and via ", Main.InlineCode("include()"), " in your own project."
             ),
 
-            # JS Runtime
-            SectionH2("JS Runtime"),
+            # Interactive Components
+            SectionH2("Interactive Components"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Interactive components (Dialog, Menu, Tooltip, etc.) require the Suite.jl JavaScript runtime. Add it to your layout:"
-            ),
-            Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Main.CodeBlock(language="julia", """# src/components/Layout.jl
-function Layout(children...)
-    Div(:class => "min-h-screen",
-        # Your navbar, content, footer...
-        children...,
-
-        # Suite.jl JS runtime (loads once, auto-discovers components)
-        suite_script()
-    )
-end""")
-            ),
-            P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "The ", Main.InlineCode("suite_script()"),
-                " function injects the bundled JavaScript that powers focus traps, dismiss layers, floating positioning, keyboard navigation, and all other interactive behaviors. It loads once and auto-discovers components via ", Main.InlineCode("data-suite-*"), " attributes."
+                "All interactive components (Dialog, Menu, Tooltip, etc.) are powered by WebAssembly via Therapy.jl's ", Main.InlineCode("@island"), " macro. No JavaScript runtime is needed — just use the components directly in your layouts."
             ),
 
             # Next steps

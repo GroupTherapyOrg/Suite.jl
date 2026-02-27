@@ -66,8 +66,8 @@ export Accordion, AccordionItem, AccordionTrigger, AccordionContent
 
     # Walk children to find AccordionItem VNodes and inject signal bindings
     for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-suite-accordion-item"))
-            item_value = string(child.props[Symbol("data-suite-accordion-item")])
+        if child isa VNode && haskey(child.props, Symbol("data-accordion-item"))
+            item_value = string(child.props[Symbol("data-accordion-item")])
             is_initially_open = item_value in open_values
 
             # Create signal for this item's open/closed state (Int32: 0=closed, 1=open)
@@ -84,7 +84,7 @@ export Accordion, AccordionItem, AccordionTrigger, AccordionContent
                     if subchild.tag == :h3
                         # H3 wrapper — look inside for the trigger button
                         for btn in subchild.children
-                            if btn isa VNode && haskey(btn.props, Symbol("data-suite-accordion-trigger"))
+                            if btn isa VNode && haskey(btn.props, Symbol("data-accordion-trigger"))
                                 # Inject reactive bindings on trigger
                                 btn.props[Symbol("data-state")] = BindBool(item_open, "closed", "open")
                                 btn.props[:aria_expanded] = BindBool(item_open, "false", "true")
@@ -118,7 +118,7 @@ export Accordion, AccordionItem, AccordionTrigger, AccordionContent
                                 end
                             end
                         end
-                    elseif haskey(subchild.props, Symbol("data-suite-accordion-content"))
+                    elseif haskey(subchild.props, Symbol("data-accordion-content"))
                         # Inject reactive bindings on content
                         subchild.props[Symbol("data-state")] = BindBool(item_open, "closed", "open")
                         # Remove HTML hidden attr — CSS handles visibility via data-state
@@ -137,7 +137,7 @@ export Accordion, AccordionItem, AccordionTrigger, AccordionContent
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     attrs = Pair{Symbol,Any}[
-        Symbol("data-suite-accordion") => type,
+        Symbol("data-accordion") => type,
         Symbol("data-orientation") => orientation,
         :class => classes,
     ]
@@ -168,7 +168,7 @@ function AccordionItem(children...; value::String="", disabled::Bool=false,
     classes = cn("", class)
 
     attrs = Pair{Symbol,Any}[
-        Symbol("data-suite-accordion-item") => value,
+        Symbol("data-accordion-item") => value,
         Symbol("data-state") => "closed",
         :class => classes,
     ]
@@ -208,7 +208,7 @@ function AccordionTrigger(children...; theme::Symbol=:default,
 
     H3(:class => "flex",
         Therapy.Button(:type => "button",
-               Symbol("data-suite-accordion-trigger") => "",
+               Symbol("data-accordion-trigger") => "",
                Symbol("data-state") => "closed",
                :aria_expanded => "false",
                :class => classes,
@@ -232,7 +232,7 @@ function AccordionContent(children...; class::String="", kwargs...)
     inner_class = "pb-4 pt-0"
     classes = cn(base, class)
 
-    Div(Symbol("data-suite-accordion-content") => "",
+    Div(Symbol("data-accordion-content") => "",
         Symbol("data-state") => "closed",
         :role => "region",
         :hidden => true,

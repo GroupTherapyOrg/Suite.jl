@@ -43,14 +43,14 @@ export Collapsible, CollapsibleTrigger, CollapsibleContent
     # Walk children to inject signal bindings into trigger/content VNodes
     for child in children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-collapsible-trigger"))
+            if haskey(child.props, Symbol("data-collapsible-trigger"))
                 # Inject reactive bindings into trigger
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 child.props[:aria_expanded] = BindBool(is_open, "false", "true")
                 if !disabled
                     child.props[:on_click] = () -> set_open(Int32(1) - is_open())
                 end
-            elseif haskey(child.props, Symbol("data-suite-collapsible-content"))
+            elseif haskey(child.props, Symbol("data-collapsible-content"))
                 # Inject reactive bindings into content
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 # Remove HTML hidden attr — CSS handles visibility via data-state
@@ -63,7 +63,7 @@ export Collapsible, CollapsibleTrigger, CollapsibleContent
     end
 
     attrs = Pair{Symbol,Any}[
-        Symbol("data-suite-collapsible") => "",
+        Symbol("data-collapsible") => "",
         Symbol("data-state") => BindBool(is_open, "closed", "open"),
         :class => cn("", class),
     ]
@@ -87,7 +87,7 @@ function CollapsibleTrigger(children...; theme::Symbol=:default,
     classes = cn("cursor-pointer text-warm-800 dark:text-warm-300", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-collapsible-trigger") => "",
+    Div(Symbol("data-collapsible-trigger") => "",
         Symbol("data-state") => "closed",
         :aria_expanded => "false",
         :class => classes,
@@ -106,7 +106,7 @@ signal bindings (data-state) and CSS visibility class at render time.
 function CollapsibleContent(children...; class::String="", force_mount::Bool=false, kwargs...)
     classes = cn("overflow-hidden", class)
 
-    Div(Symbol("data-suite-collapsible-content") => "",
+    Div(Symbol("data-collapsible-content") => "",
         Symbol("data-state") => "closed",
         :hidden => true,
         :class => classes,

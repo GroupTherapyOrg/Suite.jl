@@ -52,7 +52,7 @@ const SHEET_SIDE_CLASSES = Dict{String, String}(
     # Walk children to inject signal bindings
     for child in children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-sheet-trigger-wrapper"))
+            if haskey(child.props, Symbol("data-sheet-trigger-wrapper"))
                 # Inject reactive bindings on trigger wrapper
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 child.props[:aria_expanded] = BindBool(is_open, "false", "true")
@@ -74,11 +74,11 @@ end
 function _sheet_inject_content_bindings!(node::VNode, is_open, set_open)
     for child in node.children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-sheet-overlay"))
+            if haskey(child.props, Symbol("data-sheet-overlay"))
                 # Overlay: bind data-state, add click-to-close
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 child.props[:on_click] = () -> set_open(Int32(0))
-            elseif haskey(child.props, Symbol("data-suite-sheet-content"))
+            elseif haskey(child.props, Symbol("data-sheet-content"))
                 # Content: bind data-state
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 # Walk content for close buttons
@@ -88,9 +88,9 @@ function _sheet_inject_content_bindings!(node::VNode, is_open, set_open)
     end
 end
 
-# Recursively inject close handler on all [data-suite-sheet-close] elements
+# Recursively inject close handler on all [data-sheet-close] elements
 function _sheet_inject_close_buttons!(node::VNode, set_open)
-    if haskey(node.props, Symbol("data-suite-sheet-close"))
+    if haskey(node.props, Symbol("data-sheet-close"))
         node.props[:on_click] = () -> set_open(Int32(0))
     end
     for child in node.children
@@ -106,7 +106,7 @@ end
 The button that opens the sheet.
 """
 function SheetTrigger(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-sheet-trigger-wrapper") => "",
+    Span(Symbol("data-sheet-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
          Symbol("data-state") => "closed",
@@ -141,13 +141,13 @@ function SheetContent(children...; side::String="right", theme::Symbol=:default,
 
     Div(
         # Overlay backdrop
-        Div(Symbol("data-suite-sheet-overlay") => "",
+        Div(Symbol("data-sheet-overlay") => "",
             Symbol("data-state") => "closed",
             :class => "fixed inset-0 z-50 bg-warm-950/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             :style => "display:none",
         ),
         # Content
-        Div(Symbol("data-suite-sheet-content") => "",
+        Div(Symbol("data-sheet-content") => "",
             Symbol("data-state") => "closed",
             :role => "dialog",
             :aria_modal => "true",
@@ -157,7 +157,7 @@ function SheetContent(children...; side::String="right", theme::Symbol=:default,
             children...,
             # Default close button (X in top-right)
             Therapy.Button(:type => "button",
-                   Symbol("data-suite-sheet-close") => "",
+                   Symbol("data-sheet-close") => "",
                    :class => "absolute right-4 top-4 rounded-sm opacity-70 cursor-pointer ring-offset-warm-50 dark:ring-offset-warm-950 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2 disabled:pointer-events-none",
                    :aria_label => "Close",
                    Svg(:class => "h-4 w-4", :fill => "none", :viewBox => "0 0 24 24",
@@ -219,7 +219,7 @@ end
 A button that closes the sheet when clicked.
 """
 function SheetClose(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-sheet-close") => "",
+    Span(Symbol("data-sheet-close") => "",
          :class => cn(class),
          :style => "display:contents",
          kwargs...,

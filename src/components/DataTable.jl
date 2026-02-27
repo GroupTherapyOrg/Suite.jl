@@ -127,20 +127,20 @@ end
 
     Div(:class => wrapper_classes,
         Symbol("data-modal") => BindModal(is_active, Int32(16)),
-        Symbol("data-suite-datatable") => id,
-        Symbol("data-suite-datatable-page-size") => string(page_size),
-        Symbol("data-suite-datatable-sortable") => string(sortable),
-        Symbol("data-suite-datatable-filterable") => string(filterable),
-        Symbol("data-suite-datatable-selectable") => string(selectable),
-        Symbol("data-suite-datatable-column-visibility") => string(column_visibility),
+        Symbol("data-datatable") => id,
+        Symbol("data-datatable-page-size") => string(page_size),
+        Symbol("data-datatable-sortable") => string(sortable),
+        Symbol("data-datatable-filterable") => string(filterable),
+        Symbol("data-datatable-selectable") => string(selectable),
+        Symbol("data-datatable-column-visibility") => string(column_visibility),
         kwargs...,
 
         # Hidden data stores (no <script> — zero JS rule)
         Span(:style => "display:none",
-             Symbol("data-suite-datatable-store") => id,
+             Symbol("data-datatable-store") => id,
              data_json),
         Span(:style => "display:none",
-             Symbol("data-suite-datatable-columns") => id,
+             Symbol("data-datatable-columns") => id,
              col_meta),
 
         # Toolbar: filter + column visibility
@@ -215,8 +215,8 @@ function _dt_toolbar(id, filterable, placeholder, filter_columns, column_visibil
         push!(items, Therapy.Input(:type => "text",
                           :placeholder => placeholder,
                           :class => input_classes,
-                          Symbol("data-suite-datatable-filter") => id,
-                          Symbol("data-suite-datatable-filter-columns") => filter_cols_attr))
+                          Symbol("data-datatable-filter") => id,
+                          Symbol("data-datatable-filter-columns") => filter_cols_attr))
     end
 
     if column_visibility
@@ -233,9 +233,9 @@ function _dt_toolbar(id, filterable, placeholder, filter_columns, column_visibil
                     Therapy.Input(:type => "checkbox",
                           :checked => "checked",
                           :class => "sr-only",
-                          Symbol("data-suite-datatable-col-toggle") => id,
+                          Symbol("data-datatable-col-toggle") => id,
                           :value => col.key),
-                    Span("✓ ", Symbol("data-suite-datatable-col-check") => col.key,
+                    Span("✓ ", Symbol("data-datatable-col-check") => col.key,
                          :class => "text-accent-600 w-4"),
                     Span(col.header),
                 ))
@@ -245,14 +245,14 @@ function _dt_toolbar(id, filterable, placeholder, filter_columns, column_visibil
         theme !== :default && (dropdown_classes = apply_theme(dropdown_classes, get_theme(theme)))
 
         push!(items, Div(:class => "relative ml-auto",
-            Symbol("data-suite-datatable-col-vis") => id,
+            Symbol("data-datatable-col-vis") => id,
             Therapy.Button(:type => "button",
                    :class => vis_btn_classes,
-                   Symbol("data-suite-datatable-col-vis-trigger") => id,
+                   Symbol("data-datatable-col-vis-trigger") => id,
                    "Columns ",
                    Therapy.RawHtml(_DT_CHEVRON_SVG)),
             Div(:class => dropdown_classes,
-                Symbol("data-suite-datatable-col-vis-content") => id,
+                Symbol("data-datatable-col-vis-content") => id,
                 col_items...),
         ))
     end
@@ -274,7 +274,7 @@ function _dt_table(id, data, columns, selectable, sortable, caption, theme)
             Th(:class => "w-12 px-2 align-middle",
                 Therapy.Input(:type => "checkbox",
                       :class => cb_classes,
-                      Symbol("data-suite-datatable-select-all") => id,
+                      Symbol("data-datatable-select-all") => id,
                       Symbol("aria-label") => "Select all rows")))
     end
     for col in columns
@@ -287,17 +287,17 @@ function _dt_table(id, data, columns, selectable, sortable, caption, theme)
             btn_classes = cn("inline-flex items-center justify-center cursor-pointer whitespace-nowrap font-medium transition-colors hover:text-warm-800 dark:hover:text-warm-300 -ml-1 h-8 px-1")
             push!(header_cells,
                 Th(:class => head_classes,
-                    Symbol("data-suite-datatable-col") => col.key,
+                    Symbol("data-datatable-col") => col.key,
                     Therapy.Button(:type => "button",
                            :class => btn_classes,
-                           Symbol("data-suite-datatable-sort") => id,
+                           Symbol("data-datatable-sort") => id,
                            :value => col.key,
                            col.header,
                            Therapy.RawHtml(_DT_SORT_SVG))))
         else
             push!(header_cells,
                 Th(:class => head_classes,
-                    Symbol("data-suite-datatable-col") => col.key,
+                    Symbol("data-datatable-col") => col.key,
                     col.header))
         end
     end
@@ -313,11 +313,11 @@ function _dt_table(id, data, columns, selectable, sortable, caption, theme)
     theme !== :default && (header_row_classes = apply_theme(header_row_classes, get_theme(theme)))
 
     Div(:class => "relative w-full overflow-x-auto rounded-md border border-warm-200 dark:border-warm-700",
-        Symbol("data-suite-datatable-wrapper") => id,
+        Symbol("data-datatable-wrapper") => id,
         Therapy.Table(:class => table_classes,
             Thead(:class => header_row_classes,
                 Tr(header_cells...)),
-            Tbody(Symbol("data-suite-datatable-body") => id,
+            Tbody(Symbol("data-datatable-body") => id,
                 body_rows...),
             caption != "" ? Caption(:class => "text-warm-600 dark:text-warm-500 mt-4 text-sm", caption) : Span(),
         ),
@@ -346,7 +346,7 @@ function _dt_render_rows(id, data, columns, selectable, theme)
                 Td(:class => "w-12 px-2 align-middle",
                     Therapy.Input(:type => "checkbox",
                           :class => cb_classes,
-                          Symbol("data-suite-datatable-select-row") => id,
+                          Symbol("data-datatable-select-row") => id,
                           :value => string(i - 1),
                           Symbol("aria-label") => "Select row")))
         end
@@ -366,7 +366,7 @@ function _dt_render_rows(id, data, columns, selectable, theme)
         end
 
         push!(rows, Tr(:class => row_classes,
-                       Symbol("data-suite-datatable-row") => id,
+                       Symbol("data-datatable-row") => id,
                        Symbol("data-row-index") => string(i - 1),
                        cells...))
     end
@@ -385,31 +385,31 @@ function _dt_pagination(id, total_rows, total_pages, page_size, selectable, them
     pagination_classes = cn("flex items-center justify-between px-2 py-4")
 
     Div(:class => pagination_classes,
-        Symbol("data-suite-datatable-pagination") => id,
+        Symbol("data-datatable-pagination") => id,
 
         # Selection info (left side)
         selectable ?
             Div(:class => info_classes,
-                Symbol("data-suite-datatable-selection-info") => id,
+                Symbol("data-datatable-selection-info") => id,
                 "0 of $total_rows row(s) selected.") :
             Div(:class => info_classes,
-                Symbol("data-suite-datatable-row-info") => id,
+                Symbol("data-datatable-row-info") => id,
                 "$total_rows row(s) total."),
 
         # Page navigation (right side)
         Div(:class => nav_classes,
             Span(:class => "text-sm text-warm-600 dark:text-warm-500",
-                 Symbol("data-suite-datatable-page-info") => id,
+                 Symbol("data-datatable-page-info") => id,
                  "Page 1 of $total_pages"),
             Therapy.Button(:type => "button",
                    :class => btn_base,
                    :disabled => "disabled",
-                   Symbol("data-suite-datatable-prev") => id,
+                   Symbol("data-datatable-prev") => id,
                    "Previous"),
             Therapy.Button(:type => "button",
                    :class => btn_base,
                    total_pages <= 1 ? (:disabled => "disabled") : (:data_x => ""),
-                   Symbol("data-suite-datatable-next") => id,
+                   Symbol("data-datatable-next") => id,
                    "Next"),
         ),
     )

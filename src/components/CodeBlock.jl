@@ -61,7 +61,7 @@ const _CODEBLOCK_COPY_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="14
         push!(header_items,
             Therapy.Button(
                 :class => "cursor-pointer ml-auto inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs text-warm-400 hover:text-warm-200 hover:bg-warm-800 transition-colors",
-                Symbol("data-suite-codeblock-copy") => "true",
+                Symbol("data-codeblock-copy") => "true",
                 RawHtml(_CODEBLOCK_COPY_SVG),
             ))
     end
@@ -89,7 +89,7 @@ const _CODEBLOCK_COPY_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="14
         )
     end
 
-    lang_attr = isempty(language) ? Pair{Symbol,String}[] : [Symbol("data-suite-codeblock-lang") => language]
+    lang_attr = isempty(language) ? Pair{Symbol,String}[] : [Symbol("data-codeblock-lang") => language]
     Div(:class => wrapper_classes,
         Symbol("data-modal") => BindModal(is_active, Int32(18)),
         lang_attr..., kwargs...,

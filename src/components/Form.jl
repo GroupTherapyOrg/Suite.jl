@@ -56,8 +56,8 @@ end
          Symbol("data-modal") => BindModal(is_active, Int32(17)),
          :action => action,
          :method => method,
-         Symbol("data-suite-form") => id,
-         Symbol("data-suite-form-validate-on") => validate_on,
+         Symbol("data-form") => id,
+         Symbol("data-form-validate-on") => validate_on,
          :novalidate => "novalidate",
          kwargs...,
          children...)
@@ -101,20 +101,20 @@ function FormField(children...; name::String,
 
     # Build validation attributes
     attrs = Pair{Symbol,String}[
-        Symbol("data-suite-form-field") => name,
-        Symbol("data-suite-form-field-id") => field_id,
+        Symbol("data-form-field") => name,
+        Symbol("data-form-field-id") => field_id,
     ]
 
-    required && push!(attrs, Symbol("data-suite-form-required") => required_message)
-    min_length > 0 && push!(attrs, Symbol("data-suite-form-min-length") => string(min_length))
-    min_length > 0 && min_length_message != "" && push!(attrs, Symbol("data-suite-form-min-length-message") => min_length_message)
-    max_length > 0 && push!(attrs, Symbol("data-suite-form-max-length") => string(max_length))
-    max_length > 0 && max_length_message != "" && push!(attrs, Symbol("data-suite-form-max-length-message") => max_length_message)
-    pattern != "" && push!(attrs, Symbol("data-suite-form-pattern") => pattern)
-    pattern != "" && pattern_message != "" && push!(attrs, Symbol("data-suite-form-pattern-message") => pattern_message)
-    min != "" && push!(attrs, Symbol("data-suite-form-min") => min)
-    max != "" && push!(attrs, Symbol("data-suite-form-max") => max)
-    custom_message != "" && push!(attrs, Symbol("data-suite-form-custom-message") => custom_message)
+    required && push!(attrs, Symbol("data-form-required") => required_message)
+    min_length > 0 && push!(attrs, Symbol("data-form-min-length") => string(min_length))
+    min_length > 0 && min_length_message != "" && push!(attrs, Symbol("data-form-min-length-message") => min_length_message)
+    max_length > 0 && push!(attrs, Symbol("data-form-max-length") => string(max_length))
+    max_length > 0 && max_length_message != "" && push!(attrs, Symbol("data-form-max-length-message") => max_length_message)
+    pattern != "" && push!(attrs, Symbol("data-form-pattern") => pattern)
+    pattern != "" && pattern_message != "" && push!(attrs, Symbol("data-form-pattern-message") => pattern_message)
+    min != "" && push!(attrs, Symbol("data-form-min") => min)
+    max != "" && push!(attrs, Symbol("data-form-max") => max)
+    custom_message != "" && push!(attrs, Symbol("data-form-custom-message") => custom_message)
 
     Div(attrs..., kwargs..., children...)
 end
@@ -128,7 +128,7 @@ function FormItem(children...; class::String="", theme::Symbol=:default, kwargs.
     item_classes = cn("grid gap-2", class)
     theme !== :default && (item_classes = apply_theme(item_classes, get_theme(theme)))
     Div(:class => item_classes,
-        Symbol("data-suite-form-item") => "",
+        Symbol("data-form-item") => "",
         kwargs...,
         children...)
 end
@@ -143,7 +143,7 @@ function FormLabel(children...; class::String="", theme::Symbol=:default, kwargs
     label_classes = cn("text-sm font-medium text-warm-800 dark:text-warm-300 data-[error=true]:text-accent-secondary-600 dark:data-[error=true]:text-accent-secondary-500", class)
     theme !== :default && (label_classes = apply_theme(label_classes, get_theme(theme)))
     Therapy.Label(:class => label_classes,
-          Symbol("data-suite-form-label") => "",
+          Symbol("data-form-label") => "",
           kwargs...,
           children...)
 end
@@ -155,7 +155,7 @@ Wrapper for the actual form control (input, select, textarea, etc.).
 Injects ARIA attributes (aria-invalid, aria-describedby) via JS runtime.
 """
 function FormControl(children...; kwargs...)
-    Div(Symbol("data-suite-form-control") => "",
+    Div(Symbol("data-form-control") => "",
         :style => "display:contents",
         kwargs...,
         children...)
@@ -170,7 +170,7 @@ function FormDescription(children...; class::String="", theme::Symbol=:default, 
     desc_classes = cn("text-sm text-warm-600 dark:text-warm-500", class)
     theme !== :default && (desc_classes = apply_theme(desc_classes, get_theme(theme)))
     P(:class => desc_classes,
-      Symbol("data-suite-form-description") => "",
+      Symbol("data-form-description") => "",
       kwargs...,
       children...)
 end
@@ -184,7 +184,7 @@ function FormMessage(children...; class::String="", theme::Symbol=:default, kwar
     msg_classes = cn("text-sm text-accent-secondary-600 dark:text-accent-secondary-500 hidden", class)
     theme !== :default && (msg_classes = apply_theme(msg_classes, get_theme(theme)))
     P(:class => msg_classes,
-      Symbol("data-suite-form-message") => "",
+      Symbol("data-form-message") => "",
       :role => "alert",
       Symbol("aria-live") => "polite",
       kwargs...,

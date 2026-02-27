@@ -64,7 +64,7 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     # Walk children to find MenubarMenu elements and assign indices
     menu_idx = Int32(0)
     for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-suite-menubar-menu"))
+        if child isa VNode && haskey(child.props, Symbol("data-menubar-menu"))
             menu_idx += Int32(1)
             _menubar_inject_menu_bindings!(child, active_menu, set_active, menu_idx)
         end
@@ -78,7 +78,7 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menubar") => "",
+    Div(Symbol("data-menubar") => "",
         Symbol("data-modal") => BindModal(active_menu, Int32(8)),  # mode 8 = menubar
         Symbol("data-loop") => string(loop),
         :role => "menubar",
@@ -88,11 +88,11 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
 end
 
 # Walk a MenubarMenu's children to inject on_click on trigger markers
-# and data-suite-menubar-trigger on inner buttons
+# and data-menubar-trigger on inner buttons
 function _menubar_inject_menu_bindings!(menu_node::VNode, active_menu, set_active, idx)
     for child in menu_node.children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-menubar-trigger-marker"))
+            if haskey(child.props, Symbol("data-menubar-trigger-marker"))
                 # Put on_click on the marker div — toggles this menu open/closed
                 let i = idx
                     child.props[:on_click] = () -> set_active(i * (Int32(1) - Int32(active_menu() == i)))
@@ -100,7 +100,7 @@ function _menubar_inject_menu_bindings!(menu_node::VNode, active_menu, set_activ
                 # Find inner button and add trigger identification
                 for inner in child.children
                     if inner isa VNode
-                        inner.props[Symbol("data-suite-menubar-trigger")] = ""
+                        inner.props[Symbol("data-menubar-trigger")] = ""
                         inner.props[Symbol("aria-haspopup")] = "menu"
                         inner.props[Symbol("aria-expanded")] = "false"
                         inner.props[Symbol("data-state")] = "closed"
@@ -117,7 +117,7 @@ end
 An individual menu within the menubar. Contains a trigger and content.
 """
 function MenubarMenu(children...; value::String="", class::String="", kwargs...)
-    Div(Symbol("data-suite-menubar-menu") => "",
+    Div(Symbol("data-menubar-menu") => "",
         Symbol("data-value") => value,
         :class => cn("relative", class),
         :style => "display:contents",
@@ -143,7 +143,7 @@ function MenubarTrigger(children...; disabled::Bool=false, theme::Symbol=:defaul
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menubar-trigger-marker") => "",
+    Div(Symbol("data-menubar-trigger-marker") => "",
         :style => "display:contents",
         Therapy.Button(:type => "button",
                :role => "menuitem",
@@ -176,7 +176,7 @@ function MenubarContent(children...; side::String="bottom", side_offset::Int=4, 
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menubar-content") => "",
+    Div(Symbol("data-menubar-content") => "",
         Symbol("data-side-preference") => side,
         Symbol("data-side-offset") => string(side_offset),
         Symbol("data-align-preference") => align,
@@ -227,7 +227,7 @@ function MenubarItem(children...; shortcut::String="", disabled::Bool=false, tex
     item_children = collect(Any, children)
     if !isempty(shortcut)
         push!(item_children, Span(:class => "ml-auto text-xs tracking-widest text-warm-600 dark:text-warm-500",
-                                   Symbol("data-suite-menu-shortcut") => "",
+                                   Symbol("data-menu-shortcut") => "",
                                    shortcut))
     end
 
@@ -244,7 +244,7 @@ function MenubarItem(children...; shortcut::String="", disabled::Bool=false, tex
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-item") => "",
+    Div(Symbol("data-menu-item") => "",
         :role => "menuitem",
         :tabindex => "-1",
         :class => classes,
@@ -270,7 +270,7 @@ function MenubarCheckboxItem(children...; checked::Bool=false, disabled::Bool=fa
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-checkbox-item") => "",
+    Div(Symbol("data-menu-checkbox-item") => "",
         Symbol("data-state") => state,
         :role => "menuitemcheckbox",
         Symbol("aria-checked") => string(checked),
@@ -279,7 +279,7 @@ function MenubarCheckboxItem(children...; checked::Bool=false, disabled::Bool=fa
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         Span(:class => "pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
-             Symbol("data-suite-menu-item-indicator") => "",
+             Symbol("data-menu-item-indicator") => "",
              :style => checked ? "" : "display:none",
              Therapy.RawHtml(_MENUBAR_CHECK_SVG)),
         children...,
@@ -292,7 +292,7 @@ end
 Container for radio menu items.
 """
 function MenubarRadioGroup(children...; value::String="", class::String="", kwargs...)
-    Div(Symbol("data-suite-menu-radio-group") => "",
+    Div(Symbol("data-menu-radio-group") => "",
         Symbol("data-value") => value,
         :role => "group",
         :class => cn(class),
@@ -317,7 +317,7 @@ function MenubarRadioItem(children...; value::String="", checked::Bool=false, di
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-radio-item") => "",
+    Div(Symbol("data-menu-radio-item") => "",
         Symbol("data-value") => value,
         Symbol("data-state") => state,
         :role => "menuitemradio",
@@ -327,7 +327,7 @@ function MenubarRadioItem(children...; value::String="", checked::Bool=false, di
         (disabled ? [Symbol("data-disabled") => ""] : Pair{Symbol,String}[])...,
         kwargs...,
         Span(:class => "pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
-             Symbol("data-suite-menu-item-indicator") => "",
+             Symbol("data-menu-item-indicator") => "",
              :style => checked ? "" : "display:none",
              Therapy.RawHtml(_MENUBAR_DOT_SVG)),
         children...,
@@ -341,7 +341,7 @@ Custom indicator for checkbox/radio items.
 """
 function MenubarItemIndicator(children...; class::String="", kwargs...)
     Span(:class => cn("pointer-events-none absolute left-2 flex h-3.5 w-3.5 items-center justify-center", class),
-         Symbol("data-suite-menu-item-indicator") => "",
+         Symbol("data-menu-item-indicator") => "",
          kwargs...,
          children...)
 end
@@ -355,7 +355,7 @@ function MenubarSeparator(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("-mx-1 my-1 h-px bg-warm-200 dark:bg-warm-700", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-separator") => "",
+    Div(Symbol("data-menu-separator") => "",
         :role => "separator",
         :class => classes,
         kwargs...)
@@ -371,7 +371,7 @@ function MenubarShortcut(children...; theme::Symbol=:default, class::String="", 
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Span(:class => classes,
-         Symbol("data-suite-menu-shortcut") => "",
+         Symbol("data-menu-shortcut") => "",
          kwargs...,
          children...)
 end
@@ -382,7 +382,7 @@ end
 Container for a sub-menu.
 """
 function MenubarSub(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-menu-sub") => "",
+    Div(Symbol("data-menu-sub") => "",
         :class => cn("relative", class),
         kwargs...,
         children...)
@@ -405,7 +405,7 @@ function MenubarSubTrigger(children...; inset::Bool=false, disabled::Bool=false,
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-sub-trigger") => "",
+    Div(Symbol("data-menu-sub-trigger") => "",
         Symbol("data-state") => "closed",
         :role => "menuitem",
         Symbol("aria-haspopup") => "menu",
@@ -440,7 +440,7 @@ function MenubarSubContent(children...; theme::Symbol=:default, class::String=""
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-menu-sub-content") => "",
+    Div(Symbol("data-menu-sub-content") => "",
         Symbol("data-state") => "closed",
         :role => "menu",
         :aria_orientation => "vertical",

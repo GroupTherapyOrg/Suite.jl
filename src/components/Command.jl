@@ -56,9 +56,9 @@ const _COMMAND_SEARCH_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-modal") => BindModal(activated, Int32(11)),  # mode 11 = command
-        Symbol("data-suite-command") => "",
-        Symbol("data-suite-command-filter") => should_filter ? "true" : "false",
-        Symbol("data-suite-command-loop") => loop ? "true" : "false",
+        Symbol("data-command") => "",
+        Symbol("data-command-filter") => should_filter ? "true" : "false",
+        Symbol("data-command-loop") => loop ? "true" : "false",
         :class => classes,
         kwargs...,
         children...,
@@ -86,7 +86,7 @@ function CommandInput(; placeholder::String="", theme::Symbol=:default, class::S
 
     Div(:class => wrapper_classes,
         Therapy.RawHtml(_COMMAND_SEARCH_SVG),
-        Therapy.Input(Symbol("data-suite-command-input") => "",
+        Therapy.Input(Symbol("data-command-input") => "",
               :type => "text",
               :placeholder => placeholder,
               :autocomplete => "off",
@@ -102,7 +102,7 @@ end
 The scrollable container for command items and groups.
 """
 function CommandList(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-command-list") => "",
+    Div(Symbol("data-command-list") => "",
         :role => "listbox",
         Symbol("aria-label") => "Suggestions",
         :class => cn(
@@ -120,7 +120,7 @@ end
 Shown when the search yields no matching items.
 """
 function CommandEmpty(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-command-empty") => "",
+    Div(Symbol("data-command-empty") => "",
         :role => "presentation",
         :class => cn("py-6 text-center text-sm", class),
         :style => "display:none",
@@ -152,7 +152,7 @@ function CommandGroup(children...; heading::String="", theme::Symbol=:default, c
         heading_classes = apply_theme(heading_classes, t)
     end
 
-    Div(Symbol("data-suite-command-group") => "",
+    Div(Symbol("data-command-group") => "",
         :role => "group",
         (isempty(heading) ? () : (Symbol("aria-labelledby") => heading_id,))...,
         :class => group_classes,
@@ -160,7 +160,7 @@ function CommandGroup(children...; heading::String="", theme::Symbol=:default, c
         (isempty(heading) ? () : (
             Div(:role => "presentation",
                 :id => heading_id,
-                Symbol("data-suite-command-group-heading") => "",
+                Symbol("data-command-group-heading") => "",
                 :class => heading_classes,
                 heading),
         ))...,
@@ -190,9 +190,9 @@ function CommandItem(children...; value::String="", disabled::Bool=false,
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-command-item") => "",
-        Symbol("data-suite-command-item-value") => value,
-        (isempty(keywords) ? () : (Symbol("data-suite-command-item-keywords") => join(keywords, ","),))...,
+    Div(Symbol("data-command-item") => "",
+        Symbol("data-command-item-value") => value,
+        (isempty(keywords) ? () : (Symbol("data-command-item-keywords") => join(keywords, ","),))...,
         :role => "option",
         Symbol("aria-selected") => "false",
         :tabindex => "-1",
@@ -212,7 +212,7 @@ function CommandSeparator(; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn("bg-warm-200 dark:bg-warm-700 -mx-1 h-px", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-command-separator") => "",
+    Div(Symbol("data-command-separator") => "",
         :role => "separator",
         :class => classes,
         kwargs...)
@@ -227,7 +227,7 @@ function CommandShortcut(children...; theme::Symbol=:default, class::String="", 
     classes = cn("text-warm-600 dark:text-warm-500 ml-auto text-xs tracking-widest", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Span(Symbol("data-suite-command-shortcut") => "",
+    Span(Symbol("data-command-shortcut") => "",
          :class => classes,
          children...)
 end
@@ -267,20 +267,20 @@ end
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(12)),  # mode 12 = command_dialog
         # Hidden trigger marker for programmatic toggling
-        Span(Symbol("data-suite-command-dialog-trigger-marker") => "",
+        Span(Symbol("data-command-dialog-trigger-marker") => "",
              :style => "display:none",
              :on_click => toggle_dialog),
         # Dialog overlay + content (initially hidden)
-        Div(Symbol("data-suite-command-dialog") => "",
+        Div(Symbol("data-command-dialog") => "",
             Symbol("data-state") => "closed",
             :style => "display:none",
             :class => "fixed inset-0 z-50",
             # Overlay
             Div(:class => overlay_classes,
-                Symbol("data-suite-command-dialog-overlay") => ""),
+                Symbol("data-command-dialog-overlay") => ""),
             # Content with embedded Command
             Div(:class => content_classes,
-                Symbol("data-suite-command-dialog-content") => "",
+                Symbol("data-command-dialog-content") => "",
                 kwargs...,
                 Command(children...; theme=theme),
             ),

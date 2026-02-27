@@ -1007,9 +1007,9 @@ using Test
     @testset "ThemeSwitcher" begin
         @testset "Default rendering" begin
             html = Therapy.render_to_string(ThemeSwitcher())
-            @test occursin("data-suite-theme-switcher", html)
-            @test occursin("data-suite-theme-switcher-trigger", html)
-            @test occursin("data-suite-theme-switcher-content", html)
+            @test occursin("data-theme-switcher", html)
+            @test occursin("data-theme-switcher-trigger", html)
+            @test occursin("data-theme-switcher-content", html)
             @test occursin("aria-label=\"Switch theme\"", html)
             @test occursin("aria-haspopup=\"true\"", html)
             @test occursin("role=\"menu\"", html)
@@ -1017,10 +1017,10 @@ using Test
 
         @testset "Theme options" begin
             html = Therapy.render_to_string(ThemeSwitcher())
-            @test occursin("data-suite-theme-option=\"default\"", html)
-            @test occursin("data-suite-theme-option=\"ocean\"", html)
-            @test occursin("data-suite-theme-option=\"minimal\"", html)
-            @test occursin("data-suite-theme-option=\"nature\"", html)
+            @test occursin("data-theme-option=\"default\"", html)
+            @test occursin("data-theme-option=\"ocean\"", html)
+            @test occursin("data-theme-option=\"minimal\"", html)
+            @test occursin("data-theme-option=\"nature\"", html)
             @test occursin("Default", html)
             @test occursin("Ocean", html)
             @test occursin("Minimal", html)
@@ -1037,10 +1037,10 @@ using Test
 
         @testset "Check marks" begin
             html = Therapy.render_to_string(ThemeSwitcher())
-            @test occursin("data-suite-theme-check=\"default\"", html)
-            @test occursin("data-suite-theme-check=\"ocean\"", html)
-            @test occursin("data-suite-theme-check=\"minimal\"", html)
-            @test occursin("data-suite-theme-check=\"nature\"", html)
+            @test occursin("data-theme-check=\"default\"", html)
+            @test occursin("data-theme-check=\"ocean\"", html)
+            @test occursin("data-theme-check=\"minimal\"", html)
+            @test occursin("data-theme-check=\"nature\"", html)
         end
 
         @testset "Dropdown hidden by default" begin
@@ -1080,13 +1080,6 @@ using Test
         @test occursin("data-theme", html2)
     end
 
-    @testset "suite_script" begin
-        html = Therapy.render_to_string(suite_script())
-        @test occursin("<script", html)
-        @test occursin("Suite", html)
-        # All components removed from suite.js (now @island)
-    end
-
     # ==========================================================================
     # Phase 2: Interactive Components
     # ==========================================================================
@@ -1098,7 +1091,7 @@ using Test
                 CollapsibleContent(Div("Content")),
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-collapsible", html)
+            @test occursin("data-collapsible", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("Toggle", html)
             @test occursin("Content", html)
@@ -1123,7 +1116,7 @@ using Test
         @testset "Trigger structure" begin
             html = Therapy.render_to_string(CollapsibleTrigger("Click me"))
             @test occursin("<div", html)
-            @test occursin("data-suite-collapsible-trigger", html)
+            @test occursin("data-collapsible-trigger", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("Click me", html)
         end
@@ -1136,7 +1129,7 @@ using Test
         @testset "Content structure (standalone)" begin
             # Standalone CollapsibleContent retains hidden attr (island doesn't process it)
             html = Therapy.render_to_string(CollapsibleContent(Div("Inner")))
-            @test occursin("data-suite-collapsible-content", html)
+            @test occursin("data-collapsible-content", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("hidden", html)
             @test occursin("overflow-hidden", html)
@@ -1189,7 +1182,7 @@ using Test
                 ),
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-accordion=\"single\"", html)
+            @test occursin("data-accordion=\"single\"", html)
             @test occursin("data-orientation=\"vertical\"", html)
             @test occursin("Section 1", html)
             @test occursin("Section 2", html)
@@ -1204,7 +1197,7 @@ using Test
                     AccordionContent(Div("AA")),
                 ),
             ))
-            @test occursin("data-suite-accordion=\"multiple\"", html)
+            @test occursin("data-accordion=\"multiple\"", html)
         end
 
         @testset "Collapsible flag" begin
@@ -1246,7 +1239,7 @@ using Test
                 AccordionContent(Div("Hidden")),
             ))
             @test occursin("data-disabled", html)
-            @test occursin("data-suite-accordion-item=\"x\"", html)
+            @test occursin("data-accordion-item=\"x\"", html)
         end
 
         @testset "AccordionItem structure" begin
@@ -1254,7 +1247,7 @@ using Test
                 AccordionTrigger("Title"),
                 AccordionContent(Div("Body")),
             ))
-            @test occursin("data-suite-accordion-item=\"test\"", html)
+            @test occursin("data-accordion-item=\"test\"", html)
             @test occursin("data-state=\"closed\"", html)
         end
 
@@ -1263,7 +1256,7 @@ using Test
             @test occursin("<h3", html)
             @test occursin("<button", html)
             @test occursin("type=\"button\"", html)
-            @test occursin("data-suite-accordion-trigger", html)
+            @test occursin("data-accordion-trigger", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("Click", html)
             # Chevron icon
@@ -1274,7 +1267,7 @@ using Test
         @testset "AccordionContent structure (standalone)" begin
             # Standalone AccordionContent retains hidden attr (island doesn't process it)
             html = Therapy.render_to_string(AccordionContent(Div("Inner")))
-            @test occursin("data-suite-accordion-content", html)
+            @test occursin("data-accordion-content", html)
             @test occursin("role=\"region\"", html)
             @test occursin("hidden", html)
             @test occursin("overflow-hidden", html)
@@ -1357,7 +1350,7 @@ using Test
                 TabsContent(value="tab2", Div("Password settings")),
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-tabs", html)
+            @test occursin("data-tabs", html)
             @test occursin("Account", html)
             @test occursin("Password", html)
             @test occursin("Account settings", html)
@@ -1371,7 +1364,7 @@ using Test
                 TabsTrigger("Tab 1", value="t1"),
             ))
             @test occursin("role=\"tablist\"", html)
-            @test occursin("data-suite-tabslist", html)
+            @test occursin("data-tabslist", html)
             @test occursin("aria-orientation=\"horizontal\"", html)
         end
 
@@ -1390,7 +1383,7 @@ using Test
             @test occursin("<button", html)
             @test occursin("type=\"button\"", html)
             @test occursin("role=\"tab\"", html)
-            @test occursin("data-suite-tabs-trigger=\"my-tab\"", html)
+            @test occursin("data-tabs-trigger=\"my-tab\"", html)
             @test occursin("aria-selected=\"false\"", html)
             @test occursin("tabindex=\"-1\"", html)
             @test occursin("My Tab", html)
@@ -1416,7 +1409,7 @@ using Test
         @testset "TabsContent structure" begin
             html = Therapy.render_to_string(TabsContent(value="panel1", Div("Content")))
             @test occursin("role=\"tabpanel\"", html)
-            @test occursin("data-suite-tabs-content=\"panel1\"", html)
+            @test occursin("data-tabs-content=\"panel1\"", html)
             @test occursin("tabindex=\"0\"", html)
             @test occursin("hidden", html)
             @test occursin("Content", html)
@@ -1557,7 +1550,7 @@ using Test
                 ToggleGroupItem(value="b", "B"),
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-toggle-group=\"single\"", html)
+            @test occursin("data-toggle-group=\"single\"", html)
             @test occursin("data-orientation=\"horizontal\"", html)
             @test occursin("role=\"group\"", html)
             @test occursin("A", html)
@@ -1571,7 +1564,7 @@ using Test
             html = Therapy.render_to_string(ToggleGroup(type="multiple",
                 ToggleGroupItem(value="x", "X"),
             ))
-            @test occursin("data-suite-toggle-group=\"multiple\"", html)
+            @test occursin("data-toggle-group=\"multiple\"", html)
             # Multiple mode items get aria-pressed (not aria-checked)
             @test occursin("aria-pressed=\"false\"", html)
         end
@@ -1621,7 +1614,7 @@ using Test
 
         @testset "Item structure" begin
             html = Therapy.render_to_string(ToggleGroupItem(value="bold", "B"))
-            @test occursin("data-suite-toggle-group-item=\"bold\"", html)
+            @test occursin("data-toggle-group-item=\"bold\"", html)
             @test occursin("data-state=\"off\"", html)
             @test occursin("<button", html)
             @test occursin("B", html)
@@ -1750,7 +1743,7 @@ using Test
                 )
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-dialog", html)
+            @test occursin("data-dialog", html)
             @test occursin("Title", html)
             @test occursin("Description", html)
             @test occursin("Cancel", html)
@@ -1762,7 +1755,7 @@ using Test
                 DialogTrigger("Open"),
                 DialogContent(DialogTitle("T"))
             ))
-            @test occursin("data-suite-dialog-trigger", html)
+            @test occursin("data-dialog-trigger", html)
             @test occursin("aria-haspopup=\"dialog\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -1781,14 +1774,14 @@ using Test
                 DialogTitle("Title")
             ))
             # Overlay
-            @test occursin("data-suite-dialog-overlay", html)
+            @test occursin("data-dialog-overlay", html)
             @test occursin("bg-warm-950/80", html)
             # Content panel
-            @test occursin("data-suite-dialog-content", html)
+            @test occursin("data-dialog-content", html)
             @test occursin("role=\"dialog\"", html)
             @test occursin("aria-modal=\"true\"", html)
             # Default close button
-            @test occursin("data-suite-dialog-close", html)
+            @test occursin("data-dialog-close", html)
             @test occursin("aria-label=\"Close\"", html)
         end
 
@@ -1848,7 +1841,7 @@ using Test
 
         @testset "Close wrapper" begin
             html = Therapy.render_to_string(DialogClose("Cancel"))
-            @test occursin("data-suite-dialog-close", html)
+            @test occursin("data-dialog-close", html)
             @test occursin("display:contents", html)
             @test occursin("Cancel", html)
         end
@@ -1894,7 +1887,7 @@ using Test
                 )
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-alert-dialog", html)
+            @test occursin("data-alert-dialog", html)
             @test occursin("Are you sure?", html)
             @test occursin("This cannot be undone.", html)
         end
@@ -1904,7 +1897,7 @@ using Test
                 AlertDialogTrigger("Delete"),
                 AlertDialogContent(AlertDialogTitle("T"))
             ))
-            @test occursin("data-suite-alert-dialog-trigger", html)
+            @test occursin("data-alert-dialog-trigger", html)
             @test occursin("aria-haspopup=\"dialog\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -1930,8 +1923,8 @@ using Test
             html = Therapy.render_to_string(AlertDialogContent(
                 AlertDialogTitle("T")
             ))
-            @test occursin("data-suite-alert-dialog-overlay", html)
-            @test occursin("data-suite-alert-dialog-content", html)
+            @test occursin("data-alert-dialog-overlay", html)
+            @test occursin("data-alert-dialog-content", html)
             @test occursin("bg-warm-950/80", html)
             @test occursin("fixed", html)
             @test occursin("z-50", html)
@@ -1970,14 +1963,14 @@ using Test
 
         @testset "Action wrapper" begin
             html = Therapy.render_to_string(AlertDialogAction("Confirm"))
-            @test occursin("data-suite-alert-dialog-action", html)
+            @test occursin("data-alert-dialog-action", html)
             @test occursin("display:contents", html)
             @test occursin("Confirm", html)
         end
 
         @testset "Cancel wrapper" begin
             html = Therapy.render_to_string(AlertDialogCancel("Cancel"))
-            @test occursin("data-suite-alert-dialog-cancel", html)
+            @test occursin("data-alert-dialog-cancel", html)
             @test occursin("display:contents", html)
             @test occursin("Cancel", html)
         end
@@ -2030,7 +2023,7 @@ using Test
                 SheetTrigger("Open"),
                 SheetContent(SheetTitle("T"))
             ))
-            @test occursin("data-suite-sheet-trigger-wrapper", html)
+            @test occursin("data-sheet-trigger-wrapper", html)
             @test occursin("aria-haspopup=\"dialog\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -2046,7 +2039,7 @@ using Test
             html = Therapy.render_to_string(SheetContent(
                 SheetTitle("T")
             ))
-            @test occursin("data-suite-sheet-content", html)
+            @test occursin("data-sheet-content", html)
             @test occursin("role=\"dialog\"", html)
             @test occursin("aria-modal=\"true\"", html)
             @test occursin("inset-y-0", html)
@@ -2093,7 +2086,7 @@ using Test
             html = Therapy.render_to_string(SheetContent(
                 SheetTitle("T")
             ))
-            @test occursin("data-suite-sheet-overlay", html)
+            @test occursin("data-sheet-overlay", html)
             @test occursin("bg-warm-950/80", html)
         end
 
@@ -2101,7 +2094,7 @@ using Test
             html = Therapy.render_to_string(SheetContent(
                 SheetTitle("T")
             ))
-            @test occursin("data-suite-sheet-close", html)
+            @test occursin("data-sheet-close", html)
             @test occursin("aria-label=\"Close\"", html)
         end
 
@@ -2145,7 +2138,7 @@ using Test
 
         @testset "Close wrapper" begin
             html = Therapy.render_to_string(SheetClose("Cancel"))
-            @test occursin("data-suite-sheet-close", html)
+            @test occursin("data-sheet-close", html)
             @test occursin("display:contents", html)
             @test occursin("Cancel", html)
         end
@@ -2203,7 +2196,7 @@ using Test
                 DrawerTrigger("Open"),
                 DrawerContent(DrawerTitle("T"))
             ))
-            @test occursin("data-suite-drawer-trigger-wrapper", html)
+            @test occursin("data-drawer-trigger-wrapper", html)
             @test occursin("aria-haspopup=\"dialog\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -2219,8 +2212,8 @@ using Test
             html = Therapy.render_to_string(DrawerContent(
                 DrawerTitle("T")
             ))
-            @test occursin("data-suite-drawer-content", html)
-            @test occursin("data-suite-drawer-direction=\"bottom\"", html)
+            @test occursin("data-drawer-content", html)
+            @test occursin("data-drawer-direction=\"bottom\"", html)
             @test occursin("role=\"dialog\"", html)
             @test occursin("aria-modal=\"true\"", html)
             @test occursin("inset-x-0", html)
@@ -2233,7 +2226,7 @@ using Test
             html = Therapy.render_to_string(DrawerContent(direction="top",
                 DrawerTitle("T")
             ))
-            @test occursin("data-suite-drawer-direction=\"top\"", html)
+            @test occursin("data-drawer-direction=\"top\"", html)
             @test occursin("top-0", html)
             @test occursin("rounded-b-[10px]", html)
         end
@@ -2242,7 +2235,7 @@ using Test
             html = Therapy.render_to_string(DrawerContent(direction="left",
                 DrawerTitle("T")
             ))
-            @test occursin("data-suite-drawer-direction=\"left\"", html)
+            @test occursin("data-drawer-direction=\"left\"", html)
             @test occursin("left-0", html)
             @test occursin("rounded-r-[10px]", html)
         end
@@ -2251,7 +2244,7 @@ using Test
             html = Therapy.render_to_string(DrawerContent(direction="right",
                 DrawerTitle("T")
             ))
-            @test occursin("data-suite-drawer-direction=\"right\"", html)
+            @test occursin("data-drawer-direction=\"right\"", html)
             @test occursin("right-0", html)
             @test occursin("rounded-l-[10px]", html)
         end
@@ -2268,7 +2261,7 @@ using Test
             html = Therapy.render_to_string(DrawerContent(
                 DrawerTitle("T")
             ))
-            @test occursin("data-suite-drawer-overlay", html)
+            @test occursin("data-drawer-overlay", html)
             @test occursin("bg-warm-950/80", html)
         end
 
@@ -2302,7 +2295,7 @@ using Test
 
         @testset "Close wrapper" begin
             html = Therapy.render_to_string(DrawerClose("Cancel"))
-            @test occursin("data-suite-drawer-close", html)
+            @test occursin("data-drawer-close", html)
             @test occursin("display:contents", html)
             @test occursin("Cancel", html)
         end
@@ -2338,7 +2331,7 @@ using Test
             ))
             # @island wraps in therapy-island
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-popover-content", html)
+            @test occursin("data-popover-content", html)
             @test occursin("Popover content here", html)
         end
 
@@ -2347,7 +2340,7 @@ using Test
                 PopoverTrigger("Open"),
                 PopoverContent(P("Content"))
             ))
-            @test occursin("data-suite-popover-trigger-wrapper", html)
+            @test occursin("data-popover-trigger-wrapper", html)
             @test occursin("aria-haspopup=\"dialog\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -2361,7 +2354,7 @@ using Test
 
         @testset "Content structure" begin
             html = Therapy.render_to_string(PopoverContent(P("Hello")))
-            @test occursin("data-suite-popover-content", html)
+            @test occursin("data-popover-content", html)
             @test occursin("role=\"dialog\"", html)
             @test occursin("aria-modal=\"true\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -2373,16 +2366,16 @@ using Test
                 side="top", side_offset=8, align="start",
                 P("Content")
             ))
-            @test occursin("data-suite-popover-side=\"top\"", html)
-            @test occursin("data-suite-popover-side-offset=\"8\"", html)
-            @test occursin("data-suite-popover-align=\"start\"", html)
+            @test occursin("data-popover-side=\"top\"", html)
+            @test occursin("data-popover-side-offset=\"8\"", html)
+            @test occursin("data-popover-align=\"start\"", html)
         end
 
         @testset "Content default positioning" begin
             html = Therapy.render_to_string(PopoverContent(P("Content")))
-            @test occursin("data-suite-popover-side=\"bottom\"", html)
-            @test occursin("data-suite-popover-side-offset=\"0\"", html)
-            @test occursin("data-suite-popover-align=\"center\"", html)
+            @test occursin("data-popover-side=\"bottom\"", html)
+            @test occursin("data-popover-side-offset=\"0\"", html)
+            @test occursin("data-popover-align=\"center\"", html)
         end
 
         @testset "Content CSS classes" begin
@@ -2410,14 +2403,14 @@ using Test
 
         @testset "Close wrapper" begin
             html = Therapy.render_to_string(PopoverClose("Close"))
-            @test occursin("data-suite-popover-close", html)
+            @test occursin("data-popover-close", html)
             @test occursin("display:contents", html)
             @test occursin("Close", html)
         end
 
         @testset "Anchor" begin
             html = Therapy.render_to_string(PopoverAnchor(Span("Anchor")))
-            @test occursin("data-suite-popover-anchor", html)
+            @test occursin("data-popover-anchor", html)
             @test occursin("Anchor", html)
         end
 
@@ -2456,7 +2449,7 @@ using Test
                     TooltipContent(P("Tooltip text"))
                 )
             ))
-            @test occursin("data-suite-tooltip-provider", html)
+            @test occursin("data-tooltip-provider", html)
             @test occursin("therapy-island", html)
             @test occursin("Tooltip text", html)
         end
@@ -2466,14 +2459,14 @@ using Test
                 delay_duration=500, skip_delay_duration=200,
                 Span("Children")
             ))
-            @test occursin("data-suite-tooltip-delay=\"500\"", html)
-            @test occursin("data-suite-tooltip-skip-delay=\"200\"", html)
+            @test occursin("data-tooltip-delay=\"500\"", html)
+            @test occursin("data-tooltip-skip-delay=\"200\"", html)
         end
 
         @testset "Provider default attributes" begin
             html = Therapy.render_to_string(TooltipProvider(Span("X")))
-            @test occursin("data-suite-tooltip-delay=\"700\"", html)
-            @test occursin("data-suite-tooltip-skip-delay=\"300\"", html)
+            @test occursin("data-tooltip-delay=\"700\"", html)
+            @test occursin("data-tooltip-skip-delay=\"300\"", html)
         end
 
         @testset "Trigger wiring" begin
@@ -2481,7 +2474,7 @@ using Test
                 TooltipTrigger("Hover"),
                 TooltipContent(P("Tip"))
             ))
-            @test occursin("data-suite-tooltip-trigger-wrapper", html)
+            @test occursin("data-tooltip-trigger-wrapper", html)
             @test occursin("data-state=\"closed\"", html)
         end
 
@@ -2493,7 +2486,7 @@ using Test
 
         @testset "Content structure" begin
             html = Therapy.render_to_string(TooltipContent(P("Tip")))
-            @test occursin("data-suite-tooltip-content", html)
+            @test occursin("data-tooltip-content", html)
             @test occursin("role=\"tooltip\"", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("display:none", html)
@@ -2504,16 +2497,16 @@ using Test
                 side="bottom", side_offset=8, align="end",
                 P("Tip")
             ))
-            @test occursin("data-suite-tooltip-side=\"bottom\"", html)
-            @test occursin("data-suite-tooltip-side-offset=\"8\"", html)
-            @test occursin("data-suite-tooltip-align=\"end\"", html)
+            @test occursin("data-tooltip-side=\"bottom\"", html)
+            @test occursin("data-tooltip-side-offset=\"8\"", html)
+            @test occursin("data-tooltip-align=\"end\"", html)
         end
 
         @testset "Content default positioning" begin
             html = Therapy.render_to_string(TooltipContent(P("Tip")))
-            @test occursin("data-suite-tooltip-side=\"top\"", html)
-            @test occursin("data-suite-tooltip-side-offset=\"4\"", html)
-            @test occursin("data-suite-tooltip-align=\"center\"", html)
+            @test occursin("data-tooltip-side=\"top\"", html)
+            @test occursin("data-tooltip-side-offset=\"4\"", html)
+            @test occursin("data-tooltip-align=\"center\"", html)
         end
 
         @testset "Content CSS — inverted colors" begin
@@ -2594,7 +2587,7 @@ using Test
                 HoverCardTrigger(Span("Hover")),
                 HoverCardContent(P("Card"))
             ))
-            @test occursin("data-suite-hover-card-trigger-wrapper", html)
+            @test occursin("data-hover-card-trigger-wrapper", html)
             @test occursin("data-state=\"closed\"", html)
         end
 
@@ -2606,7 +2599,7 @@ using Test
 
         @testset "Content structure" begin
             html = Therapy.render_to_string(HoverCardContent(P("Card")))
-            @test occursin("data-suite-hover-card-content", html)
+            @test occursin("data-hover-card-content", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("display:none", html)
         end
@@ -2616,16 +2609,16 @@ using Test
                 side="top", side_offset=8, align="start",
                 P("Card")
             ))
-            @test occursin("data-suite-hover-card-side=\"top\"", html)
-            @test occursin("data-suite-hover-card-side-offset=\"8\"", html)
-            @test occursin("data-suite-hover-card-align=\"start\"", html)
+            @test occursin("data-hover-card-side=\"top\"", html)
+            @test occursin("data-hover-card-side-offset=\"8\"", html)
+            @test occursin("data-hover-card-align=\"start\"", html)
         end
 
         @testset "Content default positioning" begin
             html = Therapy.render_to_string(HoverCardContent(P("Card")))
-            @test occursin("data-suite-hover-card-side=\"bottom\"", html)
-            @test occursin("data-suite-hover-card-side-offset=\"4\"", html)
-            @test occursin("data-suite-hover-card-align=\"center\"", html)
+            @test occursin("data-hover-card-side=\"bottom\"", html)
+            @test occursin("data-hover-card-side-offset=\"4\"", html)
+            @test occursin("data-hover-card-align=\"center\"", html)
         end
 
         @testset "Content CSS classes" begin
@@ -2657,8 +2650,8 @@ using Test
                 HoverCardTrigger(Span("X")),
                 HoverCardContent(P("Y"))
             ))
-            @test occursin("data-suite-hover-card-open-delay=\"500\"", html)
-            @test occursin("data-suite-hover-card-close-delay=\"200\"", html)
+            @test occursin("data-hover-card-open-delay=\"500\"", html)
+            @test occursin("data-hover-card-close-delay=\"200\"", html)
         end
 
         @testset "Default delay attributes" begin
@@ -2666,8 +2659,8 @@ using Test
                 HoverCardTrigger(Span("X")),
                 HoverCardContent(P("Y"))
             ))
-            @test occursin("data-suite-hover-card-open-delay=\"700\"", html)
-            @test occursin("data-suite-hover-card-close-delay=\"300\"", html)
+            @test occursin("data-hover-card-open-delay=\"700\"", html)
+            @test occursin("data-hover-card-close-delay=\"300\"", html)
         end
 
         @testset "Root uses display:contents" begin
@@ -2707,8 +2700,8 @@ using Test
                 )
             ))
             @test occursin("therapy-island", html)  # @island wrapper
-            @test occursin("data-suite-dropdown-menu-trigger-wrapper", html)
-            @test occursin("data-suite-dropdown-menu-content", html)
+            @test occursin("data-dropdown-menu-trigger-wrapper", html)
+            @test occursin("data-dropdown-menu-content", html)
             @test occursin("role=\"menu\"", html)
             @test occursin("aria-haspopup=\"menu\"", html)
             @test occursin("aria-expanded=\"false\"", html)
@@ -2719,7 +2712,7 @@ using Test
 
         @testset "MenuItem" begin
             html = Therapy.render_to_string(DropdownMenuItem("Profile"))
-            @test occursin("data-suite-menu-item", html)
+            @test occursin("data-menu-item", html)
             @test occursin("role=\"menuitem\"", html)
             @test occursin("tabindex=\"-1\"", html)
             @test occursin("Profile", html)
@@ -2731,7 +2724,7 @@ using Test
             html = Therapy.render_to_string(DropdownMenuItem("Profile", shortcut="⇧⌘P"))
             @test occursin("Profile", html)
             @test occursin("⇧⌘P", html)
-            @test occursin("data-suite-menu-shortcut", html)
+            @test occursin("data-menu-shortcut", html)
             @test occursin("tracking-widest", html)
         end
 
@@ -2748,7 +2741,7 @@ using Test
 
         @testset "CheckboxItem unchecked" begin
             html = Therapy.render_to_string(DropdownMenuCheckboxItem("Show toolbar"))
-            @test occursin("data-suite-menu-checkbox-item", html)
+            @test occursin("data-menu-checkbox-item", html)
             @test occursin("role=\"menuitemcheckbox\"", html)
             @test occursin("aria-checked=\"false\"", html)
             @test occursin("data-state=\"unchecked\"", html)
@@ -2760,7 +2753,7 @@ using Test
             html = Therapy.render_to_string(DropdownMenuCheckboxItem("Show toolbar", checked=true))
             @test occursin("aria-checked=\"true\"", html)
             @test occursin("data-state=\"checked\"", html)
-            @test occursin("data-suite-menu-item-indicator", html)
+            @test occursin("data-menu-item-indicator", html)
             # Check SVG should be visible
             @test occursin("M20 6L9 17l-5-5", html)
         end
@@ -2771,7 +2764,7 @@ using Test
                 DropdownMenuRadioItem(value="center", checked=true, "Center"),
                 DropdownMenuRadioItem(value="bottom", "Bottom"),
             ))
-            @test occursin("data-suite-menu-radio-group", html)
+            @test occursin("data-menu-radio-group", html)
             @test occursin("role=\"group\"", html)
             @test occursin("role=\"menuitemradio\"", html)
             # Checked item
@@ -2796,7 +2789,7 @@ using Test
         @testset "Separator" begin
             html = Therapy.render_to_string(DropdownMenuSeparator())
             @test occursin("role=\"separator\"", html)
-            @test occursin("data-suite-menu-separator", html)
+            @test occursin("data-menu-separator", html)
             @test occursin("h-px", html)
             @test occursin("bg-warm-200", html)
         end
@@ -2805,7 +2798,7 @@ using Test
             html = Therapy.render_to_string(DropdownMenuShortcut("⌘S"))
             @test occursin("⌘S", html)
             @test occursin("tracking-widest", html)
-            @test occursin("data-suite-menu-shortcut", html)
+            @test occursin("data-menu-shortcut", html)
         end
 
         @testset "Group" begin
@@ -2824,10 +2817,10 @@ using Test
                     DropdownMenuItem("Sub Item 2"),
                 )
             ))
-            @test occursin("data-suite-menu-sub", html)
-            @test occursin("data-suite-menu-sub-trigger", html)
+            @test occursin("data-menu-sub", html)
+            @test occursin("data-menu-sub-trigger", html)
             @test occursin("aria-haspopup=\"menu\"", html)
-            @test occursin("data-suite-menu-sub-content", html)
+            @test occursin("data-menu-sub-content", html)
             @test occursin("Sub Item 1", html)
             # Chevron icon in sub-trigger
             @test occursin("M6 12L10 8L6 4", html)
@@ -2878,13 +2871,13 @@ using Test
                 DropdownMenuItem("A")
             ))
             @test occursin("shadow-lg", html)  # SubContent uses shadow-lg
-            @test occursin("data-suite-menu-sub-content", html)
+            @test occursin("data-menu-sub-content", html)
             @test occursin("role=\"menu\"", html)
         end
 
         @testset "ItemIndicator" begin
             html = Therapy.render_to_string(DropdownMenuItemIndicator(Span("✓")))
-            @test occursin("data-suite-menu-item-indicator", html)
+            @test occursin("data-menu-item-indicator", html)
             @test occursin("✓", html)
         end
 
@@ -2970,8 +2963,8 @@ using Test
                 )
             ))
             @test occursin("therapy-island", html)  # @island wrapper
-            @test occursin("data-suite-context-menu-trigger-wrapper", html)
-            @test occursin("data-suite-context-menu-content", html)
+            @test occursin("data-context-menu-trigger-wrapper", html)
+            @test occursin("data-context-menu-content", html)
             @test occursin("role=\"menu\"", html)
             @test occursin("Cut", html)
             @test occursin("Copy", html)
@@ -2986,7 +2979,7 @@ using Test
 
         @testset "MenuItem" begin
             html = Therapy.render_to_string(ContextMenuItem("Cut"))
-            @test occursin("data-suite-menu-item", html)
+            @test occursin("data-menu-item", html)
             @test occursin("role=\"menuitem\"", html)
             @test occursin("Cut", html)
         end
@@ -2994,7 +2987,7 @@ using Test
         @testset "MenuItem with shortcut" begin
             html = Therapy.render_to_string(ContextMenuItem("Cut", shortcut="⌘X"))
             @test occursin("⌘X", html)
-            @test occursin("data-suite-menu-shortcut", html)
+            @test occursin("data-menu-shortcut", html)
         end
 
         @testset "MenuItem disabled" begin
@@ -3004,7 +2997,7 @@ using Test
 
         @testset "CheckboxItem" begin
             html = Therapy.render_to_string(ContextMenuCheckboxItem("Show Grid", checked=true))
-            @test occursin("data-suite-menu-checkbox-item", html)
+            @test occursin("data-menu-checkbox-item", html)
             @test occursin("role=\"menuitemcheckbox\"", html)
             @test occursin("aria-checked=\"true\"", html)
             @test occursin("data-state=\"checked\"", html)
@@ -3015,7 +3008,7 @@ using Test
                 ContextMenuRadioItem(value="light", checked=true, "Light"),
                 ContextMenuRadioItem(value="dark", "Dark"),
             ))
-            @test occursin("data-suite-menu-radio-group", html)
+            @test occursin("data-menu-radio-group", html)
             @test occursin("role=\"menuitemradio\"", html)
             @test occursin("aria-checked=\"true\"", html)
         end
@@ -3045,9 +3038,9 @@ using Test
                     ContextMenuItem("Link"),
                 )
             ))
-            @test occursin("data-suite-menu-sub", html)
-            @test occursin("data-suite-menu-sub-trigger", html)
-            @test occursin("data-suite-menu-sub-content", html)
+            @test occursin("data-menu-sub", html)
+            @test occursin("data-menu-sub-trigger", html)
+            @test occursin("data-menu-sub-content", html)
             @test occursin("Email", html)
             @test occursin("Link", html)
         end
@@ -3101,12 +3094,12 @@ using Test
         @testset "Shortcut standalone" begin
             html = Therapy.render_to_string(ContextMenuShortcut("⌘Z"))
             @test occursin("⌘Z", html)
-            @test occursin("data-suite-menu-shortcut", html)
+            @test occursin("data-menu-shortcut", html)
         end
 
         @testset "ItemIndicator" begin
             html = Therapy.render_to_string(ContextMenuItemIndicator(Span("•")))
-            @test occursin("data-suite-menu-item-indicator", html)
+            @test occursin("data-menu-item-indicator", html)
         end
 
         @testset "Group" begin
@@ -3156,7 +3149,7 @@ using Test
                 )
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-select-content", html)
+            @test occursin("data-select-content", html)
             @test occursin("role=\"combobox\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("aria-autocomplete=\"none\"", html)
@@ -3173,7 +3166,7 @@ using Test
                     SelectItem("Banana", value="banana"),
                 )
             ))
-            @test occursin("data-suite-select-value=\"banana\"", html)
+            @test occursin("data-select-value=\"banana\"", html)
         end
 
         @testset "Select disabled" begin
@@ -3216,7 +3209,7 @@ using Test
 
         @testset "SelectValue placeholder" begin
             html = Therapy.render_to_string(SelectValue(placeholder="Choose..."))
-            @test occursin("data-suite-select-display", html)
+            @test occursin("data-select-display", html)
             @test occursin("data-placeholder", html)
             @test occursin("Choose...", html)
         end
@@ -3242,9 +3235,9 @@ using Test
             html = Therapy.render_to_string(SelectContent(side="top", align="end", side_offset=8,
                 SelectItem("A", value="a")
             ))
-            @test occursin("data-suite-select-side=\"top\"", html)
-            @test occursin("data-suite-select-align=\"end\"", html)
-            @test occursin("data-suite-select-side-offset=\"8\"", html)
+            @test occursin("data-select-side=\"top\"", html)
+            @test occursin("data-select-align=\"end\"", html)
+            @test occursin("data-select-side-offset=\"8\"", html)
         end
 
         @testset "SelectContent custom class" begin
@@ -3256,8 +3249,8 @@ using Test
 
         @testset "SelectItem basic" begin
             html = Therapy.render_to_string(SelectItem("Apple", value="apple"))
-            @test occursin("data-suite-select-item", html)
-            @test occursin("data-suite-select-item-value=\"apple\"", html)
+            @test occursin("data-select-item", html)
+            @test occursin("data-select-item-value=\"apple\"", html)
             @test occursin("role=\"option\"", html)
             @test occursin("aria-selected=\"false\"", html)
             @test occursin("data-state=\"unchecked\"", html)
@@ -3266,7 +3259,7 @@ using Test
             @test occursin("pr-8", html)
             @test occursin("pl-2", html)
             # Check indicator hidden by default
-            @test occursin("data-suite-select-item-indicator", html)
+            @test occursin("data-select-item-indicator", html)
         end
 
         @testset "SelectItem disabled" begin
@@ -3278,7 +3271,7 @@ using Test
 
         @testset "SelectItem with text_value" begin
             html = Therapy.render_to_string(SelectItem("🍎 Apple", value="apple", text_value="Apple"))
-            @test occursin("data-suite-select-item-text=\"Apple\"", html)
+            @test occursin("data-select-item-text=\"Apple\"", html)
         end
 
         @testset "SelectItem custom class" begin
@@ -3292,14 +3285,14 @@ using Test
                 SelectItem("Apple", value="apple"),
             ))
             @test occursin("role=\"group\"", html)
-            @test occursin("data-suite-select-group", html)
+            @test occursin("data-select-group", html)
             @test occursin("Fruits", html)
             @test occursin("Apple", html)
         end
 
         @testset "SelectLabel" begin
             html = Therapy.render_to_string(SelectLabel("Category"))
-            @test occursin("data-suite-select-label", html)
+            @test occursin("data-select-label", html)
             @test occursin("role=\"presentation\"", html)
             @test occursin("font-semibold", html)
             @test occursin("Category", html)
@@ -3307,7 +3300,7 @@ using Test
 
         @testset "SelectSeparator" begin
             html = Therapy.render_to_string(SelectSeparator())
-            @test occursin("data-suite-select-separator", html)
+            @test occursin("data-select-separator", html)
             @test occursin("role=\"separator\"", html)
             @test occursin("h-px", html)
             @test occursin("bg-warm-200", html)
@@ -3315,7 +3308,7 @@ using Test
 
         @testset "SelectScrollUpButton" begin
             html = Therapy.render_to_string(SelectScrollUpButton())
-            @test occursin("data-suite-select-scroll-up", html)
+            @test occursin("data-select-scroll-up", html)
             @test occursin("aria-hidden=\"true\"", html)
             # Default chevron up icon
             @test occursin("m18 15-6-6-6 6", html)
@@ -3323,7 +3316,7 @@ using Test
 
         @testset "SelectScrollDownButton" begin
             html = Therapy.render_to_string(SelectScrollDownButton())
-            @test occursin("data-suite-select-scroll-down", html)
+            @test occursin("data-select-scroll-down", html)
             @test occursin("aria-hidden=\"true\"", html)
             # Default chevron down icon
             @test occursin("m6 9 6 6 6-6", html)
@@ -3398,9 +3391,9 @@ using Test
                 )
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-command=", html)
-            @test occursin("data-suite-command-input", html)
-            @test occursin("data-suite-command-list", html)
+            @test occursin("data-command=", html)
+            @test occursin("data-command-input", html)
+            @test occursin("data-command-list", html)
             @test occursin("role=\"listbox\"", html)
             @test occursin("Type a command...", html)
             @test occursin("Calendar", html)
@@ -3427,7 +3420,7 @@ using Test
                     CommandItem("Test", value="test"),
                 )
             ))
-            @test occursin("data-suite-command-filter=\"false\"", html)
+            @test occursin("data-command-filter=\"false\"", html)
         end
 
         @testset "Command loop attribute" begin
@@ -3437,7 +3430,7 @@ using Test
                     CommandItem("Test", value="test"),
                 )
             ))
-            @test occursin("data-suite-command-loop=\"false\"", html)
+            @test occursin("data-command-loop=\"false\"", html)
         end
 
         @testset "Command custom class" begin
@@ -3452,7 +3445,7 @@ using Test
 
         @testset "CommandInput" begin
             html = Therapy.render_to_string(CommandInput(placeholder="Search..."))
-            @test occursin("data-suite-command-input", html)
+            @test occursin("data-command-input", html)
             @test occursin("placeholder=\"Search...\"", html)
             @test occursin("autocomplete=\"off\"", html)
             @test occursin("spellcheck=\"false\"", html)
@@ -3470,7 +3463,7 @@ using Test
             html = Therapy.render_to_string(CommandList(
                 CommandItem("A", value="a"),
             ))
-            @test occursin("data-suite-command-list", html)
+            @test occursin("data-command-list", html)
             @test occursin("role=\"listbox\"", html)
             @test occursin("aria-label=\"Suggestions\"", html)
             @test occursin("max-h-[300px]", html)
@@ -3479,7 +3472,7 @@ using Test
 
         @testset "CommandEmpty" begin
             html = Therapy.render_to_string(CommandEmpty("No results found."))
-            @test occursin("data-suite-command-empty", html)
+            @test occursin("data-command-empty", html)
             @test occursin("role=\"presentation\"", html)
             @test occursin("No results found.", html)
             @test occursin("text-center", html)
@@ -3490,11 +3483,11 @@ using Test
             html = Therapy.render_to_string(CommandGroup(heading="Suggestions",
                 CommandItem("Calendar", value="calendar"),
             ))
-            @test occursin("data-suite-command-group", html)
+            @test occursin("data-command-group", html)
             @test occursin("role=\"group\"", html)
             @test occursin("aria-labelledby=", html)
             @test occursin("Suggestions", html)
-            @test occursin("data-suite-command-group-heading", html)
+            @test occursin("data-command-group-heading", html)
             @test occursin("font-medium", html)
             @test occursin("text-xs", html)
         end
@@ -3503,15 +3496,15 @@ using Test
             html = Therapy.render_to_string(CommandGroup(
                 CommandItem("A", value="a"),
             ))
-            @test occursin("data-suite-command-group", html)
+            @test occursin("data-command-group", html)
             @test occursin("role=\"group\"", html)
             @test !occursin("aria-labelledby", html)
         end
 
         @testset "CommandItem basic" begin
             html = Therapy.render_to_string(CommandItem("Calendar", value="calendar"))
-            @test occursin("data-suite-command-item", html)
-            @test occursin("data-suite-command-item-value=\"calendar\"", html)
+            @test occursin("data-command-item", html)
+            @test occursin("data-command-item-value=\"calendar\"", html)
             @test occursin("role=\"option\"", html)
             @test occursin("aria-selected=\"false\"", html)
             @test occursin("Calendar", html)
@@ -3530,7 +3523,7 @@ using Test
         @testset "CommandItem with keywords" begin
             html = Therapy.render_to_string(CommandItem("Settings", value="settings",
                 keywords=["preferences", "config"]))
-            @test occursin("data-suite-command-item-keywords=\"preferences,config\"", html)
+            @test occursin("data-command-item-keywords=\"preferences,config\"", html)
         end
 
         @testset "CommandItem custom class" begin
@@ -3540,7 +3533,7 @@ using Test
 
         @testset "CommandSeparator" begin
             html = Therapy.render_to_string(CommandSeparator())
-            @test occursin("data-suite-command-separator", html)
+            @test occursin("data-command-separator", html)
             @test occursin("role=\"separator\"", html)
             @test occursin("h-px", html)
             @test occursin("bg-warm-200", html)
@@ -3548,7 +3541,7 @@ using Test
 
         @testset "CommandShortcut" begin
             html = Therapy.render_to_string(CommandShortcut("⌘K"))
-            @test occursin("data-suite-command-shortcut", html)
+            @test occursin("data-command-shortcut", html)
             @test occursin("⌘K", html)
             @test occursin("tracking-widest", html)
             @test occursin("text-xs", html)
@@ -3563,13 +3556,13 @@ using Test
                 )
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-command-dialog-trigger-marker", html)
-            @test occursin("data-suite-command-dialog=", html)
+            @test occursin("data-command-dialog-trigger-marker", html)
+            @test occursin("data-command-dialog=", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("display:none", html)
-            @test occursin("data-suite-command-dialog-overlay", html)
-            @test occursin("data-suite-command-dialog-content", html)
-            @test occursin("data-suite-command=", html)
+            @test occursin("data-command-dialog-overlay", html)
+            @test occursin("data-command-dialog-content", html)
+            @test occursin("data-command=", html)
             # Should contain the Command inside
             @test occursin("Type a command...", html)
             @test occursin("Test", html)
@@ -3614,7 +3607,7 @@ using Test
                     ),
                 )
             ))
-            @test occursin("data-suite-command=", html)
+            @test occursin("data-command=", html)
             @test occursin("Type a command or search...", html)
             @test occursin("No results found.", html)
             @test occursin("Suggestions", html)
@@ -3909,11 +3902,11 @@ using Test
                 ),
             ))
             @test occursin("therapy-island", html)  # @island wrapper
-            @test occursin("data-suite-menubar", html)
+            @test occursin("data-menubar", html)
             @test occursin("role=\"menubar\"", html)
-            @test occursin("data-suite-menubar-trigger-marker", html)
-            @test occursin("data-suite-menubar-trigger", html)
-            @test occursin("data-suite-menubar-content", html)
+            @test occursin("data-menubar-trigger-marker", html)
+            @test occursin("data-menubar-trigger", html)
+            @test occursin("data-menubar-content", html)
             @test occursin("aria-haspopup=\"menu\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -3956,7 +3949,7 @@ using Test
             html = Therapy.render_to_string(MenubarContent(
                 MenubarItem("A")
             ))
-            @test occursin("data-suite-menubar-content", html)
+            @test occursin("data-menubar-content", html)
             @test occursin("role=\"menu\"", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("display:none", html)
@@ -3969,7 +3962,7 @@ using Test
 
         @testset "MenuItem" begin
             html = Therapy.render_to_string(MenubarItem("Profile"))
-            @test occursin("data-suite-menu-item", html)
+            @test occursin("data-menu-item", html)
             @test occursin("role=\"menuitem\"", html)
             @test occursin("Profile", html)
         end
@@ -3978,7 +3971,7 @@ using Test
             html = Therapy.render_to_string(MenubarItem("New Tab", shortcut="⌘T"))
             @test occursin("New Tab", html)
             @test occursin("⌘T", html)
-            @test occursin("data-suite-menu-shortcut", html)
+            @test occursin("data-menu-shortcut", html)
         end
 
         @testset "MenuItem disabled" begin
@@ -3988,7 +3981,7 @@ using Test
 
         @testset "CheckboxItem" begin
             html = Therapy.render_to_string(MenubarCheckboxItem("Toolbar", checked=true))
-            @test occursin("data-suite-menu-checkbox-item", html)
+            @test occursin("data-menu-checkbox-item", html)
             @test occursin("role=\"menuitemcheckbox\"", html)
             @test occursin("aria-checked=\"true\"", html)
             @test occursin("data-state=\"checked\"", html)
@@ -3999,7 +3992,7 @@ using Test
                 MenubarRadioItem(value="a", checked=true, "Alpha"),
                 MenubarRadioItem(value="b", "Beta"),
             ))
-            @test occursin("data-suite-menu-radio-group", html)
+            @test occursin("data-menu-radio-group", html)
             @test occursin("role=\"menuitemradio\"", html)
             @test occursin("data-state=\"checked\"", html)
             @test occursin("data-state=\"unchecked\"", html)
@@ -4025,9 +4018,9 @@ using Test
                     MenubarItem("Sub Item"),
                 )
             ))
-            @test occursin("data-suite-menu-sub", html)
-            @test occursin("data-suite-menu-sub-trigger", html)
-            @test occursin("data-suite-menu-sub-content", html)
+            @test occursin("data-menu-sub", html)
+            @test occursin("data-menu-sub-trigger", html)
+            @test occursin("data-menu-sub-content", html)
             @test occursin("Sub Item", html)
             # Chevron icon
             @test occursin("M6 12L10 8L6 4", html)
@@ -4083,13 +4076,13 @@ using Test
                 ),
             ))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-nav-menu", html)
-            @test occursin("data-suite-nav-menu-list", html)
-            @test occursin("data-suite-nav-menu-item", html)
-            @test occursin("data-suite-nav-menu-trigger-marker", html)
-            @test occursin("data-suite-nav-menu-trigger", html)
-            @test occursin("data-suite-nav-menu-content", html)
-            @test occursin("data-suite-nav-menu-link", html)
+            @test occursin("data-nav-menu", html)
+            @test occursin("data-nav-menu-list", html)
+            @test occursin("data-nav-menu-item", html)
+            @test occursin("data-nav-menu-trigger-marker", html)
+            @test occursin("data-nav-menu-trigger", html)
+            @test occursin("data-nav-menu-content", html)
+            @test occursin("data-nav-menu-link", html)
             @test occursin("Getting Started", html)
             @test occursin("Introduction", html)
             @test occursin("Documentation", html)
@@ -4119,15 +4112,15 @@ using Test
                 NavigationMenuLink("A", href="/a/")
             ))
             @test occursin("<li", html)
-            @test occursin("data-suite-nav-menu-item", html)
+            @test occursin("data-nav-menu-item", html)
         end
 
         @testset "Trigger is a button with chevron in marker" begin
             html = Therapy.render_to_string(NavigationMenuTrigger("Products"))
-            @test occursin("data-suite-nav-menu-trigger-marker", html)
+            @test occursin("data-nav-menu-trigger-marker", html)
             @test occursin("<button", html)
             @test occursin("type=\"button\"", html)
-            @test occursin("data-suite-nav-menu-trigger", html)
+            @test occursin("data-nav-menu-trigger", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("Products", html)
@@ -4149,7 +4142,7 @@ using Test
             html = Therapy.render_to_string(NavigationMenuContent(
                 NavigationMenuLink("A", href="/a/")
             ))
-            @test occursin("data-suite-nav-menu-content", html)
+            @test occursin("data-nav-menu-content", html)
             @test occursin("data-state=\"closed\"", html)
             @test occursin("display:none", html)
             # Inline dropdown positioning
@@ -4168,7 +4161,7 @@ using Test
             html = Therapy.render_to_string(NavigationMenuLink("Install", href="/install/"))
             @test occursin("<a", html)
             @test occursin("href=\"/install/\"", html)
-            @test occursin("data-suite-nav-menu-link", html)
+            @test occursin("data-nav-menu-link", html)
             @test occursin("Install", html)
             @test occursin("rounded-sm", html)
         end
@@ -4193,7 +4186,7 @@ using Test
 
         @testset "Indicator" begin
             html = Therapy.render_to_string(NavigationMenuIndicator())
-            @test occursin("data-suite-nav-menu-indicator", html)
+            @test occursin("data-nav-menu-indicator", html)
             @test occursin("data-state=\"hidden\"", html)
             @test occursin("rotate-45", html)  # arrow
         end
@@ -4239,7 +4232,7 @@ using Test
     @testset "Toaster" begin
         @testset "Default rendering" begin
             html = Therapy.render_to_string(Toaster())
-            @test occursin("data-suite-toaster", html)
+            @test occursin("data-toaster", html)
             @test occursin("aria-label=\"Notifications\"", html)
             @test occursin("tabindex=\"-1\"", html)
             @test occursin("<section", html)
@@ -4291,8 +4284,8 @@ using Test
             html_default = Therapy.render_to_string(Toaster())
             html_ocean = Therapy.render_to_string(Toaster(theme=:ocean))
             # Both should render the container
-            @test occursin("data-suite-toaster", html_default)
-            @test occursin("data-suite-toaster", html_ocean)
+            @test occursin("data-toaster", html_default)
+            @test occursin("data-toaster", html_ocean)
         end
 
         @testset "Exported from Suite" begin
@@ -4318,18 +4311,18 @@ using Test
 
         @testset "Default rendering" begin
             html = Therapy.render_to_string(Calendar())
-            @test occursin("data-suite-calendar", html)
+            @test occursin("data-calendar", html)
             @test occursin("role=\"grid\"", html)
-            @test occursin("data-suite-calendar-mode=\"single\"", html)
+            @test occursin("data-calendar-mode=\"single\"", html)
             @test occursin("p-3", html)
         end
 
         @testset "Month/year navigation buttons" begin
             html = Therapy.render_to_string(Calendar(month=2, year=2026))
-            @test occursin("data-suite-calendar-month=\"2\"", html)
-            @test occursin("data-suite-calendar-year=\"2026\"", html)
-            @test occursin("data-suite-calendar-prev", html)
-            @test occursin("data-suite-calendar-next", html)
+            @test occursin("data-calendar-month=\"2\"", html)
+            @test occursin("data-calendar-year=\"2026\"", html)
+            @test occursin("data-calendar-prev", html)
+            @test occursin("data-calendar-next", html)
             @test occursin("Go to previous month", html)
             @test occursin("Go to next month", html)
         end
@@ -4355,9 +4348,9 @@ using Test
         @testset "Day buttons rendered" begin
             html = Therapy.render_to_string(Calendar(month=2, year=2026))
             # February 2026 has 28 days
-            @test occursin("data-suite-calendar-day-btn=\"2026-02-01\"", html)
-            @test occursin("data-suite-calendar-day-btn=\"2026-02-28\"", html)
-            @test occursin("data-suite-calendar-day=\"2026-02-01\"", html)
+            @test occursin("data-calendar-day-btn=\"2026-02-01\"", html)
+            @test occursin("data-calendar-day-btn=\"2026-02-28\"", html)
+            @test occursin("data-calendar-day=\"2026-02-01\"", html)
         end
 
         @testset "Day button ARIA label" begin
@@ -4383,13 +4376,13 @@ using Test
             html_hide = Therapy.render_to_string(Calendar(month=2, year=2026, show_outside_days=false))
             # Outside days should be empty cells (no button)
             # The non-outside cells should still have buttons
-            @test occursin("data-suite-calendar-day-btn=\"2026-02-01\"", html_hide)
+            @test occursin("data-calendar-day-btn=\"2026-02-01\"", html_hide)
         end
 
         @testset "Selection modes" begin
             for mode in ["single", "multiple", "range"]
                 html = Therapy.render_to_string(Calendar(mode=mode))
-                @test occursin("data-suite-calendar-mode=\"$mode\"", html)
+                @test occursin("data-calendar-mode=\"$mode\"", html)
             end
 
             # range and multiple have aria-multiselectable
@@ -4406,17 +4399,17 @@ using Test
 
         @testset "Pre-selected date" begin
             html = Therapy.render_to_string(Calendar(selected="2026-02-14", month=2, year=2026))
-            @test occursin("data-suite-calendar-selected=\"2026-02-14\"", html)
+            @test occursin("data-calendar-selected=\"2026-02-14\"", html)
         end
 
         @testset "Disabled dates" begin
             html = Therapy.render_to_string(Calendar(disabled_dates="2026-02-14,2026-02-15", month=2, year=2026))
-            @test occursin("data-suite-calendar-disabled=\"2026-02-14,2026-02-15\"", html)
+            @test occursin("data-calendar-disabled=\"2026-02-14,2026-02-15\"", html)
         end
 
         @testset "Number of months" begin
             html = Therapy.render_to_string(Calendar(number_of_months=2, month=1, year=2026))
-            @test occursin("data-suite-calendar-months-count=\"2\"", html)
+            @test occursin("data-calendar-months-count=\"2\"", html)
             @test occursin("January 2026", html)
             @test occursin("February 2026", html)
         end
@@ -4482,7 +4475,7 @@ using Test
 
         @testset "Fixed weeks" begin
             html = Therapy.render_to_string(Calendar(month=2, year=2026, fixed_weeks=true))
-            @test occursin("data-suite-calendar-fixed-weeks=\"true\"", html)
+            @test occursin("data-calendar-fixed-weeks=\"true\"", html)
         end
 
         @testset "Island tier (no JS)" begin
@@ -4499,10 +4492,10 @@ using Test
 
         @testset "Default rendering" begin
             html = Therapy.render_to_string(DatePicker())
-            @test occursin("data-suite-datepicker", html)
-            @test occursin("data-suite-datepicker-trigger", html)
-            @test occursin("data-suite-datepicker-content", html)
-            @test occursin("data-suite-datepicker-value", html)
+            @test occursin("data-datepicker", html)
+            @test occursin("data-datepicker-trigger", html)
+            @test occursin("data-datepicker-content", html)
+            @test occursin("data-datepicker-value", html)
         end
 
         @testset "Trigger button" begin
@@ -4522,14 +4515,14 @@ using Test
 
         @testset "Pre-selected date display" begin
             html = Therapy.render_to_string(DatePicker(selected="2026-02-14", month=2, year=2026))
-            @test occursin("data-suite-datepicker-selected=\"2026-02-14\"", html)
+            @test occursin("data-datepicker-selected=\"2026-02-14\"", html)
             # Should show formatted date, not placeholder
             @test !occursin("Pick a date", html)
         end
 
         @testset "Contains Calendar component" begin
             html = Therapy.render_to_string(DatePicker(month=2, year=2026))
-            @test occursin("data-suite-calendar", html)
+            @test occursin("data-calendar", html)
             @test occursin("role=\"grid\"", html)
             @test occursin("February 2026", html)
         end
@@ -4548,8 +4541,8 @@ using Test
 
         @testset "Selection mode passthrough" begin
             html = Therapy.render_to_string(DatePicker(mode="range", number_of_months=2, month=1, year=2026))
-            @test occursin("data-suite-datepicker-mode=\"range\"", html)
-            @test occursin("data-suite-calendar-mode=\"range\"", html)
+            @test occursin("data-datepicker-mode=\"range\"", html)
+            @test occursin("data-calendar-mode=\"range\"", html)
             @test occursin("January 2026", html)
             @test occursin("February 2026", html)
         end
@@ -4578,7 +4571,7 @@ using Test
             # DatePicker is now @island — no JS runtime needed
             html = Therapy.render_to_string(DatePicker(month=2, year=2026))
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-datepicker-trigger-marker", html)
+            @test occursin("data-datepicker-trigger-marker", html)
         end
 
         @testset "Display format helpers" begin
@@ -4646,7 +4639,7 @@ using Test
         @testset "Default rendering" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns))
             @test occursin("therapy-island", html)  # @island wrapper
-            @test occursin("data-suite-datatable", html)
+            @test occursin("data-datatable", html)
             @test occursin("<table", html)
             @test occursin("<thead", html)
             @test occursin("<tbody", html)
@@ -4657,8 +4650,8 @@ using Test
 
         @testset "Data store (JSON)" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns))
-            @test occursin("data-suite-datatable-store", html)
-            @test occursin("data-suite-datatable-columns", html)
+            @test occursin("data-datatable-store", html)
+            @test occursin("data-datatable-columns", html)
             @test occursin("display:none", html)  # hidden data store spans
             # All data in JSON store (HTML-escaped in span elements)
             @test occursin("&quot;name&quot;:&quot;Alice&quot;", html)
@@ -4675,7 +4668,7 @@ using Test
 
         @testset "Sort buttons on sortable columns" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns, sortable=true))
-            @test occursin("data-suite-datatable-sort", html)
+            @test occursin("data-datatable-sort", html)
             @test occursin("<svg", html)  # sort icon SVG
 
             # Non-sortable column
@@ -4685,18 +4678,18 @@ using Test
             ]
             html2 = Therapy.render_to_string(DataTable(test_data, cols_no_sort))
             # Email should still have sort button
-            @test occursin("data-suite-datatable-sort", html2)
+            @test occursin("data-datatable-sort", html2)
         end
 
         @testset "Sortable=false disables all sorting" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns, sortable=false))
             # No sort buttons should be present — check for sort button SVG icon
-            @test !occursin("data-suite-datatable-sort=\"", html)
+            @test !occursin("data-datatable-sort=\"", html)
         end
 
         @testset "Filter input" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns, filterable=true))
-            @test occursin("data-suite-datatable-filter", html)
+            @test occursin("data-datatable-filter", html)
             @test occursin("Filter...", html)
 
             html2 = Therapy.render_to_string(DataTable(test_data, test_columns, filterable=true, filter_placeholder="Search..."))
@@ -4708,9 +4701,9 @@ using Test
 
         @testset "Pagination" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns, paginated=true, page_size=2))
-            @test occursin("data-suite-datatable-pagination", html)
-            @test occursin("data-suite-datatable-prev", html)
-            @test occursin("data-suite-datatable-next", html)
+            @test occursin("data-datatable-pagination", html)
+            @test occursin("data-datatable-prev", html)
+            @test occursin("data-datatable-next", html)
             @test occursin("Page 1 of 3", html)
             @test occursin("5 row(s) total", html)
             # Only first 2 rows rendered in body
@@ -4719,7 +4712,7 @@ using Test
 
             # No pagination
             html2 = Therapy.render_to_string(DataTable(test_data, test_columns, paginated=false))
-            @test !occursin("data-suite-datatable-pagination", html2)
+            @test !occursin("data-datatable-pagination", html2)
             # All rows rendered
             @test occursin("Alice", html2)
             @test occursin("Eve", html2)
@@ -4727,27 +4720,27 @@ using Test
 
         @testset "Row selection" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns, selectable=true))
-            @test occursin("data-suite-datatable-select-all", html)
-            @test occursin("data-suite-datatable-select-row", html)
+            @test occursin("data-datatable-select-all", html)
+            @test occursin("data-datatable-select-row", html)
             @test occursin("Select all rows", html)
             @test occursin("Select row", html)
             @test occursin("row(s) selected", html)
 
             html2 = Therapy.render_to_string(DataTable(test_data, test_columns, selectable=false))
-            @test !occursin("data-suite-datatable-select-all", html2)
-            @test !occursin("data-suite-datatable-select-row", html2)
+            @test !occursin("data-datatable-select-all", html2)
+            @test !occursin("data-datatable-select-row", html2)
         end
 
         @testset "Column visibility" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns, column_visibility=true))
-            @test occursin("data-suite-datatable-col-vis", html)
-            @test occursin("data-suite-datatable-col-vis-trigger", html)
-            @test occursin("data-suite-datatable-col-vis-content", html)
+            @test occursin("data-datatable-col-vis", html)
+            @test occursin("data-datatable-col-vis-trigger", html)
+            @test occursin("data-datatable-col-vis-content", html)
             @test occursin("Columns", html)
-            @test occursin("data-suite-datatable-col-toggle", html)
+            @test occursin("data-datatable-col-toggle", html)
 
             html2 = Therapy.render_to_string(DataTable(test_data, test_columns, column_visibility=false))
-            @test !occursin("data-suite-datatable-col-vis", html2)
+            @test !occursin("data-datatable-col-vis", html2)
         end
 
         @testset "Column alignment" begin
@@ -4844,7 +4837,7 @@ using Test
 
         @testset "Page size config" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns, page_size=3))
-            @test occursin("data-suite-datatable-page-size=\"3\"", html)
+            @test occursin("data-datatable-page-size=\"3\"", html)
             @test occursin("Page 1 of 2", html)
 
             html2 = Therapy.render_to_string(DataTable(test_data, test_columns, page_size=10))
@@ -4858,8 +4851,8 @@ using Test
             ]
             html = Therapy.render_to_string(DataTable(test_data, cols, column_visibility=true))
             # Only Email should have a toggle checkbox
-            @test occursin("data-suite-datatable-col-check=\"email\"", html)
-            @test !occursin("data-suite-datatable-col-check=\"name\"", html)
+            @test occursin("data-datatable-col-check=\"email\"", html)
+            @test !occursin("data-datatable-col-check=\"name\"", html)
         end
 
         @testset "Table structure" begin
@@ -4888,7 +4881,7 @@ using Test
         @testset "Filter columns attribute" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns,
                 filterable=true, filter_columns=["name", "email"]))
-            @test occursin("data-suite-datatable-filter-columns=\"name,email\"", html)
+            @test occursin("data-datatable-filter-columns=\"name,email\"", html)
         end
 
         @testset "Large dataset pagination" begin
@@ -4907,8 +4900,8 @@ using Test
             html = Therapy.render_to_string(Form(Span("content")))
             @test occursin("therapy-island", html)  # @island wrapper
             @test occursin("<form", html)
-            @test occursin("data-suite-form", html)
-            @test occursin("data-suite-form-validate-on=\"submit\"", html)
+            @test occursin("data-form", html)
+            @test occursin("data-form-validate-on=\"submit\"", html)
             @test occursin("space-y-6", html)
 
             html2 = Therapy.render_to_string(Form(Span("x"), action="/api/test", method="get"))
@@ -4916,13 +4909,13 @@ using Test
             @test occursin("method=\"get\"", html2)
 
             html3 = Therapy.render_to_string(Form(Span("x"), validate_on="change"))
-            @test occursin("data-suite-form-validate-on=\"change\"", html3)
+            @test occursin("data-form-validate-on=\"change\"", html3)
         end
 
         @testset "FormField with name" begin
             html = Therapy.render_to_string(FormField(Span("child"), name="username"))
-            @test occursin("data-suite-form-field=\"username\"", html)
-            @test occursin("data-suite-form-field-id=", html)
+            @test occursin("data-form-field=\"username\"", html)
+            @test occursin("data-form-field-id=", html)
         end
 
         @testset "FormField validation attributes" begin
@@ -4936,36 +4929,36 @@ using Test
                 pattern="[^@]+@[^@]+",
                 pattern_message="Invalid email",
             ))
-            @test occursin("data-suite-form-required=\"Email is required\"", html)
-            @test occursin("data-suite-form-min-length=\"5\"", html)
-            @test occursin("data-suite-form-min-length-message=\"Too short\"", html)
-            @test occursin("data-suite-form-max-length=\"100\"", html)
-            @test occursin("data-suite-form-pattern", html)
-            @test occursin("data-suite-form-pattern-message=\"Invalid email\"", html)
+            @test occursin("data-form-required=\"Email is required\"", html)
+            @test occursin("data-form-min-length=\"5\"", html)
+            @test occursin("data-form-min-length-message=\"Too short\"", html)
+            @test occursin("data-form-max-length=\"100\"", html)
+            @test occursin("data-form-pattern", html)
+            @test occursin("data-form-pattern-message=\"Invalid email\"", html)
         end
 
         @testset "FormField required default message" begin
             html = Therapy.render_to_string(FormField(Span("x"), name="test", required=true))
-            @test occursin("data-suite-form-required=\"This field is required\"", html)
+            @test occursin("data-form-required=\"This field is required\"", html)
         end
 
         @testset "FormField min/max numeric" begin
             html = Therapy.render_to_string(FormField(Span("x"), name="age",
                 min="0", max="120"))
-            @test occursin("data-suite-form-min=\"0\"", html)
-            @test occursin("data-suite-form-max=\"120\"", html)
+            @test occursin("data-form-min=\"0\"", html)
+            @test occursin("data-form-max=\"120\"", html)
         end
 
         @testset "FormItem layout" begin
             html = Therapy.render_to_string(FormItem(Span("content")))
             @test occursin("grid gap-2", html)
-            @test occursin("data-suite-form-item", html)
+            @test occursin("data-form-item", html)
         end
 
         @testset "FormLabel" begin
             html = Therapy.render_to_string(FormLabel("Email"))
             @test occursin("<label", html)
-            @test occursin("data-suite-form-label", html)
+            @test occursin("data-form-label", html)
             @test occursin("font-medium", html)
             @test occursin("data-[error=true]:text-accent-secondary-600", html)
             @test occursin("Email", html)
@@ -4973,7 +4966,7 @@ using Test
 
         @testset "FormControl" begin
             html = Therapy.render_to_string(FormControl(Input(type="text")))
-            @test occursin("data-suite-form-control", html)
+            @test occursin("data-form-control", html)
             @test occursin("display:contents", html)
             @test occursin("<input", html)
         end
@@ -4981,7 +4974,7 @@ using Test
         @testset "FormDescription" begin
             html = Therapy.render_to_string(FormDescription("Helper text"))
             @test occursin("<p", html)
-            @test occursin("data-suite-form-description", html)
+            @test occursin("data-form-description", html)
             @test occursin("text-warm-600", html)
             @test occursin("Helper text", html)
         end
@@ -4989,7 +4982,7 @@ using Test
         @testset "FormMessage" begin
             html = Therapy.render_to_string(FormMessage())
             @test occursin("<p", html)
-            @test occursin("data-suite-form-message", html)
+            @test occursin("data-form-message", html)
             @test occursin("hidden", html)
             @test occursin("text-accent-secondary-600", html)
             @test occursin("role=\"alert\"", html)
@@ -5015,15 +5008,15 @@ using Test
                 )
             )
             @test occursin("<form", html)
-            @test occursin("data-suite-form-field=\"username\"", html)
+            @test occursin("data-form-field=\"username\"", html)
             @test occursin("<label", html)
             @test occursin("Username", html)
-            @test occursin("data-suite-form-control", html)
+            @test occursin("data-form-control", html)
             @test occursin("placeholder=\"Enter username\"", html)
             @test occursin("Your public display name.", html)
-            @test occursin("data-suite-form-message", html)
-            @test occursin("data-suite-form-required", html)
-            @test occursin("data-suite-form-min-length=\"2\"", html)
+            @test occursin("data-form-message", html)
+            @test occursin("data-form-required", html)
+            @test occursin("data-form-min-length=\"2\"", html)
             @test occursin("Submit", html)
         end
 
@@ -5055,12 +5048,12 @@ using Test
 
         @testset "No validation attrs when not set" begin
             html = Therapy.render_to_string(FormField(Span("x"), name="basic"))
-            @test !occursin("data-suite-form-required", html)
-            @test !occursin("data-suite-form-min-length", html)
-            @test !occursin("data-suite-form-max-length", html)
-            @test !occursin("data-suite-form-pattern", html)
-            @test !occursin("data-suite-form-min=", html)
-            @test !occursin("data-suite-form-max=", html)
+            @test !occursin("data-form-required", html)
+            @test !occursin("data-form-min-length", html)
+            @test !occursin("data-form-max-length", html)
+            @test !occursin("data-form-pattern", html)
+            @test !occursin("data-form-min=", html)
+            @test !occursin("data-form-max=", html)
         end
     end
 
@@ -5247,7 +5240,7 @@ using Test
             @test occursin("<pre", html)
             @test occursin("<code", html)
             @test occursin("x = 1", html)
-            @test occursin("data-suite-codeblock", html)
+            @test occursin("data-codeblock", html)
             @test occursin("font-mono", html)
         end
 
@@ -5260,11 +5253,11 @@ using Test
 
         @testset "Copy button" begin
             html = Therapy.render_to_string(CodeBlock("test", show_copy=true))
-            @test occursin("data-suite-codeblock-copy", html)
+            @test occursin("data-codeblock-copy", html)
             @test occursin("<svg", html)
 
             html_no_copy = Therapy.render_to_string(CodeBlock("test", show_copy=false))
-            @test !occursin("data-suite-codeblock-copy", html_no_copy)
+            @test !occursin("data-codeblock-copy", html_no_copy)
         end
 
         @testset "Line numbers" begin
@@ -5290,7 +5283,7 @@ using Test
         @testset "Empty code" begin
             html = Therapy.render_to_string(CodeBlock())
             @test occursin("<code", html)
-            @test occursin("data-suite-codeblock", html)
+            @test occursin("data-codeblock", html)
         end
 
         @testset "Custom class" begin
@@ -5302,7 +5295,7 @@ using Test
             html = Therapy.render_to_string(CodeBlock("x", language="bash", show_copy=true))
             @test occursin("border-b", html)  # Header separator
             @test occursin("bash", html)
-            @test occursin("data-suite-codeblock-copy", html)
+            @test occursin("data-codeblock-copy", html)
         end
 
         @testset "No header when no language and no copy" begin
@@ -5466,7 +5459,7 @@ using Test
             html = Therapy.render_to_string(TreeView(TreeViewItem(label="main.jl")))
             @test occursin("main.jl", html)
             @test occursin("role=\"treeitem\"", html)
-            @test occursin("data-suite-treeview-item", html)
+            @test occursin("data-treeview-item", html)
             @test occursin("<li", html)
             # File icon SVG
             @test occursin("<svg", html)
@@ -5477,10 +5470,10 @@ using Test
                 TreeViewItem(label="src", is_folder=true)
             ))
             @test occursin("src", html)
-            @test occursin("data-suite-treeview-folder", html)
+            @test occursin("data-treeview-folder", html)
             @test occursin("aria-expanded=\"false\"", html)
             # Chevron SVG for folder
-            @test occursin("data-suite-treeview-chevron", html)
+            @test occursin("data-treeview-chevron", html)
         end
 
         @testset "Expanded folder" begin
@@ -5489,7 +5482,7 @@ using Test
                     TreeViewItem(label="utils.jl")
                 )
             ))
-            @test occursin("data-suite-treeview-expanded", html)
+            @test occursin("data-treeview-expanded", html)
             @test occursin("aria-expanded=\"true\"", html)
             @test occursin("utils.jl", html)
             @test occursin("role=\"group\"", html)
@@ -5510,7 +5503,7 @@ using Test
             html = Therapy.render_to_string(TreeView(
                 TreeViewItem(label="main.jl", selected=true)
             ))
-            @test occursin("data-suite-treeview-selected=\"true\"", html)
+            @test occursin("data-treeview-selected=\"true\"", html)
             @test occursin("aria-selected=\"true\"", html)
             @test occursin("text-accent-700", html)
         end
@@ -5530,7 +5523,7 @@ using Test
                     TreeViewItem(label="child.jl")
                 )
             ))
-            @test occursin("data-suite-treeview-depth=\"0\"", html)
+            @test occursin("data-treeview-depth=\"0\"", html)
         end
 
         @testset "Auto-detect folder" begin
@@ -5539,7 +5532,7 @@ using Test
                     TreeViewItem(label="child.jl")
                 )
             ))
-            @test occursin("data-suite-treeview-folder", html)
+            @test occursin("data-treeview-folder", html)
         end
 
         @testset "Dark mode" begin
@@ -5568,7 +5561,7 @@ using Test
                     Suite.CarouselItem("Slide 1"),
                 ),
             ))
-            @test occursin("data-suite-carousel", html)
+            @test occursin("data-carousel", html)
             @test occursin("role=\"region\"", html)
             @test occursin("aria-roledescription=\"carousel\"", html)
             @test occursin("relative", html)
@@ -5576,22 +5569,22 @@ using Test
 
         @testset "Carousel orientation" begin
             html = Therapy.render_to_string(Suite.Carousel(orientation="vertical"))
-            @test occursin("data-suite-carousel-orientation=\"vertical\"", html)
+            @test occursin("data-carousel-orientation=\"vertical\"", html)
         end
 
         @testset "Carousel loop and autoplay" begin
             html = Therapy.render_to_string(Suite.Carousel(loop=true, autoplay=true, autoplay_interval=3000))
-            @test occursin("data-suite-carousel-loop=\"true\"", html)
-            @test occursin("data-suite-carousel-autoplay=\"true\"", html)
-            @test occursin("data-suite-carousel-autoplay-interval=\"3000\"", html)
+            @test occursin("data-carousel-loop=\"true\"", html)
+            @test occursin("data-carousel-autoplay=\"true\"", html)
+            @test occursin("data-carousel-autoplay-interval=\"3000\"", html)
         end
 
         @testset "CarouselContent" begin
             html = Therapy.render_to_string(Suite.CarouselContent(
                 Suite.CarouselItem("Slide 1"),
             ))
-            @test occursin("data-suite-carousel-viewport", html)
-            @test occursin("data-suite-carousel-content", html)
+            @test occursin("data-carousel-viewport", html)
+            @test occursin("data-carousel-content", html)
             @test occursin("overflow-hidden", html)
             @test occursin("scroll-smooth", html)
             @test occursin("snap-x", html)
@@ -5601,7 +5594,7 @@ using Test
         @testset "CarouselItem" begin
             html = Therapy.render_to_string(Suite.CarouselItem("Slide Content"))
             @test occursin("Slide Content", html)
-            @test occursin("data-suite-carousel-item", html)
+            @test occursin("data-carousel-item", html)
             @test occursin("role=\"group\"", html)
             @test occursin("aria-roledescription=\"slide\"", html)
             @test occursin("snap-start", html)
@@ -5611,7 +5604,7 @@ using Test
         @testset "CarouselPrevious" begin
             html = Therapy.render_to_string(Suite.CarouselPrevious())
             @test occursin("<button", html)
-            @test occursin("data-suite-carousel-prev", html)
+            @test occursin("data-carousel-prev", html)
             @test occursin("aria-label=\"Previous slide\"", html)
             @test occursin("<svg", html)
             @test occursin("rounded-full", html)
@@ -5620,7 +5613,7 @@ using Test
         @testset "CarouselNext" begin
             html = Therapy.render_to_string(Suite.CarouselNext())
             @test occursin("<button", html)
-            @test occursin("data-suite-carousel-next", html)
+            @test occursin("data-carousel-next", html)
             @test occursin("aria-label=\"Next slide\"", html)
             @test occursin("<svg", html)
         end
@@ -5651,8 +5644,8 @@ using Test
             @test occursin("Slide 1", html)
             @test occursin("Slide 2", html)
             @test occursin("Slide 3", html)
-            @test occursin("data-suite-carousel-prev", html)
-            @test occursin("data-suite-carousel-next", html)
+            @test occursin("data-carousel-prev", html)
+            @test occursin("data-carousel-next", html)
         end
 
         @testset "Registry" begin
@@ -5674,13 +5667,13 @@ using Test
                 Suite.ResizableHandle(),
                 Suite.ResizablePanel(Div("Right")),
             ))
-            @test occursin("data-suite-resizable-direction=\"horizontal\"", html)
+            @test occursin("data-resizable-direction=\"horizontal\"", html)
             @test occursin("flex", html)
         end
 
         @testset "Vertical direction" begin
             html = Therapy.render_to_string(Suite.ResizablePanelGroup(direction="vertical"))
-            @test occursin("data-suite-resizable-direction=\"vertical\"", html)
+            @test occursin("data-resizable-direction=\"vertical\"", html)
             @test occursin("flex-col", html)
         end
 
@@ -5689,23 +5682,23 @@ using Test
                 default_size=30, min_size=20, max_size=80,
                 Div("Content")
             ))
-            @test occursin("data-suite-resizable-panel", html)
-            @test occursin("data-suite-resizable-default-size=\"30\"", html)
-            @test occursin("data-suite-resizable-min-size=\"20\"", html)
-            @test occursin("data-suite-resizable-max-size=\"80\"", html)
+            @test occursin("data-resizable-panel", html)
+            @test occursin("data-resizable-default-size=\"30\"", html)
+            @test occursin("data-resizable-min-size=\"20\"", html)
+            @test occursin("data-resizable-max-size=\"80\"", html)
             @test occursin("flex-grow:30", html)
             @test occursin("Content", html)
         end
 
         @testset "Panel auto-size" begin
             html = Therapy.render_to_string(Suite.ResizablePanel(Div("Auto")))
-            @test occursin("data-suite-resizable-default-size=\"0\"", html)
+            @test occursin("data-resizable-default-size=\"0\"", html)
             @test occursin("flex-grow:1", html)
         end
 
         @testset "Handle rendering" begin
             html = Therapy.render_to_string(Suite.ResizableHandle())
-            @test occursin("data-suite-resizable-handle", html)
+            @test occursin("data-resizable-handle", html)
             @test occursin("role=\"separator\"", html)
             @test occursin("tabindex=\"0\"", html)
             @test occursin("aria-orientation=\"vertical\"", html)
@@ -5736,8 +5729,8 @@ using Test
             ))
             @test occursin("Left", html)
             @test occursin("Right", html)
-            @test occursin("data-suite-resizable-direction", html)
-            @test occursin("data-suite-resizable-handle", html)
+            @test occursin("data-resizable-direction", html)
+            @test occursin("data-resizable-handle", html)
             @test occursin("flex-grow:30", html)
             @test occursin("flex-grow:70", html)
         end
@@ -5814,11 +5807,11 @@ using Test
         @testset "Basic structure" begin
             html = Therapy.render_to_string(Slider())
             @test occursin("therapy-island", html)
-            @test occursin("data-suite-slider", html)
+            @test occursin("data-slider", html)
             @test occursin("role=\"slider\"", html)
-            @test occursin("data-suite-slider-track", html)
-            @test occursin("data-suite-slider-range", html)
-            @test occursin("data-suite-slider-thumb", html)
+            @test occursin("data-slider-track", html)
+            @test occursin("data-slider-range", html)
+            @test occursin("data-slider-thumb", html)
             @test occursin("<span", html)
         end
 

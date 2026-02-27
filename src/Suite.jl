@@ -64,11 +64,11 @@ include("components/Switch.jl")
 # include("components/RadioGroup.jl")
 include("components/Slider.jl")
 
-# --- JS Runtime Components (implemented) ---
+# --- Theme Components ---
 include("components/ThemeToggle.jl")
 include("components/ThemeSwitcher.jl")
 
-# --- Phase 3: JS Runtime Components ---
+# --- Phase 3: Island Components ---
 include("components/Dialog.jl")
 include("components/AlertDialog.jl")
 include("components/DropdownMenu.jl")
@@ -104,7 +104,7 @@ include("components/Toolbar.jl")
 include("components/StatusBar.jl")
 include("components/TreeView.jl")
 
-# --- JS Runtime ---
+# --- Theme Script (FOUC prevention) ---
 include("runtime.jl")
 
 end # module Suite

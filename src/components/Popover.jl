@@ -43,7 +43,7 @@ export Popover, PopoverTrigger, PopoverContent,
     # Walk children to inject signal bindings
     for child in children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-popover-trigger-wrapper"))
+            if haskey(child.props, Symbol("data-popover-trigger-wrapper"))
                 # Inject reactive bindings on trigger wrapper
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 child.props[:aria_expanded] = BindBool(is_open, "false", "true")
@@ -64,7 +64,7 @@ end
 
 # Walk children to find popover content and close buttons
 function _popover_inject_content_bindings!(node::VNode, is_open, set_open)
-    if haskey(node.props, Symbol("data-suite-popover-content"))
+    if haskey(node.props, Symbol("data-popover-content"))
         # Content: bind data-state
         node.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
         # Walk content for close buttons
@@ -77,9 +77,9 @@ function _popover_inject_content_bindings!(node::VNode, is_open, set_open)
     end
 end
 
-# Recursively inject close handler on all [data-suite-popover-close] elements
+# Recursively inject close handler on all [data-popover-close] elements
 function _popover_inject_close_buttons!(node::VNode, set_open)
-    if haskey(node.props, Symbol("data-suite-popover-close"))
+    if haskey(node.props, Symbol("data-popover-close"))
         node.props[:on_click] = () -> set_open(Int32(0))
     end
     for child in node.children
@@ -95,7 +95,7 @@ end
 The button that opens the popover.
 """
 function PopoverTrigger(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-popover-trigger-wrapper") => "",
+    Span(Symbol("data-popover-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
          Symbol("data-state") => "closed",
@@ -132,10 +132,10 @@ function PopoverContent(children...; side::String="bottom", side_offset::Int=0, 
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-popover-content") => "",
-        Symbol("data-suite-popover-side") => side,
-        Symbol("data-suite-popover-side-offset") => string(side_offset),
-        Symbol("data-suite-popover-align") => align,
+    Div(Symbol("data-popover-content") => "",
+        Symbol("data-popover-side") => side,
+        Symbol("data-popover-side-offset") => string(side_offset),
+        Symbol("data-popover-align") => align,
         Symbol("data-state") => "closed",
         :role => "dialog",
         :aria_modal => "true",
@@ -153,7 +153,7 @@ end
 A button that closes the popover when clicked.
 """
 function PopoverClose(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-popover-close") => "",
+    Span(Symbol("data-popover-close") => "",
          :class => cn(class),
          :style => "display:contents",
          kwargs...,
@@ -167,7 +167,7 @@ Optional custom anchor element. When used, the popover positions relative
 to this element instead of the trigger.
 """
 function PopoverAnchor(children...; class::String="", kwargs...)
-    Div(Symbol("data-suite-popover-anchor") => "",
+    Div(Symbol("data-popover-anchor") => "",
         :class => cn(class),
         kwargs...,
         children...)

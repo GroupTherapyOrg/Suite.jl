@@ -148,26 +148,26 @@ end
               :aria_label => "Calendar navigation",
               Therapy.Button(:type => "button",
                      :class => cn(_nav_button_classes(theme)),
-                     Symbol("data-suite-calendar-prev") => id,
+                     Symbol("data-calendar-prev") => id,
                      :aria_label => "Go to previous month",
                      Therapy.RawHtml(_CALENDAR_CHEVRON_LEFT)),
               Therapy.Button(:type => "button",
                      :class => cn(_nav_button_classes(theme)),
-                     Symbol("data-suite-calendar-next") => id,
+                     Symbol("data-calendar-next") => id,
                      :aria_label => "Go to next month",
                      Therapy.RawHtml(_CALENDAR_CHEVRON_RIGHT)),
     )
 
     Div(Symbol("data-modal") => BindModal(is_active, Int32(14)),
-        Symbol("data-suite-calendar") => id,
-        Symbol("data-suite-calendar-mode") => mode,
-        Symbol("data-suite-calendar-month") => string(month),
-        Symbol("data-suite-calendar-year") => string(year),
-        Symbol("data-suite-calendar-selected") => selected,
-        Symbol("data-suite-calendar-disabled") => disabled_dates,
-        Symbol("data-suite-calendar-show-outside") => show_outside_days ? "true" : "false",
-        Symbol("data-suite-calendar-fixed-weeks") => fixed_weeks ? "true" : "false",
-        Symbol("data-suite-calendar-months-count") => string(number_of_months),
+        Symbol("data-calendar") => id,
+        Symbol("data-calendar-mode") => mode,
+        Symbol("data-calendar-month") => string(month),
+        Symbol("data-calendar-year") => string(year),
+        Symbol("data-calendar-selected") => selected,
+        Symbol("data-calendar-disabled") => disabled_dates,
+        Symbol("data-calendar-show-outside") => show_outside_days ? "true" : "false",
+        Symbol("data-calendar-fixed-weeks") => fixed_weeks ? "true" : "false",
+        Symbol("data-calendar-months-count") => string(number_of_months),
         :class => root_classes,
         :style => "position:relative",
         kwargs...,
@@ -216,7 +216,7 @@ function _calendar_month_panel(cal_id, year, month, show_outside_days, fixed_wee
                   Span(:class => "text-sm font-medium select-none",
                        :role => "status",
                        :aria_live => "polite",
-                       Symbol("data-suite-calendar-caption") => cal_id,
+                       Symbol("data-calendar-caption") => cal_id,
                        month_label))
 
     # Weekday header
@@ -241,16 +241,16 @@ function _calendar_month_panel(cal_id, year, month, show_outside_days, fixed_wee
         :role => "grid",
         :aria_label => month_label,
         :class => "w-full border-collapse",
-        Symbol("data-suite-calendar-grid") => cal_id,
-        Symbol("data-suite-calendar-grid-month") => string(month),
-        Symbol("data-suite-calendar-grid-year") => string(year),
+        Symbol("data-calendar-grid") => cal_id,
+        Symbol("data-calendar-grid-month") => string(month),
+        Symbol("data-calendar-grid-year") => string(year),
     ]
     if mode in ("multiple", "range")
         push!(grid_attrs, :aria_multiselectable => "true")
     end
 
     Div(:class => "flex flex-col gap-4 w-full",
-        Symbol("data-suite-calendar-month-panel") => string(month_index),
+        Symbol("data-calendar-month-panel") => string(month_index),
         caption,
         Therapy.Table(grid_attrs..., thead, tbody))
 end
@@ -290,7 +290,7 @@ function _calendar_day_cell(cal_id, day, show_outside_days, mode, theme)
 
     # Modifiers as data attributes
     data_attrs = Pair{Symbol,String}[]
-    push!(data_attrs, Symbol("data-suite-calendar-day") => day.iso_date)
+    push!(data_attrs, Symbol("data-calendar-day") => day.iso_date)
 
     if day.outside
         push!(btn_parts, "text-warm-400 dark:text-warm-600 opacity-50")
@@ -315,7 +315,7 @@ function _calendar_day_cell(cal_id, day, show_outside_days, mode, theme)
        Therapy.Button(:type => "button",
               :class => btn_classes,
               :tabindex => "-1",
-              Symbol("data-suite-calendar-day-btn") => day.iso_date,
+              Symbol("data-calendar-day-btn") => day.iso_date,
               :aria_label => Dates.format(day.date, "E, U d, yyyy"),
               string(day.day_num)))
 end
@@ -387,34 +387,34 @@ end
     theme !== :default && (content_classes = apply_theme(content_classes, get_theme(theme)))
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(15)),
-        Symbol("data-suite-datepicker") => id,
-        Symbol("data-suite-datepicker-mode") => mode,
-        Symbol("data-suite-datepicker-selected") => selected,
+        Symbol("data-datepicker") => id,
+        Symbol("data-datepicker-mode") => mode,
+        Symbol("data-datepicker-selected") => selected,
         :style => "display:contents",
         kwargs...,
         # Hidden trigger marker for programmatic toggle (Escape, click-outside, auto-close)
-        Span(Symbol("data-suite-datepicker-trigger-marker") => "",
+        Span(Symbol("data-datepicker-trigger-marker") => "",
              :style => "display:none",
              :on_click => () -> set_open(Int32(1) - is_open())),
         # Trigger wrapper with click handler
-        Div(Symbol("data-suite-datepicker-trigger-wrapper") => "",
+        Div(Symbol("data-datepicker-trigger-wrapper") => "",
             :style => "display:contents",
             :on_click => () -> set_open(Int32(1) - is_open()),
             # Trigger button
             Therapy.Button(:type => "button",
                    :class => trigger_classes,
-                   Symbol("data-suite-datepicker-trigger") => id,
+                   Symbol("data-datepicker-trigger") => id,
                    :aria_haspopup => "dialog",
                    :aria_expanded => "false",
                    Span(:class => "flex-1 $text_class",
-                        Symbol("data-suite-datepicker-value") => id,
+                        Symbol("data-datepicker-value") => id,
                         display_text),
                    Span(:class => "text-warm-400 dark:text-warm-600 shrink-0",
                         Therapy.RawHtml(_CALENDAR_ICON_SVG)))),
         # Popover content (hidden by default)
-        Div(Symbol("data-suite-datepicker-content") => id,
-            Symbol("data-suite-datepicker-side") => "bottom",
-            Symbol("data-suite-datepicker-align") => "start",
+        Div(Symbol("data-datepicker-content") => id,
+            Symbol("data-datepicker-side") => "bottom",
+            Symbol("data-datepicker-align") => "start",
             Symbol("data-state") => "closed",
             :role => "dialog",
             :aria_modal => "true",

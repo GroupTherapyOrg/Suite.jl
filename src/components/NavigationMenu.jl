@@ -73,7 +73,7 @@ const _NAV_CHEVRON_DOWN = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-nav-menu") => "",
+    Div(Symbol("data-nav-menu") => "",
         Symbol("data-modal") => BindModal(active_item, Int32(9)),  # mode 9 = nav_menu
         Symbol("data-orientation") => orientation,
         Symbol("data-delay-duration") => string(delay_duration),
@@ -86,11 +86,11 @@ end
 
 # Walk VNode tree to find NavigationMenuItems with triggers
 function _nav_walk_and_inject!(node::VNode, active_item, set_active, idx_ref)
-    if haskey(node.props, Symbol("data-suite-nav-menu-item"))
+    if haskey(node.props, Symbol("data-nav-menu-item"))
         # Check if this item has a trigger marker
         has_trigger = false
         for child in node.children
-            if child isa VNode && haskey(child.props, Symbol("data-suite-nav-menu-trigger-marker"))
+            if child isa VNode && haskey(child.props, Symbol("data-nav-menu-trigger-marker"))
                 has_trigger = true
                 break
             end
@@ -111,7 +111,7 @@ end
 # Inject on_click on a trigger marker within an item
 function _nav_inject_item_bindings!(item::VNode, active_item, set_active, idx)
     for child in item.children
-        if child isa VNode && haskey(child.props, Symbol("data-suite-nav-menu-trigger-marker"))
+        if child isa VNode && haskey(child.props, Symbol("data-nav-menu-trigger-marker"))
             let i = idx
                 child.props[:on_click] = () -> set_active(i * (Int32(1) - Int32(active_item() == i)))
             end
@@ -125,7 +125,7 @@ end
 Container for navigation menu items. Renders as a `<ul>`.
 """
 function NavigationMenuList(children...; class::String="", kwargs...)
-    Ul(Symbol("data-suite-nav-menu-list") => "",
+    Ul(Symbol("data-nav-menu-list") => "",
        :class => cn(
            "flex flex-1 list-none items-center justify-center gap-1",
            class
@@ -141,7 +141,7 @@ end
 A single item within the navigation menu. Can contain a trigger + content or just a link.
 """
 function NavigationMenuItem(children...; value::String="", class::String="", kwargs...)
-    Li(Symbol("data-suite-nav-menu-item") => "",
+    Li(Symbol("data-nav-menu-item") => "",
        (isempty(value) ? Pair{Symbol,String}[] : [Symbol("data-value") => value])...,
        :class => cn("relative", class),
        kwargs...,
@@ -168,9 +168,9 @@ function NavigationMenuTrigger(children...; disabled::Bool=false, theme::Symbol=
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Span(Symbol("data-suite-nav-menu-trigger-marker") => "",
+    Span(Symbol("data-nav-menu-trigger-marker") => "",
          :style => "display:contents",
-         Therapy.Button(Symbol("data-suite-nav-menu-trigger") => "",
+         Therapy.Button(Symbol("data-nav-menu-trigger") => "",
                 Symbol("data-state") => "closed",
                 Symbol("aria-expanded") => "false",
                 :type => "button",
@@ -216,7 +216,7 @@ function NavigationMenuContent(children...; theme::Symbol=:default, class::Strin
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-nav-menu-content") => "",
+    Div(Symbol("data-nav-menu-content") => "",
         Symbol("data-state") => "closed",
         :style => "display:none",
         :class => classes,
@@ -246,7 +246,7 @@ function NavigationMenuLink(children...; href::String="#", active::Bool=false, d
         push!(link_children, Span(:class => "text-xs text-warm-600 dark:text-warm-500 line-clamp-2", description))
     end
 
-    A(Symbol("data-suite-nav-menu-link") => "",
+    A(Symbol("data-nav-menu-link") => "",
       :href => href,
       :class => classes,
       (active ? [Symbol("data-active") => "true"] : Pair{Symbol,String}[])...,
@@ -285,7 +285,7 @@ function NavigationMenuIndicator(; theme::Symbol=:default, class::String="", kwa
     arrow_classes = "relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm shadow-md bg-warm-200 dark:bg-warm-700"
     theme !== :default && (arrow_classes = apply_theme(arrow_classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-nav-menu-indicator") => "",
+    Div(Symbol("data-nav-menu-indicator") => "",
         Symbol("data-state") => "hidden",
         :class => classes,
         kwargs...,

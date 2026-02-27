@@ -41,10 +41,10 @@ export Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 
     Div(:class => classes,
         Symbol("data-modal") => BindModal(is_active, Int32(20)),
-        Symbol("data-suite-carousel-orientation") => orientation,
-        Symbol("data-suite-carousel-loop") => string(loop),
-        Symbol("data-suite-carousel-autoplay") => string(autoplay),
-        Symbol("data-suite-carousel-autoplay-interval") => string(autoplay_interval),
+        Symbol("data-carousel-orientation") => orientation,
+        Symbol("data-carousel-loop") => string(loop),
+        Symbol("data-carousel-autoplay") => string(autoplay),
+        Symbol("data-carousel-autoplay-interval") => string(autoplay_interval),
         :role => "region",
         Symbol("aria-roledescription") => "carousel",
         Symbol("aria-label") => "Carousel",
@@ -63,9 +63,9 @@ function CarouselContent(children...; class::String="", theme::Symbol=:default, 
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(:class => "overflow-hidden",
-        :data_suite_carousel_viewport => "true",
+        :data_carousel_viewport => "true",
         Div(:class => classes,
-            :data_suite_carousel_content => "true",
+            :data_carousel_content => "true",
             kwargs...,
             children...,
         )
@@ -84,7 +84,7 @@ function CarouselItem(children...; class::String="", theme::Symbol=:default, kwa
     Div(:class => classes,
         :role => "group",
         Symbol("aria-roledescription") => "slide",
-        :data_suite_carousel_item => "true",
+        :data_carousel_item => "true",
         kwargs...,
         children...,
     )
@@ -111,7 +111,7 @@ function CarouselPrevious(; class::String="", theme::Symbol=:default, kwargs...)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Therapy.Button(:class => classes,
-        :data_suite_carousel_prev => "true",
+        :data_carousel_prev => "true",
         Symbol("aria-label") => "Previous slide",
         kwargs...,
         RawHtml(_CAROUSEL_PREV_SVG),
@@ -139,7 +139,7 @@ function CarouselNext(; class::String="", theme::Symbol=:default, kwargs...)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Therapy.Button(:class => classes,
-        :data_suite_carousel_next => "true",
+        :data_carousel_next => "true",
         Symbol("aria-label") => "Next slide",
         kwargs...,
         RawHtml(_CAROUSEL_NEXT_SVG),

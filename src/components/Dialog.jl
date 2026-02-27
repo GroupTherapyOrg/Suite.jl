@@ -45,7 +45,7 @@ export Dialog, DialogTrigger, DialogContent,
     # Walk children to inject signal bindings
     for child in children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-dialog-trigger-wrapper"))
+            if haskey(child.props, Symbol("data-dialog-trigger-wrapper"))
                 # Inject reactive bindings on trigger wrapper
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 child.props[:aria_expanded] = BindBool(is_open, "false", "true")
@@ -67,11 +67,11 @@ end
 function _dialog_inject_content_bindings!(node::VNode, is_open, set_open)
     for child in node.children
         if child isa VNode
-            if haskey(child.props, Symbol("data-suite-dialog-overlay"))
+            if haskey(child.props, Symbol("data-dialog-overlay"))
                 # Overlay: bind data-state, add click-to-close
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 child.props[:on_click] = () -> set_open(Int32(0))
-            elseif haskey(child.props, Symbol("data-suite-dialog-content"))
+            elseif haskey(child.props, Symbol("data-dialog-content"))
                 # Content: bind data-state
                 child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
                 # Walk content for close buttons
@@ -81,9 +81,9 @@ function _dialog_inject_content_bindings!(node::VNode, is_open, set_open)
     end
 end
 
-# Recursively inject close handler on all [data-suite-dialog-close] elements
+# Recursively inject close handler on all [data-dialog-close] elements
 function _dialog_inject_close_buttons!(node::VNode, set_open)
-    if haskey(node.props, Symbol("data-suite-dialog-close"))
+    if haskey(node.props, Symbol("data-dialog-close"))
         node.props[:on_click] = () -> set_open(Int32(0))
     end
     for child in node.children
@@ -99,7 +99,7 @@ end
 The button that opens the dialog. Wrap around a Button or any clickable element.
 """
 function DialogTrigger(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-dialog-trigger-wrapper") => "",
+    Span(Symbol("data-dialog-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
          Symbol("data-state") => "closed",
@@ -132,13 +132,13 @@ function DialogContent(children...; theme::Symbol=:default, class::String="", kw
 
     Div(
         # Overlay backdrop
-        Div(Symbol("data-suite-dialog-overlay") => "",
+        Div(Symbol("data-dialog-overlay") => "",
             Symbol("data-state") => "closed",
             :class => "fixed inset-0 z-50 bg-warm-950/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             :style => "display:none",
         ),
         # Content
-        Div(Symbol("data-suite-dialog-content") => "",
+        Div(Symbol("data-dialog-content") => "",
             Symbol("data-state") => "closed",
             :role => "dialog",
             :aria_modal => "true",
@@ -148,7 +148,7 @@ function DialogContent(children...; theme::Symbol=:default, class::String="", kw
             children...,
             # Default close button (X in top-right)
             Therapy.Button(:type => "button",
-                   Symbol("data-suite-dialog-close") => "",
+                   Symbol("data-dialog-close") => "",
                    :class => "absolute right-4 top-4 rounded-sm opacity-70 cursor-pointer ring-offset-warm-50 dark:ring-offset-warm-950 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent-600 focus:ring-offset-2 disabled:pointer-events-none",
                    :aria_label => "Close",
                    # X icon
@@ -211,7 +211,7 @@ end
 A button that closes the dialog when clicked. Wrap around a Button or any element.
 """
 function DialogClose(children...; class::String="", kwargs...)
-    Span(Symbol("data-suite-dialog-close") => "",
+    Span(Symbol("data-dialog-close") => "",
          :class => cn(class),
          :style => "display:contents",
          kwargs...,
