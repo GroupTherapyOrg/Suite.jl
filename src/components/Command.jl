@@ -288,6 +288,28 @@ end
     )
 end
 
+# --- Hydration Body (Wasm compilation) ---
+# Command: mode=11 (fire-and-forget, fuzzy filtering + keyboard nav handled by JS modal handler)
+const _COMMAND_HYDRATION_BODY = quote
+    activated, _set_activated = create_signal(Int32(1))
+    Div(Symbol("data-modal") => BindModal(activated, Int32(11)))
+end
+
+# CommandDialog: mode=12 (toggle dialog + nested Command island)
+const _COMMANDDIALOG_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(12)),
+        Span(
+            :on_click => () -> set_open(Int32(1) - is_open()),
+        ),
+        Div(
+            Div(),
+            Div(),
+        ),
+    )
+end
+
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(

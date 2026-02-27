@@ -191,6 +191,13 @@ function FormMessage(children...; class::String="", theme::Symbol=:default, kwar
       children...)
 end
 
+# --- Hydration Body (Wasm compilation) ---
+# Form: mode=17 (fire-and-forget, per-field validation handled by JS modal handler)
+const _FORM_HYDRATION_BODY = quote
+    is_active, set_active = create_signal(Int32(1))
+    Form(Symbol("data-modal") => BindModal(is_active, Int32(17)))
+end
+
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(

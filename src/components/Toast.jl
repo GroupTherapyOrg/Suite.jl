@@ -64,6 +64,13 @@ export Toaster
     )
 end
 
+# --- Hydration Body (Wasm compilation) ---
+# Toaster: mode=22 (fire-and-forget, toast queue + stacking + auto-dismiss handled by JS modal handler)
+const _TOASTER_HYDRATION_BODY = quote
+    is_active, set_active = create_signal(Int32(1))
+    Section(Symbol("data-modal") => BindModal(is_active, Int32(22)))
+end
+
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(

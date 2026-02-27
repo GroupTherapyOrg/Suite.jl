@@ -415,6 +415,13 @@ function _dt_pagination(id, total_rows, total_pages, page_size, selectable, them
     )
 end
 
+# --- Hydration Body (Wasm compilation) ---
+# DataTable: mode=16 (fire-and-forget, sorting + filtering + pagination handled by JS modal handler)
+const _DATATABLE_HYDRATION_BODY = quote
+    is_active, set_active = create_signal(Int32(1))
+    Div(Symbol("data-modal") => BindModal(is_active, Int32(16)))
+end
+
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(

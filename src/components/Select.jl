@@ -291,6 +291,25 @@ function SelectScrollDownButton(children...; class::String="", kwargs...)
         (isempty(children) ? (Therapy.RawHtml(_SELECT_SCROLL_DOWN_SVG),) : children)...)
 end
 
+# --- Hydration Body (Wasm compilation) ---
+# Select: mode=10 (click trigger, floating, keyboard nav).
+# Root Div (BindModal) → Div trigger (BindBool + click, contains Button) → Div content (BindBool)
+const _SELECT_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(10)),
+        Div(
+            Symbol("data-state") => BindBool(is_open, "closed", "open"),
+            :aria_expanded => BindBool(is_open, "false", "true"),
+            :on_click => () -> set_open(Int32(1) - is_open()),
+            Button(),
+        ),
+        Div(
+            Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        ),
+    )
+end
+
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(
