@@ -1,8 +1,8 @@
 # Popover.jl — Suite.jl Popover Component
 #
-# Tier: js_runtime (requires suite.js)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Floating, FocusGuards, FocusTrap, DismissLayer, ScrollLock, Popover
+# JS Modules: none
 #
 # Usage via package: using Suite; Popover(...)
 # Usage via extract: include("components/Popover.jl"); Popover(...)
@@ -12,8 +12,10 @@
 #   - Modal by default: focus trapped, scroll locked
 #   - Escape key dismisses
 #   - Click outside dismisses
-#   - Positioned relative to trigger using Floating positioning
+#   - Positioned relative to trigger using floating positioning (Wasm)
 #   - Supports side/align/offset configuration
+#   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
+#   - BindModal(mode=3) handles modal behavior + floating positioning
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -24,53 +26,67 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 export Popover, PopoverTrigger, PopoverContent,
        PopoverClose, PopoverAnchor
 
-"""
-    Popover(children...; class, kwargs...) -> VNode
+#   Popover(children...; class, kwargs...) -> IslandVNode
+#
+# A click-triggered floating panel. Contains trigger and floating content.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# PopoverTrigger and PopoverContent children are auto-detected and injected
+# with signal bindings for data-state, aria-expanded, and modal+floating behavior.
+#
+# Examples:
+#   Popover(PopoverTrigger(Button(variant="outline", "Open")), PopoverContent(P("Content")))
+@island function Popover(children...; class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
-A click-triggered floating panel. Contains trigger and floating content.
-
-# Examples
-```julia
-Popover(
-    PopoverTrigger(Button(variant="outline", "Open")),
-    PopoverContent(
-        P("Place content for the popover here.")
-    )
-)
-```
-"""
-function Popover(children...; class::String="", kwargs...)
-    id = "suite-popover-" * string(rand(UInt32), base=16)
-
-    trigger_nodes = []
-    content_nodes = []
+    # Walk children to inject signal bindings
     for child in children
-        if child isa Therapy.VNode && haskey(child.props, Symbol("data-suite-popover-trigger-wrapper"))
-            push!(trigger_nodes, child)
-        else
-            push!(content_nodes, child)
+        if child isa VNode
+            if haskey(child.props, Symbol("data-suite-popover-trigger-wrapper"))
+                # Inject reactive bindings on trigger wrapper
+                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
+                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
+            else
+                # Content or other children — walk into them for content + close buttons
+                _popover_inject_content_bindings!(child, is_open, set_open)
+            end
         end
     end
 
-    Div(:class => cn(class),
-        Symbol("data-suite-popover") => id,
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(3)),  # mode 3 = popover (dialog + floating)
+        :class => cn("", class),
         :style => "display:contents",
         kwargs...,
-        [_popover_set_trigger_id(t, id) for t in trigger_nodes]...,
-        content_nodes...,
-    )
+        children...)
 end
 
-function _popover_set_trigger_id(node, id)
-    if node isa Therapy.VNode && haskey(node.props, Symbol("data-suite-popover-trigger-wrapper"))
-        new_props = copy(node.props)
-        new_props[Symbol("data-suite-popover-trigger")] = id
-        new_props[Symbol("aria-haspopup")] = "dialog"
-        new_props[Symbol("aria-expanded")] = "false"
-        new_props[Symbol("data-state")] = "closed"
-        return Therapy.VNode(node.tag, new_props, node.children)
+# Walk children to find popover content and close buttons
+function _popover_inject_content_bindings!(node::VNode, is_open, set_open)
+    if haskey(node.props, Symbol("data-suite-popover-content"))
+        # Content: bind data-state
+        node.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+        # Walk content for close buttons
+        _popover_inject_close_buttons!(node, set_open)
     end
-    node
+    for child in node.children
+        if child isa VNode
+            _popover_inject_content_bindings!(child, is_open, set_open)
+        end
+    end
+end
+
+# Recursively inject close handler on all [data-suite-popover-close] elements
+function _popover_inject_close_buttons!(node::VNode, set_open)
+    if haskey(node.props, Symbol("data-suite-popover-close"))
+        node.props[:on_click] = () -> set_open(Int32(0))
+    end
+    for child in node.children
+        if child isa VNode
+            _popover_inject_close_buttons!(child, set_open)
+        end
+    end
 end
 
 """
@@ -82,6 +98,9 @@ function PopoverTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-suite-popover-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
+         Symbol("data-state") => "closed",
+         :aria_haspopup => "dialog",
+         :aria_expanded => "false",
          kwargs...,
          children...)
 end
@@ -159,10 +178,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Popover,
         "Popover.jl",
-        :js_runtime,
+        :island,
         "Click-triggered floating panel with focus trap and positioning",
         Symbol[],
-        [:Floating, :FocusGuards, :FocusTrap, :DismissLayer, :ScrollLock, :Popover],
+        Symbol[],
         [:Popover, :PopoverTrigger, :PopoverContent,
          :PopoverClose, :PopoverAnchor],
     ))

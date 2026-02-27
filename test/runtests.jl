@@ -2338,7 +2338,9 @@ using Test
                     P("Popover content here")
                 )
             ))
-            @test occursin("data-suite-popover", html)
+            # @island wraps in therapy-island
+            @test occursin("therapy-island", html)
+            @test occursin("data-suite-popover-content", html)
             @test occursin("Popover content here", html)
         end
 
@@ -2347,7 +2349,7 @@ using Test
                 PopoverTrigger("Open"),
                 PopoverContent(P("Content"))
             ))
-            @test occursin("data-suite-popover-trigger", html)
+            @test occursin("data-suite-popover-trigger-wrapper", html)
             @test occursin("aria-haspopup=\"dialog\"", html)
             @test occursin("aria-expanded=\"false\"", html)
             @test occursin("data-state=\"closed\"", html)
@@ -2439,15 +2441,12 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Popover)
             meta = Suite.COMPONENT_REGISTRY[:Popover]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Popover in meta.exports
             @test :PopoverTrigger in meta.exports
             @test :PopoverContent in meta.exports
             @test :PopoverClose in meta.exports
-            @test :Popover in meta.js_modules
-            @test :Floating in meta.js_modules
-            @test :FocusTrap in meta.js_modules
-            @test :DismissLayer in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 

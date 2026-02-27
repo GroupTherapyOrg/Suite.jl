@@ -552,74 +552,7 @@
         // Sheet: removed (now @island — SUITE-907)
         // Drawer: removed (now @island — SUITE-907)
 
-        // --- Popover --------------------------------------------------------------
-        Popover: {
-            init() {
-                const triggers = document.querySelectorAll('[data-suite-popover-trigger]');
-                triggers.forEach(trigger => {
-                    if (trigger._suitePopover) return;
-                    trigger._suitePopover = true;
-
-                    const popId = trigger.getAttribute('data-suite-popover-trigger');
-                    const root = document.querySelector('[data-suite-popover="' + popId + '"]');
-                    if (!root) return;
-
-                    const content = root.querySelector('[data-suite-popover-content]');
-                    if (!content) return;
-
-                    const side = content.getAttribute('data-side-preference') || 'bottom';
-                    const sideOffset = parseInt(content.getAttribute('data-side-offset') || '0', 10);
-                    const align = content.getAttribute('data-align-preference') || 'center';
-
-                    let cleanupFloat, cleanupDismiss, cleanupFocusTrap;
-
-                    function open() {
-                        root.style.display = '';
-                        content.setAttribute('data-state', 'open');
-                        trigger.setAttribute('data-state', 'open');
-                        trigger.setAttribute('aria-expanded', 'true');
-
-                        cleanupFloat = Suite.Floating.position(trigger, content, {
-                            side: side, sideOffset: sideOffset, align: align
-                        });
-
-                        Suite.ScrollLock.lock();
-                        Suite.FocusGuards.install();
-                        cleanupFocusTrap = Suite.FocusTrap.activate(content);
-                        cleanupDismiss = Suite.DismissLayer.activate(content, {
-                            disableOutsidePointerEvents: true,
-                            onDismiss: close,
-                        });
-                    }
-
-                    function close() {
-                        if (cleanupDismiss) { cleanupDismiss(); cleanupDismiss = null; }
-                        if (cleanupFocusTrap) { cleanupFocusTrap(); cleanupFocusTrap = null; }
-                        if (cleanupFloat) { cleanupFloat(); cleanupFloat = null; }
-
-                        content.setAttribute('data-state', 'closed');
-                        trigger.setAttribute('data-state', 'closed');
-                        trigger.setAttribute('aria-expanded', 'false');
-
-                        Suite.ScrollLock.unlock();
-                        Suite.FocusGuards.uninstall();
-
-                        const hide = () => { root.style.display = 'none'; };
-                        content.addEventListener('animationend', hide, { once: true });
-                        setTimeout(hide, 250);
-                    }
-
-                    trigger.addEventListener('click', () => {
-                        const isOpen = content.getAttribute('data-state') === 'open';
-                        if (isOpen) close(); else open();
-                    });
-
-                    root.querySelectorAll('[data-suite-popover-close]').forEach(btn => {
-                        btn.addEventListener('click', close);
-                    });
-                });
-            }
-        },
+        // Popover: removed (now @island — SUITE-908)
 
         // --- Tooltip --------------------------------------------------------------
         Tooltip: {
@@ -4651,7 +4584,8 @@
             // AlertDialog: removed (now @island)
             // Sheet: removed (now @island)
             // Drawer: removed (now @island)
-            this.Popover.init();
+            // Popover: removed (now @island)
+
             this.Tooltip.init();
             this.HoverCard.init();
             this.DropdownMenu.init();
