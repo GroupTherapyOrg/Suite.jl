@@ -4520,10 +4520,11 @@ using Test
         @testset "Registry registration" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Calendar)
             meta = Suite.COMPONENT_REGISTRY[:Calendar]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test meta.file == "Calendar.jl"
             @test :Calendar in meta.exports
             @test :DatePicker in meta.exports
+            @test isempty(meta.js_modules)
         end
 
         @testset "Theme support" begin
@@ -4540,19 +4541,10 @@ using Test
             @test occursin("data-suite-calendar-fixed-weeks=\"true\"", html)
         end
 
-        @testset "JS module in suite.js" begin
-            js = Suite.suite_js_source()
-            @test occursin("Calendar:", js)
-            @test occursin("data-suite-calendar", js)
-            @test occursin("_handleKeyDown", js)
-            @test occursin("ArrowLeft", js)
-            @test occursin("ArrowRight", js)
-            @test occursin("ArrowUp", js)
-            @test occursin("ArrowDown", js)
-            @test occursin("PageUp", js)
-            @test occursin("PageDown", js)
-            @test occursin("Home", js)
-            @test occursin("End", js)
+        @testset "Island tier (no JS)" begin
+            # Calendar is now @island — no JS runtime needed
+            html = Therapy.render_to_string(Calendar(month=2, year=2026))
+            @test occursin("therapy-island", html)
         end
     end
 
@@ -4638,13 +4630,11 @@ using Test
             @test occursin("bg-warm-50", html)
         end
 
-        @testset "JS datepicker module in suite.js" begin
-            js = Suite.suite_js_source()
-            @test occursin("_setupDatePicker", js)
-            @test occursin("_openDatePicker", js)
-            @test occursin("_closeDatePicker", js)
-            @test occursin("_updateDatePickerDisplay", js)
-            @test occursin("suite:calendar:select", js)
+        @testset "Island tier (no JS)" begin
+            # DatePicker is now @island — no JS runtime needed
+            html = Therapy.render_to_string(DatePicker(month=2, year=2026))
+            @test occursin("therapy-island", html)
+            @test occursin("data-suite-datepicker-trigger-marker", html)
         end
 
         @testset "Display format helpers" begin
@@ -5878,6 +5868,7 @@ using Test
     @testset "Slider" begin
         @testset "Basic structure" begin
             html = Therapy.render_to_string(Slider())
+            @test occursin("therapy-island", html)
             @test occursin("data-suite-slider", html)
             @test occursin("role=\"slider\"", html)
             @test occursin("data-suite-slider-track", html)
@@ -5999,9 +5990,9 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Slider)
             meta = Suite.COMPONENT_REGISTRY[:Slider]
-            @test meta.tier == :js_runtime
+            @test meta.tier == :island
             @test :Slider in meta.exports
-            @test :Slider in meta.js_modules
+            @test isempty(meta.js_modules)
         end
     end
 end

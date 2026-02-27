@@ -1,15 +1,15 @@
 # Slider.jl — Suite.jl Slider Component
 #
-# Tier: js_runtime (requires suite.js for drag + keyboard interaction)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: none (leaf component)
-# JS Modules: Slider
+# JS Modules: none
 #
 # Usage via package: using Suite; Slider(default_value=50)
 # Usage via extract: include("components/Slider.jl"); Slider(...)
 #
 # Behavior:
 #   - Range slider with track, fill range, and draggable thumb
-#   - JS discovers via data-suite-slider attribute
+#   - Signal-driven: BindModal(mode=13) handles drag + keyboard interaction
 #   - Pointer capture API for drag interaction
 #   - Keyboard: Arrow keys ±step, Home/End min/max, PageUp/Down ±10×step
 #   - ARIA: role=slider on thumb with aria-valuenow/min/max/orientation
@@ -28,34 +28,31 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export Slider
 
-"""
-    Slider(; min, max, step, default_value, orientation, disabled, class, kwargs...) -> VNode
-
-An input where the user selects a value from within a given range.
-
-Requires `suite_script()` in your layout for JS behavior.
-
-# Props
-- `min`: Minimum value (default `0`)
-- `max`: Maximum value (default `100`)
-- `step`: Step increment (default `1`)
-- `default_value`: Initial value (default `0`)
-- `orientation`: `"horizontal"` or `"vertical"` (default `"horizontal"`)
-- `disabled`: Disable the slider (default `false`)
-
-# Examples
-```julia
-Slider()
-Slider(default_value=50, min=0, max=100)
-Slider(step=10, default_value=30)
-Slider(orientation="vertical")
-Slider(disabled=true, default_value=40)
-```
-"""
-function Slider(; min::Real=0, max::Real=100, step::Real=1,
+#   Slider(; min, max, step, default_value, orientation, disabled, class, kwargs...) -> IslandVNode
+#
+# An input where the user selects a value from within a given range.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# Props:
+# - `min`: Minimum value (default `0`)
+# - `max`: Maximum value (default `100`)
+# - `step`: Step increment (default `1`)
+# - `default_value`: Initial value (default `0`)
+# - `orientation`: `"horizontal"` or `"vertical"` (default `"horizontal"`)
+# - `disabled`: Disable the slider (default `false`)
+#
+# Examples:
+#   Slider()
+#   Slider(default_value=50, min=0, max=100)
+#   Slider(step=10, default_value=30)
+#   Slider(orientation="vertical")
+#   Slider(disabled=true, default_value=40)
+@island function Slider(; min::Real=0, max::Real=100, step::Real=1,
                   default_value::Real=0, orientation::String="horizontal",
                   disabled::Bool=false, theme::Symbol=:default,
                   class::String="", kwargs...)
+    is_active, set_active = create_signal(Int32(1))
+
     clamped = clamp(default_value, min, max)
     pct = max > min ? (clamped - min) / (max - min) * 100 : 0
 
@@ -109,6 +106,7 @@ function Slider(; min::Real=0, max::Real=100, step::Real=1,
 
     # Root data attributes
     root_attrs = Pair{Symbol,Any}[
+        Symbol("data-modal") => BindModal(is_active, Int32(13)),
         Symbol("data-suite-slider") => "",
         Symbol("data-orientation") => orientation,
         Symbol("data-min") => string(min),
@@ -152,10 +150,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Slider,
         "Slider.jl",
-        :js_runtime,
+        :island,
         "Range slider with drag and keyboard interaction",
         Symbol[],
-        [:Slider],
+        Symbol[],
         [:Slider],
     ))
 end

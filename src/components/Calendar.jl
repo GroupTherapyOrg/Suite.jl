@@ -1,21 +1,21 @@
 # Calendar.jl — Suite.jl Calendar Component
 #
-# Tier: js_runtime (requires suite.js)
+# Tier: island (Wasm — no JavaScript required)
 # Suite Dependencies: Button (for nav buttons)
-# JS Modules: Calendar
+# JS Modules: none
 #
 # Usage via package: using Suite; Calendar()
 # Usage via extract: include("components/Calendar.jl"); Calendar()
 #
 # Behavior (matches shadcn/ui Calendar / react-day-picker):
 #   - Month grid with day selection
-#   - Keyboard navigation (arrow keys, PageUp/Down, Home/End)
+#   - Signal-driven: BindModal(mode=14) handles month nav, selection, keyboard
 #   - Single, multiple, and range selection modes
 #   - Month/year navigation via prev/next buttons
-#   - Today highlighting
-#   - Outside days display
+#   - Today highlighting, outside days display
 #   - Disabled/hidden day support
 #   - ARIA: role=grid, aria-label, roving tabindex
+#   - DatePicker: BindModal(mode=15) handles popover open/close + floating
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -87,37 +87,29 @@ function _calendar_weeks(year::Int, month::Int; show_outside_days::Bool=true)
     weeks
 end
 
-"""
-    Calendar(; mode, month, year, selected, disabled_dates,
-                   show_outside_days, fixed_weeks, class, theme, kwargs...) -> VNode
-
-A date calendar grid with selection, navigation, and keyboard interaction.
-
-# Arguments
-- `mode::String="single"`: Selection mode ("single", "multiple", "range")
-- `month::Int=current_month`: Displayed month (1-12)
-- `year::Int=current_year`: Displayed year
-- `selected::String=""`: Pre-selected date(s) as ISO string(s), comma-separated for multiple
-- `disabled_dates::String=""`: Disabled dates as comma-separated ISO strings
-- `show_outside_days::Bool=true`: Show days from adjacent months
-- `fixed_weeks::Bool=false`: Always show 6 weeks
-- `number_of_months::Int=1`: Number of months to display side by side
-- `class::String=""`: Additional CSS classes
-- `theme::Symbol=:default`: Theme preset
-
-# Examples
-```julia
-# Single date selection
-Calendar()
-
-# Range selection with 2 months
-Calendar(mode="range", number_of_months=2)
-
-# Pre-selected date
-Calendar(selected="2026-02-14")
-```
-"""
-function Calendar(; mode::String="single",
+#   Calendar(; mode, month, year, selected, disabled_dates,
+#                  show_outside_days, fixed_weeks, class, theme, kwargs...) -> IslandVNode
+#
+# A date calendar grid with selection, navigation, and keyboard interaction.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# Arguments:
+# - `mode::String="single"`: Selection mode ("single", "multiple", "range")
+# - `month::Int=current_month`: Displayed month (1-12)
+# - `year::Int=current_year`: Displayed year
+# - `selected::String=""`: Pre-selected date(s) as ISO string(s), comma-separated for multiple
+# - `disabled_dates::String=""`: Disabled dates as comma-separated ISO strings
+# - `show_outside_days::Bool=true`: Show days from adjacent months
+# - `fixed_weeks::Bool=false`: Always show 6 weeks
+# - `number_of_months::Int=1`: Number of months to display side by side
+# - `class::String=""`: Additional CSS classes
+# - `theme::Symbol=:default`: Theme preset
+#
+# Examples:
+#   Calendar()
+#   Calendar(mode="range", number_of_months=2)
+#   Calendar(selected="2026-02-14")
+@island function Calendar(; mode::String="single",
                         month::Int=Dates.month(Dates.today()),
                         year::Int=Dates.year(Dates.today()),
                         selected::String="",
@@ -128,6 +120,8 @@ function Calendar(; mode::String="single",
                         class::String="",
                         theme::Symbol=:default,
                         kwargs...)
+    is_active, set_active = create_signal(Int32(1))
+
     id = "suite-calendar-" * string(rand(UInt32), base=16)
 
     root_classes = cn(
@@ -164,7 +158,8 @@ function Calendar(; mode::String="single",
                      Therapy.RawHtml(_CALENDAR_CHEVRON_RIGHT)),
     )
 
-    Div(Symbol("data-suite-calendar") => id,
+    Div(Symbol("data-modal") => BindModal(is_active, Int32(14)),
+        Symbol("data-suite-calendar") => id,
         Symbol("data-suite-calendar-mode") => mode,
         Symbol("data-suite-calendar-month") => string(month),
         Symbol("data-suite-calendar-year") => string(year),
@@ -325,37 +320,29 @@ function _calendar_day_cell(cal_id, day, show_outside_days, mode, theme)
               string(day.day_num)))
 end
 
-"""
-    DatePicker(; mode, month, year, selected, placeholder,
-                     show_outside_days, class, theme, kwargs...) -> VNode
-
-A date picker combining a trigger button with a Calendar in a Popover.
-
-# Arguments
-- `mode::String="single"`: Selection mode ("single", "multiple", "range")
-- `month::Int=current_month`: Initial displayed month
-- `year::Int=current_year`: Initial displayed year
-- `selected::String=""`: Pre-selected date(s)
-- `placeholder::String="Pick a date"`: Trigger button text when no date selected
-- `disabled_dates::String=""`: Disabled dates as comma-separated ISO strings
-- `show_outside_days::Bool=true`: Show days from adjacent months
-- `number_of_months::Int=1`: Number of months to display
-- `class::String=""`: Additional CSS classes for the trigger button
-- `theme::Symbol=:default`: Theme preset
-
-# Examples
-```julia
-# Simple date picker
-DatePicker()
-
-# Range picker with 2 months
-DatePicker(mode="range", number_of_months=2, placeholder="Select dates")
-
-# Pre-selected date
-DatePicker(selected="2026-02-14")
-```
-"""
-function DatePicker(; mode::String="single",
+#   DatePicker(; mode, month, year, selected, placeholder,
+#                    show_outside_days, class, theme, kwargs...) -> IslandVNode
+#
+# A date picker combining a trigger button with a Calendar in a Popover.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# Arguments:
+# - `mode::String="single"`: Selection mode ("single", "multiple", "range")
+# - `month::Int=current_month`: Initial displayed month
+# - `year::Int=current_year`: Initial displayed year
+# - `selected::String=""`: Pre-selected date(s)
+# - `placeholder::String="Pick a date"`: Trigger button text when no date selected
+# - `disabled_dates::String=""`: Disabled dates as comma-separated ISO strings
+# - `show_outside_days::Bool=true`: Show days from adjacent months
+# - `number_of_months::Int=1`: Number of months to display
+# - `class::String=""`: Additional CSS classes for the trigger button
+# - `theme::Symbol=:default`: Theme preset
+#
+# Examples:
+#   DatePicker()
+#   DatePicker(mode="range", number_of_months=2, placeholder="Select dates")
+#   DatePicker(selected="2026-02-14")
+@island function DatePicker(; mode::String="single",
                           month::Int=Dates.month(Dates.today()),
                           year::Int=Dates.year(Dates.today()),
                           selected::String="",
@@ -366,6 +353,8 @@ function DatePicker(; mode::String="single",
                           class::String="",
                           theme::Symbol=:default,
                           kwargs...)
+    is_open, set_open = create_signal(Int32(0))
+
     id = "suite-datepicker-" * string(rand(UInt32), base=16)
 
     # Trigger button classes (outline button style)
@@ -397,22 +386,31 @@ function DatePicker(; mode::String="single",
     )
     theme !== :default && (content_classes = apply_theme(content_classes, get_theme(theme)))
 
-    Div(Symbol("data-suite-datepicker") => id,
+    Div(Symbol("data-modal") => BindModal(is_open, Int32(15)),
+        Symbol("data-suite-datepicker") => id,
         Symbol("data-suite-datepicker-mode") => mode,
         Symbol("data-suite-datepicker-selected") => selected,
         :style => "display:contents",
         kwargs...,
-        # Trigger button
-        Therapy.Button(:type => "button",
-               :class => trigger_classes,
-               Symbol("data-suite-datepicker-trigger") => id,
-               :aria_haspopup => "dialog",
-               :aria_expanded => "false",
-               Span(:class => "flex-1 $text_class",
-                    Symbol("data-suite-datepicker-value") => id,
-                    display_text),
-               Span(:class => "text-warm-400 dark:text-warm-600 shrink-0",
-                    Therapy.RawHtml(_CALENDAR_ICON_SVG))),
+        # Hidden trigger marker for programmatic toggle (Escape, click-outside, auto-close)
+        Span(Symbol("data-suite-datepicker-trigger-marker") => "",
+             :style => "display:none",
+             :on_click => () -> set_open(Int32(1) - is_open())),
+        # Trigger wrapper with click handler
+        Div(Symbol("data-suite-datepicker-trigger-wrapper") => "",
+            :style => "display:contents",
+            :on_click => () -> set_open(Int32(1) - is_open()),
+            # Trigger button
+            Therapy.Button(:type => "button",
+                   :class => trigger_classes,
+                   Symbol("data-suite-datepicker-trigger") => id,
+                   :aria_haspopup => "dialog",
+                   :aria_expanded => "false",
+                   Span(:class => "flex-1 $text_class",
+                        Symbol("data-suite-datepicker-value") => id,
+                        display_text),
+                   Span(:class => "text-warm-400 dark:text-warm-600 shrink-0",
+                        Therapy.RawHtml(_CALENDAR_ICON_SVG)))),
         # Popover content (hidden by default)
         Div(Symbol("data-suite-datepicker-content") => id,
             Symbol("data-suite-datepicker-side") => "bottom",
@@ -422,7 +420,7 @@ function DatePicker(; mode::String="single",
             :aria_modal => "true",
             :style => "display:none",
             :class => content_classes,
-            # Calendar inside
+            # Calendar inside (nested @island)
             Calendar(mode=mode, month=month, year=year, selected=selected,
                          disabled_dates=disabled_dates, show_outside_days=show_outside_days,
                          number_of_months=number_of_months, theme=theme)),
@@ -460,10 +458,10 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Calendar,
         "Calendar.jl",
-        :js_runtime,
+        :island,
         "Date calendar grid with selection, navigation, and keyboard interaction",
         Symbol[],
-        [:Calendar],
+        Symbol[],
         [:Calendar, :DatePicker],
     ))
 end
