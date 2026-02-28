@@ -1,6 +1,6 @@
 # DataTable.jl — Suite.jl DataTable Component
 #
-# Tier: island (Wasm — no JavaScript required)
+# Tier: styling (no interactive Wasm — sorting/pagination via JS runtime)
 # Suite Dependencies: Table (renders via Table sub-components)
 # JS Modules: none
 #
@@ -93,7 +93,7 @@ end
 # - `caption::String=""`: Table caption
 # - `class::String=""`: Additional CSS classes
 # - `theme::Symbol=:default`: Theme name
-@island function DataTable(data::Vector, columns::Vector{DataTableColumn};
+function DataTable(data::Vector, columns::Vector{DataTableColumn};
     filterable::Bool=true,
     filter_placeholder::String="Filter...",
     filter_columns::Vector{String}=String[],
@@ -418,7 +418,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :DataTable,
         "DataTable.jl",
-        :island,
+        :styling,
         "Full-featured data table with sorting, filtering, pagination, row selection",
         [:Table],
         Symbol[],
