@@ -14,7 +14,7 @@
 #   - Escape/click-outside dismiss
 #   - Sub-menu support
 #   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
-#   - BindModal(mode=7) handles contextmenu positioning + menu behavior + dismiss
+#   - ShowDescendants binding handles show/hide + data-state on content children
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -55,7 +55,7 @@ const _CONTEXT_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:contextmenu, (is_open, set_open))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(7)),  # mode 7 = context_menu
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         :class => cn("", class),
         :style => "display:contents",
         kwargs...,
@@ -75,7 +75,19 @@ end
          :style => "display:contents",
          :class => cn(class),
          Symbol("data-state") => BindBool(is_open, "closed", "open"),
-         :on_click => () -> set_open(Int32(1) - is_open()),
+         :on_click => () -> begin
+             if is_open() == Int32(0)
+                 # Opening: inline Wasm behavior
+                 store_active_element()
+                 set_open(Int32(1))
+                 push_escape_handler(Int32(0))
+             else
+                 # Closing: inline Wasm behavior
+                 set_open(Int32(0))
+                 pop_escape_handler()
+                 restore_active_element()
+             end
+         end,
          kwargs...,
          children...)
 end

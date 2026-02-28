@@ -16,7 +16,7 @@
 #   - Arrow Left/Right within content navigates between menus
 #   - Same item keyboard nav, typeahead, sub-menus as DropdownMenu
 #   - Signal-driven: Int32 signal (0=none, N=menu N open)
-#   - BindModal(mode=8) handles multi-menu state + floating + dismiss
+#   - ShowDescendants binding handles show/hide + data-state on content children
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -44,7 +44,7 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
 #
 # MenubarMenu children are auto-detected and injected with signal bindings.
 # Each menu trigger gets an on_click that toggles the active menu index.
-# BindModal(mode=8) handles floating positioning, dismiss, hover-switch, and keyboard nav.
+# ShowDescendants binding handles show/hide + data-state on content descendants.
 #
 # Examples:
 #   Menubar(
@@ -79,7 +79,7 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-menubar") => "",
-        Symbol("data-modal") => BindModal(active_menu, Int32(8)),  # mode 8 = menubar
+        Symbol("data-show") => ShowDescendants(active_menu),  # show/hide + data-state binding (inline Wasm)
         Symbol("data-loop") => string(loop),
         :role => "menubar",
         :class => classes,

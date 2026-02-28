@@ -7,14 +7,15 @@
 # Usage via package: using Suite; Sheet(...)
 # Usage via extract: include("components/Sheet.jl"); Sheet(...)
 #
-# Behavior (matches shadcn Sheet = Radix Dialog + slide animation):
+# Behavior (Thaw-style inline Wasm):
 #   - Modal by default: focus trapped, scroll locked, outside pointer disabled
-#   - Escape key dismisses
-#   - Click outside overlay dismisses
+#   - Escape key dismisses (via push_escape_handler Wasm import)
+#   - Click outside overlay dismisses (via close button delegation)
 #   - Slides from edge (top/right/bottom/left)
 #   - Same behavior as Dialog, different CSS (slide vs zoom)
+#   - Scroll lock via lock_scroll/unlock_scroll Wasm imports
 #   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
-#   - BindModal handles scroll lock, focus trap, dismiss, show/hide with animation
+#   - Modal binding handles show/hide + data-state on overlay/content children
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -40,8 +41,9 @@ const SHEET_SIDE_CLASSES = Dict{String, String}(
 # scroll lock, and dismiss on Escape/click-outside.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# SheetTrigger and SheetContent children are auto-detected and injected
-# with signal bindings for data-state, aria-expanded, and modal behavior.
+# Parent island: creates signal, provides context for child islands.
+# Modal binding handles show/hide + data-state on overlay/content children.
+# Behavioral logic (scroll lock, focus, Escape) is inline Wasm in SheetTrigger.
 #
 # Examples:
 #   Sheet(SheetTrigger(Button("Open")), SheetContent(side="right", SheetHeader(SheetTitle("Title"))))
@@ -52,7 +54,7 @@ const SHEET_SIDE_CLASSES = Dict{String, String}(
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:sheet, (is_open, set_open))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(0)),  # mode 0 = dialog behavior
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         :class => cn("", class),
         kwargs...,
         children...)
@@ -61,7 +63,11 @@ end
 #   SheetTrigger(children...; class, kwargs...) -> IslandVNode
 #
 # The button that opens the sheet.
-# Child island: owns signal + BindBool + on_click handler (compilable body).
+# Child island: owns signal + BindBool + inline Wasm behavior (compilable body).
+#
+# Inline Wasm behavior (Thaw-style):
+#   - Open: store focus, set signal, lock scroll, register Escape handler
+#   - Close: set signal, unlock scroll, pop Escape handler, restore focus
 @island function SheetTrigger(children...; class::String="", kwargs...)
     is_open, set_open = use_context_signal(:sheet, Int32(0))
 
@@ -71,7 +77,19 @@ end
          Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
          :aria_expanded => BindBool(is_open, "false", "true"),
-         :on_click => () -> set_open(Int32(1) - is_open()),
+         :on_click => () -> begin
+             if is_open() == Int32(0)
+                 store_active_element()
+                 set_open(Int32(1))
+                 lock_scroll()
+                 push_escape_handler(Int32(0))
+             else
+                 set_open(Int32(0))
+                 unlock_scroll()
+                 pop_escape_handler()
+                 restore_active_element()
+             end
+         end,
          kwargs...,
          children...)
 end

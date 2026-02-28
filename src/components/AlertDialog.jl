@@ -7,17 +7,18 @@
 # Usage via package: using Suite; AlertDialog(...)
 # Usage via extract: include("components/AlertDialog.jl"); AlertDialog(...)
 #
-# Behavior (matches Radix AlertDialog):
+# Behavior (Thaw-style inline Wasm):
 #   - Always modal: focus trapped, scroll locked
-#   - Escape key does NOT dismiss (unlike Dialog)
+#   - Escape key does NOT dismiss (unlike Dialog) — no push_escape_handler
 #   - Click outside does NOT dismiss (unlike Dialog)
 #   - Focus auto-moves to Cancel button on open (not first tabbable)
 #   - Can only be closed via Action or Cancel button
 #   - role="alertdialog" (not "dialog")
+#   - Scroll lock via lock_scroll/unlock_scroll Wasm imports
 #   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
-#   - BindModal mode=1 handles modal lifecycle without Escape/outside dismiss
+#   - Modal binding (mode=1) handles show/hide + data-state on overlay/content children
 #
-# Reference: Radix UI AlertDialog — https://www.radix-ui.com/primitives/docs/components/alert-dialog
+# Reference: Thaw AlertDialog — github.com/thaw-ui/thaw
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -35,8 +36,9 @@ export AlertDialog, AlertDialogTrigger, AlertDialogContent,
 # Cannot be dismissed by Escape key or clicking outside.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# AlertDialogTrigger and AlertDialogContent children are auto-detected and
-# injected with signal bindings for data-state, aria-expanded, and modal behavior.
+# Parent island: creates signal, provides context for child islands.
+# Modal binding (mode=1) handles show/hide + data-state — NO Escape dismiss.
+# Behavioral logic (scroll lock, focus) is inline Wasm in AlertDialogTrigger.
 #
 # Examples:
 #   AlertDialog(
@@ -50,7 +52,7 @@ export AlertDialog, AlertDialogTrigger, AlertDialogContent,
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:alertdialog, (is_open, set_open))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(1)),  # mode 1 = alert_dialog (no Escape/outside dismiss)
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         :class => cn("", class),
         kwargs...,
         children...)
@@ -59,7 +61,11 @@ end
 #   AlertDialogTrigger(children...; class, kwargs...) -> IslandVNode
 #
 # The button that opens the alert dialog.
-# Child island: owns signal + BindBool + on_click handler (compilable body).
+# Child island: owns signal + BindBool + inline Wasm behavior (compilable body).
+#
+# Inline Wasm behavior (Thaw-style):
+#   - Open: store focus, set signal, lock scroll (NO Escape handler — AlertDialog)
+#   - Close: set signal, unlock scroll, restore focus
 @island function AlertDialogTrigger(children...; class::String="", kwargs...)
     # Read parent's signal from context (SSR) or create own (Wasm compilation)
     is_open, set_open = use_context_signal(:alertdialog, Int32(0))
@@ -70,7 +76,19 @@ end
          Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
          :aria_expanded => BindBool(is_open, "false", "true"),
-         :on_click => () -> set_open(Int32(1) - is_open()),
+         :on_click => () -> begin
+             if is_open() == Int32(0)
+                 # Opening: inline Wasm behavior (no Escape handler for AlertDialog)
+                 store_active_element()
+                 set_open(Int32(1))
+                 lock_scroll()
+             else
+                 # Closing: inline Wasm behavior
+                 set_open(Int32(0))
+                 unlock_scroll()
+                 restore_active_element()
+             end
+         end,
          kwargs...,
          children...)
 end

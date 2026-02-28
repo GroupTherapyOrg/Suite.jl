@@ -7,15 +7,14 @@
 # Usage via package: using Suite; Popover(...)
 # Usage via extract: include("components/Popover.jl"); Popover(...)
 #
-# Behavior (matches Radix Popover):
+# Behavior (Thaw-style inline Wasm):
 #   - Click-triggered floating panel
-#   - Modal by default: focus trapped, scroll locked
-#   - Escape key dismisses
-#   - Click outside dismisses
-#   - Positioned relative to trigger using floating positioning (Wasm)
+#   - Escape key dismisses (via push_escape_handler Wasm import)
+#   - Click outside dismisses (via close button delegation)
+#   - Positioned relative to trigger (floating positioning in slim modal binding)
 #   - Supports side/align/offset configuration
 #   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
-#   - BindModal(mode=3) handles modal behavior + floating positioning
+#   - Modal binding (mode=0) handles show/hide + data-state on content
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -31,8 +30,9 @@ export Popover, PopoverTrigger, PopoverContent,
 # A click-triggered floating panel. Contains trigger and floating content.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# PopoverTrigger and PopoverContent children are auto-detected and injected
-# with signal bindings for data-state, aria-expanded, and modal+floating behavior.
+# Parent island: creates signal, provides context for child islands.
+# Modal binding handles show/hide + data-state on content child.
+# Behavioral logic (focus, Escape) is inline Wasm in PopoverTrigger.
 #
 # Examples:
 #   Popover(PopoverTrigger(Button(variant="outline", "Open")), PopoverContent(P("Content")))
@@ -43,7 +43,7 @@ export Popover, PopoverTrigger, PopoverContent,
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:popover, (is_open, set_open))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(3)),  # mode 3 = popover (dialog + floating)
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         :class => cn("", class),
         :style => "display:contents",
         kwargs...,
@@ -53,7 +53,11 @@ end
 #   PopoverTrigger(children...; class, kwargs...) -> IslandVNode
 #
 # The button that opens the popover.
-# Child island: owns signal + BindBool + on_click handler (compilable body).
+# Child island: owns signal + BindBool + inline Wasm behavior (compilable body).
+#
+# Inline Wasm behavior (Thaw-style):
+#   - Open: store focus, set signal, register Escape handler (no scroll lock — floating panel)
+#   - Close: set signal, pop Escape handler, restore focus
 @island function PopoverTrigger(children...; class::String="", kwargs...)
     # Read parent's signal from context (SSR) or create own (Wasm compilation)
     is_open, set_open = use_context_signal(:popover, Int32(0))
@@ -64,7 +68,19 @@ end
          Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
          :aria_expanded => BindBool(is_open, "false", "true"),
-         :on_click => () -> set_open(Int32(1) - is_open()),
+         :on_click => () -> begin
+             if is_open() == Int32(0)
+                 # Opening: inline Wasm behavior (no scroll lock for floating panel)
+                 store_active_element()
+                 set_open(Int32(1))
+                 push_escape_handler(Int32(0))
+             else
+                 # Closing: inline Wasm behavior
+                 set_open(Int32(0))
+                 pop_escape_handler()
+                 restore_active_element()
+             end
+         end,
          kwargs...,
          children...)
 end

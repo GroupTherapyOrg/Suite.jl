@@ -16,7 +16,7 @@
 #   - Escape to dismiss
 #   - Motion attributes for directional slide animation
 #   - Signal-driven: Int32 signal (0=none, N=item N is open)
-#   - BindModal(mode=9) handles hover timers, motion, indicator, dismiss
+#   - ShowDescendants binding handles show/hide + data-state on content children
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -39,7 +39,7 @@ const _NAV_CHEVRON_DOWN = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
 #
 # NavigationMenuItem children with triggers are auto-detected and injected
 # with signal bindings for hover-to-open behavior.
-# BindModal(mode=9) handles hover timers, motion direction, indicator, and dismiss.
+# ShowDescendants binding handles show/hide + data-state on content descendants.
 #
 # Examples:
 #   NavigationMenu(
@@ -74,7 +74,7 @@ const _NAV_CHEVRON_DOWN = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-nav-menu") => "",
-        Symbol("data-modal") => BindModal(active_item, Int32(9)),  # mode 9 = nav_menu
+        Symbol("data-show") => ShowDescendants(active_item),  # show/hide + data-state binding (inline Wasm)
         Symbol("data-orientation") => orientation,
         Symbol("data-delay-duration") => string(delay_duration),
         Symbol("data-skip-delay-duration") => string(skip_delay_duration),

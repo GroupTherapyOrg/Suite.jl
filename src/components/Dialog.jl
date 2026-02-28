@@ -7,21 +7,22 @@
 # Usage via package: using Suite; Dialog(DialogTrigger(Button("Open")), DialogContent(...))
 # Usage via extract: include("components/Dialog.jl"); Dialog(...)
 #
-# Behavior (matches Radix Dialog):
+# Behavior (Thaw-style inline Wasm):
 #   - Modal by default: focus trapped, scroll locked, outside pointer disabled
-#   - Escape key dismisses
-#   - Click outside overlay dismisses
-#   - Focus auto-moves to first tabbable non-link element on open
-#   - Focus returns to trigger on close
+#   - Escape key dismisses (via push_escape_handler Wasm import)
+#   - Click outside overlay dismisses (via close button delegation)
+#   - Focus auto-moves to content on open
+#   - Focus returns to trigger on close (via store/restore_active_element Wasm imports)
+#   - Scroll lock via lock_scroll/unlock_scroll Wasm imports
 #   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
-#   - BindModal handles scroll lock, focus trap, dismiss, show/hide with animation
+#   - ShowDescendants binding handles show/hide + data-state on overlay/content children
 #
 # Architecture: Split islands (Thaw-style)
-#   - Dialog (parent island): creates signal, provides context, wraps with BindModal
-#   - DialogTrigger (child island): reads context, toggles signal on click
+#   - Dialog (parent island): creates signal, provides context, registers show binding
+#   - DialogTrigger (child island): reads context, toggles signal with inline Wasm behavior
 #   - DialogContent: plain function (complex styling, SSR-only)
 #
-# Reference: Radix UI Dialog — https://www.radix-ui.com/primitives/docs/components/dialog
+# Reference: Thaw Dialog — github.com/thaw-ui/thaw
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -38,9 +39,9 @@ export Dialog, DialogTrigger, DialogContent,
 # A modal dialog overlay. Contains trigger, overlay, and content.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# Parent island: creates signal, provides context for child islands,
-# wraps children with BindModal for focus trap, scroll lock, dismiss.
-# No tree walking — children handle their own bindings.
+# Parent island: creates signal, provides context for child islands.
+# Modal binding handles show/hide + data-state on overlay/content children.
+# Behavioral logic (scroll lock, focus, Escape) is inline Wasm in DialogTrigger.
 #
 # Examples:
 #   Dialog(DialogTrigger(Button("Open")), DialogContent(DialogHeader(DialogTitle("Title"))))
@@ -51,7 +52,7 @@ export Dialog, DialogTrigger, DialogContent,
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:dialog, (is_open, set_open))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(0)),  # mode 0 = dialog
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         :class => cn("", class),
         kwargs...,
         children...)
@@ -61,6 +62,10 @@ end
 #
 # The button that opens the dialog. Wrap around a Button or any clickable element.
 # Child island: reads parent context signal via use_context_signal.
+#
+# Inline Wasm behavior (Thaw-style):
+#   - Open: store focus, set signal, lock scroll, register Escape handler
+#   - Close: set signal, unlock scroll, pop Escape handler, restore focus
 @island function DialogTrigger(children...; class::String="", kwargs...)
     # Read parent's signal from context (SSR) or create own (Wasm compilation)
     is_open, set_open = use_context_signal(:dialog, Int32(0))
@@ -71,7 +76,21 @@ end
          Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
          :aria_expanded => BindBool(is_open, "false", "true"),
-         :on_click => () -> set_open(Int32(1) - is_open()),
+         :on_click => () -> begin
+             if is_open() == Int32(0)
+                 # Opening: inline Wasm behavior
+                 store_active_element()
+                 set_open(Int32(1))
+                 lock_scroll()
+                 push_escape_handler(Int32(0))
+             else
+                 # Closing: inline Wasm behavior
+                 set_open(Int32(0))
+                 unlock_scroll()
+                 pop_escape_handler()
+                 restore_active_element()
+             end
+         end,
          kwargs...,
          children...)
 end

@@ -19,7 +19,7 @@ using Therapy: Script, Style, Meta
 using Therapy: Svg, Path, Circle, Rect, Line, Polygon, Polyline, Text, G, Defs, Use
 using Therapy: render_to_string, render_page
 using Therapy: @island, island, IslandDef, get_islands, clear_islands!
-using Therapy: create_signal, BindBool, BindModal
+using Therapy: create_signal, BindBool, BindModal, ShowDescendants
 using Therapy: provide_context, use_context, use_context_signal
 
 using Dates

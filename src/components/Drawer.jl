@@ -7,17 +7,15 @@
 # Usage via package: using Suite; Drawer(...)
 # Usage via extract: include("components/Drawer.jl"); Drawer(...)
 #
-# Behavior (matches Vaul drawer):
-#   - Bottom sheet with drag-to-dismiss
-#   - Modal: focus trapped, scroll locked
-#   - Escape key dismisses
-#   - Click outside dismisses
-#   - Drag velocity > 0.4 → close (fast swipe)
-#   - Drag distance > 25% height → close
-#   - Logarithmic damping when dragging past open position
+# Behavior (Thaw-style inline Wasm):
+#   - Bottom sheet modal: focus trapped, scroll locked
+#   - Escape key dismisses (via push_escape_handler Wasm import)
+#   - Click outside dismisses (via close button delegation)
 #   - Supports 4 directions: bottom (default), top, left, right
+#   - Same modal behavior as Dialog, different CSS (slide vs zoom)
+#   - Scroll lock via lock_scroll/unlock_scroll Wasm imports
 #   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
-#   - BindModal mode=2 handles modal lifecycle + drag-to-dismiss
+#   - Modal binding handles show/hide + data-state on overlay/content children
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -31,12 +29,13 @@ export Drawer, DrawerTrigger, DrawerContent,
 
 #   Drawer(children...; class, kwargs...) -> IslandVNode
 #
-# A draggable bottom sheet overlay. Supports drag-to-dismiss with velocity
-# and distance thresholds. Interactive behavior is compiled to WebAssembly —
-# no JavaScript required.
+# A slide-in panel from the edge of the screen. Modal with focus trap,
+# scroll lock, and dismiss on Escape/click-outside.
+# Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# DrawerTrigger and DrawerContent children are auto-detected and injected
-# with signal bindings for data-state, aria-expanded, and modal+drag behavior.
+# Parent island: creates signal, provides context for child islands.
+# Modal binding handles show/hide + data-state on overlay/content children.
+# Behavioral logic (scroll lock, focus, Escape) is inline Wasm in DrawerTrigger.
 #
 # Examples:
 #   Drawer(DrawerTrigger(Button("Open")), DrawerContent(DrawerHandle(), DrawerTitle("Goal")))
@@ -47,7 +46,7 @@ export Drawer, DrawerTrigger, DrawerContent,
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:drawer, (is_open, set_open))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(2)),  # mode 2 = drawer (dialog + drag-to-dismiss)
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         :class => cn("", class),
         kwargs...,
         children...)
@@ -56,7 +55,11 @@ end
 #   DrawerTrigger(children...; class, kwargs...) -> IslandVNode
 #
 # The button that opens the drawer.
-# Child island: owns signal + BindBool + on_click handler (compilable body).
+# Child island: owns signal + BindBool + inline Wasm behavior (compilable body).
+#
+# Inline Wasm behavior (Thaw-style):
+#   - Open: store focus, set signal, lock scroll, register Escape handler
+#   - Close: set signal, unlock scroll, pop Escape handler, restore focus
 @island function DrawerTrigger(children...; class::String="", kwargs...)
     # Read parent's signal from context (SSR) or create own (Wasm compilation)
     is_open, set_open = use_context_signal(:drawer, Int32(0))
@@ -67,7 +70,21 @@ end
          Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
          :aria_expanded => BindBool(is_open, "false", "true"),
-         :on_click => () -> set_open(Int32(1) - is_open()),
+         :on_click => () -> begin
+             if is_open() == Int32(0)
+                 # Opening: inline Wasm behavior
+                 store_active_element()
+                 set_open(Int32(1))
+                 lock_scroll()
+                 push_escape_handler(Int32(0))
+             else
+                 # Closing: inline Wasm behavior
+                 set_open(Int32(0))
+                 unlock_scroll()
+                 pop_escape_handler()
+                 restore_active_element()
+             end
+         end,
          kwargs...,
          children...)
 end

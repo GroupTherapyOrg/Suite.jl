@@ -17,7 +17,7 @@
 #   - Sub-menu support with ArrowRight/ArrowLeft
 #   - Focus returns to trigger on close
 #   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
-#   - BindModal(mode=6) handles floating positioning + menu behavior + dismiss
+#   - ShowDescendants binding handles show/hide + data-state on content children
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -62,7 +62,7 @@ const _DROPDOWN_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:dropdown, (is_open, set_open))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(6)),  # mode 6 = dropdown_menu
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         :class => cn("", class),
         :style => "display:contents",
         kwargs...,
@@ -84,7 +84,19 @@ end
          Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "menu",
          :aria_expanded => BindBool(is_open, "false", "true"),
-         :on_click => () -> set_open(Int32(1) - is_open()),
+         :on_click => () -> begin
+             if is_open() == Int32(0)
+                 # Opening: inline Wasm behavior (no scroll lock — floating panel)
+                 store_active_element()
+                 set_open(Int32(1))
+                 push_escape_handler(Int32(0))
+             else
+                 # Closing: inline Wasm behavior
+                 set_open(Int32(0))
+                 pop_escape_handler()
+                 restore_active_element()
+             end
+         end,
          kwargs...,
          children...)
 end

@@ -7,13 +7,13 @@
 # Usage via package: using Suite; Tooltip(...)
 # Usage via extract: include("components/Tooltip.jl"); Tooltip(...)
 #
-# Behavior (matches Radix Tooltip):
+# Behavior (Thaw-style inline Wasm):
 #   - Hover/focus-triggered informational popup
 #   - Provider-level delay (700ms default)
-#   - Escape key dismisses
-#   - No focus trap (tooltip content is not interactive)
-#   - Floating positioning with flip/shift collision avoidance
-#   - Signal-driven: BindModal(mode=4) handles hover timing + floating positioning
+#   - No focus trap, no scroll lock (tooltip content is not interactive)
+#   - Signal-driven: BindBool maps open signal to data-state
+#   - Modal binding (mode=0) handles show/hide + data-state on content
+#   - Hover timing is inline Wasm in TooltipTrigger (pointerenter/pointerleave)
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -48,8 +48,9 @@ end
 # A hover/focus-triggered informational popup.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# BindModal(mode=4) handles hover timing, floating positioning, Escape dismiss,
-# and pointerdown dismiss. Data-state updates are managed by the modal_state JS handler.
+# Parent island: creates signal, provides context for child islands.
+# Modal binding handles show/hide + data-state on content child.
+# Hover behavior (pointerenter/pointerleave) is inline Wasm in TooltipTrigger.
 #
 # Examples:
 #   TooltipProvider(Tooltip(TooltipTrigger(Button("Hover me")), TooltipContent(P("Tip"))))
@@ -60,7 +61,7 @@ end
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:tooltip, (is_open, set_open))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(4)),  # mode 4 = tooltip (hover + floating)
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         :class => cn("", class),
         :style => "display:contents",
         kwargs...,

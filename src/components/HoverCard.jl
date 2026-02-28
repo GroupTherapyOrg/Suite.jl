@@ -7,14 +7,13 @@
 # Usage via package: using Suite; HoverCard(...)
 # Usage via extract: include("components/HoverCard.jl"); HoverCard(...)
 #
-# Behavior (matches Radix HoverCard):
+# Behavior (Thaw-style inline Wasm):
 #   - Hover-triggered preview card for links/anchors
-#   - Open delay 700ms, close delay 300ms (configurable)
-#   - Hovering content keeps card open (cancels close timer)
-#   - Escape key dismisses, click outside dismisses
-#   - No focus trap (preview content, not interactive)
-#   - Floating positioning with flip/shift collision avoidance
-#   - Signal-driven: BindModal(mode=5) handles hover timing + floating positioning
+#   - Open delay 700ms, close delay 300ms (configurable via data attributes)
+#   - No focus trap, no scroll lock (preview content, not interactive)
+#   - Signal-driven: BindBool maps open signal to data-state
+#   - Modal binding (mode=0) handles show/hide + data-state on content
+#   - Hover timing is inline Wasm in HoverCardTrigger (pointerenter/pointerleave)
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -29,8 +28,9 @@ export HoverCard, HoverCardTrigger, HoverCardContent
 # A hover-triggered preview card. Shows rich content when hovering a trigger.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# BindModal(mode=5) handles hover timing (delayed open + delayed close),
-# floating positioning, content hover (cancel close), Escape + click-outside dismiss.
+# Parent island: creates signal, provides context for child islands.
+# Modal binding handles show/hide + data-state on content child.
+# Hover behavior (pointerenter/pointerleave) is inline Wasm in HoverCardTrigger.
 #
 # Arguments:
 # - open_delay::Int=700: Milliseconds before card opens on hover
@@ -45,7 +45,7 @@ export HoverCard, HoverCardTrigger, HoverCardContent
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:hovercard, (is_open, set_open))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(5)),  # mode 5 = hover_card (hover + floating + dismiss)
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         Symbol("data-hover-card-open-delay") => string(open_delay),
         Symbol("data-hover-card-close-delay") => string(close_delay),
         :class => cn("", class),
