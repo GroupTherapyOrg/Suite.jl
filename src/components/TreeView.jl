@@ -1,6 +1,6 @@
 # TreeView.jl — Suite.jl TreeView Component
 #
-# Tier: island (Wasm — no JavaScript required)
+# Tier: styling (no interactive Wasm — expand/collapse via CSS data-attributes)
 # Suite Dependencies: none
 # JS Modules: none
 #
@@ -55,7 +55,7 @@ export TreeView, TreeViewItem
 #       ),
 #       TreeViewItem(label="Project.toml"),
 #   )
-@island function TreeView(children...; class::String="", theme::Symbol=:default, kwargs...)
+function TreeView(children...; class::String="", theme::Symbol=:default, kwargs...)
     classes = cn("text-sm", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
@@ -170,7 +170,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :TreeView,
         "TreeView.jl",
-        :island,
+        :styling,
         "File browser tree component with expand/collapse and keyboard navigation",
         Symbol[],
         Symbol[],

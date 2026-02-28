@@ -1,6 +1,6 @@
 # Resizable.jl — Suite.jl Resizable Panel Component
 #
-# Tier: island (Wasm — no JavaScript required)
+# Tier: styling (no interactive Wasm — resize behavior via JS runtime)
 # Suite Dependencies: none
 # JS Modules: none
 #
@@ -30,7 +30,7 @@ export ResizablePanelGroup, ResizablePanel, ResizableHandle
 # A container for resizable panels arranged horizontally or vertically.
 # Options: direction ("horizontal"/"vertical")
 # Examples: ResizablePanelGroup(direction="horizontal", ResizablePanel(default_size=30, ...), ResizableHandle(), ...)
-@island function ResizablePanelGroup(children...; direction::String="horizontal",
+function ResizablePanelGroup(children...; direction::String="horizontal",
                              class::String="", theme::Symbol=:default, kwargs...)
     flex_dir = direction == "vertical" ? "flex-col" : "flex-row"
 
@@ -128,7 +128,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Resizable,
         "Resizable.jl",
-        :island,
+        :styling,
         "Draggable panel resizing with min/max constraints",
         Symbol[],
         [:Resizable],

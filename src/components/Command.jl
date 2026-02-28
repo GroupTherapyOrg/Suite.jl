@@ -1,6 +1,6 @@
 # Command.jl — Suite.jl Command Component (cmdk-style command palette)
 #
-# Tier: island (Wasm — no JavaScript required)
+# Tier: island (CommandDialog has Wasm signals; Command is styling-only)
 # Suite Dependencies: none
 # JS Modules: none
 #
@@ -43,7 +43,7 @@ const _COMMAND_SEARCH_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16
 #       CommandList(CommandEmpty("No results."), CommandGroup(heading="Suggestions",
 #           CommandItem("Calendar", value="calendar")))
 #   )
-@island function Command(children...; should_filter::Bool=true, loop::Bool=true,
+function Command(children...; should_filter::Bool=true, loop::Bool=true,
                       theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "glass-panel-elevated",

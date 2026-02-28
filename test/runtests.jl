@@ -3391,7 +3391,6 @@ using Test
                     ),
                 )
             ))
-            @test occursin("therapy-island", html)
             @test occursin("data-command=", html)
             @test occursin("data-command-input", html)
             @test occursin("data-command-list", html)
@@ -4525,7 +4524,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Toast)
             meta = Suite.COMPONENT_REGISTRY[:Toast]
-            @test meta.tier == :island
+            @test meta.tier == :styling
             @test :Toaster in meta.exports
             @test :Toast in meta.js_modules
         end
@@ -5536,7 +5535,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :CodeBlock)
             meta = Suite.COMPONENT_REGISTRY[:CodeBlock]
-            @test meta.tier == :island
+            @test meta.tier == :styling
             @test :CodeBlock in meta.exports
         end
     end
@@ -5778,7 +5777,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :TreeView)
             meta = Suite.COMPONENT_REGISTRY[:TreeView]
-            @test meta.tier == :island
+            @test meta.tier == :styling
             @test :TreeView in meta.exports
             @test :TreeViewItem in meta.exports
         end
@@ -5881,7 +5880,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Carousel)
             meta = Suite.COMPONENT_REGISTRY[:Carousel]
-            @test meta.tier == :island
+            @test meta.tier == :styling
             @test :Carousel in meta.exports
             @test :CarouselContent in meta.exports
             @test :CarouselItem in meta.exports
@@ -5980,7 +5979,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Resizable)
             meta = Suite.COMPONENT_REGISTRY[:Resizable]
-            @test meta.tier == :island
+            @test meta.tier == :styling
             @test :ResizablePanelGroup in meta.exports
             @test :ResizablePanel in meta.exports
             @test :ResizableHandle in meta.exports

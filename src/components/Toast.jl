@@ -1,6 +1,6 @@
 # Toaster.jl — Suite.jl Toast Notification Component (Sonner-style)
 #
-# Tier: island (Wasm — no JavaScript required)
+# Tier: styling (no interactive Wasm — toast behavior via JS runtime)
 # Suite Dependencies: none (leaf component)
 # JS Modules: none
 #
@@ -36,7 +36,7 @@ export Toaster
 # Args: position ("bottom-right" etc.), duration (4000ms), visible_toasts (3)
 # Client API: Suite.toast("msg"), Suite.toast.success("msg"), .error, .warning, .info
 # Dismiss: Suite.toast.dismiss(id), Suite.toast.dismissAll()
-@island function Toaster(;
+function Toaster(;
     theme::Symbol=:default,
     position::String="bottom-right",
     duration::Int=4000,
@@ -67,7 +67,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Toast,
         "Toast.jl",
-        :island,
+        :styling,
         "Sonner-style toast notification system",
         Symbol[],
         [:Toast],

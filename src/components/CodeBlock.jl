@@ -1,6 +1,6 @@
 # CodeBlock.jl — Suite.jl CodeBlock Component
 #
-# Tier: island (Wasm — no JavaScript required)
+# Tier: styling (no interactive Wasm — copy button via JS runtime)
 # Suite Dependencies: none
 # JS Modules: none
 #
@@ -39,7 +39,7 @@ const _CODEBLOCK_COPY_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="14
 #   CodeBlock("using Suite\nButton(\"Click\")", language="julia")
 #   CodeBlock("npm install", language="bash", show_copy=true)
 #   CodeBlock(read("script.jl", String), language="julia", show_line_numbers=true)
-@island function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool=false,
+function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool=false,
                    show_copy::Bool=true, class::String="", theme::Symbol=:default, kwargs...)
     wrapper_classes = cn("group relative overflow-hidden rounded-lg border border-warm-200 dark:border-warm-700 bg-warm-950 dark:bg-warm-950", class)
     theme !== :default && (wrapper_classes = apply_theme(wrapper_classes, get_theme(theme)))
@@ -102,7 +102,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :CodeBlock,
         "CodeBlock.jl",
-        :island,
+        :styling,
         "Styled code display with copy button, line numbers, and language badge",
         Symbol[],
         Symbol[],

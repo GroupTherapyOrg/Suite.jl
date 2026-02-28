@@ -1,6 +1,6 @@
 # Carousel.jl — Suite.jl Carousel Component
 #
-# Tier: island (Wasm — no JavaScript required)
+# Tier: styling (no interactive Wasm — carousel behavior via JS runtime)
 # Suite Dependencies: none
 # JS Modules: none
 #
@@ -30,7 +30,7 @@ export Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 # A scrollable content slider with snap-point navigation.
 # Options: orientation ("horizontal"/"vertical"), loop (Bool), autoplay (Bool), autoplay_interval (Int ms)
 # Examples: Carousel(CarouselContent(CarouselItem("1"), ...), CarouselPrevious(), CarouselNext())
-@island function Carousel(children...; orientation::String="horizontal",
+function Carousel(children...; orientation::String="horizontal",
                   loop::Bool=false, autoplay::Bool=false,
                   autoplay_interval::Int=4000,
                   class::String="", theme::Symbol=:default, kwargs...)
@@ -150,7 +150,7 @@ if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Carousel,
         "Carousel.jl",
-        :island,
+        :styling,
         "Scrollable content slider with snap navigation",
         Symbol[],
         [:Carousel],
