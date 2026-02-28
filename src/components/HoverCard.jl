@@ -42,9 +42,8 @@ export HoverCard, HoverCardTrigger, HoverCardContent
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Provide context for child islands (Thaw-style signal sharing)
-    provide_context(:hovercard_open, is_open)
-    provide_context(:hovercard_set_open, set_open)
+    # Provide context for child islands (single key with getter+setter tuple)
+    provide_context(:hovercard, (is_open, set_open))
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(5)),  # mode 5 = hover_card (hover + floating + dismiss)
         Symbol("data-hover-card-open-delay") => string(open_delay),
@@ -60,7 +59,8 @@ end
 # The element that triggers the hover card on hover.
 # Child island: owns signal + pointerenter/pointerleave handlers (compilable body).
 @island function HoverCardTrigger(children...; class::String="", kwargs...)
-    is_open, set_open = create_signal(Int32(0))
+    # Read parent's signal from context (SSR) or create own (Wasm compilation)
+    is_open, set_open = use_context_signal(:hovercard, Int32(0))
 
     Span(Symbol("data-hover-card-trigger-wrapper") => "",
          :style => "display:contents",

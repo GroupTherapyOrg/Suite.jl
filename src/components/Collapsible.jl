@@ -40,25 +40,16 @@ export Collapsible, CollapsibleTrigger, CollapsibleContent
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(open ? 1 : 0))
 
-    # Walk children to inject signal bindings into trigger/content VNodes
+    # Provide context for child islands (single key with getter+setter tuple)
+    provide_context(:collapsible, (is_open, set_open))
+
+    # Inject signal bindings into CollapsibleContent VNodes (plain function children)
     for child in children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-collapsible-trigger"))
-                # Inject reactive bindings into trigger
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
-                if !disabled
-                    child.props[:on_click] = () -> set_open(Int32(1) - is_open())
-                end
-            elseif haskey(child.props, Symbol("data-collapsible-content"))
-                # Inject reactive bindings into content
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                # Remove HTML hidden attr — CSS handles visibility via data-state
-                delete!(child.props, :hidden)
-                # Add CSS class to hide when closed
-                current_class = get(child.props, :class, "")
-                child.props[:class] = cn(current_class, "data-[state=closed]:hidden")
-            end
+        if child isa VNode && haskey(child.props, Symbol("data-collapsible-content"))
+            child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
+            delete!(child.props, :hidden)
+            current_class = get(child.props, :class, "")
+            child.props[:class] = cn(current_class, "data-[state=closed]:hidden")
         end
     end
 
@@ -74,22 +65,22 @@ export Collapsible, CollapsibleTrigger, CollapsibleContent
     Div(attrs..., kwargs..., children...)
 end
 
-"""
-    CollapsibleTrigger(children...; class, kwargs...) -> VNode
-
-The button that toggles the collapsible open/closed state.
-
-Must be a direct child of `Collapsible`. The parent @island injects
-signal bindings (data-state, aria-expanded, on_click) at render time.
-"""
-function CollapsibleTrigger(children...; theme::Symbol=:default,
+#   CollapsibleTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The button that toggles the collapsible open/closed state.
+# Child island: reads parent context signal via use_context_signal.
+@island function CollapsibleTrigger(children...; theme::Symbol=:default,
                                 class::String="", kwargs...)
+    # Read parent's signal from context (SSR) or create own (Wasm compilation)
+    is_open, set_open = use_context_signal(:collapsible, Int32(0))
+
     classes = cn("cursor-pointer text-warm-800 dark:text-warm-300", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-collapsible-trigger") => "",
-        Symbol("data-state") => "closed",
-        :aria_expanded => "false",
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        :aria_expanded => BindBool(is_open, "false", "true"),
+        :on_click => () -> set_open(Int32(1) - is_open()),
         :class => classes,
         kwargs...,
         children...)
@@ -112,6 +103,28 @@ function CollapsibleContent(children...; class::String="", force_mount::Bool=fal
         :class => classes,
         kwargs...,
         children...)
+end
+
+# --- Hydration Bodies (Wasm compilation) ---
+
+# Parent island: Div(BindBool + children) — no BindModal needed, just toggle visibility
+const _COLLAPSIBLE_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        children,
+    )
+end
+
+# Child island: Div(BindBool + click toggle + children)
+const _COLLAPSIBLETRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        :aria_expanded => BindBool(is_open, "false", "true"),
+        :on_click => () -> set_open(Int32(1) - is_open()),
+        children,
+    )
 end
 
 # --- Registry ---

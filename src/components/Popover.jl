@@ -40,9 +40,8 @@ export Popover, PopoverTrigger, PopoverContent,
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Provide context for child islands (Thaw-style signal sharing)
-    provide_context(:popover_open, is_open)
-    provide_context(:popover_set_open, set_open)
+    # Provide context for child islands (single key with getter+setter tuple)
+    provide_context(:popover, (is_open, set_open))
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(3)),  # mode 3 = popover (dialog + floating)
         :class => cn("", class),
@@ -56,7 +55,8 @@ end
 # The button that opens the popover.
 # Child island: owns signal + BindBool + on_click handler (compilable body).
 @island function PopoverTrigger(children...; class::String="", kwargs...)
-    is_open, set_open = create_signal(Int32(0))
+    # Read parent's signal from context (SSR) or create own (Wasm compilation)
+    is_open, set_open = use_context_signal(:popover, Int32(0))
 
     Span(Symbol("data-popover-trigger-wrapper") => "",
          :style => "display:contents",

@@ -48,9 +48,8 @@ export Dialog, DialogTrigger, DialogContent,
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Provide context for child islands (Thaw-style signal sharing)
-    provide_context(:dialog_open, is_open)
-    provide_context(:dialog_set_open, set_open)
+    # Provide context for child islands (single key with getter+setter tuple)
+    provide_context(:dialog, (is_open, set_open))
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(0)),  # mode 0 = dialog
         :class => cn("", class),
@@ -61,11 +60,10 @@ end
 #   DialogTrigger(children...; class, kwargs...) -> IslandVNode
 #
 # The button that opens the dialog. Wrap around a Button or any clickable element.
-# Child island: owns signal + BindBool + on_click handler (compilable body).
-# At runtime, context sharing connects to parent Dialog's signal (Phase 6-7).
+# Child island: reads parent context signal via use_context_signal.
 @island function DialogTrigger(children...; class::String="", kwargs...)
-    # Own signal for independent compilation (connected to parent via context at runtime)
-    is_open, set_open = create_signal(Int32(0))
+    # Read parent's signal from context (SSR) or create own (Wasm compilation)
+    is_open, set_open = use_context_signal(:dialog, Int32(0))
 
     Span(Symbol("data-dialog-trigger-wrapper") => "",
          :style => "display:contents",

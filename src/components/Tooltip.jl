@@ -57,9 +57,8 @@ end
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Provide context for child islands (Thaw-style signal sharing)
-    provide_context(:tooltip_open, is_open)
-    provide_context(:tooltip_set_open, set_open)
+    # Provide context for child islands (single key with getter+setter tuple)
+    provide_context(:tooltip, (is_open, set_open))
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(4)),  # mode 4 = tooltip (hover + floating)
         :class => cn("", class),
@@ -73,7 +72,8 @@ end
 # The element that triggers the tooltip on hover/focus.
 # Child island: owns signal + pointerenter/pointerleave handlers (compilable body).
 @island function TooltipTrigger(children...; class::String="", kwargs...)
-    is_open, set_open = create_signal(Int32(0))
+    # Read parent's signal from context (SSR) or create own (Wasm compilation)
+    is_open, set_open = use_context_signal(:tooltip, Int32(0))
 
     Div(Symbol("data-tooltip-trigger-wrapper") => "",
         :style => "display:contents",

@@ -49,9 +49,8 @@ const SHEET_SIDE_CLASSES = Dict{String, String}(
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Provide context for child islands (Thaw-style signal sharing)
-    provide_context(:sheet_open, is_open)
-    provide_context(:sheet_set_open, set_open)
+    # Provide context for child islands (single key with getter+setter tuple)
+    provide_context(:sheet, (is_open, set_open))
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(0)),  # mode 0 = dialog behavior
         :class => cn("", class),
@@ -64,7 +63,7 @@ end
 # The button that opens the sheet.
 # Child island: owns signal + BindBool + on_click handler (compilable body).
 @island function SheetTrigger(children...; class::String="", kwargs...)
-    is_open, set_open = create_signal(Int32(0))
+    is_open, set_open = use_context_signal(:sheet, Int32(0))
 
     Span(Symbol("data-sheet-trigger-wrapper") => "",
          :style => "display:contents",

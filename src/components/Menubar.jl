@@ -452,6 +452,48 @@ function MenubarSubContent(children...; theme::Symbol=:default, class::String=""
     )
 end
 
+# --- Props Transform (counts menus for while loop) ---
+const _MENUBAR_PROPS_TRANSFORM = (props, args) -> begin
+    count = 0
+    for arg in args
+        if arg isa VNode && haskey(arg.props, Symbol("data-menubar-menu"))
+            count += 1
+        end
+    end
+    props[:n_menus] = count
+end
+
+# --- Hydration Body (Wasm compilation) ---
+# Menubar: mode=8, multi-item signal (0=none, N=menu N open).
+# Root Div (BindModal) → [Div menu → Div marker (click) → Button → Div content] × N
+const _MENUBAR_HYDRATION_BODY = quote
+    active_menu, set_active = create_signal(Int32(0))
+    n = compiled_get_prop_i32(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(active_menu, Int32(8)),
+        begin
+            i = Int32(0)
+            while i < n
+                Div(
+                    Div(
+                        :on_click => (e) -> begin
+                            idx = compiled_get_event_data_index()
+                            if active_menu() == idx
+                                set_active(Int32(0))
+                            else
+                                set_active(idx)
+                            end
+                        end,
+                        Button(),
+                    ),
+                    Div(),
+                )
+                i = i + Int32(1)
+            end
+        end
+    )
+end
+
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(
