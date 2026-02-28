@@ -25,13 +25,64 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export Tabs, TabsList, TabsTrigger, TabsContent
 
+# SSR helper: walk children VNodes and inject data-index + initial data-state attributes.
+# Extracted from the island body so the AST transform doesn't try to compile for-loops.
+function _tabs_ssr_setup!(children, default_value::String)
+    triggers = VNode[]
+    contents = VNode[]
+
+    for child in children
+        if child isa VNode
+            if haskey(child.props, Symbol("data-tabslist"))
+                for trigger_child in child.children
+                    if trigger_child isa VNode && haskey(trigger_child.props, Symbol("data-tabs-trigger"))
+                        push!(triggers, trigger_child)
+                    end
+                end
+            elseif haskey(child.props, Symbol("data-tabs-content"))
+                push!(contents, child)
+            end
+        end
+    end
+
+    # Set data-index and initial state on triggers
+    for (i, trigger) in enumerate(triggers)
+        idx = i - 1
+        value = string(trigger.props[Symbol("data-tabs-trigger")])
+        is_active = value == default_value
+        trigger.props[Symbol("data-index")] = string(idx)
+        trigger.props[Symbol("data-state")] = is_active ? "active" : "inactive"
+        trigger.props[:aria_selected] = is_active ? "true" : "false"
+        trigger.props[:tabindex] = is_active ? "0" : "-1"
+    end
+
+    # Match content panels to triggers and set data-index + state
+    for content in contents
+        content_value = string(content.props[Symbol("data-tabs-content")])
+        for (i, trigger) in enumerate(triggers)
+            trigger_value = string(trigger.props[Symbol("data-tabs-trigger")])
+            if trigger_value == content_value
+                idx = i - 1
+                is_active = trigger_value == default_value
+                content.props[Symbol("data-index")] = string(idx)
+                content.props[Symbol("data-state")] = is_active ? "active" : "inactive"
+                delete!(content.props, :hidden)
+                current_class = get(content.props, :class, "")
+                content.props[:class] = cn(current_class, "data-[state=inactive]:hidden")
+                break
+            end
+        end
+    end
+end
+
 #   Tabs(children...; default_value, orientation, activation, class, kwargs...) -> IslandVNode
 #
 # A set of layered panels, each associated with a tab trigger.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# TabsTrigger children (inside TabsList) and TabsContent children are auto-detected
-# and injected with signal bindings for data-state, aria-selected, and click handlers.
+# Uses a single INDEX signal for the active tab. The v2 pipeline compiles this to
+# a Wasm module with 1 signal and 1 handler. DOM bindings are auto-registered on
+# all [data-index] descendants via register_match_descendants (import 90).
 #
 # Props:
 #   default_value: the value of the initially selected tab
@@ -47,74 +98,15 @@ export Tabs, TabsList, TabsTrigger, TabsContent
 @island function Tabs(children...; default_value::String="",
                    orientation::String="horizontal", activation::String="automatic",
                    class::String="", kwargs...)
-    # Collect triggers and content panels from children
-    triggers = VNode[]
-    contents = VNode[]
+    # Compilable: 1 signal for active tab index (from PROPS_TRANSFORM _a, prop index 0)
+    active, set_active = create_signal(compiled_get_prop_i32(Int32(0)))
 
-    for child in children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-tabslist"))
-                # Walk TabsList children to find triggers
-                for trigger_child in child.children
-                    if trigger_child isa VNode && haskey(trigger_child.props, Symbol("data-tabs-trigger"))
-                        push!(triggers, trigger_child)
-                    end
-                end
-            elseif haskey(child.props, Symbol("data-tabs-content"))
-                push!(contents, child)
-            end
-        end
-    end
+    # Compilable: auto-register match bindings on all [data-index] descendants
+    # Mode 3 = inactive/active (DATA_STATE_MODES[3])
+    compiled_register_match_descendants(Int32(1), Int32(3))
 
-    # Create per-trigger signals (Int32: 0=inactive, 1=active)
-    trigger_signals = Tuple{Any, Any}[]
-    for trigger in triggers
-        value = string(trigger.props[Symbol("data-tabs-trigger")])
-        is_active = value == default_value
-        sig, set_sig = create_signal(Int32(is_active ? 1 : 0))
-        push!(trigger_signals, (sig, set_sig))
-    end
-
-    # Inject BindBool and click handlers on triggers
-    for (i, trigger) in enumerate(triggers)
-        sig = trigger_signals[i][1]
-        trigger.props[Symbol("data-state")] = BindBool(sig, "inactive", "active")
-        trigger.props[:aria_selected] = BindBool(sig, "false", "true")
-        trigger.props[Symbol("data-index")] = string(i - 1)  # 0-indexed for hydration
-        # Set initial tabindex correctly (active=0, inactive=-1)
-        value = string(trigger.props[Symbol("data-tabs-trigger")])
-        is_active = value == default_value
-        trigger.props[:tabindex] = is_active ? "0" : "-1"
-
-        # Click handler (unless disabled)
-        if !haskey(trigger.props, :disabled) && !haskey(trigger.props, Symbol("data-disabled"))
-            let all_sigs = trigger_signals, my_idx = i
-                trigger.props[:on_click] = function()
-                    for (j, (_, setter)) in enumerate(all_sigs)
-                        setter(j == my_idx ? Int32(1) : Int32(0))
-                    end
-                end
-            end
-        end
-    end
-
-    # Match content panels to triggers by value and inject BindBool
-    for content in contents
-        content_value = string(content.props[Symbol("data-tabs-content")])
-        for (i, trigger) in enumerate(triggers)
-            trigger_value = string(trigger.props[Symbol("data-tabs-trigger")])
-            if trigger_value == content_value
-                sig = trigger_signals[i][1]
-                content.props[Symbol("data-state")] = BindBool(sig, "inactive", "active")
-                # Remove HTML hidden attr — CSS handles visibility via data-state
-                delete!(content.props, :hidden)
-                # Add CSS class to hide when inactive
-                current_class = get(content.props, :class, "")
-                content.props[:class] = cn(current_class, "data-[state=inactive]:hidden")
-                break
-            end
-        end
-    end
+    # SSR-only: walk children, inject data-index + initial data-state
+    _tabs_ssr_setup!(children, default_value)
 
     classes = cn("", class)
 
@@ -122,6 +114,12 @@ export Tabs, TabsList, TabsTrigger, TabsContent
         Symbol("data-orientation") => orientation,
         Symbol("data-activation") => activation,
         :class => classes,
+        :on_click => () -> begin
+            idx = compiled_get_event_data_index()
+            if idx >= Int32(0)
+                set_active(idx)
+            end
+        end,
         kwargs...,
         children...)
 end

@@ -25,13 +25,50 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export ToggleGroup, ToggleGroupItem
 
+# SSR helper: walk ToggleGroupItem children and inject data-index + initial data-state.
+# Extracted from the island body so the AST transform doesn't try to compile for-loops.
+function _togglegroup_ssr_setup!(children, type::String, default_value, disabled::Bool)
+    on_values = Set{String}()
+    if default_value !== nothing
+        if default_value isa AbstractString
+            push!(on_values, default_value)
+        elseif default_value isa AbstractVector
+            for v in default_value
+                push!(on_values, string(v))
+            end
+        end
+    end
+
+    item_idx = 0
+    for child in children
+        if child isa VNode && haskey(child.props, Symbol("data-toggle-group-item"))
+            item_value = string(child.props[Symbol("data-toggle-group-item")])
+            is_on = item_value in on_values
+
+            child.props[Symbol("data-state")] = is_on ? "on" : "off"
+            child.props[Symbol("data-index")] = string(item_idx)
+
+            # ARIA attributes based on type
+            if type == "single"
+                child.props[:role] = "radio"
+                child.props[:aria_checked] = is_on ? "true" : "false"
+            else
+                child.props[:aria_pressed] = is_on ? "true" : "false"
+            end
+
+            item_idx += 1
+        end
+    end
+end
+
 #   ToggleGroup(children...; type, default_value, variant, size, orientation, disabled, class, kwargs...) -> IslandVNode
 #
 # A group of toggle buttons where selection is managed collectively.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# ToggleGroupItem children are auto-detected and injected with signal bindings
-# for data-state, aria-checked/aria-pressed, and click handlers.
+# Uses a single signal for state: INDEX (single mode) or BITMASK (multiple mode).
+# The v2 pipeline compiles this to a Wasm module with 1 signal and 1 handler.
+# DOM bindings are auto-registered on all [data-index] descendants.
 #
 # Props:
 #   type: "single" (default) or "multiple" — selection mode
@@ -51,73 +88,24 @@ export ToggleGroup, ToggleGroupItem
                           variant::String="default", size::String="default",
                           orientation::String="horizontal", disabled::Bool=false,
                           theme::Symbol=:default, class::String="", kwargs...)
-    # Compute which items are initially on
-    on_values = Set{String}()
-    if default_value !== nothing
-        if default_value isa AbstractString
-            push!(on_values, default_value)
-        elseif default_value isa AbstractVector
-            for v in default_value
-                push!(on_values, string(v))
-            end
-        end
+    # Compilable: 1 signal for active state (from PROPS_TRANSFORM _a, prop index 0)
+    # Single mode: index of selected item (-1 = none selected)
+    # Multiple mode: bitmask of selected items
+    active, set_active = create_signal(compiled_get_prop_i32(Int32(0)))
+
+    # Compilable: mode-dependent binding registration
+    # _m is prop index 1 (alphabetically: _a=0, _m=1, _n=2)
+    m_flag = compiled_get_prop_i32(Int32(1))
+    if m_flag == Int32(0)
+        # Single mode: match bindings (data-state = off/on when signal == index)
+        compiled_register_match_descendants(Int32(1), Int32(1))
+    else
+        # Multiple mode: bit bindings (data-state = off/on when bit N is set)
+        compiled_register_bit_descendants(Int32(1), Int32(1))
     end
 
-    # Collect item signals for coordination
-    item_signals = Tuple{Any, Any}[]
-    items = VNode[]
-
-    for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-toggle-group-item"))
-            item_value = string(child.props[Symbol("data-toggle-group-item")])
-            is_on = item_value in on_values
-
-            # Create signal for this item (Int32: 0=off, 1=on)
-            item_sig, set_item_sig = create_signal(Int32(is_on ? 1 : 0))
-            push!(item_signals, (item_sig, set_item_sig))
-            push!(items, child)
-            item_idx = length(item_signals)
-
-            # Inject BindBool for data-state (off/on)
-            child.props[Symbol("data-state")] = BindBool(item_sig, "off", "on")
-            child.props[Symbol("data-index")] = string(item_idx - 1)  # 0-indexed for hydration
-
-            # Inject ARIA attributes based on type
-            if type == "single"
-                child.props[:role] = "radio"
-                child.props[:aria_checked] = BindBool(item_sig, "false", "true")
-            else
-                child.props[:aria_pressed] = BindBool(item_sig, "false", "true")
-            end
-
-            # Click handler (unless disabled)
-            item_is_disabled = haskey(child.props, Symbol("data-disabled"))
-            if !disabled && !item_is_disabled
-                let all_sigs = item_signals, my_get = item_sig, my_set = set_item_sig, my_idx = item_idx
-                    child.props[:on_click] = function()
-                        current = my_get()
-                        if type == "single"
-                            if current == Int32(1)
-                                # Already on — deselect
-                                my_set(Int32(0))
-                            else
-                                # Deselect all, select this
-                                for (j, (_, setter)) in enumerate(all_sigs)
-                                    if j != my_idx
-                                        setter(Int32(0))
-                                    end
-                                end
-                                my_set(Int32(1))
-                            end
-                        else
-                            # Multiple mode — toggle
-                            my_set(Int32(1) - current)
-                        end
-                    end
-                end
-            end
-        end
-    end
+    # SSR-only: walk children, inject data-index + initial data-state
+    _togglegroup_ssr_setup!(children, type, default_value, disabled)
 
     base = "inline-flex items-center justify-center gap-1 rounded-lg"
     classes = cn(base, class)
@@ -135,7 +123,26 @@ export ToggleGroup, ToggleGroupItem
         push!(attrs, Symbol("data-disabled") => "")
     end
 
-    Div(attrs..., kwargs..., children...)
+    Div(attrs...,
+        :on_click => () -> begin
+            idx = compiled_get_event_data_index()
+            if idx >= Int32(0)
+                m = compiled_get_prop_i32(Int32(1))
+                if m == Int32(0)
+                    # Single mode: toggle current or deselect
+                    current = active()
+                    if current == idx
+                        set_active(Int32(-1))
+                    else
+                        set_active(idx)
+                    end
+                else
+                    # Multiple mode: toggle bit
+                    set_active(xor(active(), Int32(1) << idx))
+                end
+            end
+        end,
+        kwargs..., children...)
 end
 
 """

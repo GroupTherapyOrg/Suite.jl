@@ -26,13 +26,62 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 export Accordion, AccordionItem, AccordionTrigger, AccordionContent
 
+# SSR helper: walk AccordionItem children and inject data-index + initial data-state.
+# Extracted from the island body so the AST transform doesn't try to compile for-loops.
+function _accordion_ssr_setup!(children, type::String, collapsible::Bool, default_value, disabled::Bool)
+    open_values = Set{String}()
+    if default_value !== nothing
+        if default_value isa AbstractString
+            push!(open_values, default_value)
+        elseif default_value isa AbstractVector
+            for v in default_value
+                push!(open_values, string(v))
+            end
+        end
+    end
+
+    item_idx = 0
+    for child in children
+        if child isa VNode && haskey(child.props, Symbol("data-accordion-item"))
+            item_value = string(child.props[Symbol("data-accordion-item")])
+            is_open = item_value in open_values
+
+            child.props[Symbol("data-state")] = is_open ? "open" : "closed"
+            child.props[Symbol("data-index")] = string(item_idx)
+
+            for subchild in child.children
+                if subchild isa VNode
+                    if subchild.tag == :h3
+                        for btn in subchild.children
+                            if btn isa VNode && haskey(btn.props, Symbol("data-accordion-trigger"))
+                                btn.props[Symbol("data-state")] = is_open ? "open" : "closed"
+                                btn.props[:aria_expanded] = is_open ? "true" : "false"
+                                btn.props[Symbol("data-index")] = string(item_idx)
+                            end
+                        end
+                    elseif haskey(subchild.props, Symbol("data-accordion-content"))
+                        subchild.props[Symbol("data-state")] = is_open ? "open" : "closed"
+                        subchild.props[Symbol("data-index")] = string(item_idx)
+                        delete!(subchild.props, :hidden)
+                        current_class = get(subchild.props, :class, "")
+                        subchild.props[:class] = cn(current_class, "data-[state=closed]:hidden")
+                    end
+                end
+            end
+
+            item_idx += 1
+        end
+    end
+end
+
 #   Accordion(children...; type, collapsible, default_value, orientation, disabled, class, kwargs...) -> IslandVNode
 #
 # A vertically stacked set of interactive headings that reveal/hide content sections.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# AccordionItem children are auto-detected and injected with signal bindings for
-# data-state, aria-expanded, and click handlers for toggle coordination.
+# Uses a single signal for state: INDEX (single mode) or BITMASK (multiple mode).
+# The v2 pipeline compiles this to a Wasm module with 1 signal and 1 handler.
+# DOM bindings are auto-registered on all [data-index] descendants.
 #
 # Props:
 #   type: "single" (default) or "multiple"
@@ -48,90 +97,24 @@ export Accordion, AccordionItem, AccordionTrigger, AccordionContent
                         default_value=nothing, orientation::String="vertical",
                         disabled::Bool=false, theme::Symbol=:default,
                         class::String="", kwargs...)
-    # Compute which items are initially open
-    open_values = Set{String}()
-    if default_value !== nothing
-        if default_value isa AbstractString
-            push!(open_values, default_value)
-        elseif default_value isa AbstractVector
-            for v in default_value
-                push!(open_values, string(v))
-            end
-        end
+    # Compilable: 1 signal for active state (from PROPS_TRANSFORM _a, prop index 0)
+    # Single mode: index of open item (-1 = none open)
+    # Multiple mode: bitmask of open items
+    active, set_active = create_signal(compiled_get_prop_i32(Int32(0)))
+
+    # Compilable: mode-dependent binding registration
+    # _m is prop index 2 (alphabetically: _a=0, _c=1, _m=2, _n=3)
+    m_flag = compiled_get_prop_i32(Int32(2))
+    if m_flag == Int32(0)
+        # Single mode: match bindings (data-state = closed/open when signal == index)
+        compiled_register_match_descendants(Int32(1), Int32(0))
+    else
+        # Multiple mode: bit bindings (data-state = closed/open when bit N is set)
+        compiled_register_bit_descendants(Int32(1), Int32(0))
     end
 
-    # Collect item signals for single-mode coordination
-    # Each tuple: (getter, setter)
-    item_signals = Tuple{Any, Any}[]
-
-    # Walk children to find AccordionItem VNodes and inject signal bindings
-    for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-accordion-item"))
-            item_value = string(child.props[Symbol("data-accordion-item")])
-            is_initially_open = item_value in open_values
-
-            # Create signal for this item's open/closed state (Int32: 0=closed, 1=open)
-            item_open, set_item_open = create_signal(Int32(is_initially_open ? 1 : 0))
-            push!(item_signals, (item_open, set_item_open))
-            item_idx = length(item_signals)
-
-            # Inject BindBool on the AccordionItem root
-            child.props[Symbol("data-state")] = BindBool(item_open, "closed", "open")
-
-            # Walk item's children for trigger (H3 > Button) and content
-            for subchild in child.children
-                if subchild isa VNode
-                    if subchild.tag == :h3
-                        # H3 wrapper — look inside for the trigger button
-                        for btn in subchild.children
-                            if btn isa VNode && haskey(btn.props, Symbol("data-accordion-trigger"))
-                                # Inject reactive bindings on trigger
-                                btn.props[Symbol("data-state")] = BindBool(item_open, "closed", "open")
-                                btn.props[:aria_expanded] = BindBool(item_open, "false", "true")
-                                btn.props[Symbol("data-index")] = string(item_idx - 1)  # 0-indexed for hydration
-                                # Inject click handler (unless disabled)
-                                item_is_disabled = haskey(child.props, Symbol("data-disabled"))
-                                if !disabled && !item_is_disabled
-                                    let all_sigs = item_signals, my_get = item_open, my_set = set_item_open, my_idx = item_idx
-                                        btn.props[:on_click] = function()
-                                            current = my_get()
-                                            if type == "single"
-                                                if current == Int32(1)
-                                                    # This item is open — collapse if allowed
-                                                    if collapsible
-                                                        my_set(Int32(0))
-                                                    end
-                                                else
-                                                    # Close all others, open this one
-                                                    for (j, (_, setter)) in enumerate(all_sigs)
-                                                        if j != my_idx
-                                                            setter(Int32(0))
-                                                        end
-                                                    end
-                                                    my_set(Int32(1))
-                                                end
-                                            else
-                                                # Multiple mode — toggle
-                                                my_set(Int32(1) - current)
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    elseif haskey(subchild.props, Symbol("data-accordion-content"))
-                        # Inject reactive bindings on content
-                        subchild.props[Symbol("data-state")] = BindBool(item_open, "closed", "open")
-                        # Remove HTML hidden attr — CSS handles visibility via data-state
-                        delete!(subchild.props, :hidden)
-                        # Add CSS class to hide when closed
-                        current_class = get(subchild.props, :class, "")
-                        subchild.props[:class] = cn(current_class, "data-[state=closed]:hidden")
-                    end
-                end
-            end
-        end
-    end
+    # SSR-only: walk children, inject data-index + initial data-state
+    _accordion_ssr_setup!(children, type, collapsible, default_value, disabled)
 
     base = "divide-y divide-warm-200 dark:divide-warm-700"
     classes = cn(base, class)
@@ -149,7 +132,29 @@ export Accordion, AccordionItem, AccordionTrigger, AccordionContent
         push!(attrs, Symbol("data-disabled") => "")
     end
 
-    Div(attrs..., kwargs..., children...)
+    Div(attrs...,
+        :on_click => () -> begin
+            idx = compiled_get_event_data_index()
+            if idx >= Int32(0)
+                m = compiled_get_prop_i32(Int32(2))
+                if m == Int32(0)
+                    # Single mode: toggle current or switch to new
+                    current = active()
+                    if current == idx
+                        c = compiled_get_prop_i32(Int32(1))
+                        if c == Int32(1)
+                            set_active(Int32(-1))
+                        end
+                    else
+                        set_active(idx)
+                    end
+                else
+                    # Multiple mode: toggle bit
+                    set_active(xor(active(), Int32(1) << idx))
+                end
+            end
+        end,
+        kwargs..., children...)
 end
 
 """
