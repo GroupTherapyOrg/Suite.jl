@@ -12,7 +12,8 @@
 #   - Clicking opens a dropdown with 5 theme options
 #   - Each option shows name, description, and color swatch
 #   - Selecting a theme sets data-theme on <html> + persists to localStorage
-#   - Signal-driven: BindModal(mode=23) handles all interaction via Wasm
+#   - Signal-driven: ShowDescendants binding handles dropdown visibility
+#   - Inline Wasm: on_click toggles signal, push_escape_handler for dismiss
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -38,12 +39,13 @@ const _THEME_OPTIONS = [
 # Also requires theme CSS overrides in input.css for non-default themes.
 # Examples: ThemeSwitcher(), ThemeSwitcher(class="ml-2")
 @island function ThemeSwitcher(; themes=_THEME_OPTIONS, class::String="", kwargs...)
-    is_active, set_active = create_signal(Int32(1))
+    # Signal for dropdown open state (Int32: 0=closed, 1=open)
+    is_open, set_open = create_signal(Int32(0))
 
     trigger_classes = cn("inline-flex items-center justify-center rounded-md p-2 hover:bg-warm-200 dark:hover:bg-warm-800 transition-colors cursor-pointer relative", class)
 
     Div(:class => "relative",
-        Symbol("data-modal") => BindModal(is_active, Int32(23)),
+        Symbol("data-show") => ShowDescendants(is_open),
         Symbol("data-theme-switcher") => "",
         kwargs...,
         # Trigger button — palette icon
@@ -52,8 +54,19 @@ const _THEME_OPTIONS = [
             Symbol("data-theme-switcher-trigger") => "",
             :aria_label => "Switch theme",
             :aria_haspopup => "true",
-            :aria_expanded => "false",
+            Symbol("aria-expanded") => BindBool(is_open, "false", "true"),
             :title => "Switch theme",
+            :on_click => () -> begin
+                if is_open() == Int32(0)
+                    store_active_element()
+                    set_open(Int32(1))
+                    push_escape_handler(Int32(0))
+                else
+                    set_open(Int32(0))
+                    pop_escape_handler()
+                    restore_active_element()
+                end
+            end,
             # Palette/Paintbrush SVG icon
             Svg(:class => "w-5 h-5 text-warm-600 dark:text-warm-400",
                 :fill => "none", :viewBox => "0 0 24 24", :stroke => "currentColor", :stroke_width => "2",
@@ -61,9 +74,11 @@ const _THEME_OPTIONS = [
                      :d => "M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z")
             ),
         ),
-        # Dropdown panel (hidden by default, positioned below trigger)
-        Div(:class => "hidden absolute right-0 top-full mt-2 z-50 w-56 rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900 shadow-lg",
+        # Dropdown panel (hidden by default, shown by ShowDescendants binding)
+        Div(:class => "absolute right-0 top-full mt-2 z-50 w-56 rounded-md border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900 shadow-lg",
             Symbol("data-theme-switcher-content") => "",
+            Symbol("data-state") => "closed",
+            :style => "display:none",
             :role => "menu",
             :aria_label => "Theme options",
             Div(:class => "p-1",

@@ -9,7 +9,7 @@
 #
 # Scrollable content slider with snap points, previous/next buttons,
 # dot indicators, and keyboard navigation.
-# Signal-driven: BindModal(mode=20) handles all interaction via Wasm
+# Data-attribute driven: carousel behavior via data-carousel-* attributes
 #
 # Reference: shadcn/ui Carousel (Embla Carousel) — simplified to CSS scroll-snap
 
@@ -34,13 +34,11 @@ export Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
                   loop::Bool=false, autoplay::Bool=false,
                   autoplay_interval::Int=4000,
                   class::String="", theme::Symbol=:default, kwargs...)
-    is_active, set_active = create_signal(Int32(1))
-
     classes = cn("relative group", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(:class => classes,
-        Symbol("data-modal") => BindModal(is_active, Int32(20)),
+        Symbol("data-carousel") => "",
         Symbol("data-carousel-orientation") => orientation,
         Symbol("data-carousel-loop") => string(loop),
         Symbol("data-carousel-autoplay") => string(autoplay),

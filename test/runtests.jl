@@ -1045,7 +1045,8 @@ using Test
 
         @testset "Dropdown hidden by default" begin
             html = Therapy.render_to_string(ThemeSwitcher())
-            @test occursin("hidden absolute", html)
+            @test occursin("display:none", html)
+            @test occursin("data-state=\"closed\"", html)
             @test occursin("aria-expanded=\"false\"", html)
         end
 
@@ -5452,7 +5453,7 @@ using Test
             html = Therapy.render_to_string(TreeView())
             @test occursin("<ul", html)
             @test occursin("role=\"tree\"", html)
-            @test occursin("data-modal", html)
+            @test occursin("data-treeview", html)
         end
 
         @testset "File item" begin

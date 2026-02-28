@@ -9,7 +9,7 @@
 #
 # Draggable panel resizing with flex-grow layout, min/max constraints,
 # keyboard arrow key support, and ARIA separator semantics.
-# Signal-driven: BindModal(mode=21) handles all interaction via Wasm
+# Data-attribute driven: resize behavior via data-resizable-* attributes
 #
 # Reference: react-resizable-panels by bvaughn + shadcn/ui Resizable
 
@@ -32,15 +32,13 @@ export ResizablePanelGroup, ResizablePanel, ResizableHandle
 # Examples: ResizablePanelGroup(direction="horizontal", ResizablePanel(default_size=30, ...), ResizableHandle(), ...)
 @island function ResizablePanelGroup(children...; direction::String="horizontal",
                              class::String="", theme::Symbol=:default, kwargs...)
-    is_active, set_active = create_signal(Int32(1))
-
     flex_dir = direction == "vertical" ? "flex-col" : "flex-row"
 
     classes = cn("flex w-full h-full overflow-hidden", flex_dir, class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(:class => classes,
-        Symbol("data-modal") => BindModal(is_active, Int32(21)),
+        Symbol("data-resizable") => "",
         Symbol("data-resizable-direction") => direction,
         :style => "flex-wrap:nowrap;",
         kwargs...,

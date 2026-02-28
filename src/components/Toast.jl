@@ -10,7 +10,7 @@
 # Architecture:
 #   - Toaster() renders an invisible container (placed once in layout)
 #   - Toasts are triggered from client JS: Suite.toast("Hello")
-#   - Signal-driven: BindModal(mode=22) handles queue, stacking, auto-dismiss, swipe
+#   - Data-attribute driven: toaster behavior via data-toaster-* attributes
 #   - Variants: default, success, error, warning, info
 #   - Positions: top-left, top-center, top-right, bottom-left, bottom-center, bottom-right
 #
@@ -32,7 +32,7 @@ export Toaster
 #   Toaster(; position, duration, visible_toasts, class, kwargs...) -> VNode
 #
 # A toast notification container. Place once in your layout.
-# Toasts are triggered via Suite.toast() (exposed by Therapy.jl hydration mode=22).
+# Toasts are triggered via Suite.toast() in the browser.
 # Args: position ("bottom-right" etc.), duration (4000ms), visible_toasts (3)
 # Client API: Suite.toast("msg"), Suite.toast.success("msg"), .error, .warning, .info
 # Dismiss: Suite.toast.dismiss(id), Suite.toast.dismissAll()
@@ -44,15 +44,12 @@ export Toaster
     class::String="",
     kwargs...
 )
-    is_active, set_active = create_signal(Int32(1))
-
     classes = cn("", class)
     if theme !== :default
         t = get_theme(theme)
         classes = apply_theme(classes, t)
     end
     Section(
-        Symbol("data-modal") => BindModal(is_active, Int32(22)),
         :aria_label => "Notifications",
         :tabindex => "-1",
         Symbol("data-toaster") => "",

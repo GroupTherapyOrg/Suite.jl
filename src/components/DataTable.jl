@@ -13,7 +13,7 @@
 #   - Pagination (page navigation, configurable page size)
 #   - Row selection (checkbox column, select all)
 #   - Column visibility (toggle column display)
-#   - Signal-driven: BindModal(mode=16) handles all interaction via Wasm
+#   - Data-attribute driven: table behavior via data-datatable-* attributes
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -107,8 +107,6 @@ end
     theme::Symbol=:default,
     kwargs...)
 
-    is_active, set_active = create_signal(Int32(1))
-
     id = "suite-dt-" * string(rand(UInt32), base=16)
 
     # Serialize data to JSON for hydration consumption
@@ -126,7 +124,6 @@ end
     theme !== :default && (wrapper_classes = apply_theme(wrapper_classes, get_theme(theme)))
 
     Div(:class => wrapper_classes,
-        Symbol("data-modal") => BindModal(is_active, Int32(16)),
         Symbol("data-datatable") => id,
         Symbol("data-datatable-page-size") => string(page_size),
         Symbol("data-datatable-sortable") => string(sortable),

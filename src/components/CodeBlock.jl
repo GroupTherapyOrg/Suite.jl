@@ -10,8 +10,7 @@
 # Behavior:
 #   - Styled code display container with optional copy-to-clipboard, language badge,
 #     and line numbers.
-#   - Signal-driven: BindModal(mode=18) handles copy button + Julia syntax highlighting
-#   - Copy button: copies code text to clipboard, shows checkmark feedback for 2s
+#   - Copy button click handler via data attributes (hydration JS)
 #   - Julia/jl language: auto-highlighted with keyword/string/comment/number colors
 #   - Sessions.jl uses this for cell code display and output rendering.
 
@@ -42,9 +41,6 @@ const _CODEBLOCK_COPY_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="14
 #   CodeBlock(read("script.jl", String), language="julia", show_line_numbers=true)
 @island function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool=false,
                    show_copy::Bool=true, class::String="", theme::Symbol=:default, kwargs...)
-    # Fire-and-forget signal — triggers BindModal(mode=18) once on hydration
-    is_active, set_active = create_signal(Int32(1))
-
     wrapper_classes = cn("group relative overflow-hidden rounded-lg border border-warm-200 dark:border-warm-700 bg-warm-950 dark:bg-warm-950", class)
     theme !== :default && (wrapper_classes = apply_theme(wrapper_classes, get_theme(theme)))
 
@@ -91,7 +87,7 @@ const _CODEBLOCK_COPY_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="14
 
     lang_attr = isempty(language) ? Pair{Symbol,String}[] : [Symbol("data-codeblock-lang") => language]
     Div(:class => wrapper_classes,
-        Symbol("data-modal") => BindModal(is_active, Int32(18)),
+        Symbol("data-codeblock") => "",
         lang_attr..., kwargs...,
         has_header ? Div(:class => "flex items-center gap-2 border-b border-warm-800 px-4 py-2",
             header_items...

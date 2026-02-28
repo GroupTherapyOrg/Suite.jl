@@ -14,7 +14,8 @@
 #   - Groups auto-hide when no matching items
 #   - Empty state shown when no results
 #   - CommandDialog wraps Command inside a modal overlay
-#   - Signal-driven: BindModal(mode=11) handles filtering/nav, BindModal(mode=12) handles dialog
+#   - Data-attribute driven: command behavior via data-command-* attributes
+#   - CommandDialog uses ShowDescendants + inline Wasm for modal open/close
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -34,7 +35,7 @@ const _COMMAND_SEARCH_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16
 # A command palette / search interface for filtering and selecting items.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# BindModal(mode=11) handles fuzzy filtering, keyboard navigation, and item highlighting.
+# Data-attribute driven: filtering, keyboard navigation, and item highlighting.
 #
 # Examples:
 #   Command(
@@ -44,9 +45,6 @@ const _COMMAND_SEARCH_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16
 #   )
 @island function Command(children...; should_filter::Bool=true, loop::Bool=true,
                       theme::Symbol=:default, class::String="", kwargs...)
-    # Signal starts at 1 = "activated" — mode=11 installs behaviors immediately
-    activated, _set_activated = create_signal(Int32(1))
-
     classes = cn(
         "glass-panel-elevated",
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
@@ -55,8 +53,7 @@ const _COMMAND_SEARCH_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-modal") => BindModal(activated, Int32(11)),  # mode 11 = command
-        Symbol("data-command") => "",
+    Div(Symbol("data-command") => "",
         Symbol("data-command-filter") => should_filter ? "true" : "false",
         Symbol("data-command-loop") => loop ? "true" : "false",
         :class => classes,
@@ -237,16 +234,13 @@ end
 # A command palette inside a dialog overlay. Useful for ⌘K command palette pattern.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# BindModal(mode=12) handles dialog open/close, scroll lock, Escape/overlay dismiss.
-# The embedded Command @island (mode=11) handles filtering and keyboard navigation.
+# ShowDescendants binding handles dialog show/hide + data-state on overlay/content.
+# Inline Wasm: on_click toggles signal, store/restore focus, scroll lock, Escape handler.
+# The embedded Command @island handles filtering and keyboard navigation.
 #
-# To open programmatically, click the trigger marker or use island._suiteOpen().
+# To open programmatically, click the trigger marker.
 @island function CommandDialog(children...; theme::Symbol=:default, class::String="", kwargs...)
     is_open, set_open = create_signal(Int32(0))
-
-    function toggle_dialog()
-        set_open(Int32(1) - is_open())
-    end
 
     overlay_classes = "fixed inset-0 bg-warm-950/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
     content_classes = cn(
@@ -265,11 +259,23 @@ end
         content_classes = apply_theme(content_classes, t)
     end
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(12)),  # mode 12 = command_dialog
+    Div(Symbol("data-show") => ShowDescendants(is_open),
         # Hidden trigger marker for programmatic toggling
         Span(Symbol("data-command-dialog-trigger-marker") => "",
              :style => "display:none",
-             :on_click => toggle_dialog),
+             :on_click => () -> begin
+                 if is_open() == Int32(0)
+                     store_active_element()
+                     set_open(Int32(1))
+                     lock_scroll()
+                     push_escape_handler(Int32(0))
+                 else
+                     set_open(Int32(0))
+                     unlock_scroll()
+                     pop_escape_handler()
+                     restore_active_element()
+                 end
+             end),
         # Dialog overlay + content (initially hidden)
         Div(Symbol("data-command-dialog") => "",
             Symbol("data-state") => "closed",
@@ -277,10 +283,12 @@ end
             :class => "fixed inset-0 z-50",
             # Overlay
             Div(:class => overlay_classes,
-                Symbol("data-command-dialog-overlay") => ""),
+                Symbol("data-command-dialog-overlay") => "",
+                Symbol("data-state") => "closed"),
             # Content with embedded Command
             Div(:class => content_classes,
                 Symbol("data-command-dialog-content") => "",
+                Symbol("data-state") => "closed",
                 kwargs...,
                 Command(children...; theme=theme),
             ),

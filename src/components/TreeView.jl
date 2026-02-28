@@ -10,7 +10,7 @@
 # Behavior:
 #   - File browser tree component with expand/collapse folders, keyboard navigation,
 #     and selected state highlighting.
-#   - Signal-driven: BindModal(mode=19) handles all interaction via Wasm
+#   - Data-attribute driven: tree behavior via data-treeview-* attributes
 #   - Click on folder toggles expand/collapse
 #   - Click on item selects it (deselects others)
 #   - Keyboard: ArrowDown/Up move focus, ArrowRight expand/enter child,
@@ -56,13 +56,10 @@ export TreeView, TreeViewItem
 #       TreeViewItem(label="Project.toml"),
 #   )
 @island function TreeView(children...; class::String="", theme::Symbol=:default, kwargs...)
-    # Fire-and-forget signal — triggers BindModal(mode=19) once on hydration
-    is_active, set_active = create_signal(Int32(1))
-
     classes = cn("text-sm", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-modal") => BindModal(is_active, Int32(19)),
+    Div(Symbol("data-treeview") => "",
         Ul(:class => classes, :role => "tree",
            kwargs..., children...)
     )
