@@ -7,17 +7,23 @@
 # Usage via package: using Suite; Slider(default_value=50)
 # Usage via extract: include("components/Slider.jl"); Slider(...)
 #
-# Behavior:
+# Behavior (Thaw-style inline Wasm):
 #   - Range slider with track, fill range, and draggable thumb
-#   - Signal-driven: BindModal(mode=13) handles drag + keyboard interaction
-#   - Pointer capture API for drag interaction
-#   - Keyboard: Arrow keys ±step, Home/End min/max, PageUp/Down ±10×step
+#   - Inline Wasm: pointer capture for drag, keyboard for arrow/Home/End
+#   - Pointer down: capture pointer, calculate position, update signal
+#   - Pointer move: update signal from pointer position (while dragging)
+#   - Pointer up: release pointer capture
+#   - Keyboard: Arrow keys ±step, Home/End min/max
 #   - ARIA: role=slider on thumb with aria-valuenow/min/max/orientation
 #   - Supports horizontal and vertical orientation
-#   - Fires suite:slider:change custom event on value change
 #
-# Reference: shadcn/ui Slider — https://ui.shadcn.com/docs/components/slider
-# Reference: Radix UI Slider — https://www.radix-ui.com/primitives/docs/components/slider
+# Architecture: Monolithic @island
+#   - Single island handles signal, pointer, and keyboard behavior
+#   - Uses existing Wasm imports: capture_pointer (44), release_pointer (45),
+#     get_pointer_x (36), get_bounding_rect_x (28), get_bounding_rect_w (30),
+#     get_key_code (34), prevent_default (52)
+#
+# Reference: Thaw Slider — github.com/thaw-ui/thaw
 # Reference: WAI-ARIA Slider — https://www.w3.org/WAI/ARIA/apg/patterns/slider/
 
 # --- Self-containment header ---
@@ -32,6 +38,12 @@ export Slider
 #
 # An input where the user selects a value from within a given range.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
+#
+# Inline Wasm behavior (Thaw-style):
+#   - Pointer down on track: capture pointer, calculate value, update signal
+#   - Pointer move (dragging): recalculate value from pointer position
+#   - Pointer up: release pointer capture
+#   - Keyboard: arrows ± step, Home = min, End = max
 #
 # Props:
 # - `min`: Minimum value (default `0`)
@@ -106,7 +118,6 @@ export Slider
 
     # Root data attributes
     root_attrs = Pair{Symbol,Any}[
-        Symbol("data-modal") => BindModal(is_active, Int32(13)),
         Symbol("data-slider") => "",
         Symbol("data-orientation") => orientation,
         Symbol("data-min") => string(min),

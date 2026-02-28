@@ -7,17 +7,23 @@
 # Usage via package: using Suite; Select(...)
 # Usage via extract: include("components/Select.jl"); Select(...)
 #
-# Behavior (matches Radix Select):
+# Behavior (Thaw-style inline Wasm):
 #   - Custom styled select dropdown replacing native <select>
-#   - Click or keyboard trigger opens floating content
-#   - Arrow key navigation through items (wraps)
-#   - Typeahead search (1s timeout, repeated char cycling)
-#   - Escape key dismisses, click outside dismisses
-#   - Tab prevented while open (select is not tab-navigable)
+#   - Click trigger opens/closes floating content
+#   - Escape key dismisses (via push_escape_handler Wasm import)
+#   - Focus returns to trigger on close (via store/restore_active_element Wasm imports)
+#   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
+#   - ShowDescendants binding handles show/hide + data-state on content children
 #   - Check indicator on selected item
 #   - Groups, labels, separators support
-#   - Popper positioning mode with flip/shift
-#   - Signal-driven: BindModal(mode=10) handles floating positioning + item nav + dismiss
+#
+# Architecture: Split islands (Thaw-style)
+#   - Select (parent island): creates signal, provides context, registers show binding
+#   - SelectTrigger (child island): reads context, toggles signal with inline Wasm behavior
+#   - SelectContent: plain function (styling, SSR-only)
+#   - SelectItem: plain function (styling, SSR-only)
+#
+# Reference: Thaw Select — github.com/thaw-ui/thaw
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -43,8 +49,9 @@ const _SELECT_SCROLL_DOWN_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width
 # A custom styled select dropdown replacing native `<select>`.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# SelectTrigger and SelectContent children are auto-detected and injected
-# with signal bindings for data-state, aria-expanded, and select behavior.
+# Parent island: creates signal, provides context for child islands.
+# ShowDescendants binding handles show/hide + data-state on content children.
+# Behavioral logic (focus, Escape) is inline Wasm in SelectTrigger.
 #
 # Examples:
 #   Select(
@@ -54,29 +61,15 @@ const _SELECT_SCROLL_DOWN_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width
 @island function Select(children...; value::String="", default_value::String="",
                      name::String="", disabled::Bool=false, required::Bool=false,
                      class::String="", kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject signal bindings on trigger
-    for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-select-trigger-wrapper"))
-            # Inject on_click toggle on trigger wrapper
-            child.props[:on_click] = () -> set_open(Int32(1) - is_open())
-            # Set inner button ARIA props
-            if !isempty(child.children)
-                inner = child.children[1]
-                if inner isa VNode
-                    inner.props[:role] = "combobox"
-                    inner.props[Symbol("aria-expanded")] = "false"
-                    inner.props[Symbol("aria-autocomplete")] = "none"
-                    inner.props[Symbol("data-state")] = "closed"
-                end
-            end
-        end
-    end
+    # Provide context for child islands (single key with getter+setter tuple)
+    provide_context(:select, (is_open, set_open))
 
     initial_value = !isempty(value) ? value : default_value
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(10)),  # mode 10 = select
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         Symbol("data-select-value") => initial_value,
         Symbol("data-select-name") => name,
         :class => cn(class),
@@ -88,12 +81,18 @@ const _SELECT_SCROLL_DOWN_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width
     )
 end
 
-"""
-    SelectTrigger(children...; class, kwargs...) -> VNode
+#   SelectTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The button that opens the select dropdown.
+# Child island: reads parent context signal via use_context_signal.
+#
+# Inline Wasm behavior (Thaw-style):
+#   - Open: store focus, set signal, register Escape handler
+#   - Close: set signal, pop Escape handler, restore focus
+@island function SelectTrigger(children...; theme::Symbol=:default, class::String="", kwargs...)
+    # Read parent's signal from context (SSR) or create own (Wasm compilation)
+    is_open, set_open = use_context_signal(:select, Int32(0))
 
-The button that opens the select dropdown.
-"""
-function SelectTrigger(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "border-warm-200 dark:border-warm-700",
         "focus-visible:border-accent-600 focus-visible:ring-accent-600/50",
@@ -108,16 +107,34 @@ function SelectTrigger(children...; theme::Symbol=:default, class::String="", kw
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
-    Div(Symbol("data-select-trigger-wrapper") => "",
-        :style => "display:contents",
-        Therapy.Button(:type => "button",
-               :class => classes,
-               kwargs...,
-               Span(:class => "line-clamp-1 flex items-center gap-2",
-                    Symbol("data-slot") => "select-value",
-                    children...),
-               Therapy.RawHtml(_SELECT_CHEVRON_SVG),
-        ))
+    Span(Symbol("data-select-trigger-wrapper") => "",
+         :style => "display:contents",
+         Symbol("data-state") => BindBool(is_open, "closed", "open"),
+         :on_click => () -> begin
+             if is_open() == Int32(0)
+                 # Opening: inline Wasm behavior (no scroll lock — floating panel)
+                 store_active_element()
+                 set_open(Int32(1))
+                 push_escape_handler(Int32(0))
+             else
+                 # Closing: inline Wasm behavior
+                 set_open(Int32(0))
+                 pop_escape_handler()
+                 restore_active_element()
+             end
+         end,
+         kwargs...,
+         Therapy.Button(:type => "button",
+                :class => classes,
+                :role => "combobox",
+                Symbol("aria-expanded") => BindBool(is_open, "false", "true"),
+                Symbol("aria-autocomplete") => "none",
+                Symbol("aria-haspopup") => "listbox",
+                Span(:class => "line-clamp-1 flex items-center gap-2",
+                     Symbol("data-slot") => "select-value",
+                     children...),
+                Therapy.RawHtml(_SELECT_CHEVRON_SVG),
+         ))
 end
 
 """
@@ -298,7 +315,7 @@ if @isdefined(register_component!)
         :Select,
         "Select.jl",
         :island,
-        "Custom styled select dropdown with typeahead, keyboard navigation, and floating positioning",
+        "Custom styled select dropdown with keyboard navigation and dismiss",
         Symbol[],
         Symbol[],
         [:Select, :SelectTrigger, :SelectValue, :SelectContent,

@@ -4571,7 +4571,7 @@ using Test
             # DatePicker is now @island — no JS runtime needed
             html = Therapy.render_to_string(DatePicker(month=2, year=2026))
             @test occursin("therapy-island", html)
-            @test occursin("data-datepicker-trigger-marker", html)
+            @test occursin("data-datepicker-trigger-wrapper", html)
         end
 
         @testset "Display format helpers" begin

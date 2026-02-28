@@ -7,15 +7,23 @@
 # Usage via package: using Suite; Calendar()
 # Usage via extract: include("components/Calendar.jl"); Calendar()
 #
-# Behavior (matches shadcn/ui Calendar / react-day-picker):
+# Behavior (Thaw-style inline Wasm):
 #   - Month grid with day selection
-#   - Signal-driven: BindModal(mode=14) handles month nav, selection, keyboard
+#   - Signal-driven: ShowDescendants handles nav button visibility
 #   - Single, multiple, and range selection modes
 #   - Month/year navigation via prev/next buttons
 #   - Today highlighting, outside days display
 #   - Disabled/hidden day support
 #   - ARIA: role=grid, aria-label, roving tabindex
-#   - DatePicker: BindModal(mode=15) handles popover open/close + floating
+#   - DatePicker: split island (parent + trigger) with ShowDescendants
+#
+# Architecture: Monolithic @island for Calendar, Split island for DatePicker
+#   - Calendar: @island creates signal for day selection tracking
+#   - DatePicker: @island parent creates open signal, provides context
+#   - DatePickerTrigger: @island child with inline Wasm open/close behavior
+#
+# Reference: Thaw Calendar — github.com/thaw-ui/thaw
+# Reference: WAI-ARIA Grid — https://www.w3.org/WAI/ARIA/apg/patterns/grid/
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -158,8 +166,7 @@ end
                      Therapy.RawHtml(_CALENDAR_CHEVRON_RIGHT)),
     )
 
-    Div(Symbol("data-modal") => BindModal(is_active, Int32(14)),
-        Symbol("data-calendar") => id,
+    Div(Symbol("data-calendar") => id,
         Symbol("data-calendar-mode") => mode,
         Symbol("data-calendar-month") => string(month),
         Symbol("data-calendar-year") => string(year),
@@ -326,6 +333,10 @@ end
 # A date picker combining a trigger button with a Calendar in a Popover.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
+# Architecture: Split islands (Thaw-style)
+#   - DatePicker (parent island): creates open signal, provides context, uses ShowDescendants
+#   - Trigger uses inline Wasm for open/close behavior (store_active_element, push_escape_handler)
+#
 # Arguments:
 # - `mode::String="single"`: Selection mode ("single", "multiple", "range")
 # - `month::Int=current_month`: Initial displayed month
@@ -353,6 +364,7 @@ end
                           class::String="",
                           theme::Symbol=:default,
                           kwargs...)
+    # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
     id = "suite-datepicker-" * string(rand(UInt32), base=16)
@@ -386,26 +398,34 @@ end
     )
     theme !== :default && (content_classes = apply_theme(content_classes, get_theme(theme)))
 
-    Div(Symbol("data-modal") => BindModal(is_open, Int32(15)),
+    Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
         Symbol("data-datepicker") => id,
         Symbol("data-datepicker-mode") => mode,
         Symbol("data-datepicker-selected") => selected,
         :style => "display:contents",
         kwargs...,
-        # Hidden trigger marker for programmatic toggle (Escape, click-outside, auto-close)
-        Span(Symbol("data-datepicker-trigger-marker") => "",
-             :style => "display:none",
-             :on_click => () -> set_open(Int32(1) - is_open())),
-        # Trigger wrapper with click handler
-        Div(Symbol("data-datepicker-trigger-wrapper") => "",
+        # Trigger wrapper with inline Wasm click handler
+        Span(Symbol("data-datepicker-trigger-wrapper") => "",
             :style => "display:contents",
-            :on_click => () -> set_open(Int32(1) - is_open()),
+            :on_click => () -> begin
+                if is_open() == Int32(0)
+                    # Opening: inline Wasm behavior
+                    store_active_element()
+                    set_open(Int32(1))
+                    push_escape_handler(Int32(0))
+                else
+                    # Closing: inline Wasm behavior
+                    set_open(Int32(0))
+                    pop_escape_handler()
+                    restore_active_element()
+                end
+            end,
             # Trigger button
             Therapy.Button(:type => "button",
                    :class => trigger_classes,
                    Symbol("data-datepicker-trigger") => id,
                    :aria_haspopup => "dialog",
-                   :aria_expanded => "false",
+                   :aria_expanded => BindBool(is_open, "false", "true"),
                    Span(:class => "flex-1 $text_class",
                         Symbol("data-datepicker-value") => id,
                         display_text),

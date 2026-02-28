@@ -7,13 +7,13 @@
 # Usage via package: using Suite; Form(...)
 # Usage via extract: include("components/Form.jl"); Form(...)
 #
-# Behavior (matches shadcn/ui Form pattern):
+# Behavior (Thaw-style inline Wasm):
 #   - Per-field validation with error messages
 #   - ARIA: aria-invalid, aria-describedby linking
 #   - Label → Control → Description → Message ID linking
 #   - Submit prevention when invalid
 #   - Validation modes: onSubmit, onChange, onBlur
-#   - Signal-driven: BindModal(mode=17) handles all validation via Wasm
+#   - Signal-driven: create_signal tracks form state
 
 # --- Self-containment header ---
 if !@isdefined(Div); using Therapy end
@@ -53,7 +53,6 @@ end
     theme !== :default && (form_classes = apply_theme(form_classes, get_theme(theme)))
 
     Therapy.Form(:class => form_classes,
-         Symbol("data-modal") => BindModal(is_active, Int32(17)),
          :action => action,
          :method => method,
          Symbol("data-form") => id,
