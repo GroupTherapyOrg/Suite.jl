@@ -121,55 +121,12 @@ function __init__()
         end
     end
 
-    # Register hydration bodies and props transforms for Wasm compilation
+    # Register props transforms for Wasm compilation (used by compile_island)
     Therapy.register_island_props_transform!(:Tabs, _TABS_PROPS_TRANSFORM)
-    Therapy.register_hydration_body!(:Tabs, _TABS_HYDRATION_BODY)
     Therapy.register_island_props_transform!(:Accordion, _ACCORDION_PROPS_TRANSFORM)
-    Therapy.register_hydration_body!(:Accordion, _ACCORDION_HYDRATION_BODY)
     Therapy.register_island_props_transform!(:ToggleGroup, _TOGGLEGROUP_PROPS_TRANSFORM)
-    Therapy.register_hydration_body!(:ToggleGroup, _TOGGLEGROUP_HYDRATION_BODY)
-
-    # Split island parents (Div + BindModal + children)
-    Therapy.register_hydration_body!(:Dialog, _DIALOG_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:AlertDialog, _ALERTDIALOG_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Sheet, _SHEET_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Drawer, _DRAWER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Popover, _POPOVER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Tooltip, _TOOLTIP_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:HoverCard, _HOVERCARD_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:DropdownMenu, _DROPDOWNMENU_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:ContextMenu, _CONTEXTMENU_HYDRATION_BODY)
-
-    # Split island child triggers (own signal + BindBool/events + children)
-    Therapy.register_hydration_body!(:DialogTrigger, _DIALOGTRIGGER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:AlertDialogTrigger, _ALERTDIALOGTRIGGER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:SheetTrigger, _SHEETTRIGGER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:DrawerTrigger, _DRAWERTRIGGER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:PopoverTrigger, _POPOVERTRIGGER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:TooltipTrigger, _TOOLTIPTRIGGER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:HoverCardTrigger, _HOVERCARDTRIGGER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:DropdownMenuTrigger, _DROPDOWNMENUTRIGGER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:ContextMenuTrigger, _CONTEXTMENUTRIGGER_HYDRATION_BODY)
     Therapy.register_island_props_transform!(:NavigationMenu, _NAVIGATIONMENU_PROPS_TRANSFORM)
-    Therapy.register_hydration_body!(:NavigationMenu, _NAVIGATIONMENU_HYDRATION_BODY)
     Therapy.register_island_props_transform!(:Menubar, _MENUBAR_PROPS_TRANSFORM)
-    Therapy.register_hydration_body!(:Menubar, _MENUBAR_HYDRATION_BODY)
-
-    # Wave 5: Complex inputs + remaining components
-    Therapy.register_hydration_body!(:Select, _SELECT_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Command, _COMMAND_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:CommandDialog, _COMMANDDIALOG_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Slider, _SLIDER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Calendar, _CALENDAR_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:DatePicker, _DATEPICKER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:DataTable, _DATATABLE_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Form, _FORM_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:CodeBlock, _CODEBLOCK_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:TreeView, _TREEVIEW_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Carousel, _CAROUSEL_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:ResizablePanelGroup, _RESIZABLE_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:Toaster, _TOASTER_HYDRATION_BODY)
-    Therapy.register_hydration_body!(:ThemeSwitcher, _THEMESWITCHER_HYDRATION_BODY)
 end
 
 end # module Suite

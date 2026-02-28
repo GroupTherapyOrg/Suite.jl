@@ -146,12 +146,6 @@ function CarouselNext(; class::String="", theme::Symbol=:default, kwargs...)
     )
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# Carousel: mode=20 (fire-and-forget, scroll snap nav + keyboard handled by JS modal handler)
-const _CAROUSEL_HYDRATION_BODY = quote
-    is_active, set_active = create_signal(Int32(1))
-    Div(Symbol("data-modal") => BindModal(is_active, Int32(20)))
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

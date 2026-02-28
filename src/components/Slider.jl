@@ -145,12 +145,6 @@ export Slider
     )
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# Slider: mode=13 (fire-and-forget, drag + keyboard handled by JS modal handler)
-const _SLIDER_HYDRATION_BODY = quote
-    is_active, set_active = create_signal(Int32(1))
-    Span(Symbol("data-modal") => BindModal(is_active, Int32(13)))
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

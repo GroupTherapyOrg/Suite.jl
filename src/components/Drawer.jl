@@ -195,28 +195,6 @@ function DrawerClose(children...; class::String="", kwargs...)
          children...)
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# Mode=2 (dialog behavior + drag-to-dismiss). Same element structure as Dialog.
-# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
-const _DRAWER_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Div(
-        Symbol("data-modal") => BindModal(is_open, Int32(2)),
-        children,
-    )
-end
-
-# Child island: Span(BindBool + click toggle + children)
-const _DRAWERTRIGGER_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Span(
-        Symbol("data-state") => BindBool(is_open, "closed", "open"),
-        :aria_expanded => BindBool(is_open, "false", "true"),
-        :on_click => () -> set_open(Int32(1) - is_open()),
-        children,
-    )
-end
-
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(

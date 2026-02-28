@@ -453,26 +453,6 @@ function _format_display_date(selected::String, mode::String)
     end
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# Calendar: mode=14 (fire-and-forget, month nav + selection + keyboard handled by JS modal handler)
-const _CALENDAR_HYDRATION_BODY = quote
-    is_active, set_active = create_signal(Int32(1))
-    Div(Symbol("data-modal") => BindModal(is_active, Int32(14)))
-end
-
-# DatePicker: mode=15 (toggle popover + floating, contains nested Calendar island)
-const _DATEPICKER_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Div(
-        Symbol("data-modal") => BindModal(is_open, Int32(15)),
-        Span(),
-        Div(
-            :on_click => () -> set_open(Int32(1) - is_open()),
-            Button(),
-        ),
-        Div(),
-    )
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

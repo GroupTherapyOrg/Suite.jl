@@ -281,64 +281,6 @@ const _ACCORDION_PROPS_TRANSFORM = (props, args) -> begin
     props[:_n] = item_idx
 end
 
-const _ACCORDION_HYDRATION_BODY = quote
-    active, set_active = create_signal(compiled_get_prop_i32(Int32(0)))
-    c_flag = compiled_get_prop_i32(Int32(1))
-    m_flag = compiled_get_prop_i32(Int32(2))
-    n = compiled_get_prop_i32(Int32(3))
-    Div(
-        begin
-            i = Int32(0)
-            while i < n
-                Div(
-                    if m_flag == Int32(0)
-                        Symbol("data-state") => MatchBindBool(active, i, "closed", "open")
-                    else
-                        Symbol("data-state") => BitBindBool(active, i, "closed", "open")
-                    end,
-                    H3(
-                        Button(
-                            if m_flag == Int32(0)
-                                Symbol("data-state") => MatchBindBool(active, i, "closed", "open")
-                            else
-                                Symbol("data-state") => BitBindBool(active, i, "closed", "open")
-                            end,
-                            if m_flag == Int32(0)
-                                :aria_expanded => MatchBindBool(active, i, "false", "true")
-                            else
-                                :aria_expanded => BitBindBool(active, i, "false", "true")
-                            end,
-                            :on_click => (e) -> begin
-                                idx = compiled_get_event_data_index()
-                                if m_flag == Int32(0)
-                                    if idx == active()
-                                        if c_flag == Int32(1)
-                                            set_active(Int32(-1))
-                                        end
-                                    else
-                                        set_active(idx)
-                                    end
-                                else
-                                    set_active(active() ⊻ (Int32(1) << idx))
-                                end
-                            end,
-                            Svg(Path())
-                        )
-                    ),
-                    Div(
-                        if m_flag == Int32(0)
-                            Symbol("data-state") => MatchBindBool(active, i, "closed", "open")
-                        else
-                            Symbol("data-state") => BitBindBool(active, i, "closed", "open")
-                        end,
-                        Div()
-                    )
-                )
-                i = i + Int32(1)
-            end
-        end
-    )
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

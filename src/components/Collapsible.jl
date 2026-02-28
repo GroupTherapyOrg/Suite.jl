@@ -105,28 +105,6 @@ function CollapsibleContent(children...; class::String="", force_mount::Bool=fal
         children...)
 end
 
-# --- Hydration Bodies (Wasm compilation) ---
-
-# Parent island: Div(BindBool + children) — no BindModal needed, just toggle visibility
-const _COLLAPSIBLE_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Div(
-        Symbol("data-state") => BindBool(is_open, "closed", "open"),
-        children,
-    )
-end
-
-# Child island: Div(BindBool + click toggle + children)
-const _COLLAPSIBLETRIGGER_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Div(
-        Symbol("data-state") => BindBool(is_open, "closed", "open"),
-        :aria_expanded => BindBool(is_open, "false", "true"),
-        :on_click => () -> set_open(Int32(1) - is_open()),
-        children,
-    )
-end
-
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(

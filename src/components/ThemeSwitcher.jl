@@ -97,16 +97,6 @@ function _ThemeOption(opt)
     )
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# ThemeSwitcher: mode=23 (dropdown toggle + theme selection handled by JS modal handler)
-const _THEMESWITCHER_HYDRATION_BODY = quote
-    is_active, set_active = create_signal(Int32(0))
-    Div(
-        Symbol("data-modal") => BindModal(is_active, Int32(23)),
-        Button(),
-        Div(),
-    )
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

@@ -167,12 +167,6 @@ function _treeview_increment_depth(child, new_depth)
     child
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# TreeView: mode=19 (fire-and-forget, keyboard nav + expand/collapse handled by JS modal handler)
-const _TREEVIEW_HYDRATION_BODY = quote
-    is_active, set_active = create_signal(Int32(1))
-    Div(Symbol("data-modal") => BindModal(is_active, Int32(19)))
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

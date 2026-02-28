@@ -185,28 +185,6 @@ function AlertDialogCancel(children...; class::String="", kwargs...)
          children...)
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# Same structure as Dialog but mode=1 (no Escape/click-outside dismiss) and no overlay click handler
-# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
-const _ALERTDIALOG_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Div(
-        Symbol("data-modal") => BindModal(is_open, Int32(1)),
-        children,
-    )
-end
-
-# Child island: Span(BindBool + click toggle + children)
-const _ALERTDIALOGTRIGGER_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Span(
-        Symbol("data-state") => BindBool(is_open, "closed", "open"),
-        :aria_expanded => BindBool(is_open, "false", "true"),
-        :on_click => () -> set_open(Int32(1) - is_open()),
-        children,
-    )
-end
-
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(

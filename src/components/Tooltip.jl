@@ -125,28 +125,6 @@ function TooltipContent(children...; side::String="top", side_offset::Int=4, ali
     )
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# Tooltip: mode=4 (hover + floating). Trigger uses pointerenter/pointerleave.
-# Root Div (BindModal) → Div trigger (hover events, contains Button) → Div content
-# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
-const _TOOLTIP_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Div(
-        Symbol("data-modal") => BindModal(is_open, Int32(4)),
-        children,
-    )
-end
-
-# Child island: Div(pointerenter/leave + Button(children))
-const _TOOLTIPTRIGGER_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Div(
-        :on_pointerenter => () -> set_open(Int32(1)),
-        :on_pointerleave => () -> set_open(Int32(0)),
-        Button(children),
-    )
-end
-
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(

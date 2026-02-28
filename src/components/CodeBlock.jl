@@ -100,12 +100,6 @@ const _CODEBLOCK_COPY_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="14
     )
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# CodeBlock: mode=18 (fire-and-forget, copy button + syntax highlighting handled by JS modal handler)
-const _CODEBLOCK_HYDRATION_BODY = quote
-    is_active, set_active = create_signal(Int32(1))
-    Div(Symbol("data-modal") => BindModal(is_active, Int32(18)))
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

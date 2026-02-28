@@ -319,38 +319,6 @@ const _NAVIGATIONMENU_PROPS_TRANSFORM = (props, args) -> begin
     props[:n_items] = count
 end
 
-# --- Hydration Body (Wasm compilation) ---
-# NavigationMenu: mode=9, multi-item signal (0=none, N=item N open).
-# Root Div (BindModal) → Ul → [Li → Span trigger → Button (SVG chevron) → Div content] × N
-const _NAVIGATIONMENU_HYDRATION_BODY = quote
-    active_item, set_active = create_signal(Int32(0))
-    n = compiled_get_prop_i32(Int32(0))
-    Div(
-        Symbol("data-modal") => BindModal(active_item, Int32(9)),
-        Ul(
-            begin
-                i = Int32(0)
-                while i < n
-                    Li(
-                        Span(
-                            :on_click => (e) -> begin
-                                idx = compiled_get_event_data_index()
-                                if active_item() == idx
-                                    set_active(Int32(0))
-                                else
-                                    set_active(idx)
-                                end
-                            end,
-                            Button(Svg(Path())),
-                        ),
-                        Div(),
-                    )
-                    i = i + Int32(1)
-                end
-            end
-        ),
-    )
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

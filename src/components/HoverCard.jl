@@ -111,27 +111,6 @@ function HoverCardContent(children...; side::String="bottom", side_offset::Int=4
     )
 end
 
-# --- Hydration Bodies (Wasm compilation) ---
-
-# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
-const _HOVERCARD_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Div(
-        Symbol("data-modal") => BindModal(is_open, Int32(5)),
-        children,
-    )
-end
-
-# Child island: Span(pointerenter/leave + children)
-const _HOVERCARDTRIGGER_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Span(
-        :on_pointerenter => () -> set_open(Int32(1)),
-        :on_pointerleave => () -> set_open(Int32(0)),
-        children,
-    )
-end
-
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(

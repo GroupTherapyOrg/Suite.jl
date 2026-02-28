@@ -235,34 +235,6 @@ const _TABS_PROPS_TRANSFORM = (props, args) -> begin
     props[:_n] = n
 end
 
-const _TABS_HYDRATION_BODY = quote
-    active, set_active = create_signal(compiled_get_prop_i32(Int32(0)))
-    n = compiled_get_prop_i32(Int32(1))
-    Div(
-        Div(
-            begin
-                i = Int32(0)
-                while i < n
-                    Button(
-                        Symbol("data-state") => MatchBindBool(active, i, "inactive", "active"),
-                        :aria_selected => MatchBindBool(active, i, "false", "true"),
-                        :on_click => (e) -> set_active(compiled_get_event_data_index()),
-                    )
-                    i = i + Int32(1)
-                end
-            end
-        ),
-        begin
-            j = Int32(0)
-            while j < n
-                Div(
-                    Symbol("data-state") => MatchBindBool(active, j, "inactive", "active"),
-                )
-                j = j + Int32(1)
-            end
-        end
-    )
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

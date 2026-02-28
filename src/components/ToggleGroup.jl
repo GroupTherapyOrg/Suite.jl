@@ -221,43 +221,6 @@ const _TOGGLEGROUP_PROPS_TRANSFORM = (props, args) -> begin
     props[:_n] = item_idx
 end
 
-const _TOGGLEGROUP_HYDRATION_BODY = quote
-    active, set_active = create_signal(compiled_get_prop_i32(Int32(0)))
-    m_flag = compiled_get_prop_i32(Int32(1))
-    n = compiled_get_prop_i32(Int32(2))
-    Div(
-        begin
-            i = Int32(0)
-            while i < n
-                Button(
-                    if m_flag == Int32(0)
-                        Symbol("data-state") => MatchBindBool(active, i, "off", "on")
-                    else
-                        Symbol("data-state") => BitBindBool(active, i, "off", "on")
-                    end,
-                    if m_flag == Int32(0)
-                        :aria_checked => MatchBindBool(active, i, "false", "true")
-                    else
-                        :aria_pressed => BitBindBool(active, i, "false", "true")
-                    end,
-                    :on_click => (e) -> begin
-                        idx = compiled_get_event_data_index()
-                        if m_flag == Int32(0)
-                            if idx == active()
-                                set_active(Int32(-1))
-                            else
-                                set_active(idx)
-                            end
-                        else
-                            set_active(active() ⊻ (Int32(1) << idx))
-                        end
-                    end,
-                )
-                i = i + Int32(1)
-            end
-        end
-    )
-end
 
 # --- Registry ---
 if @isdefined(register_component!)

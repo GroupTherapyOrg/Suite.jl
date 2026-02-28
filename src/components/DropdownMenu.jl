@@ -390,28 +390,6 @@ function DropdownMenuSubContent(children...; theme::Symbol=:default, class::Stri
     )
 end
 
-# --- Hydration Bodies (Wasm compilation) ---
-
-# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
-const _DROPDOWNMENU_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Div(
-        Symbol("data-modal") => BindModal(is_open, Int32(6)),
-        children,
-    )
-end
-
-# Child island: Span(BindBool + click toggle + children)
-const _DROPDOWNMENUTRIGGER_HYDRATION_BODY = quote
-    is_open, set_open = create_signal(Int32(0))
-    Span(
-        Symbol("data-state") => BindBool(is_open, "closed", "open"),
-        :aria_expanded => BindBool(is_open, "false", "true"),
-        :on_click => () -> set_open(Int32(1) - is_open()),
-        children,
-    )
-end
-
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(
