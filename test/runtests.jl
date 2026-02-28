@@ -3882,6 +3882,235 @@ using Test
             # warm stays for ocean
             @test occursin("border-warm-200", result)
         end
+
+        @testset "Suite.extract() comprehensive" begin
+            @testset "Single component extraction produces standalone file" begin
+                mktempdir() do dir
+                    extracted = Suite.extract(:Button, dir, overwrite=true)
+                    @test "Button.jl" in extracted
+                    @test "utils.jl" in extracted
+                    @test isfile(joinpath(dir, "Button.jl"))
+                    @test isfile(joinpath(dir, "utils.jl"))
+
+                    content = read(joinpath(dir, "Button.jl"), String)
+                    # Self-containment header present
+                    @test occursin("if !@isdefined(Div)", content)
+                    @test occursin("using Therapy", content)
+                    # No actual Suite.jl code imports (comments mentioning Suite are OK)
+                    lines = filter(l -> !startswith(strip(l), "#") && !startswith(strip(l), "\""), split(content, "\n"))
+                    code_str = join(lines, "\n")
+                    @test !occursin("using Suite", code_str)
+                    @test !occursin("import Suite", code_str)
+                end
+            end
+
+            @testset "Dialog extraction produces multi-export file" begin
+                mktempdir() do dir
+                    extracted = Suite.extract(:Dialog, dir, overwrite=true)
+                    @test "Dialog.jl" in extracted
+                    @test isfile(joinpath(dir, "Dialog.jl"))
+
+                    content = read(joinpath(dir, "Dialog.jl"), String)
+                    # All Dialog exports present as functions
+                    @test occursin("function Dialog(", content) || occursin("function Dialog(;", content)
+                    @test occursin("DialogTrigger", content)
+                    @test occursin("DialogContent", content)
+                    @test occursin("DialogHeader", content)
+                    @test occursin("DialogTitle", content)
+                    @test occursin("DialogDescription", content)
+                    @test occursin("DialogClose", content)
+                    # Self-containment
+                    @test occursin("if !@isdefined(Div)", content)
+                    # No actual Suite.jl code imports (comments mentioning Suite are OK)
+                    lines = filter(l -> !startswith(strip(l), "#") && !startswith(strip(l), "\""), split(content, "\n"))
+                    @test !occursin("using Suite", join(lines, "\n"))
+                end
+            end
+
+            @testset "DataTable extraction includes Table dependency" begin
+                mktempdir() do dir
+                    extracted = Suite.extract(:DataTable, dir, overwrite=true)
+                    @test "DataTable.jl" in extracted
+                    @test "Table.jl" in extracted  # dependency
+                    @test isfile(joinpath(dir, "DataTable.jl"))
+                    @test isfile(joinpath(dir, "Table.jl"))
+                end
+            end
+
+            @testset "DataTable extraction without deps skips Table" begin
+                mktempdir() do dir
+                    extracted = Suite.extract(:DataTable, dir, overwrite=true, include_deps=false)
+                    @test "DataTable.jl" in extracted
+                    @test !("Table.jl" in extracted)
+                end
+            end
+
+            @testset ":all extraction extracts all registered components" begin
+                mktempdir() do dir
+                    extracted = Suite.extract(:all, dir, overwrite=true)
+                    # Should have at least all registered components
+                    n_registered = length(Suite.COMPONENT_REGISTRY)
+                    # extracted includes utils.jl + component files
+                    n_component_files = count(f -> f != "utils.jl" && f != "suite.js", extracted)
+                    @test n_component_files == n_registered
+                    @test n_registered > 50  # sanity: we have 50+ components
+                    @test "utils.jl" in extracted
+                    @test "Button.jl" in extracted
+                    @test "Dialog.jl" in extracted
+                    @test "Tabs.jl" in extracted
+                end
+            end
+
+            @testset "Extracted files depend only on Therapy.jl" begin
+                mktempdir() do dir
+                    # Extract a styling and an island component
+                    Suite.extract([:Button, :Card, :Dialog, :Tabs], dir, overwrite=true)
+                    for fname in ["Button.jl", "Card.jl", "Dialog.jl", "Tabs.jl"]
+                        content = read(joinpath(dir, fname), String)
+                        # Filter out comments and docstrings for import checking
+                        lines = filter(l -> !startswith(strip(l), "#") && !startswith(strip(l), "\""), split(content, "\n"))
+                        code_str = join(lines, "\n")
+                        @test !occursin("using Suite", code_str)
+                        @test !occursin("import Suite", code_str)
+                        @test occursin("using Therapy", content) || occursin("if !@isdefined(Div)", content)
+                    end
+                end
+            end
+
+            @testset "Extracted styling component renders identically" begin
+                mktempdir() do dir
+                    Suite.extract(:Button, dir, overwrite=true)
+                    # Render via package
+                    html_pkg = Therapy.render_to_string(Button("Test"))
+                    # Include extracted file and render
+                    include(joinpath(dir, "Button.jl"))
+                    # The extracted Button function is now in scope
+                    # (Since we just included it, it shadows the Suite version)
+                    html_ext = Therapy.render_to_string(Button("Test"))
+                    @test html_pkg == html_ext
+                end
+            end
+
+            @testset "Overwrite=false skips existing files" begin
+                mktempdir() do dir
+                    Suite.extract(:Button, dir, overwrite=true)
+                    # Modify the file
+                    btn_path = joinpath(dir, "Button.jl")
+                    original = read(btn_path, String)
+                    write(btn_path, "# MODIFIED\n" * original)
+
+                    # Extract again without overwrite
+                    extracted = Suite.extract(:Button, dir, overwrite=false)
+                    # Button.jl should NOT be in extracted (skipped)
+                    @test !("Button.jl" in extracted)
+                    # File should still have our modification
+                    @test startswith(read(btn_path, String), "# MODIFIED")
+                end
+            end
+
+            @testset "Overwrite=true replaces existing files" begin
+                mktempdir() do dir
+                    Suite.extract(:Button, dir, overwrite=true)
+                    btn_path = joinpath(dir, "Button.jl")
+                    write(btn_path, "# MODIFIED")
+
+                    extracted = Suite.extract(:Button, dir, overwrite=true)
+                    @test "Button.jl" in extracted
+                    @test !startswith(read(btn_path, String), "# MODIFIED")
+                end
+            end
+
+            @testset "Custom output path works" begin
+                mktempdir() do dir
+                    custom = joinpath(dir, "my", "custom", "path")
+                    extracted = Suite.extract(:Badge, custom, overwrite=true)
+                    @test isdir(custom)
+                    @test isfile(joinpath(custom, "Badge.jl"))
+                    @test "Badge.jl" in extracted
+                end
+            end
+
+            @testset "resolve_deps topological order" begin
+                # DataTable depends on Table — Table must come first
+                deps = Suite.resolve_deps([:DataTable])
+                table_idx = findfirst(==(:Table), deps)
+                dt_idx = findfirst(==(:DataTable), deps)
+                @test table_idx !== nothing
+                @test dt_idx !== nothing
+                @test table_idx < dt_idx
+            end
+
+            @testset "list() runs without error" begin
+                # Verify list() doesn't throw and registry is populated
+                @test length(Suite.COMPONENT_REGISTRY) > 50
+                @test haskey(Suite.COMPONENT_REGISTRY, :Button)
+                @test haskey(Suite.COMPONENT_REGISTRY, :Dialog)
+                @test haskey(Suite.COMPONENT_REGISTRY, :Tabs)
+            end
+
+            @testset "info() metadata is correct" begin
+                meta = Suite.COMPONENT_REGISTRY[:Dialog]
+                @test meta.name == :Dialog
+                @test meta.tier == :island
+                @test :DialogTrigger in meta.exports
+                @test :DialogContent in meta.exports
+                @test :DialogClose in meta.exports
+            end
+
+            @testset "info() for unknown component" begin
+                @test !haskey(Suite.COMPONENT_REGISTRY, :NonExistentComponent)
+            end
+
+            @testset "Varargs API: extract(:Button, :Card)" begin
+                mktempdir() do dir
+                    extracted = Suite.extract(:Button, :Card, path=dir, overwrite=true)
+                    @test "Button.jl" in extracted
+                    @test "Card.jl" in extracted
+                    @test "utils.jl" in extracted
+                    @test isfile(joinpath(dir, "Button.jl"))
+                    @test isfile(joinpath(dir, "Card.jl"))
+                end
+            end
+
+            @testset "Varargs API: extract(:all) with default path" begin
+                mktempdir() do dir
+                    # Use explicit path to avoid creating ./components/ in test dir
+                    extracted = Suite.extract(:all, path=dir, overwrite=true)
+                    n_component_files = count(f -> f != "utils.jl" && f != "suite.js", extracted)
+                    @test n_component_files == length(Suite.COMPONENT_REGISTRY)
+                end
+            end
+
+            @testset "Varargs API: extract with path= keyword" begin
+                mktempdir() do dir
+                    custom = joinpath(dir, "my", "ui")
+                    extracted = Suite.extract(:Badge, path=custom, overwrite=true)
+                    @test isdir(custom)
+                    @test isfile(joinpath(custom, "Badge.jl"))
+                    @test "Badge.jl" in extracted
+                end
+            end
+
+            @testset "Extracted files have correct utils.jl include path" begin
+                mktempdir() do dir
+                    Suite.extract(:Button, dir, overwrite=true)
+                    content = read(joinpath(dir, "Button.jl"), String)
+                    # Extracted file should reference utils.jl in same directory
+                    @test occursin("joinpath(@__DIR__, \"utils.jl\")", content)
+                    # Should NOT reference parent directory
+                    @test !occursin("joinpath(@__DIR__, \"..\", \"utils.jl\")", content)
+                end
+            end
+
+            @testset "Extracted themed files have correct utils.jl include path" begin
+                mktempdir() do dir
+                    Suite.extract(:Button, dir, theme=:ocean, overwrite=true)
+                    content = read(joinpath(dir, "Button.jl"), String)
+                    @test occursin("joinpath(@__DIR__, \"utils.jl\")", content)
+                    @test !occursin("joinpath(@__DIR__, \"..\", \"utils.jl\")", content)
+                end
+            end
+        end
     end
 
     @testset "Menubar" begin

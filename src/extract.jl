@@ -6,6 +6,7 @@
 export extract
 
 """
+    extract(components...; path="./components/", overwrite=false, include_deps=true, theme=:default)
     extract(components, target_dir; overwrite=false, include_deps=true, include_js=true, theme=:default)
 
 Extract Suite.jl component source files into your project directory.
@@ -13,34 +14,35 @@ Extract Suite.jl component source files into your project directory.
 This copies the component source code so you can customize it freely,
 just like `npx shadcn add` does for React projects.
 
-# Arguments
-- `components::Union{Symbol, Vector{Symbol}}`: Component(s) to extract
-- `target_dir::String`: Directory to copy files into
-
-# Keywords
-- `overwrite::Bool = false`: Overwrite existing files (default: skip with warning)
-- `include_deps::Bool = true`: Also extract component dependencies
-- `include_js::Bool = true`: Copy suite.js if any component needs JS runtime
-- `theme::Symbol = :default`: Apply theme substitutions to extracted source files
-
-# Example
+# Examples
 ```julia
 using Suite
 
-# Extract a single component
-Suite.extract(:Button, "src/components/")
-
-# Extract multiple with dependencies
-Suite.extract([:Dialog, :Card], "src/components/")
-
-# Extract with a theme — class strings are substituted in the output
-Suite.extract(:Button, "src/components/", theme=:ocean)
+Suite.extract(:Button)                    # writes Button.jl to ./components/
+Suite.extract(:Dialog)                    # writes Dialog.jl (with Dialog, DialogTrigger, DialogContent)
+Suite.extract(:Button, :Dialog)           # multiple components
+Suite.extract(:all)                       # everything
+Suite.extract(:Button, path="src/ui/")    # custom output path
+Suite.extract(:Button, "src/ui/")         # also works (positional target_dir)
+Suite.extract(:Button, path="src/ui/", theme=:ocean)  # with theme substitution
 ```
 """
+function extract(components::Symbol...; path::String="./components/",
+                 overwrite::Bool=false, include_deps::Bool=true, theme::Symbol=:default)
+    comps = length(components) == 1 && first(components) === :all ? :all : collect(components)
+    return extract(comps, path; overwrite=overwrite, include_deps=include_deps,
+                   include_js=true, theme=theme)
+end
+
 function extract(components::Union{Symbol, Vector{Symbol}}, target_dir::String;
                  overwrite::Bool=false, include_deps::Bool=true, include_js::Bool=true,
                  theme::Symbol=:default)
-    comps = components isa Symbol ? [components] : components
+    # Handle :all — extract every registered component
+    if components === :all
+        comps = collect(keys(COMPONENT_REGISTRY))
+    else
+        comps = components isa Symbol ? [components] : components
+    end
 
     # Resolve dependency graph
     all_comps = include_deps ? resolve_deps(comps) : comps
@@ -172,21 +174,33 @@ end
 
 # --- Internal helpers ---
 
+"""
+Rewrite include paths for standalone usage. In the Suite.jl source tree,
+component files live in `src/components/` and utils.jl is at `src/utils.jl`,
+so components use `joinpath(@__DIR__, "..", "utils.jl")`. In extracted form,
+both files are in the same directory, so we rewrite to `joinpath(@__DIR__, "utils.jl")`.
+"""
+function _fixup_extracted_source(content::String)
+    replace(content,
+        "joinpath(@__DIR__, \"..\", \"utils.jl\")" => "joinpath(@__DIR__, \"utils.jl\")")
+end
+
 function _copy_file(src::String, dst::String, overwrite::Bool)
     if !isfile(src)
         @warn "Source file not found: $src"
         return false
     end
 
+    content = _fixup_extracted_source(read(src, String))
+
     if isfile(dst) && !overwrite
-        # Check if content is identical
-        if read(src, String) == read(dst, String)
+        if isfile(dst) && read(dst, String) == content
             return false  # Skip silently, already up to date
         end
         return false  # Skip, file exists and differs
     end
 
-    cp(src, dst; force=overwrite)
+    Base.write(dst, content)
     return true
 end
 
@@ -197,6 +211,7 @@ function _copy_file_themed(src::String, dst::String, overwrite::Bool, t::SuiteTh
     end
 
     content = read(src, String)
+    content = _fixup_extracted_source(content)
     themed_content = apply_theme_to_source(content, t)
 
     if isfile(dst) && !overwrite
@@ -206,6 +221,6 @@ function _copy_file_themed(src::String, dst::String, overwrite::Bool, t::SuiteTh
         return false  # Skip, file exists and differs
     end
 
-    write(dst, themed_content)
+    Base.write(dst, themed_content)
     return true
 end
