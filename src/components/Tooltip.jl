@@ -57,15 +57,9 @@ end
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject hover handlers on trigger wrapper
-    for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-tooltip-trigger-wrapper"))
-            # Trigger wrapper: hover events toggle the signal
-            child.props[:on_pointerenter] = () -> set_open(Int32(1))
-            child.props[:on_pointerleave] = () -> set_open(Int32(0))
-            child.props[Symbol("data-state")] = "closed"
-        end
-    end
+    # Provide context for child islands (Thaw-style signal sharing)
+    provide_context(:tooltip_open, is_open)
+    provide_context(:tooltip_set_open, set_open)
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(4)),  # mode 4 = tooltip (hover + floating)
         :class => cn("", class),
@@ -74,14 +68,18 @@ end
         children...)
 end
 
-"""
-    TooltipTrigger(children...; class, kwargs...) -> VNode
+#   TooltipTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The element that triggers the tooltip on hover/focus.
+# Child island: owns signal + pointerenter/pointerleave handlers (compilable body).
+@island function TooltipTrigger(children...; class::String="", kwargs...)
+    is_open, set_open = create_signal(Int32(0))
 
-The element that triggers the tooltip on hover/focus.
-"""
-function TooltipTrigger(children...; class::String="", kwargs...)
     Div(Symbol("data-tooltip-trigger-wrapper") => "",
         :style => "display:contents",
+        Symbol("data-state") => "closed",
+        :on_pointerenter => () -> set_open(Int32(1)),
+        :on_pointerleave => () -> set_open(Int32(0)),
         Therapy.Button(:type => "button",
                :class => cn("cursor-pointer", class),
                kwargs...,
@@ -124,6 +122,28 @@ function TooltipContent(children...; side::String="top", side_offset::Int=4, ali
         :class => classes,
         kwargs...,
         children...,
+    )
+end
+
+# --- Hydration Body (Wasm compilation) ---
+# Tooltip: mode=4 (hover + floating). Trigger uses pointerenter/pointerleave.
+# Root Div (BindModal) → Div trigger (hover events, contains Button) → Div content
+# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
+const _TOOLTIP_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(4)),
+        children,
+    )
+end
+
+# Child island: Div(pointerenter/leave + Button(children))
+const _TOOLTIPTRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        :on_pointerenter => () -> set_open(Int32(1)),
+        :on_pointerleave => () -> set_open(Int32(0)),
+        Button(children),
     )
 end
 

@@ -16,6 +16,11 @@
 #   - Signal-driven: BindBool maps open signal to data-state and aria-expanded
 #   - BindModal handles scroll lock, focus trap, dismiss, show/hide with animation
 #
+# Architecture: Split islands (Thaw-style)
+#   - Dialog (parent island): creates signal, provides context, wraps with BindModal
+#   - DialogTrigger (child island): reads context, toggles signal on click
+#   - DialogContent: plain function (complex styling, SSR-only)
+#
 # Reference: Radix UI Dialog — https://www.radix-ui.com/primitives/docs/components/dialog
 
 # --- Self-containment header ---
@@ -33,8 +38,9 @@ export Dialog, DialogTrigger, DialogContent,
 # A modal dialog overlay. Contains trigger, overlay, and content.
 # Interactive behavior is compiled to WebAssembly — no JavaScript required.
 #
-# DialogTrigger and DialogContent children are auto-detected and injected
-# with signal bindings for data-state, aria-expanded, and modal behavior.
+# Parent island: creates signal, provides context for child islands,
+# wraps children with BindModal for focus trap, scroll lock, dismiss.
+# No tree walking — children handle their own bindings.
 #
 # Examples:
 #   Dialog(DialogTrigger(Button("Open")), DialogContent(DialogHeader(DialogTitle("Title"))))
@@ -42,20 +48,9 @@ export Dialog, DialogTrigger, DialogContent,
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject signal bindings
-    for child in children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-dialog-trigger-wrapper"))
-                # Inject reactive bindings on trigger wrapper
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
-                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
-            else
-                # Content wrapper — walk into it
-                _dialog_inject_content_bindings!(child, is_open, set_open)
-            end
-        end
-    end
+    # Provide context for child islands (Thaw-style signal sharing)
+    provide_context(:dialog_open, is_open)
+    provide_context(:dialog_set_open, set_open)
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(0)),  # mode 0 = dialog
         :class => cn("", class),
@@ -63,48 +58,22 @@ export Dialog, DialogTrigger, DialogContent,
         children...)
 end
 
-# Walk the content wrapper to find overlay, content, and close buttons
-function _dialog_inject_content_bindings!(node::VNode, is_open, set_open)
-    for child in node.children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-dialog-overlay"))
-                # Overlay: bind data-state, add click-to-close
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:on_click] = () -> set_open(Int32(0))
-            elseif haskey(child.props, Symbol("data-dialog-content"))
-                # Content: bind data-state
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                # Walk content for close buttons
-                _dialog_inject_close_buttons!(child, set_open)
-            end
-        end
-    end
-end
+#   DialogTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The button that opens the dialog. Wrap around a Button or any clickable element.
+# Child island: owns signal + BindBool + on_click handler (compilable body).
+# At runtime, context sharing connects to parent Dialog's signal (Phase 6-7).
+@island function DialogTrigger(children...; class::String="", kwargs...)
+    # Own signal for independent compilation (connected to parent via context at runtime)
+    is_open, set_open = create_signal(Int32(0))
 
-# Recursively inject close handler on all [data-dialog-close] elements
-function _dialog_inject_close_buttons!(node::VNode, set_open)
-    if haskey(node.props, Symbol("data-dialog-close"))
-        node.props[:on_click] = () -> set_open(Int32(0))
-    end
-    for child in node.children
-        if child isa VNode
-            _dialog_inject_close_buttons!(child, set_open)
-        end
-    end
-end
-
-"""
-    DialogTrigger(children...; class, kwargs...) -> VNode
-
-The button that opens the dialog. Wrap around a Button or any clickable element.
-"""
-function DialogTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-dialog-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
-         Symbol("data-state") => "closed",
+         Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
-         :aria_expanded => "false",
+         :aria_expanded => BindBool(is_open, "false", "true"),
+         :on_click => () -> set_open(Int32(1) - is_open()),
          kwargs...,
          children...)
 end
@@ -216,6 +185,28 @@ function DialogClose(children...; class::String="", kwargs...)
          :style => "display:contents",
          kwargs...,
          children...)
+end
+
+# --- Hydration Bodies (Wasm compilation) ---
+
+# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
+const _DIALOG_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(0)),
+        children,
+    )
+end
+
+# Child island: Span(BindBool + click toggle + children)
+const _DIALOGTRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Span(
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        :aria_expanded => BindBool(is_open, "false", "true"),
+        :on_click => () -> set_open(Int32(1) - is_open()),
+        children,
+    )
 end
 
 # --- Registry ---

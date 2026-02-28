@@ -47,20 +47,9 @@ export AlertDialog, AlertDialogTrigger, AlertDialogContent,
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject signal bindings
-    for child in children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-alert-dialog-trigger-wrapper"))
-                # Inject reactive bindings on trigger wrapper
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
-                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
-            else
-                # Content wrapper — walk into it
-                _alert_dialog_inject_content_bindings!(child, is_open, set_open)
-            end
-        end
-    end
+    # Provide context for child islands (Thaw-style signal sharing)
+    provide_context(:alertdialog_open, is_open)
+    provide_context(:alertdialog_set_open, set_open)
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(1)),  # mode 1 = alert_dialog (no Escape/outside dismiss)
         :class => cn("", class),
@@ -68,48 +57,20 @@ export AlertDialog, AlertDialogTrigger, AlertDialogContent,
         children...)
 end
 
-# Walk the content wrapper to find overlay, content, and action/cancel buttons
-function _alert_dialog_inject_content_bindings!(node::VNode, is_open, set_open)
-    for child in node.children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-alert-dialog-overlay"))
-                # Overlay: bind data-state (no click-to-close for AlertDialog)
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-            elseif haskey(child.props, Symbol("data-alert-dialog-content"))
-                # Content: bind data-state
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                # Walk content for action/cancel buttons
-                _alert_dialog_inject_close_buttons!(child, set_open)
-            end
-        end
-    end
-end
+#   AlertDialogTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The button that opens the alert dialog.
+# Child island: owns signal + BindBool + on_click handler (compilable body).
+@island function AlertDialogTrigger(children...; class::String="", kwargs...)
+    is_open, set_open = create_signal(Int32(0))
 
-# Recursively inject close handler on action and cancel elements
-function _alert_dialog_inject_close_buttons!(node::VNode, set_open)
-    if haskey(node.props, Symbol("data-alert-dialog-action")) ||
-       haskey(node.props, Symbol("data-alert-dialog-cancel"))
-        node.props[:on_click] = () -> set_open(Int32(0))
-    end
-    for child in node.children
-        if child isa VNode
-            _alert_dialog_inject_close_buttons!(child, set_open)
-        end
-    end
-end
-
-"""
-    AlertDialogTrigger(children...; class, kwargs...) -> VNode
-
-The button that opens the alert dialog.
-"""
-function AlertDialogTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-alert-dialog-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
-         Symbol("data-state") => "closed",
+         Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
-         :aria_expanded => "false",
+         :aria_expanded => BindBool(is_open, "false", "true"),
+         :on_click => () -> set_open(Int32(1) - is_open()),
          kwargs...,
          children...)
 end
@@ -222,6 +183,28 @@ function AlertDialogCancel(children...; class::String="", kwargs...)
          :style => "display:contents",
          kwargs...,
          children...)
+end
+
+# --- Hydration Body (Wasm compilation) ---
+# Same structure as Dialog but mode=1 (no Escape/click-outside dismiss) and no overlay click handler
+# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
+const _ALERTDIALOG_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(1)),
+        children,
+    )
+end
+
+# Child island: Span(BindBool + click toggle + children)
+const _ALERTDIALOGTRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Span(
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        :aria_expanded => BindBool(is_open, "false", "true"),
+        :on_click => () -> set_open(Int32(1) - is_open()),
+        children,
+    )
 end
 
 # --- Registry ---

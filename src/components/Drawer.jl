@@ -44,20 +44,9 @@ export Drawer, DrawerTrigger, DrawerContent,
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject signal bindings
-    for child in children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-drawer-trigger-wrapper"))
-                # Inject reactive bindings on trigger wrapper
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
-                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
-            else
-                # Content wrapper — walk into it
-                _drawer_inject_content_bindings!(child, is_open, set_open)
-            end
-        end
-    end
+    # Provide context for child islands (Thaw-style signal sharing)
+    provide_context(:drawer_open, is_open)
+    provide_context(:drawer_set_open, set_open)
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(2)),  # mode 2 = drawer (dialog + drag-to-dismiss)
         :class => cn("", class),
@@ -65,48 +54,20 @@ export Drawer, DrawerTrigger, DrawerContent,
         children...)
 end
 
-# Walk the content wrapper to find overlay, content, and close buttons
-function _drawer_inject_content_bindings!(node::VNode, is_open, set_open)
-    for child in node.children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-drawer-overlay"))
-                # Overlay: bind data-state, add click-to-close
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:on_click] = () -> set_open(Int32(0))
-            elseif haskey(child.props, Symbol("data-drawer-content"))
-                # Content: bind data-state
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                # Walk content for close buttons
-                _drawer_inject_close_buttons!(child, set_open)
-            end
-        end
-    end
-end
+#   DrawerTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The button that opens the drawer.
+# Child island: owns signal + BindBool + on_click handler (compilable body).
+@island function DrawerTrigger(children...; class::String="", kwargs...)
+    is_open, set_open = create_signal(Int32(0))
 
-# Recursively inject close handler on all [data-drawer-close] elements
-function _drawer_inject_close_buttons!(node::VNode, set_open)
-    if haskey(node.props, Symbol("data-drawer-close"))
-        node.props[:on_click] = () -> set_open(Int32(0))
-    end
-    for child in node.children
-        if child isa VNode
-            _drawer_inject_close_buttons!(child, set_open)
-        end
-    end
-end
-
-"""
-    DrawerTrigger(children...; class, kwargs...) -> VNode
-
-The button that opens the drawer.
-"""
-function DrawerTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-drawer-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
-         Symbol("data-state") => "closed",
+         Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
-         :aria_expanded => "false",
+         :aria_expanded => BindBool(is_open, "false", "true"),
+         :on_click => () -> set_open(Int32(1) - is_open()),
          kwargs...,
          children...)
 end
@@ -232,6 +193,28 @@ function DrawerClose(children...; class::String="", kwargs...)
          :style => "display:contents",
          kwargs...,
          children...)
+end
+
+# --- Hydration Body (Wasm compilation) ---
+# Mode=2 (dialog behavior + drag-to-dismiss). Same element structure as Dialog.
+# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
+const _DRAWER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(2)),
+        children,
+    )
+end
+
+# Child island: Span(BindBool + click toggle + children)
+const _DRAWERTRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Span(
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        :aria_expanded => BindBool(is_open, "false", "true"),
+        :on_click => () -> set_open(Int32(1) - is_open()),
+        children,
+    )
 end
 
 # --- Registry ---

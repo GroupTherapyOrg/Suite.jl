@@ -49,20 +49,9 @@ const SHEET_SIDE_CLASSES = Dict{String, String}(
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject signal bindings
-    for child in children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-sheet-trigger-wrapper"))
-                # Inject reactive bindings on trigger wrapper
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
-                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
-            else
-                # Content wrapper — walk into it
-                _sheet_inject_content_bindings!(child, is_open, set_open)
-            end
-        end
-    end
+    # Provide context for child islands (Thaw-style signal sharing)
+    provide_context(:sheet_open, is_open)
+    provide_context(:sheet_set_open, set_open)
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(0)),  # mode 0 = dialog behavior
         :class => cn("", class),
@@ -70,48 +59,20 @@ const SHEET_SIDE_CLASSES = Dict{String, String}(
         children...)
 end
 
-# Walk the content wrapper to find overlay, content, and close buttons
-function _sheet_inject_content_bindings!(node::VNode, is_open, set_open)
-    for child in node.children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-sheet-overlay"))
-                # Overlay: bind data-state, add click-to-close
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:on_click] = () -> set_open(Int32(0))
-            elseif haskey(child.props, Symbol("data-sheet-content"))
-                # Content: bind data-state
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                # Walk content for close buttons
-                _sheet_inject_close_buttons!(child, set_open)
-            end
-        end
-    end
-end
+#   SheetTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The button that opens the sheet.
+# Child island: owns signal + BindBool + on_click handler (compilable body).
+@island function SheetTrigger(children...; class::String="", kwargs...)
+    is_open, set_open = create_signal(Int32(0))
 
-# Recursively inject close handler on all [data-sheet-close] elements
-function _sheet_inject_close_buttons!(node::VNode, set_open)
-    if haskey(node.props, Symbol("data-sheet-close"))
-        node.props[:on_click] = () -> set_open(Int32(0))
-    end
-    for child in node.children
-        if child isa VNode
-            _sheet_inject_close_buttons!(child, set_open)
-        end
-    end
-end
-
-"""
-    SheetTrigger(children...; class, kwargs...) -> VNode
-
-The button that opens the sheet.
-"""
-function SheetTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-sheet-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
-         Symbol("data-state") => "closed",
+         Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
-         :aria_expanded => "false",
+         :aria_expanded => BindBool(is_open, "false", "true"),
+         :on_click => () -> set_open(Int32(1) - is_open()),
          kwargs...,
          children...)
 end
@@ -224,6 +185,28 @@ function SheetClose(children...; class::String="", kwargs...)
          :style => "display:contents",
          kwargs...,
          children...)
+end
+
+# --- Hydration Body (Wasm compilation) ---
+# Same structure as Dialog (mode=0). Sheet differs only in CSS (slide vs zoom).
+# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
+const _SHEET_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(0)),
+        children,
+    )
+end
+
+# Child island: Span(BindBool + click toggle + children)
+const _SHEETTRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Span(
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        :aria_expanded => BindBool(is_open, "false", "true"),
+        :on_click => () -> set_open(Int32(1) - is_open()),
+        children,
+    )
 end
 
 # --- Registry ---

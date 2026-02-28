@@ -42,15 +42,9 @@ export HoverCard, HoverCardTrigger, HoverCardContent
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject hover handlers on trigger wrapper
-    for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-hover-card-trigger-wrapper"))
-            # Trigger wrapper: hover events toggle the signal
-            child.props[:on_pointerenter] = () -> set_open(Int32(1))
-            child.props[:on_pointerleave] = () -> set_open(Int32(0))
-            child.props[Symbol("data-state")] = "closed"
-        end
-    end
+    # Provide context for child islands (Thaw-style signal sharing)
+    provide_context(:hovercard_open, is_open)
+    provide_context(:hovercard_set_open, set_open)
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(5)),  # mode 5 = hover_card (hover + floating + dismiss)
         Symbol("data-hover-card-open-delay") => string(open_delay),
@@ -61,16 +55,19 @@ export HoverCard, HoverCardTrigger, HoverCardContent
         children...)
 end
 
-"""
-    HoverCardTrigger(children...; class, kwargs...) -> VNode
+#   HoverCardTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The element that triggers the hover card on hover.
+# Child island: owns signal + pointerenter/pointerleave handlers (compilable body).
+@island function HoverCardTrigger(children...; class::String="", kwargs...)
+    is_open, set_open = create_signal(Int32(0))
 
-The element that triggers the hover card on hover.
-Typically wraps a link or anchor element.
-"""
-function HoverCardTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-hover-card-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
+         Symbol("data-state") => "closed",
+         :on_pointerenter => () -> set_open(Int32(1)),
+         :on_pointerleave => () -> set_open(Int32(0)),
          kwargs...,
          children...)
 end
@@ -111,6 +108,27 @@ function HoverCardContent(children...; side::String="bottom", side_offset::Int=4
         :class => classes,
         kwargs...,
         children...,
+    )
+end
+
+# --- Hydration Bodies (Wasm compilation) ---
+
+# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
+const _HOVERCARD_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(5)),
+        children,
+    )
+end
+
+# Child island: Span(pointerenter/leave + children)
+const _HOVERCARDTRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Span(
+        :on_pointerenter => () -> set_open(Int32(1)),
+        :on_pointerleave => () -> set_open(Int32(0)),
+        children,
     )
 end
 

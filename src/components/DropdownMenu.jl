@@ -59,20 +59,9 @@ const _DROPDOWN_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject signal bindings
-    for child in children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-dropdown-menu-trigger-wrapper"))
-                # Inject reactive bindings on trigger wrapper
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
-                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
-            else
-                # Content — inject data-state binding
-                _dropdown_inject_content_bindings!(child, is_open)
-            end
-        end
-    end
+    # Provide context for child islands (Thaw-style signal sharing)
+    provide_context(:dropdown_open, is_open)
+    provide_context(:dropdown_set_open, set_open)
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(6)),  # mode 6 = dropdown_menu
         :class => cn("", class),
@@ -81,30 +70,21 @@ const _DROPDOWN_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
         children...)
 end
 
-# Walk children to find content and inject data-state binding
-function _dropdown_inject_content_bindings!(node::VNode, is_open)
-    if haskey(node.props, Symbol("data-dropdown-menu-content"))
-        node.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-    end
-    for child in node.children
-        if child isa VNode
-            _dropdown_inject_content_bindings!(child, is_open)
-        end
-    end
-end
+#   DropdownMenuTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The button that opens the dropdown menu.
+# Child island: owns signal + BindBool + on_click handler (compilable body).
+# At runtime, context sharing connects to parent DropdownMenu's signal.
+@island function DropdownMenuTrigger(children...; class::String="", kwargs...)
+    is_open, set_open = create_signal(Int32(0))
 
-"""
-    DropdownMenuTrigger(children...; class, kwargs...) -> VNode
-
-The button that opens the dropdown menu.
-"""
-function DropdownMenuTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-dropdown-menu-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
-         Symbol("data-state") => "closed",
+         Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "menu",
-         :aria_expanded => "false",
+         :aria_expanded => BindBool(is_open, "false", "true"),
+         :on_click => () -> set_open(Int32(1) - is_open()),
          kwargs...,
          children...)
 end
@@ -407,6 +387,28 @@ function DropdownMenuSubContent(children...; theme::Symbol=:default, class::Stri
         :class => classes,
         kwargs...,
         children...,
+    )
+end
+
+# --- Hydration Bodies (Wasm compilation) ---
+
+# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
+const _DROPDOWNMENU_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(6)),
+        children,
+    )
+end
+
+# Child island: Span(BindBool + click toggle + children)
+const _DROPDOWNMENUTRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Span(
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        :aria_expanded => BindBool(is_open, "false", "true"),
+        :on_click => () -> set_open(Int32(1) - is_open()),
+        children,
     )
 end
 

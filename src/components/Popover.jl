@@ -40,20 +40,9 @@ export Popover, PopoverTrigger, PopoverContent,
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject signal bindings
-    for child in children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-popover-trigger-wrapper"))
-                # Inject reactive bindings on trigger wrapper
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:aria_expanded] = BindBool(is_open, "false", "true")
-                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
-            else
-                # Content or other children — walk into them for content + close buttons
-                _popover_inject_content_bindings!(child, is_open, set_open)
-            end
-        end
-    end
+    # Provide context for child islands (Thaw-style signal sharing)
+    provide_context(:popover_open, is_open)
+    provide_context(:popover_set_open, set_open)
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(3)),  # mode 3 = popover (dialog + floating)
         :class => cn("", class),
@@ -62,45 +51,20 @@ export Popover, PopoverTrigger, PopoverContent,
         children...)
 end
 
-# Walk children to find popover content and close buttons
-function _popover_inject_content_bindings!(node::VNode, is_open, set_open)
-    if haskey(node.props, Symbol("data-popover-content"))
-        # Content: bind data-state
-        node.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-        # Walk content for close buttons
-        _popover_inject_close_buttons!(node, set_open)
-    end
-    for child in node.children
-        if child isa VNode
-            _popover_inject_content_bindings!(child, is_open, set_open)
-        end
-    end
-end
+#   PopoverTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The button that opens the popover.
+# Child island: owns signal + BindBool + on_click handler (compilable body).
+@island function PopoverTrigger(children...; class::String="", kwargs...)
+    is_open, set_open = create_signal(Int32(0))
 
-# Recursively inject close handler on all [data-popover-close] elements
-function _popover_inject_close_buttons!(node::VNode, set_open)
-    if haskey(node.props, Symbol("data-popover-close"))
-        node.props[:on_click] = () -> set_open(Int32(0))
-    end
-    for child in node.children
-        if child isa VNode
-            _popover_inject_close_buttons!(child, set_open)
-        end
-    end
-end
-
-"""
-    PopoverTrigger(children...; class, kwargs...) -> VNode
-
-The button that opens the popover.
-"""
-function PopoverTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-popover-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn("cursor-pointer", class),
-         Symbol("data-state") => "closed",
+         Symbol("data-state") => BindBool(is_open, "closed", "open"),
          :aria_haspopup => "dialog",
-         :aria_expanded => "false",
+         :aria_expanded => BindBool(is_open, "false", "true"),
+         :on_click => () -> set_open(Int32(1) - is_open()),
          kwargs...,
          children...)
 end
@@ -171,6 +135,28 @@ function PopoverAnchor(children...; class::String="", kwargs...)
         :class => cn(class),
         kwargs...,
         children...)
+end
+
+# --- Hydration Bodies (Wasm compilation) ---
+
+# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
+const _POPOVER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(3)),
+        children,
+    )
+end
+
+# Child island: Span(BindBool + click toggle + children)
+const _POPOVERTRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Span(
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        :aria_expanded => BindBool(is_open, "false", "true"),
+        :on_click => () -> set_open(Int32(1) - is_open()),
+        children,
+    )
 end
 
 # --- Registry ---

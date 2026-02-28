@@ -52,19 +52,9 @@ const _CONTEXT_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     # Signal for open state (Int32: 0=closed, 1=open)
     is_open, set_open = create_signal(Int32(0))
 
-    # Walk children to inject signal bindings
-    for child in children
-        if child isa VNode
-            if haskey(child.props, Symbol("data-context-menu-trigger-wrapper"))
-                # Inject reactive bindings on trigger wrapper
-                child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-                child.props[:on_click] = () -> set_open(Int32(1) - is_open())
-            else
-                # Content — inject data-state binding
-                _context_inject_content_bindings!(child, is_open)
-            end
-        end
-    end
+    # Provide context for child islands (Thaw-style signal sharing)
+    provide_context(:contextmenu_open, is_open)
+    provide_context(:contextmenu_set_open, set_open)
 
     Div(Symbol("data-modal") => BindModal(is_open, Int32(7)),  # mode 7 = context_menu
         :class => cn("", class),
@@ -73,28 +63,19 @@ const _CONTEXT_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
         children...)
 end
 
-# Walk children to find content and inject data-state binding
-function _context_inject_content_bindings!(node::VNode, is_open)
-    if haskey(node.props, Symbol("data-context-menu-content"))
-        node.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-    end
-    for child in node.children
-        if child isa VNode
-            _context_inject_content_bindings!(child, is_open)
-        end
-    end
-end
+#   ContextMenuTrigger(children...; class, kwargs...) -> IslandVNode
+#
+# The area that responds to right-click. Can wrap any content.
+# Child island: owns signal + BindBool + on_click handler (compilable body).
+# At runtime, context sharing connects to parent ContextMenu's signal.
+@island function ContextMenuTrigger(children...; class::String="", kwargs...)
+    is_open, set_open = create_signal(Int32(0))
 
-"""
-    ContextMenuTrigger(children...; class, kwargs...) -> VNode
-
-The area that responds to right-click. Can wrap any content.
-Renders as a `<span>` (not a button — any content can be right-clicked).
-"""
-function ContextMenuTrigger(children...; class::String="", kwargs...)
     Span(Symbol("data-context-menu-trigger-wrapper") => "",
          :style => "display:contents",
          :class => cn(class),
+         Symbol("data-state") => BindBool(is_open, "closed", "open"),
+         :on_click => () -> set_open(Int32(1) - is_open()),
          kwargs...,
          children...)
 end
@@ -391,6 +372,27 @@ function ContextMenuSubContent(children...; theme::Symbol=:default, class::Strin
         :class => classes,
         kwargs...,
         children...,
+    )
+end
+
+# --- Hydration Bodies (Wasm compilation) ---
+
+# Parent island: Div(BindModal) wrapping children (nested islands handle their own bindings)
+const _CONTEXTMENU_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Div(
+        Symbol("data-modal") => BindModal(is_open, Int32(7)),
+        children,
+    )
+end
+
+# Child island: Span(BindBool + click toggle + children)
+const _CONTEXTMENUTRIGGER_HYDRATION_BODY = quote
+    is_open, set_open = create_signal(Int32(0))
+    Span(
+        Symbol("data-state") => BindBool(is_open, "closed", "open"),
+        :on_click => () -> set_open(Int32(1) - is_open()),
+        children,
     )
 end
 
