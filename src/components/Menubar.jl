@@ -58,17 +58,11 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
 #       ),
 #   )
 @island function Menubar(children...; loop::Bool=true, theme::Symbol=:default, class::String="", kwargs...)
-    # Signal for active menu index (Int32: 0=none, N=menu N is open)
+    # Compilable: 1 signal for active menu index (Int32: 0=none, N=menu N is open)
     active_menu, set_active = create_signal(Int32(0))
 
-    # Walk children to find MenubarMenu elements and assign indices
-    menu_idx = Int32(0)
-    for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-menubar-menu"))
-            menu_idx += Int32(1)
-            _menubar_inject_menu_bindings!(child, active_menu, set_active, menu_idx)
-        end
-    end
+    # SSR-only: walk children, inject data-index on trigger markers
+    _menubar_ssr_setup!(children)
 
     classes = cn(
         "flex h-9 items-center gap-1 rounded-md p-1 shadow-xs",
@@ -83,20 +77,39 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
         Symbol("data-loop") => string(loop),
         :role => "menubar",
         :class => classes,
+        :on_click => () -> begin
+            idx = compiled_get_event_data_index()
+            if idx >= Int32(0)
+                menu_idx = idx + Int32(1)  # 0-based data-index → 1-based signal
+                if active_menu() == menu_idx
+                    set_active(Int32(0))  # Close
+                else
+                    set_active(menu_idx)  # Open
+                end
+            end
+        end,
         kwargs...,
         children...)
 end
 
-# Walk a MenubarMenu's children to inject on_click on trigger markers
-# and data-menubar-trigger on inner buttons
-function _menubar_inject_menu_bindings!(menu_node::VNode, active_menu, set_active, idx)
+# SSR helper: walk MenubarMenu children and inject data-index + trigger attributes.
+# Extracted from the island body so the AST transform doesn't try to compile for-loops.
+function _menubar_ssr_setup!(children)
+    menu_idx = 0
+    for child in children
+        if child isa VNode && haskey(child.props, Symbol("data-menubar-menu"))
+            _menubar_ssr_inject!(child, menu_idx)
+            menu_idx += 1
+        end
+    end
+end
+
+function _menubar_ssr_inject!(menu_node::VNode, idx::Int)
     for child in menu_node.children
         if child isa VNode
             if haskey(child.props, Symbol("data-menubar-trigger-marker"))
-                # Put on_click on the marker div — toggles this menu open/closed
-                let i = idx
-                    child.props[:on_click] = () -> set_active(i * (Int32(1) - Int32(active_menu() == i)))
-                end
+                # Add data-index on trigger marker for event delegation
+                child.props[Symbol("data-index")] = string(idx)
                 # Find inner button and add trigger identification
                 for inner in child.children
                     if inner isa VNode

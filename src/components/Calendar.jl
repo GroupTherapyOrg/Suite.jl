@@ -117,19 +117,20 @@ end
 #   Calendar()
 #   Calendar(mode="range", number_of_months=2)
 #   Calendar(selected="2026-02-14")
-@island function Calendar(; mode::String="single",
-                        month::Int=Dates.month(Dates.today()),
-                        year::Int=Dates.year(Dates.today()),
-                        selected::String="",
-                        disabled_dates::String="",
-                        show_outside_days::Bool=true,
-                        fixed_weeks::Bool=false,
-                        number_of_months::Int=1,
-                        class::String="",
-                        theme::Symbol=:default,
-                        kwargs...)
-    is_active, set_active = create_signal(Int32(1))
-
+# SSR helper: builds the complete Calendar VNode tree.
+# Extracted from the island body so the AST transform doesn't try to compile
+# for-loops, string operations, or Dates calls.
+function _calendar_render(; mode::String="single",
+                          month::Int=Dates.month(Dates.today()),
+                          year::Int=Dates.year(Dates.today()),
+                          selected::String="",
+                          disabled_dates::String="",
+                          show_outside_days::Bool=true,
+                          fixed_weeks::Bool=false,
+                          number_of_months::Int=1,
+                          class::String="",
+                          theme::Symbol=:default,
+                          kwargs...)
     id = "suite-calendar-" * string(rand(UInt32), base=16)
 
     root_classes = cn(
@@ -182,6 +183,26 @@ end
         Div(:class => cn("flex gap-4", number_of_months > 1 ? "flex-row" : "flex-col"),
             month_panels...),
     )
+end
+
+@island function Calendar(; mode::String="single",
+                        month::Int=Dates.month(Dates.today()),
+                        year::Int=Dates.year(Dates.today()),
+                        selected::String="",
+                        disabled_dates::String="",
+                        show_outside_days::Bool=true,
+                        fixed_weeks::Bool=false,
+                        number_of_months::Int=1,
+                        class::String="",
+                        theme::Symbol=:default,
+                        kwargs...)
+    # No signals — Calendar interactivity (day selection, month navigation)
+    # is handled by JS data attributes, not compiled Wasm handlers.
+    # SSR-only: all complex rendering delegated to external helper.
+    _calendar_render(; mode=mode, month=month, year=year, selected=selected,
+                      disabled_dates=disabled_dates, show_outside_days=show_outside_days,
+                      fixed_weeks=fixed_weeks, number_of_months=number_of_months,
+                      class=class, theme=theme, kwargs...)
 end
 
 function _nav_button_classes(theme::Symbol=:default)

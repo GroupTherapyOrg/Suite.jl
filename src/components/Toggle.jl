@@ -60,14 +60,15 @@ export Toggle
         Symbol("data-state") => BindBool(is_pressed, "off", "on"),
         :aria_pressed => BindBool(is_pressed, "false", "true"),
         :class => classes,
-        :on_click => () -> set_pressed(Int32(1) - is_pressed()),
     ]
     if disabled
         push!(attrs, :disabled => true)
         push!(attrs, Symbol("data-disabled") => "")
     end
 
-    Therapy.Button(attrs..., kwargs..., children...)
+    Therapy.Button(attrs...,
+        :on_click => () -> set_pressed(Int32(1) - is_pressed()),
+        kwargs..., children...)
 end
 
 # --- Registry ---

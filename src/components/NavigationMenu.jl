@@ -56,16 +56,11 @@ const _NAV_CHEVRON_DOWN = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
 #       ),
 #   )
 @island function NavigationMenu(children...; orientation::String="horizontal", delay_duration::Int=200, skip_delay_duration::Int=300, theme::Symbol=:default, class::String="", kwargs...)
-    # Signal for active item index (Int32: 0=none, N=item N is open)
+    # Compilable: 1 signal for active item index (Int32: 0=none, N=item N is open)
     active_item, set_active = create_signal(Int32(0))
 
-    # Walk children to find items with triggers and inject on_click handlers
-    idx_ref = Ref(Int32(0))
-    for child in children
-        if child isa VNode
-            _nav_walk_and_inject!(child, active_item, set_active, idx_ref)
-        end
-    end
+    # SSR-only: walk children, inject data-index on trigger markers
+    _nav_ssr_setup!(children)
 
     classes = cn(
         "relative flex max-w-max flex-1 items-center justify-center",
@@ -79,13 +74,34 @@ const _NAV_CHEVRON_DOWN = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
         Symbol("data-delay-duration") => string(delay_duration),
         Symbol("data-skip-delay-duration") => string(skip_delay_duration),
         :class => classes,
+        :on_click => () -> begin
+            idx = compiled_get_event_data_index()
+            if idx >= Int32(0)
+                item_idx = idx + Int32(1)  # 0-based data-index → 1-based signal
+                if active_item() == item_idx
+                    set_active(Int32(0))  # Close
+                else
+                    set_active(item_idx)  # Open
+                end
+            end
+        end,
         kwargs...,
         children...,
     )
 end
 
-# Walk VNode tree to find NavigationMenuItems with triggers
-function _nav_walk_and_inject!(node::VNode, active_item, set_active, idx_ref)
+# SSR helper: walk VNode tree to find NavigationMenuItems with triggers and inject data-index.
+# Extracted from the island body so the AST transform doesn't try to compile for-loops.
+function _nav_ssr_setup!(children)
+    idx_ref = Ref(0)
+    for child in children
+        if child isa VNode
+            _nav_ssr_walk!(child, idx_ref)
+        end
+    end
+end
+
+function _nav_ssr_walk!(node::VNode, idx_ref::Ref{Int})
     if haskey(node.props, Symbol("data-nav-menu-item"))
         # Check if this item has a trigger marker
         has_trigger = false
@@ -96,25 +112,23 @@ function _nav_walk_and_inject!(node::VNode, active_item, set_active, idx_ref)
             end
         end
         if has_trigger
-            idx_ref[] += Int32(1)
-            _nav_inject_item_bindings!(node, active_item, set_active, idx_ref[])
+            _nav_ssr_inject!(node, idx_ref[])
+            idx_ref[] += 1
         end
         return  # Don't recurse into items
     end
     for child in node.children
         if child isa VNode
-            _nav_walk_and_inject!(child, active_item, set_active, idx_ref)
+            _nav_ssr_walk!(child, idx_ref)
         end
     end
 end
 
-# Inject on_click on a trigger marker within an item
-function _nav_inject_item_bindings!(item::VNode, active_item, set_active, idx)
+function _nav_ssr_inject!(item::VNode, idx::Int)
     for child in item.children
         if child isa VNode && haskey(child.props, Symbol("data-nav-menu-trigger-marker"))
-            let i = idx
-                child.props[:on_click] = () -> set_active(i * (Int32(1) - Int32(active_item() == i)))
-            end
+            # Add data-index on trigger marker for event delegation
+            child.props[Symbol("data-index")] = string(idx)
         end
     end
 end

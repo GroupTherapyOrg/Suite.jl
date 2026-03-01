@@ -70,14 +70,15 @@ export Switch
         Symbol("data-state") => BindBool(is_checked, "unchecked", "checked"),
         :aria_checked => BindBool(is_checked, "false", "true"),
         :class => track_classes,
-        :on_click => () -> set_checked(Int32(1) - is_checked()),
     ]
     if disabled
         push!(attrs, :disabled => true)
         push!(attrs, Symbol("data-disabled") => "")
     end
 
-    Therapy.Button(attrs..., kwargs...,
+    Therapy.Button(attrs...,
+        :on_click => () -> set_checked(Int32(1) - is_checked()),
+        kwargs...,
         Span(Symbol("data-state") => BindBool(is_checked, "unchecked", "checked"), :class => thumb_classes))
 end
 
