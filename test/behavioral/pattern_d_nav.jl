@@ -46,7 +46,7 @@
                 ),
             ))
             @test occursin("aria-expanded", html)
-            @test_broken occursin("aria-haspopup", html)  # Gap: trigger lacks aria-haspopup="menu"
+            @test occursin("aria-haspopup", html)
         end
 
         @testset "Data state" begin

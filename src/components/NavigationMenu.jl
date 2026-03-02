@@ -187,6 +187,7 @@ function NavigationMenuTrigger(children...; disabled::Bool=false, theme::Symbol=
          Therapy.Button(Symbol("data-nav-menu-trigger") => "",
                 Symbol("data-state") => "closed",
                 Symbol("aria-expanded") => "false",
+                Symbol("aria-haspopup") => "menu",
                 :type => "button",
                 :class => classes,
                 (disabled ? [:disabled => ""] : Pair{Symbol,String}[])...,
