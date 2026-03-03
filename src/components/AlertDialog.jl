@@ -125,6 +125,7 @@ function AlertDialogContent(children...; theme::Symbol=:default, class::String="
             :role => "alertdialog",
             :aria_modal => "true",
             :tabindex => "-1",
+            :style => "display:none",
             :class => classes,
             kwargs...,
             children...,

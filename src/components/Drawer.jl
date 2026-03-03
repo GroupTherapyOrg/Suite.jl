@@ -134,7 +134,7 @@ function DrawerContent(children...; direction::String="bottom", theme::Symbol=:d
             :role => "dialog",
             :aria_modal => "true",
             :tabindex => "-1",
-            :style => "touch-action:none",
+            :style => "display:none;touch-action:none",
             :class => classes,
             kwargs...,
             children...,

@@ -47,9 +47,12 @@ test.describe('AlertDialog', () => {
     const content = alertDialog.locator('[data-alert-dialog-content]').first();
     await expect(content).toBeVisible({ timeout: 5000 });
 
-    // Find cancel button (data-alert-dialog-cancel wrapper > button)
-    const cancelBtn = content.locator('[data-alert-dialog-cancel] button, button:has-text("Cancel")').first();
-    await cancelBtn.click({ force: true });
+    // Cancel is a <span data-alert-dialog-cancel> with display:contents — click via dispatchEvent
+    await page.evaluate(() => {
+      const island = document.querySelector('therapy-island[data-component="alertdialog"]');
+      const cancel = island?.querySelector('[data-alert-dialog-cancel]');
+      if (cancel) cancel.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    });
 
     await expect(content).not.toBeVisible({ timeout: 5000 });
   });

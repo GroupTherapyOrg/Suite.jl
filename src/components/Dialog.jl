@@ -129,6 +129,7 @@ function DialogContent(children...; theme::Symbol=:default, class::String="", kw
             :role => "dialog",
             :aria_modal => "true",
             :tabindex => "-1",
+            :style => "display:none",
             :class => classes,
             kwargs...,
             children...,

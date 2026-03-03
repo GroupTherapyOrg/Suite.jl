@@ -60,9 +60,12 @@ test.describe('Drawer', () => {
     const content = page.locator('[data-drawer-content]').first();
     await expect(content).toBeVisible({ timeout: 5000 });
 
-    // Close button: try standalone button or button inside span wrapper
-    const closeBtn = content.locator('button[data-drawer-close], [data-drawer-close] button').first();
-    await closeBtn.click({ force: true });
+    // Close button click via dispatchEvent (avoids fixed-position overlay interception)
+    await page.evaluate(() => {
+      const island = document.querySelector('therapy-island[data-component="drawer"]');
+      const btn = island?.querySelector('[data-drawer-close]');
+      if (btn) btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    });
     await expect(content).toHaveAttribute('data-state', 'closed', { timeout: 5000 });
   });
 

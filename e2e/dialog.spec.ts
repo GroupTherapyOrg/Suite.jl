@@ -84,9 +84,18 @@ test.describe('Dialog', () => {
     const content = dialog.locator('[data-dialog-content]').first();
     await expect(content).toBeVisible({ timeout: 5000 });
 
-    // X close button is <button data-dialog-close=""> (absolute top-right corner)
-    const closeBtn = content.locator('button[data-dialog-close]').first();
-    await closeBtn.click({ force: true });
+    // X close button is <button data-dialog-close=""> — click via dispatchEvent
+    // to avoid fixed-position overlay interception issues with Playwright force:true
+    await page.evaluate(() => {
+      const allDialogs = document.querySelectorAll('therapy-island[data-component="dialog"]');
+      for (const d of allDialogs) {
+        if (d.querySelector('[data-dialog-trigger-wrapper] button')) {
+          const btn = d.querySelector('button[data-dialog-close]');
+          if (btn) btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+          break;
+        }
+      }
+    });
 
     await expect(content).not.toBeVisible({ timeout: 5000 });
   });
