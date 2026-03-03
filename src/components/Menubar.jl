@@ -79,12 +79,28 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
         :class => classes,
         :on_click => () -> begin
             idx = compiled_get_event_data_index()
+            current = active_menu()
             if idx >= Int32(0)
                 menu_idx = idx + Int32(1)  # 0-based data-index → 1-based signal
-                if active_menu() == menu_idx
-                    set_active(Int32(0))  # Close
-                else
-                    set_active(menu_idx)  # Open
+                # NOTE: Avoid if-else — WasmTarget.jl codegen places else branch
+                # outside the if block (no wasm else opcode emitted). Use two
+                # independent if blocks with opposite conditions instead.
+                if current == menu_idx
+                    set_active(Int32(0))  # Close same trigger
+                    pop_escape_handler()
+                end
+                if current != menu_idx
+                    if current == Int32(0)
+                        push_escape_handler(Int32(0))  # Register Escape on first open
+                    end
+                    set_active(menu_idx)  # Open different trigger
+                end
+            end
+            # Close on non-trigger click (menu items) or Escape (handler_0 called with no event target)
+            if idx < Int32(0)
+                if current > Int32(0)
+                    set_active(Int32(0))
+                    pop_escape_handler()
                 end
             end
         end,
