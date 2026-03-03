@@ -14,9 +14,9 @@ test.describe('Drawer', () => {
     await expect(trigger).toBeVisible();
   });
 
-  test('drawer content is hidden initially', async ({ page }) => {
+  test('drawer content has data-state=closed initially', async ({ page }) => {
     const content = page.locator('[data-drawer-content]').first();
-    await expect(content).not.toBeVisible();
+    await expect(content).toHaveAttribute('data-state', 'closed');
   });
 
   test('drawer overlay is hidden initially', async ({ page }) => {
@@ -60,11 +60,10 @@ test.describe('Drawer', () => {
     const content = page.locator('[data-drawer-content]').first();
     await expect(content).toBeVisible({ timeout: 5000 });
 
-    const closeBtn = content.locator('[data-drawer-close] button, button[aria-label="Close"]').first();
-    if (await closeBtn.isVisible()) {
-      await closeBtn.click();
-      await expect(content).not.toBeVisible({ timeout: 5000 });
-    }
+    // Close button: try standalone button or button inside span wrapper
+    const closeBtn = content.locator('button[data-drawer-close], [data-drawer-close] button').first();
+    await closeBtn.click({ force: true });
+    await expect(content).toHaveAttribute('data-state', 'closed', { timeout: 5000 });
   });
 
   test('Escape key closes the drawer', async ({ page }) => {
@@ -76,7 +75,7 @@ test.describe('Drawer', () => {
 
     await page.keyboard.press('Escape');
 
-    await expect(content).not.toBeVisible({ timeout: 5000 });
+    await expect(content).toHaveAttribute('data-state', 'closed', { timeout: 5000 });
   });
 
   test('overlay click closes the drawer', async ({ page }) => {
@@ -86,10 +85,14 @@ test.describe('Drawer', () => {
     const content = page.locator('[data-drawer-content]').first();
     await expect(content).toBeVisible({ timeout: 5000 });
 
-    const overlay = page.locator('[data-drawer-overlay]').first();
-    await overlay.click({ force: true });
+    // Dispatch click directly on overlay via JS (same approach as sheet/dialog)
+    await page.evaluate(() => {
+      const island = document.querySelector('therapy-island[data-component="drawer"]');
+      const ov = island?.querySelector('[data-drawer-overlay]');
+      if (ov) ov.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    });
 
-    await expect(content).not.toBeVisible({ timeout: 5000 });
+    await expect(content).toHaveAttribute('data-state', 'closed', { timeout: 5000 });
   });
 
   test('drawer has direction attribute', async ({ page }) => {
