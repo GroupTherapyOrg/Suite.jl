@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: 'list',
   timeout: 30000,
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3456',
+    baseURL: (process.env.BASE_URL || 'http://localhost:3456').replace(/\/?$/, '/'),
     trace: 'on-first-retry',
   },
   projects: [

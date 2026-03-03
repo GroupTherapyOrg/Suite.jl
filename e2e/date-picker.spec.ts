@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('DatePicker', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/date-picker');
+    await page.goto('./components/date-picker');
     await waitForHydration(page);
   });
 

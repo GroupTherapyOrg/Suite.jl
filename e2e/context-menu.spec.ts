@@ -16,7 +16,7 @@ async function rightClickTrigger(page: any) {
 
 test.describe('ContextMenu', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/context-menu');
+    await page.goto('./components/context-menu');
     await waitForHydration(page);
   });
 

@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('DropdownMenu', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/dropdown-menu');
+    await page.goto('./components/dropdown-menu');
     await waitForHydration(page);
   });
 

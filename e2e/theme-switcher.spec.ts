@@ -3,14 +3,14 @@ import { waitForHydration } from './helpers';
 
 test.describe('ThemeSwitcher', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/toggle');
+    await page.goto('./components/toggle');
     // Clear theme from localStorage (key uses base-path prefix)
     await page.evaluate(() => {
       const bp = document.documentElement.getAttribute('data-base-path') || '';
       const tk = bp ? 'suite-active-theme:' + bp : 'suite-active-theme';
       localStorage.removeItem(tk);
     });
-    await page.goto('/components/toggle');
+    await page.goto('./components/toggle');
     await waitForHydration(page);
   });
 

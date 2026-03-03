@@ -10,7 +10,7 @@ function demoDialog(page: import('@playwright/test').Page) {
 
 test.describe('Dialog', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/dialog');
+    await page.goto('./components/dialog');
     await waitForHydration(page);
   });
 

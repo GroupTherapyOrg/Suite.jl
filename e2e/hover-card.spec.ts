@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('HoverCard', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/hover-card');
+    await page.goto('./components/hover-card');
     await waitForHydration(page);
   });
 

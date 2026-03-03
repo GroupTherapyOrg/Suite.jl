@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('Collapsible', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/collapsible');
+    await page.goto('./components/collapsible');
     await waitForHydration(page);
   });
 

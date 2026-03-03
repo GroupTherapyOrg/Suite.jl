@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('Toggle', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/toggle');
+    await page.goto('./components/toggle');
     await waitForHydration(page);
   });
 

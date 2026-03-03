@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('Tooltip', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/tooltip');
+    await page.goto('./components/tooltip');
     await waitForHydration(page);
   });
 

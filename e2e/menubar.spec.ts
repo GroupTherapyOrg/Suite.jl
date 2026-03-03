@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('Menubar', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/menubar');
+    await page.goto('./components/menubar');
     await waitForHydration(page);
   });
 

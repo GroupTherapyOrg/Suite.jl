@@ -10,7 +10,7 @@ function demoAlertDialog(page: import('@playwright/test').Page) {
 
 test.describe('AlertDialog', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/alert-dialog');
+    await page.goto('./components/alert-dialog');
     await waitForHydration(page);
   });
 

@@ -20,7 +20,7 @@ async function go(page: Page, path: string) {
 
 test.describe('ThemeToggle', () => {
   test('click toggles dark class on html element', async ({ page }) => {
-    await go(page, '/components/toggle');
+    await go(page, './components/toggle');
 
     const html = page.locator('html');
     const wasDark = await html.evaluate(el => el.classList.contains('dark'));
@@ -37,7 +37,7 @@ test.describe('ThemeToggle', () => {
 
 test.describe('ThemeSwitcher', () => {
   test('click opens theme dropdown', async ({ page }) => {
-    await go(page, '/components/toggle');
+    await go(page, './components/toggle');
 
     // ThemeSwitcher is in the header/nav area
     const switcher = page.locator('therapy-island[data-component="themeswitcher"]');
@@ -55,7 +55,7 @@ test.describe('ThemeSwitcher', () => {
 
 test.describe('Tabs', () => {
   test('clicking a tab trigger switches active panel', async ({ page }) => {
-    await go(page, '/components/tabs');
+    await go(page, './components/tabs');
 
     const island = page.locator('therapy-island[data-component="tabs"]').first();
     const triggers = island.locator('[data-tabs-trigger]');
@@ -73,7 +73,7 @@ test.describe('Tabs', () => {
   });
 
   test('tab content panel switches on trigger click', async ({ page }) => {
-    await go(page, '/components/tabs');
+    await go(page, './components/tabs');
 
     const island = page.locator('therapy-island[data-component="tabs"]').first();
     const triggers = island.locator('[data-tabs-trigger]');
@@ -95,7 +95,7 @@ test.describe('Tabs', () => {
 
 test.describe('Sheet', () => {
   test('clicking trigger opens sheet content', async ({ page }) => {
-    await go(page, '/components/sheet');
+    await go(page, './components/sheet');
 
     // Scope to a single island to avoid mismatch between trigger and content
     const island = page.locator('therapy-island[data-component="sheet"]').filter({
@@ -111,7 +111,7 @@ test.describe('Sheet', () => {
 
 test.describe('Popover', () => {
   test('clicking trigger opens popover content', async ({ page }) => {
-    await go(page, '/components/popover');
+    await go(page, './components/popover');
 
     const trigger = page.locator('[data-popover-trigger-wrapper] button').first();
     await trigger.click();
@@ -123,7 +123,7 @@ test.describe('Popover', () => {
 
 test.describe('Select', () => {
   test('clicking trigger opens select dropdown', async ({ page }) => {
-    await go(page, '/components/select');
+    await go(page, './components/select');
 
     const trigger = page.locator('[data-select-trigger-wrapper] button, [role="combobox"]').first();
     await trigger.click();
@@ -135,7 +135,7 @@ test.describe('Select', () => {
 
 test.describe('DropdownMenu', () => {
   test('clicking trigger opens dropdown content', async ({ page }) => {
-    await go(page, '/components/dropdown-menu');
+    await go(page, './components/dropdown-menu');
 
     const trigger = page.locator('[data-dropdown-menu-trigger-wrapper] button, [aria-haspopup="true"]').first();
     await trigger.click();
@@ -147,7 +147,7 @@ test.describe('DropdownMenu', () => {
 
 test.describe('ContextMenu', () => {
   test('right-click opens context menu content', async ({ page }) => {
-    await go(page, '/components/context-menu');
+    await go(page, './components/context-menu');
 
     // Right-click via dispatchEvent — Playwright's click({button:'right'}) doesn't trigger
     // the wasm on_contextmenu handler reliably. Use the same approach as context-menu.spec.ts.
@@ -166,7 +166,7 @@ test.describe('HoverCard', () => {
     // DEFERRED: HoverCard hover-persist requires timer-based close delay + cross-island
     // coordination (pointerenter on content to cancel close timer). Same as NavigationMenu hover.
     // See SUITE-3015 completedNote and hover-card.spec.ts skip justification.
-    await go(page, '/components/hover-card');
+    await go(page, './components/hover-card');
 
     const trigger = page.locator('[data-hover-card-trigger-wrapper] a, [data-hover-card-trigger-wrapper] button').first();
     await trigger.hover();
@@ -180,7 +180,7 @@ test.describe('HoverCard', () => {
 
 test.describe('NavigationMenu', () => {
   test('click on trigger shows navigation content', async ({ page }) => {
-    await go(page, '/components/navigation-menu');
+    await go(page, './components/navigation-menu');
 
     // Use correct data attribute (data-nav-menu-trigger, not data-navigation-menu-trigger)
     const trigger = page.locator('[data-nav-menu-trigger]').first();
@@ -193,7 +193,7 @@ test.describe('NavigationMenu', () => {
 
 test.describe('Menubar', () => {
   test('clicking menu trigger opens menu content', async ({ page }) => {
-    await go(page, '/components/menubar');
+    await go(page, './components/menubar');
 
     // Use specific data attribute to target the menubar trigger button
     const trigger = page.locator('[data-menubar-trigger]').first();
@@ -209,7 +209,7 @@ test.describe('Menubar', () => {
 test.describe('Calendar', () => {
   test.skip('clicking a day selects it', async ({ page }) => {
     // DEFERRED: Calendar has no wasm handler — SSR-only. See calendar.spec.ts.
-    await go(page, '/components/calendar');
+    await go(page, './components/calendar');
 
     const island = page.locator('therapy-island[data-component="calendar"]').first();
     // Calendar days are buttons inside the calendar grid
@@ -232,7 +232,7 @@ test.describe('Calendar', () => {
 
   test.skip('clicking next month button changes displayed month', async ({ page }) => {
     // DEFERRED: Calendar month navigation needs Date math not available in wasm. See calendar.spec.ts.
-    await go(page, '/components/calendar');
+    await go(page, './components/calendar');
 
     const island = page.locator('therapy-island[data-component="calendar"]').first();
     // Get current month text
@@ -251,7 +251,7 @@ test.describe('Calendar', () => {
 test.describe('Slider', () => {
   test.skip('clicking slider track changes value', async ({ page }) => {
     // DEFERRED: Slider has no wasm handler — SSR-only. See slider.spec.ts.
-    await go(page, '/components/slider');
+    await go(page, './components/slider');
 
     const island = page.locator('therapy-island[data-component="slider"]').first();
     const track = island.locator('[data-slider-track]');
@@ -277,7 +277,7 @@ test.describe('Slider', () => {
 
 test.describe('DatePicker', () => {
   test('clicking trigger opens calendar popup', async ({ page }) => {
-    await go(page, '/components/date-picker');
+    await go(page, './components/date-picker');
 
     // DatePicker trigger opens popup via ShowDescendants
     const island = page.locator('therapy-island[data-component="datepicker"]').first();
@@ -292,7 +292,7 @@ test.describe('DatePicker', () => {
 
 test.describe('Command', () => {
   test('typing in command input filters items', async ({ page }) => {
-    await go(page, '/components/command');
+    await go(page, './components/command');
 
     const island = page.locator('therapy-island[data-component="commanddialog"]').first();
 
@@ -324,7 +324,7 @@ test.describe('Command', () => {
 
 test.describe('Drawer', () => {
   test('clicking trigger opens drawer content', async ({ page }) => {
-    await go(page, '/components/drawer');
+    await go(page, './components/drawer');
 
     const trigger = page.locator('[data-drawer-trigger-wrapper] button').first();
     await trigger.click();
@@ -337,7 +337,7 @@ test.describe('Drawer', () => {
 test.describe('Form', () => {
   test.skip('submitting empty form shows validation errors', async ({ page }) => {
     // DEFERRED: Form has no validation handler — SSR-only. See form.spec.ts.
-    await go(page, '/components/form');
+    await go(page, './components/form');
 
     // Find submit button
     const submit = page.locator('button[type="submit"]').first();

@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('Popover', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/popover');
+    await page.goto('./components/popover');
     await waitForHydration(page);
   });
 

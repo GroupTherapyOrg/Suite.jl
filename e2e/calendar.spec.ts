@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('Calendar', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/calendar');
+    await page.goto('./components/calendar');
     await waitForHydration(page);
   });
 

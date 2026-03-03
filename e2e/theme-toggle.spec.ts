@@ -4,9 +4,9 @@ import { waitForHydration } from './helpers';
 test.describe('ThemeToggle', () => {
   test.beforeEach(async ({ page }) => {
     // Clear stored theme preference before each test
-    await page.goto('/components/toggle');
+    await page.goto('./components/toggle');
     await page.evaluate(() => localStorage.removeItem('therapy-theme'));
-    await page.goto('/components/toggle');
+    await page.goto('./components/toggle');
     await waitForHydration(page);
   });
 

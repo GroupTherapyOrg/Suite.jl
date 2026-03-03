@@ -3,7 +3,7 @@ import { waitForHydration } from './helpers';
 
 test.describe('Accordion', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/accordion');
+    await page.goto('./components/accordion');
     await waitForHydration(page);
   });
 

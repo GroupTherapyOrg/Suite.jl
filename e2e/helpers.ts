@@ -30,39 +30,39 @@ export async function waitForHydration(page: Page, timeout = 10000) {
 /** Component page URL paths for all 25 interactive island components */
 export const componentPages: Record<string, string> = {
   // Pattern A — Simple Toggle
-  'toggle': '/components/toggle',
-  'switch': '/components/switch',
-  'theme-toggle': '/components/toggle', // ThemeToggle appears on toggle page
-  'theme-switcher': '/components/toggle', // ThemeSwitcher may be on a theme page
+  'toggle': './components/toggle',
+  'switch': './components/switch',
+  'theme-toggle': './components/toggle', // ThemeToggle appears on toggle page
+  'theme-switcher': './components/toggle', // ThemeSwitcher may be on a theme page
 
   // Pattern B — Event Delegation
-  'accordion': '/components/accordion',
-  'tabs': '/components/tabs',
-  'toggle-group': '/components/toggle-group',
+  'accordion': './components/accordion',
+  'tabs': './components/tabs',
+  'toggle-group': './components/toggle-group',
 
   // Pattern C — Split Island Modal/Floating
-  'dialog': '/components/dialog',
-  'alert-dialog': '/components/alert-dialog',
-  'collapsible': '/components/collapsible',
-  'sheet': '/components/sheet',
-  'popover': '/components/popover',
-  'select': '/components/select',
-  'dropdown-menu': '/components/dropdown-menu',
-  'context-menu': '/components/context-menu',
-  'hover-card': '/components/hover-card',
+  'dialog': './components/dialog',
+  'alert-dialog': './components/alert-dialog',
+  'collapsible': './components/collapsible',
+  'sheet': './components/sheet',
+  'popover': './components/popover',
+  'select': './components/select',
+  'dropdown-menu': './components/dropdown-menu',
+  'context-menu': './components/context-menu',
+  'hover-card': './components/hover-card',
 
   // Pattern D — Event Delegation + ShowDescendants
-  'navigation-menu': '/components/navigation-menu',
-  'menubar': '/components/menubar',
-  'tooltip': '/components/tooltip',
+  'navigation-menu': './components/navigation-menu',
+  'menubar': './components/menubar',
+  'tooltip': './components/tooltip',
 
   // Complex Islands
-  'calendar': '/components/calendar',
-  'slider': '/components/slider',
-  'date-picker': '/components/date-picker',
-  'command': '/components/command',
-  'drawer': '/components/drawer',
-  'form': '/components/form',
+  'calendar': './components/calendar',
+  'slider': './components/slider',
+  'date-picker': './components/date-picker',
+  'command': './components/command',
+  'drawer': './components/drawer',
+  'form': './components/form',
 };
 
 /**
