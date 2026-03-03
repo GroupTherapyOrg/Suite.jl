@@ -4,7 +4,12 @@ import { waitForHydration } from './helpers';
 test.describe('ThemeSwitcher', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/components/toggle');
-    await page.evaluate(() => localStorage.removeItem('suite-active-theme'));
+    // Clear theme from localStorage (key uses base-path prefix)
+    await page.evaluate(() => {
+      const bp = document.documentElement.getAttribute('data-base-path') || '';
+      const tk = bp ? 'suite-active-theme:' + bp : 'suite-active-theme';
+      localStorage.removeItem(tk);
+    });
     await page.goto('/components/toggle');
     await waitForHydration(page);
   });
@@ -35,7 +40,7 @@ test.describe('ThemeSwitcher', () => {
 
     const options = content.locator('[role="menuitem"]');
     const count = await options.count();
-    expect(count).toBeGreaterThanOrEqual(4); // default, ocean, minimal, nature (possibly islands)
+    expect(count).toBeGreaterThanOrEqual(4); // default, ocean, minimal, nature, islands
   });
 
   test('selecting a theme changes data-theme on html element', async ({ page }) => {
@@ -60,7 +65,12 @@ test.describe('ThemeSwitcher', () => {
     await expect(oceanOption).toBeVisible({ timeout: 5000 });
     await oceanOption.click();
 
-    const stored = await page.evaluate(() => localStorage.getItem('suite-active-theme'));
+    // localStorage key uses base-path prefix
+    const stored = await page.evaluate(() => {
+      const bp = document.documentElement.getAttribute('data-base-path') || '';
+      const tk = bp ? 'suite-active-theme:' + bp : 'suite-active-theme';
+      return localStorage.getItem(tk);
+    });
     expect(stored).toBe('ocean');
   });
 
@@ -89,22 +99,18 @@ test.describe('ThemeSwitcher', () => {
   });
 
   test('all themes are selectable', async ({ page }) => {
-    const themes = ['default', 'ocean', 'minimal', 'nature'];
+    const themes = ['default', 'ocean', 'minimal', 'nature', 'islands'];
     const trigger = page.locator('button[aria-label="Switch theme"]').first();
 
     for (const theme of themes) {
       await trigger.click();
+      const content = page.locator('[data-theme-switcher-content]').first();
+      await expect(content).toBeVisible({ timeout: 5000 });
       const option = page.locator(`[data-theme-option="${theme}"]`).first();
       await expect(option).toBeVisible({ timeout: 5000 });
       await option.click();
 
-      if (theme === 'default') {
-        // Default theme may not set data-theme or sets it to "default"
-        const dataTheme = await page.locator('html').getAttribute('data-theme');
-        expect(!dataTheme || dataTheme === 'default').toBeTruthy();
-      } else {
-        await expect(page.locator('html')).toHaveAttribute('data-theme', theme, { timeout: 3000 });
-      }
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme, { timeout: 3000 });
     }
   });
 });

@@ -67,8 +67,6 @@ export Switch
     attrs = Pair{Symbol,Any}[
         :type => "button",
         :role => "switch",
-        Symbol("data-state") => BindBool(is_checked, "unchecked", "checked"),
-        :aria_checked => BindBool(is_checked, "false", "true"),
         :class => track_classes,
     ]
     if disabled
@@ -77,6 +75,8 @@ export Switch
     end
 
     Therapy.Button(attrs...,
+        Symbol("data-state") => BindBool(is_checked, "unchecked", "checked"),
+        :aria_checked => BindBool(is_checked, "false", "true"),
         :on_click => () -> set_checked(Int32(1) - is_checked()),
         kwargs...,
         Span(Symbol("data-state") => BindBool(is_checked, "unchecked", "checked"), :class => thumb_classes))

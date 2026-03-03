@@ -57,8 +57,6 @@ export Toggle
 
     attrs = Pair{Symbol,Any}[
         :type => "button",
-        Symbol("data-state") => BindBool(is_pressed, "off", "on"),
-        :aria_pressed => BindBool(is_pressed, "false", "true"),
         :class => classes,
     ]
     if disabled
@@ -67,6 +65,8 @@ export Toggle
     end
 
     Therapy.Button(attrs...,
+        Symbol("data-state") => BindBool(is_pressed, "off", "on"),
+        :aria_pressed => BindBool(is_pressed, "false", "true"),
         :on_click => () -> set_pressed(Int32(1) - is_pressed()),
         kwargs..., children...)
 end

@@ -48,13 +48,22 @@ export ThemeToggle
         moon_classes = apply_theme(moon_classes, t)
     end
 
-    # :dark_mode prop triggers AnalyzedThemeBinding → set_dark_mode(value) on signal change
+    # :dark_mode prop used by SSR for theme init script generation.
+    # Handler explicitly calls set_dark_mode import for runtime dark class toggle.
     Div(:dark_mode => dark,
         Therapy.Button(:type => "button",
             :class => classes,
             :aria_label => "Toggle dark mode",
             :title => "Toggle dark mode",
-            :on_click => () -> set_dark(Int32(1) - dark()),
+            :on_click => () -> begin
+                if dark() == Int32(0)
+                    set_dark(Int32(1))
+                    set_dark_mode(1.0)
+                else
+                    set_dark(Int32(0))
+                    set_dark_mode(0.0)
+                end
+            end,
             kwargs...,
             # Sun icon (visible in dark mode)
             Svg(:class => sun_classes,
