@@ -95,4 +95,53 @@ test.describe('DropdownMenu', () => {
       expect(after).not.toBe(initial);
     }
   });
+
+  test('trigger has aria-haspopup=menu', async ({ page }) => {
+    const wrapper = page.locator('[data-dropdown-menu-trigger-wrapper]').first();
+    await expect(wrapper).toHaveAttribute('aria-haspopup', 'menu');
+    await expect(wrapper).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('clicking trigger again closes the menu', async ({ page }) => {
+    const trigger = page.locator('[data-dropdown-menu-trigger-wrapper] button').first();
+
+    // Open
+    await trigger.click();
+    const content = page.locator('[data-dropdown-menu-content]').first();
+    await expect(content).toBeVisible({ timeout: 5000 });
+
+    // Close
+    await trigger.click();
+    await expect(content).not.toBeVisible({ timeout: 5000 });
+  });
+
+  test('disabled menu items do not close the menu', async ({ page }) => {
+    const trigger = page.locator('[data-dropdown-menu-trigger-wrapper] button').first();
+    await trigger.click();
+
+    const content = page.locator('[data-dropdown-menu-content]').first();
+    await expect(content).toBeVisible({ timeout: 5000 });
+
+    const disabledItem = content.locator('[data-disabled]').first();
+    const disabledExists = await disabledItem.count();
+    if (disabledExists > 0) {
+      await disabledItem.click({ force: true });
+      // Menu should stay open
+      await expect(content).toBeVisible();
+    }
+  });
+
+  test('sub-trigger has aria-haspopup=menu', async ({ page }) => {
+    const trigger = page.locator('[data-dropdown-menu-trigger-wrapper] button').first();
+    await trigger.click();
+
+    const content = page.locator('[data-dropdown-menu-content]').first();
+    await expect(content).toBeVisible({ timeout: 5000 });
+
+    const subTrigger = content.locator('[data-menu-sub-trigger]').first();
+    const subExists = await subTrigger.count();
+    if (subExists > 0) {
+      await expect(subTrigger).toHaveAttribute('aria-haspopup', 'menu');
+    }
+  });
 });

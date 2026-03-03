@@ -82,4 +82,36 @@ test.describe('Sheet', () => {
 
     await expect(content).toHaveAttribute('data-state', 'open', { timeout: 5000 });
   });
+
+  test('overlay becomes visible when sheet opens', async ({ page }) => {
+    const trigger = page.locator('[data-sheet-trigger-wrapper] button').first();
+    await trigger.click();
+
+    const overlay = page.locator('[data-sheet-overlay]').first();
+    await expect(overlay).toBeVisible({ timeout: 5000 });
+  });
+
+  test('trigger data-state reverts to closed after dismiss', async ({ page }) => {
+    const wrapper = page.locator('[data-sheet-trigger-wrapper]').first();
+    const trigger = wrapper.locator('button').first();
+
+    await trigger.click();
+    await expect(wrapper).toHaveAttribute('data-state', 'open', { timeout: 5000 });
+
+    await page.keyboard.press('Escape');
+    await expect(wrapper).toHaveAttribute('data-state', 'closed', { timeout: 5000 });
+  });
+
+  test('focus returns to trigger after close', async ({ page }) => {
+    const trigger = page.locator('[data-sheet-trigger-wrapper] button').first();
+    await trigger.click();
+
+    const content = page.locator('[data-sheet-content]').first();
+    await expect(content).toBeVisible({ timeout: 5000 });
+
+    await page.keyboard.press('Escape');
+    await expect(content).not.toBeVisible({ timeout: 5000 });
+
+    await expect(trigger).toBeFocused();
+  });
 });

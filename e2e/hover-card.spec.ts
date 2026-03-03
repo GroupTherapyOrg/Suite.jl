@@ -47,4 +47,37 @@ test.describe('HoverCard', () => {
     // HoverCard has a 300ms close delay
     await expect(content).not.toBeVisible({ timeout: 5000 });
   });
+
+  test('content stays open while hovering over it', async ({ page }) => {
+    const triggerWrapper = page.locator('[data-hover-card-trigger-wrapper]').first();
+    const trigger = triggerWrapper.locator('a, button, span').first();
+
+    // Hover trigger to open
+    await trigger.hover();
+    const content = page.locator('[data-hover-card-content]').first();
+    await expect(content).toBeVisible({ timeout: 5000 });
+
+    // Move to content area
+    await content.hover();
+    await page.waitForTimeout(500);
+
+    // Content should still be visible
+    await expect(content).toBeVisible();
+    await expect(content).toHaveAttribute('data-state', 'open');
+  });
+
+  test('brief hover does not open content', async ({ page }) => {
+    const triggerWrapper = page.locator('[data-hover-card-trigger-wrapper]').first();
+    const trigger = triggerWrapper.locator('a, button, span').first();
+
+    // Brief hover (less than 700ms open delay)
+    await trigger.hover();
+    await page.waitForTimeout(100);
+    await page.mouse.move(0, 0);
+
+    // Wait a bit and verify content did NOT open
+    await page.waitForTimeout(300);
+    const content = page.locator('[data-hover-card-content]').first();
+    await expect(content).not.toBeVisible();
+  });
 });

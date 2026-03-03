@@ -67,4 +67,22 @@ test.describe('Popover', () => {
 
     await expect(content).toHaveAttribute('data-state', 'open', { timeout: 5000 });
   });
+
+  test('trigger has aria-haspopup=dialog', async ({ page }) => {
+    const wrapper = page.locator('[data-popover-trigger-wrapper]').first();
+    await expect(wrapper).toHaveAttribute('aria-haspopup', 'dialog');
+  });
+
+  test('focus returns to trigger after close', async ({ page }) => {
+    const trigger = page.locator('[data-popover-trigger-wrapper] button').first();
+    await trigger.click();
+
+    const content = page.locator('[data-popover-content]').first();
+    await expect(content).toBeVisible({ timeout: 5000 });
+
+    await page.keyboard.press('Escape');
+    await expect(content).not.toBeVisible({ timeout: 5000 });
+
+    await expect(trigger).toBeFocused();
+  });
 });
