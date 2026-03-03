@@ -19,7 +19,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npx serve docs/dist -l 3456 -s',
+    command: 'npx serve docs/dist -l 3456',
     port: 3456,
     reuseExistingServer: !process.env.CI,
   },
