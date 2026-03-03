@@ -75,7 +75,8 @@ end
          :style => "display:contents",
          :class => cn(class),
          Symbol("data-state") => BindBool(is_open, "closed", "open"),
-         :on_click => () -> begin
+         :on_contextmenu => () -> begin
+             prevent_default()
              if is_open() == Int32(0)
                  # Opening: inline Wasm behavior
                  store_active_element()

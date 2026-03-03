@@ -38,31 +38,16 @@ export Collapsible, CollapsibleTrigger, CollapsibleContent
 @island function Collapsible(children...; open::Bool=false, disabled::Bool=false,
                           class::String="", kwargs...)
     # Signal for open state (Int32: 0=closed, 1=open)
-    is_open, set_open = create_signal(Int32(open ? 1 : 0))
+    is_open, set_open = create_signal(Int32(0))
 
     # Provide context for child islands (single key with getter+setter tuple)
     provide_context(:collapsible, (is_open, set_open))
 
-    # Inject signal bindings into CollapsibleContent VNodes (plain function children)
-    for child in children
-        if child isa VNode && haskey(child.props, Symbol("data-collapsible-content"))
-            child.props[Symbol("data-state")] = BindBool(is_open, "closed", "open")
-            delete!(child.props, :hidden)
-            current_class = get(child.props, :class, "")
-            child.props[:class] = cn(current_class, "data-[state=closed]:hidden")
-        end
-    end
-
-    attrs = Pair{Symbol,Any}[
+    Div(Symbol("data-show") => ShowDescendants(is_open),
         Symbol("data-collapsible") => "",
-        Symbol("data-state") => BindBool(is_open, "closed", "open"),
         :class => cn("", class),
-    ]
-    if disabled
-        push!(attrs, Symbol("data-disabled") => "")
-    end
-
-    Div(attrs..., kwargs..., children...)
+        kwargs...,
+        children...)
 end
 
 #   CollapsibleTrigger(children...; class, kwargs...) -> IslandVNode
@@ -99,7 +84,7 @@ function CollapsibleContent(children...; class::String="", force_mount::Bool=fal
 
     Div(Symbol("data-collapsible-content") => "",
         Symbol("data-state") => "closed",
-        :hidden => true,
+        :style => "display:none",
         :class => classes,
         kwargs...,
         children...)
