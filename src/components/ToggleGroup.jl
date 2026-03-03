@@ -128,17 +128,25 @@ end
             idx = compiled_get_event_data_index()
             if idx >= Int32(0)
                 m = compiled_get_prop_i32(Int32(1))
+                # NOTE: Avoid if-else — WasmTarget.jl codegen omits wasm else
+                # opcode, causing else branch to run unconditionally.
                 if m == Int32(0)
-                    # Single mode: toggle current or deselect
+                    # Single mode: switch to new item
                     current = active()
-                    if current == idx
-                        set_active(Int32(-1))
-                    else
+                    if current != idx
                         set_active(idx)
                     end
-                else
+                    # Single mode: deselect if same item (always allowed)
+                    if current == idx
+                        set_active(Int32(-1))
+                    end
+                end
+                if m != Int32(0)
                     # Multiple mode: toggle bit
-                    set_active(xor(active(), Int32(1) << idx))
+                    # NOTE: Use Core.Intrinsics.shl_int — Julia's << adds bounds
+                    # checks that compile incorrectly in WasmTarget.jl.
+                    mask = Core.Intrinsics.shl_int(Int32(1), idx)
+                    set_active(xor(active(), mask))
                 end
             end
         end,
