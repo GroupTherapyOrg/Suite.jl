@@ -31,3 +31,8 @@ Manifest*.toml
 LocalPreferences.toml
 JuliaLocalPreferences.toml
 .DS_Store
+
+# Node.js (Playwright)
+node_modules/
+test-results/
+playwright-report/
