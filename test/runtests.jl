@@ -1142,8 +1142,8 @@ using Test
                 CollapsibleTrigger("T"),
                 CollapsibleContent(Div("Inner")),
             ))
-            # Inside Collapsible, hidden is replaced with CSS visibility class
-            @test occursin("data-[state=closed]:hidden", html)
+            # Inside Collapsible, content starts with display:none (ShowDescendants toggles visibility)
+            @test occursin("display:none", html)
         end
 
         @testset "Custom class" begin

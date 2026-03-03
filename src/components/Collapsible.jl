@@ -38,6 +38,8 @@ export Collapsible, CollapsibleTrigger, CollapsibleContent
 @island function Collapsible(children...; open::Bool=false, disabled::Bool=false,
                           class::String="", kwargs...)
     # Signal for open state (Int32: 0=closed, 1=open)
+    # NOTE: WasmTarget.jl can't compile ternary in create_signal arg.
+    # Use Int32(0) for wasm compilation; SSR open=true handled by data-state attr below.
     is_open, set_open = create_signal(Int32(0))
 
     # Provide context for child islands (single key with getter+setter tuple)
@@ -45,6 +47,8 @@ export Collapsible, CollapsibleTrigger, CollapsibleContent
 
     Div(Symbol("data-show") => ShowDescendants(is_open),
         Symbol("data-collapsible") => "",
+        Symbol("data-state") => open ? "open" : "closed",
+        (disabled ? (Symbol("data-disabled") => "",) : ())...,
         :class => cn("", class),
         kwargs...,
         children...)
