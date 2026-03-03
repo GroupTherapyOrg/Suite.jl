@@ -19,7 +19,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npx serve docs/dist -l 3456',
+    // Create Suite.jl symlink so /Suite.jl/*.wasm resolves (matches GitHub Pages path)
+    command: 'cd docs/dist && ln -sf . Suite.jl 2>/dev/null; cd ../.. && npx serve docs/dist -l 3456',
     port: 3456,
     reuseExistingServer: !process.env.CI,
   },
