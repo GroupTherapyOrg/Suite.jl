@@ -61,9 +61,11 @@ const _THEME_OPTIONS = [
                     store_active_element()
                     set_open(Int32(1))
                     push_escape_handler(Int32(0))
+                    add_click_outside_listener(Int32(0), Int32(0))
                 else
                     set_open(Int32(0))
                     pop_escape_handler()
+                    remove_click_outside_listener(Int32(0))
                     restore_active_element()
                 end
             end,
