@@ -1007,12 +1007,12 @@ using Test
     @testset "ThemeSwitcher" begin
         @testset "Default rendering" begin
             html = Therapy.render_to_string(ThemeSwitcher())
-            @test occursin("data-theme-switcher", html)
-            @test occursin("data-theme-switcher-trigger", html)
-            @test occursin("data-theme-switcher-content", html)
             @test occursin("aria-label=\"Switch theme\"", html)
-            @test occursin("aria-haspopup=\"true\"", html)
+            @test occursin("aria-haspopup=\"menu\"", html)
             @test occursin("role=\"menu\"", html)
+            # Composes DropdownMenu — has dropdown trigger/content markers
+            @test occursin("data-dropdown-menu-trigger-wrapper", html)
+            @test occursin("data-dropdown-menu-content", html)
         end
 
         @testset "Theme options" begin
@@ -1058,9 +1058,9 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :ThemeSwitcher)
             meta = Suite.COMPONENT_REGISTRY[:ThemeSwitcher]
-            @test meta.tier == :island
+            @test meta.tier == :styling
             @test :ThemeSwitcher in meta.exports
-            @test :ThemeSwitcher in meta.js_modules
+            @test :DropdownMenu in meta.suite_deps
         end
     end
 

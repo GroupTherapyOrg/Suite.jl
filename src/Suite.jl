@@ -69,12 +69,12 @@ include("components/Slider.jl")
 
 # --- Theme Components ---
 include("components/ThemeToggle.jl")
-include("components/ThemeSwitcher.jl")
 
 # --- Phase 3: Island Components ---
 include("components/Dialog.jl")
 include("components/AlertDialog.jl")
 include("components/DropdownMenu.jl")
+include("components/ThemeSwitcher.jl")  # Composes DropdownMenu — must load after it
 include("components/Popover.jl")
 include("components/Tooltip.jl")
 include("components/Select.jl")
