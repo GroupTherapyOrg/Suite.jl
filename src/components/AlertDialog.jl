@@ -184,9 +184,8 @@ end
 Confirm action button. Clicking closes the alert dialog.
 """
 function AlertDialogAction(children...; class::String="", kwargs...)
-    Span(Symbol("data-alert-dialog-action") => "",
-         :class => cn(class),
-         :style => "display:contents",
+    Therapy.Button(Symbol("data-alert-dialog-action") => "",
+         :class => cn("inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-accent-600 text-white hover:bg-accent-700 h-10 px-4 py-2", class),
          kwargs...,
          children...)
 end
@@ -197,9 +196,8 @@ end
 Cancel button. Clicking closes the alert dialog. Auto-focused on open.
 """
 function AlertDialogCancel(children...; class::String="", kwargs...)
-    Span(Symbol("data-alert-dialog-cancel") => "",
-         :class => cn(class),
-         :style => "display:contents",
+    Therapy.Button(Symbol("data-alert-dialog-cancel") => "",
+         :class => cn("inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-950 hover:bg-warm-100 dark:hover:bg-warm-900 text-warm-800 dark:text-warm-300 h-10 px-4 py-2", class),
          kwargs...,
          children...)
 end

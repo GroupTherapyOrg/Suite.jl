@@ -1965,14 +1965,16 @@ using Test
         @testset "Action wrapper" begin
             html = Therapy.render_to_string(AlertDialogAction("Confirm"))
             @test occursin("data-alert-dialog-action", html)
-            @test occursin("display:contents", html)
+            @test occursin("<button", html)
+            @test occursin("bg-accent-600", html)
             @test occursin("Confirm", html)
         end
 
         @testset "Cancel wrapper" begin
             html = Therapy.render_to_string(AlertDialogCancel("Cancel"))
             @test occursin("data-alert-dialog-cancel", html)
-            @test occursin("display:contents", html)
+            @test occursin("<button", html)
+            @test occursin("border-warm-200", html)
             @test occursin("Cancel", html)
         end
 
