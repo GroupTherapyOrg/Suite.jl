@@ -75,20 +75,23 @@ end
          :style => "display:contents",
          :class => cn(class),
          Symbol("data-state") => BindBool(is_open, "closed", "open"),
-         :on_contextmenu => () -> begin
+         :on_contextmenu => () -> begin  # handler_0: toggle (has prevent_default)
              prevent_default()
              if is_open() == Int32(0)
-                 # Opening: inline Wasm behavior
-                 store_active_element()
                  set_open(Int32(1))
-                 push_escape_handler(Int32(0))
-                 add_click_outside_listener(Int32(-1), Int32(0))
+                 push_dismiss_layer(Int32(-1), Int32(1))
+                 push_escape_handler(Int32(1))
              else
-                 # Closing: inline Wasm behavior
                  set_open(Int32(0))
                  pop_escape_handler()
-                 remove_click_outside_listener(Int32(-1))
-                 restore_active_element()
+                 pop_dismiss_layer()
+             end
+         end,
+         :on_dismiss => () -> begin  # handler_1: close-only (NO prevent_default!)
+             if is_open() != Int32(0)
+                 set_open(Int32(0))
+                 pop_escape_handler()
+                 pop_dismiss_layer()
              end
          end,
          kwargs...,
