@@ -44,8 +44,7 @@ export Popover, PopoverTrigger, PopoverContent,
     provide_context(:popover, (is_open, set_open))
 
     Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
-        :class => cn("", class),
-        :style => "display:contents",
+        :class => cn("relative inline-block", class),
         kwargs...,
         children...)
 end
@@ -103,6 +102,7 @@ The floating content panel. Positioned relative to the trigger.
 function PopoverContent(children...; side::String="bottom", side_offset::Int=0, align::String="center", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
         "glass-panel",
+        "absolute right-0 mt-1",
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",

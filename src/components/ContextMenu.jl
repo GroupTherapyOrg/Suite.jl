@@ -56,8 +56,7 @@ const _CONTEXT_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     provide_context(:contextmenu, (is_open, set_open))
 
     Div(Symbol("data-show") => ShowDescendants(is_open),  # show/hide + data-state binding (inline Wasm)
-        :class => cn("", class),
-        :style => "display:contents",
+        :class => cn("relative inline-block", class),
         kwargs...,
         children...)
 end
@@ -105,7 +104,7 @@ The floating menu content panel. Positioned at the right-click location.
 """
 function ContextMenuContent(children...; theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
-        "z-50 max-h-[var(--radix-popper-available-height,300px)] min-w-[8rem]",
+        "absolute z-50 max-h-[var(--radix-popper-available-height,300px)] min-w-[8rem]",
         "overflow-x-hidden overflow-y-auto rounded-md p-1 shadow-md",
         "bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-300",
         "border border-warm-200 dark:border-warm-700",
