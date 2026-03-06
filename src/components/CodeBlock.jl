@@ -67,6 +67,8 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
     # Code content with optional line numbers
     code_lines = split(code, '\n')
 
+    lang_class = isempty(language) ? "block" : "block language-$(language)"
+
     code_content = if show_line_numbers
         # Line numbers + code side by side
         Div(:class => "flex",
@@ -76,12 +78,12 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
             ),
             # Code area
             Pre(:class => "flex-1 overflow-x-auto p-4 font-mono text-sm leading-6 text-warm-200",
-                Code(:class => "block", code)
+                Code(:class => lang_class, code)
             ),
         )
     else
         Pre(:class => "overflow-x-auto p-4 font-mono text-sm leading-6 text-warm-200",
-            Code(:class => "block", code)
+            Code(:class => lang_class, code)
         )
     end
 
