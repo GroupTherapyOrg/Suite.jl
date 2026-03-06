@@ -19,6 +19,11 @@
 if !@isdefined(Div); using Therapy end
 if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
+# SSR stub: at runtime this is a Wasm import (import 92) that reads localStorage/system preference
+if !@isdefined(get_is_dark_mode)
+    get_is_dark_mode() = Int32(0)
+end
+
 # --- Component Implementation ---
 
 export ThemeToggle
@@ -35,8 +40,8 @@ export ThemeToggle
 # Examples: ThemeToggle(), ThemeToggle(class="ml-2")
 @island function ThemeToggle(; theme::Symbol=:default, class::String="", kwargs...)
     # Signal for dark mode state (Int32: 0=light, 1=dark)
-    # Initial value 0 is overridden at hydration by generate_theme_init()
-    dark, set_dark = create_signal(Int32(0))
+    # At runtime, get_is_dark_mode() reads localStorage/system preference via Wasm import
+    dark, set_dark = create_signal(get_is_dark_mode())
 
     classes = cn("inline-flex items-center justify-center rounded-md p-2 hover:bg-warm-200 dark:hover:bg-warm-800 transition-colors cursor-pointer", class)
     sun_classes = "hidden dark:block w-5 h-5 text-warm-300"
