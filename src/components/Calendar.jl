@@ -9,19 +9,17 @@
 #
 # Behavior (Full Wasm):
 #   - Month grid with day selection via compiled match_descendants / bit_descendants
-#   - Month navigation via prev/next buttons (data-index 50/51)
-#   - 12 pre-rendered month panels shown/hidden via MatchShow
 #   - Single mode: match_descendants (data-state open when signal == index)
 #   - Multiple mode: bit_descendants (data-state open when bit N set)
+#   - Month navigation via prev/next buttons (SSR-only, data-role)
 #   - DatePicker: split island (parent + trigger) with ShowDescendants
 #
 # Architecture:
-#   - Single @island with 2 signals + 1 click handler (event delegation)
-#   - Signal 1 (month_idx): Int32 0-11, which panel to show
-#   - Signal 2 (selected): Int32, -1=none (single) or bitmask (multiple)
+#   - Single @island with 1 signal + 1 click handler (event delegation)
+#   - Signal 0 (global 1): selected — Int32, -1=none (single) or bitmask (multiple)
 #   - 42 day cells per panel with data-index (0-41) → match/bit descendants
-#   - Nav buttons with data-index 50 (prev) / 51 (next)
-#   - 12 MatchShow panels: SSR pre-renders all 12, Wasm shows/hides
+#   - Nav buttons with data-role (1=prev, 2=next) — invisible to match_descendants
+#   - SSR content via _calendar_render() — opaque call, invisible to IslandTransform
 #
 # Reference: Thaw Calendar — github.com/thaw-ui/thaw
 # Reference: WAI-ARIA Grid — https://www.w3.org/WAI/ARIA/apg/patterns/grid/
@@ -35,15 +33,6 @@ using Dates
 # --- Component Implementation ---
 
 export Calendar, DatePicker
-
-# --- MatchShow SSR function ---
-# MatchShow is an AST-level construct (IslandTransform.jl detects it and generates
-# hydrate_match_binding calls). This runtime function is only used for SSR evaluation.
-function MatchShow(render::Function, signal_getter, match_value)
-    content = render()
-    visible = try signal_getter() == match_value catch; false end
-    Div(:style => visible ? "" : "display:none", content)
-end
 
 # --- SVG Icons ---
 const _CALENDAR_CHEVRON_LEFT = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>"""
@@ -105,34 +94,83 @@ function _calendar_weeks(year::Int, month::Int; show_outside_days::Bool=true)
     weeks
 end
 
-"""Build nav buttons with data-index for Wasm event delegation."""
-function _calendar_nav(theme::Symbol=:default)
-    Nav(:class => "flex items-center justify-between absolute top-3 inset-x-3 z-10",
-        :aria_label => "Calendar navigation",
-        Therapy.Button(:type => "button",
-               :class => cn(_nav_button_classes(theme)),
-               Symbol("data-index") => "50",
-               :aria_label => "Go to previous month",
-               Therapy.RawHtml(_CALENDAR_CHEVRON_LEFT)),
-        Therapy.Button(:type => "button",
-               :class => cn(_nav_button_classes(theme)),
-               Symbol("data-index") => "51",
-               :aria_label => "Go to next month",
-               Therapy.RawHtml(_CALENDAR_CHEVRON_RIGHT)),
-    )
-end
-
 # --- Props Transform ---
 # Alphabetically sorted underscore props → compiled_get_prop_i32 indices:
-#   _m (index 0) = initial month panel (always 0)
-#   _mode (index 1) = 0=single, 1=multiple
-#   _s (index 2) = initial selected: -1 (single), 0 (multiple)
+#   _mode (index 0) = 0=single, 1=multiple
+#   _s (index 1) = initial selected: -1 (single), 0 (multiple)
 const _CALENDAR_PROPS_TRANSFORM = (props, args) -> begin
     mode = get(props, :mode, "single")
     mode_flag = mode == "single" ? 0 : 1
-    props[:_m] = 0
     props[:_mode] = mode_flag
     props[:_s] = mode_flag == 0 ? -1 : 0
+end
+
+# SSR helper: builds the complete Calendar VNode tree.
+# Extracted from the island body so the AST transform doesn't try to compile
+# for-loops, string operations, or Dates calls.
+function _calendar_render(; mode::String="single",
+                          month::Int=Dates.month(Dates.today()),
+                          year::Int=Dates.year(Dates.today()),
+                          selected::String="",
+                          disabled_dates::String="",
+                          show_outside_days::Bool=true,
+                          fixed_weeks::Bool=false,
+                          number_of_months::Int=1,
+                          class::String="",
+                          theme::Symbol=:default,
+                          kwargs...)
+    id = "suite-calendar-" * string(rand(UInt32), base=16)
+
+    root_classes = cn(
+        "p-3 text-warm-800 dark:text-warm-300",
+        class
+    )
+    theme !== :default && (root_classes = apply_theme(root_classes, get_theme(theme)))
+
+    # Build month panels
+    month_panels = []
+    for i in 0:(number_of_months - 1)
+        display_month = month + i
+        display_year = year
+        while display_month > 12
+            display_month -= 12
+            display_year += 1
+        end
+        push!(month_panels, _calendar_month_panel(id, display_year, display_month,
+              show_outside_days, fixed_weeks, mode, i, number_of_months, theme))
+    end
+
+    # Navigation buttons with data-role for event delegation (invisible to match_descendants)
+    nav = Nav(:class => "flex items-center justify-between absolute top-3 inset-x-3 z-10",
+              :aria_label => "Calendar navigation",
+              Therapy.Button(:type => "button",
+                     :class => cn(_nav_button_classes(theme)),
+                     Symbol("data-role") => "1",
+                     :aria_label => "Go to previous month",
+                     Therapy.RawHtml(_CALENDAR_CHEVRON_LEFT)),
+              Therapy.Button(:type => "button",
+                     :class => cn(_nav_button_classes(theme)),
+                     Symbol("data-role") => "2",
+                     :aria_label => "Go to next month",
+                     Therapy.RawHtml(_CALENDAR_CHEVRON_RIGHT)),
+    )
+
+    Div(Symbol("data-calendar") => id,
+        Symbol("data-calendar-mode") => mode,
+        Symbol("data-calendar-month") => string(month),
+        Symbol("data-calendar-year") => string(year),
+        Symbol("data-calendar-selected") => selected,
+        Symbol("data-calendar-disabled") => disabled_dates,
+        Symbol("data-calendar-show-outside") => show_outside_days ? "true" : "false",
+        Symbol("data-calendar-fixed-weeks") => fixed_weeks ? "true" : "false",
+        Symbol("data-calendar-months-count") => string(number_of_months),
+        :class => root_classes,
+        :style => "position:relative",
+        kwargs...,
+        nav,
+        Div(:class => cn("flex gap-4", number_of_months > 1 ? "flex-row" : "flex-col"),
+            month_panels...),
+    )
 end
 
 @island function Calendar(; mode::String="single",
@@ -147,69 +185,34 @@ end
                         theme::Symbol=:default,
                         kwargs...)
     # ─── Signals ───
-    # Signal 0 (global 1): month_idx — which pre-rendered panel to show (0-11)
-    month_idx, set_month_idx = create_signal(compiled_get_prop_i32(Int32(0)))
-    # Signal 1 (global 2): selected — day index (single) or bitmask (multiple)
-    selected_val, set_selected = create_signal(compiled_get_prop_i32(Int32(2)))
+    # Signal 0 (global 1): selected — day index (single) or bitmask (multiple)
+    selected_val, set_selected = create_signal(compiled_get_prop_i32(Int32(1)))  # _s
 
-    # Mode-dependent binding on signal 1 (global 2) for day selection highlight
-    mf = compiled_get_prop_i32(Int32(1))
+    # Mode-dependent binding on signal 0 (global 1)
+    mf = compiled_get_prop_i32(Int32(0))  # _mode
     if mf == Int32(0)
         # Single mode: data-state = open when signal == index
-        compiled_register_match_descendants(Int32(2), Int32(0))
+        compiled_register_match_descendants(Int32(1), Int32(0))
     end
     if mf != Int32(0)
         # Multiple mode: data-state = open when bit N is set
-        compiled_register_bit_descendants(Int32(2), Int32(0))
+        compiled_register_bit_descendants(Int32(1), Int32(0))
     end
 
-    # ─── SSR Setup ───
-    id = "suite-calendar-" * string(rand(UInt32), base=16)
+    # SSR content — opaque call, invisible to IslandTransform
+    content = _calendar_render(; mode=mode, month=month, year=year, selected=selected,
+                      disabled_dates=disabled_dates, show_outside_days=show_outside_days,
+                      fixed_weeks=fixed_weeks, number_of_months=number_of_months,
+                      class=class, theme=theme, kwargs...)
 
-    root_classes = cn(
-        "p-3 text-warm-800 dark:text-warm-300",
-        class
-    )
-    theme !== :default && (root_classes = apply_theme(root_classes, get_theme(theme)))
-
-    # Pre-compute 12 month/year pairs starting from initial month
-    _panels_data = [( ((month-1+i)%12)+1, year+((month-1+i)÷12) ) for i in 0:11]
-
-    # Root with nav + 12 MatchShow panels
-    Div(Symbol("data-calendar") => id,
-        Symbol("data-calendar-mode") => mode,
-        Symbol("data-calendar-month") => string(month),
-        Symbol("data-calendar-year") => string(year),
-        Symbol("data-calendar-selected") => selected,
-        Symbol("data-calendar-disabled") => disabled_dates,
-        Symbol("data-calendar-show-outside") => show_outside_days ? "true" : "false",
-        Symbol("data-calendar-fixed-weeks") => fixed_weeks ? "true" : "false",
-        Symbol("data-calendar-months-count") => string(number_of_months),
-        :class => root_classes,
-        :style => "position:relative",
-        kwargs...,
+    # Root Div with click handler for day selection (event delegation)
+    # Day cells have data-index 0-41. Nav buttons use data-role (no data-index).
+    Div(:style => "display:contents",
         :on_click => () -> begin
             idx = compiled_get_event_data_index()
-            # Nav: prev button (data-index 50)
-            if idx == Int32(50)
-                m = month_idx()
-                if m != Int32(0)
-                    set_month_idx(m - Int32(1))
-                    set_selected(compiled_get_prop_i32(Int32(2)))
-                end
-            end
-            # Nav: next button (data-index 51)
-            if idx == Int32(51)
-                m = month_idx()
-                if m != Int32(11)
-                    set_month_idx(m + Int32(1))
-                    set_selected(compiled_get_prop_i32(Int32(2)))
-                end
-            end
-            # Day cell (0-41)
             if idx >= Int32(0)
                 if idx < Int32(42)
-                    mf = compiled_get_prop_i32(Int32(1))
+                    mf = compiled_get_prop_i32(Int32(0))
                     if mf == Int32(0)
                         set_selected(idx)
                     end
@@ -220,45 +223,7 @@ end
                 end
             end
         end,
-        _calendar_nav(theme),
-        Div(:class => "flex flex-col",
-            MatchShow(month_idx, Int32(0)) do
-                _calendar_month_panel(id, _panels_data[1]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(1)) do
-                _calendar_month_panel(id, _panels_data[2]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(2)) do
-                _calendar_month_panel(id, _panels_data[3]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(3)) do
-                _calendar_month_panel(id, _panels_data[4]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(4)) do
-                _calendar_month_panel(id, _panels_data[5]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(5)) do
-                _calendar_month_panel(id, _panels_data[6]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(6)) do
-                _calendar_month_panel(id, _panels_data[7]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(7)) do
-                _calendar_month_panel(id, _panels_data[8]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(8)) do
-                _calendar_month_panel(id, _panels_data[9]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(9)) do
-                _calendar_month_panel(id, _panels_data[10]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(10)) do
-                _calendar_month_panel(id, _panels_data[11]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-            MatchShow(month_idx, Int32(11)) do
-                _calendar_month_panel(id, _panels_data[12]..., show_outside_days, fixed_weeks, mode, theme)
-            end,
-        ))
+        content)
 end
 
 function _nav_button_classes(theme::Symbol=:default)
@@ -272,7 +237,7 @@ Build a single month panel with caption + grid.
 Always renders exactly 6 weeks (42 cells) for Wasm grid update compatibility.
 Simplified caption: just month name + year text (no data-index on caption elements).
 """
-function _calendar_month_panel(cal_id, month, year, show_outside_days, fixed_weeks, mode, theme)
+function _calendar_month_panel(cal_id, year, month, show_outside_days, fixed_weeks, mode, month_index, total_months, theme)
     weeks = _calendar_weeks(year, month; show_outside_days=true)  # Always generate all outside days
 
     # Pad to exactly 6 weeks for consistent 42-cell grid
@@ -343,6 +308,7 @@ function _calendar_month_panel(cal_id, month, year, show_outside_days, fixed_wee
     end
 
     Div(:class => "flex flex-col gap-4 w-full",
+        Symbol("data-calendar-month-panel") => string(month_index),
         caption,
         Therapy.Table(grid_attrs..., thead, tbody))
 end

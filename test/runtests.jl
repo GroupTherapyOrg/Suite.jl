@@ -4552,8 +4552,8 @@ using Test
             html = Therapy.render_to_string(Calendar(month=2, year=2026))
             @test occursin("data-calendar-month=\"2\"", html)
             @test occursin("data-calendar-year=\"2026\"", html)
-            @test occursin("data-index=\"50\"", html)  # prev button
-            @test occursin("data-index=\"51\"", html)  # next button
+            @test occursin("data-role=\"1\"", html)  # prev button
+            @test occursin("data-role=\"2\"", html)  # next button
             @test occursin("Go to previous month", html)
             @test occursin("Go to next month", html)
         end
@@ -4707,15 +4707,6 @@ using Test
         @testset "Fixed weeks" begin
             html = Therapy.render_to_string(Calendar(month=2, year=2026, fixed_weeks=true))
             @test occursin("data-calendar-fixed-weeks=\"true\"", html)
-        end
-
-        @testset "12-panel MatchShow architecture" begin
-            html = Therapy.render_to_string(Calendar(month=2, year=2026))
-            # First panel (February) is visible
-            @test occursin("February 2026", html)
-            # Subsequent months pre-rendered but hidden (display:none on MatchShow wrapper)
-            @test occursin("March 2026", html)
-            @test occursin("January 2027", html)  # 12th panel wraps to next year
         end
 
         @testset "Island tier (no JS)" begin
