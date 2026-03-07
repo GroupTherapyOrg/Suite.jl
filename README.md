@@ -130,6 +130,57 @@ Suite.Card(
 | **Toolbar** | `Toolbar`, `ToolbarGroup`, `ToolbarSeparator` |
 | **Kbd** | `Kbd` |
 
+## Interactivity Status
+
+All interactive behavior is compiled to **WebAssembly** via `@island` — zero JavaScript.
+
+### Fully Interactive (Wasm)
+
+These components have complete click/keyboard/pointer handling compiled to Wasm:
+
+- [x] Accordion (single + multiple mode, collapsible)
+- [x] AlertDialog (open/close, focus trap, escape dismiss)
+- [x] Calendar (day selection — single + multiple mode)
+- [x] Collapsible (open/close toggle)
+- [x] Command (filtering, keyboard navigation, item selection)
+- [x] ContextMenu (right-click trigger, open/close)
+- [x] Dialog (open/close, focus trap, escape dismiss)
+- [x] Drawer (open/close, focus trap, escape dismiss)
+- [x] DropdownMenu (open/close, item selection)
+- [x] Form (validation, error display)
+- [x] HoverCard (pointer enter/leave)
+- [x] Menubar (multi-menu navigation, keyboard support)
+- [x] NavigationMenu (active item tracking)
+- [x] Popover (open/close, positioning)
+- [x] Select (open/close, item selection)
+- [x] Sheet (open/close, focus trap)
+- [x] Slider (drag, keyboard increment)
+- [x] Switch (toggle on/off)
+- [x] Tabs (tab switching, keyboard navigation)
+- [x] ThemeToggle (dark/light mode)
+- [x] ThemeSwitcher (theme palette switching via DropdownMenu)
+- [x] Toggle (pressed/unpressed)
+- [x] ToggleGroup (single + multiple mode)
+- [x] Tooltip (pointer enter/leave)
+
+### Planned Interactive (Not Yet Wasm)
+
+These components render correctly but interactive elements don't respond to clicks yet:
+
+- [ ] **Carousel** — prev/next buttons render but do nothing; needs slide index signal + match_descendants
+- [ ] **Calendar month navigation** — prev/next arrows are SSR-only; needs MatchShow pattern for opaque content
+- [ ] **DataTable** — sort headers, filter input, pagination buttons render but are non-functional
+- [ ] **Resizable** — drag handles render but pointer capture not implemented
+- [ ] **Toast** — toaster container renders but no client API to trigger notifications
+- [ ] **CodeBlock** — copy button renders but clipboard copy not implemented
+- [ ] **TreeView** — expand/collapse chevrons render but tree state not tracked
+
+### Pure Styling (No Interactivity Needed)
+
+These components are complete — they're static HTML + CSS with no interactive behavior required:
+
+Alert, AspectRatio, Avatar, Badge, Breadcrumb, Button, Card, Empty, Footer, Input, Kbd, Label, Pagination, Progress, ScrollArea, Separator, Skeleton, Spinner, StatusBar, Table, Textarea, Toolbar, Typography
+
 ## Theme System
 
 Suite.jl includes 5 built-in themes with automatic dark mode support:
