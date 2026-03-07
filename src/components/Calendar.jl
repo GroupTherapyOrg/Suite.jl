@@ -112,7 +112,7 @@ function _calendar_render(; mode::String="single",
     id = "suite-calendar-" * string(rand(UInt32), base=16)
 
     root_classes = cn(
-        "p-3",
+        "p-3 text-warm-800 dark:text-warm-300",
         class
     )
     theme !== :default && (root_classes = apply_theme(root_classes, get_theme(theme)))
@@ -175,14 +175,14 @@ end
                         theme::Symbol=:default,
                         kwargs...)
     # ─── Signals ───
-    # Props: _m=month (index 0), _y=year (index 1) — alphabetical order
-    current_month, set_month = create_signal(compiled_get_prop_i32(Int32(0)))
-    current_year, set_year = create_signal(compiled_get_prop_i32(Int32(1)))
+    # Signal 0 (global 1): selected_index (-1=none, 0-41=cell)
+    # Bound to match_descendants for data-state="open" highlighting.
     selected_idx, set_selected = create_signal(Int32(-1))
-    base_el_id, set_base = create_signal(compiled_get_elements_count())
 
-    # Register match descendants for day selection (signal 2 = global 3, mode 0 = closed/open)
-    compiled_register_match_descendants(Int32(3), Int32(0))
+    # Register match descendants on signal 0 (global 1) for day selection highlight.
+    # match_descendants walks DOM, finds all [data-index] elements, pushes to state.elements.
+    # data-state mode 0 = closed/open (selected day gets data-state="open").
+    compiled_register_match_descendants(Int32(1), Int32(0))
 
     # SSR content — complex rendering delegated to external helper
     content = _calendar_render(; mode=mode, month=month, year=year, selected=selected,
@@ -190,329 +190,16 @@ end
                       fixed_weeks=fixed_weeks, number_of_months=number_of_months,
                       class=class, theme=theme, kwargs...)
 
-    # Root Div with event delegation click handler
-    # The AST transform sees this Div and generates cursor walk for it.
-    # `content` is treated as an opaque child (Symbol), not recursed into.
+    # Root Div with click handler for day selection (Accordion-style event delegation)
+    # Day cells have data-index 0-41; month spans have 100-111; year span has 200.
+    # Only day cell clicks (0-41) trigger selection. Nav buttons have no data-index (-1).
+    # Month navigation is SSR-only (not yet compiled to Wasm).
     Div(:style => "display:contents",
         :on_click => () -> begin
-            role = compiled_get_event_closest_role()
-            # ─── Nav: prev month (role=1) ───
-            if role == Int32(1)
-                m = current_month()
-                y = current_year()
-                if m == Int32(1)
-                    set_month(Int32(12))
-                    set_year(y - Int32(1))
-                end
-                if m != Int32(1)
-                    set_month(m - Int32(1))
-                end
-                # Update grid after month change
-                m2 = current_month()
-                y2 = current_year()
-                base = base_el_id()
-                # ── days_in_month(m2, y2) ──
-                dim = Int32(31)
-                if m2 == Int32(2)
-                    # Leap year check: (y%4==0 && y%100!=0) || y%400==0
-                    r4 = y2 - (y2 ÷ Int32(4)) * Int32(4)
-                    r100 = y2 - (y2 ÷ Int32(100)) * Int32(100)
-                    r400 = y2 - (y2 ÷ Int32(400)) * Int32(400)
-                    dim = Int32(28)
-                    if r4 == Int32(0)
-                        if r100 != Int32(0)
-                            dim = Int32(29)
-                        end
-                        if r100 == Int32(0)
-                            if r400 == Int32(0)
-                                dim = Int32(29)
-                            end
-                        end
-                    end
-                end
-                if m2 == Int32(4)
-                    dim = Int32(30)
-                end
-                if m2 == Int32(6)
-                    dim = Int32(30)
-                end
-                if m2 == Int32(9)
-                    dim = Int32(30)
-                end
-                if m2 == Int32(11)
-                    dim = Int32(30)
-                end
-                # ── day_of_week(y2, m2, 1): Tomohiko Sakamoto ──
-                # t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4}
-                # For m < 3, use y-1
-                yy = y2
-                if m2 < Int32(3)
-                    yy = y2 - Int32(1)
-                end
-                # t[m2] via if-chain
-                t_val = Int32(0)
-                if m2 == Int32(2)
-                    t_val = Int32(3)
-                end
-                if m2 == Int32(3)
-                    t_val = Int32(2)
-                end
-                if m2 == Int32(4)
-                    t_val = Int32(5)
-                end
-                if m2 == Int32(5)
-                    t_val = Int32(0)
-                end
-                if m2 == Int32(6)
-                    t_val = Int32(3)
-                end
-                if m2 == Int32(7)
-                    t_val = Int32(5)
-                end
-                if m2 == Int32(8)
-                    t_val = Int32(1)
-                end
-                if m2 == Int32(9)
-                    t_val = Int32(4)
-                end
-                if m2 == Int32(10)
-                    t_val = Int32(6)
-                end
-                if m2 == Int32(11)
-                    t_val = Int32(2)
-                end
-                if m2 == Int32(12)
-                    t_val = Int32(4)
-                end
-                # dow = (y + y/4 - y/100 + y/400 + t[m] + 1) % 7
-                # Result: 0=Sun, 1=Mon, ..., 6=Sat
-                # Convert to 0=Mon, ..., 6=Sun: dow_mon = (dow + 6) % 7
-                raw_dow = (yy + yy ÷ Int32(4) - yy ÷ Int32(100) + yy ÷ Int32(400) + t_val + Int32(1))
-                dow_sun = raw_dow - (raw_dow ÷ Int32(7)) * Int32(7)
-                dow = (dow_sun + Int32(6)) - ((dow_sun + Int32(6)) ÷ Int32(7)) * Int32(7)
-                # ── prev month's days_in_month ──
-                pm = m2 - Int32(1)
-                py = y2
-                if m2 == Int32(1)
-                    pm = Int32(12)
-                    py = y2 - Int32(1)
-                end
-                prev_dim = Int32(31)
-                if pm == Int32(2)
-                    r4p = py - (py ÷ Int32(4)) * Int32(4)
-                    r100p = py - (py ÷ Int32(100)) * Int32(100)
-                    r400p = py - (py ÷ Int32(400)) * Int32(400)
-                    prev_dim = Int32(28)
-                    if r4p == Int32(0)
-                        if r100p != Int32(0)
-                            prev_dim = Int32(29)
-                        end
-                        if r100p == Int32(0)
-                            if r400p == Int32(0)
-                                prev_dim = Int32(29)
-                            end
-                        end
-                    end
-                end
-                if pm == Int32(4)
-                    prev_dim = Int32(30)
-                end
-                if pm == Int32(6)
-                    prev_dim = Int32(30)
-                end
-                if pm == Int32(9)
-                    prev_dim = Int32(30)
-                end
-                if pm == Int32(11)
-                    prev_dim = Int32(30)
-                end
-                # ── Update 42 cells ──
-                cell_base = base + Int32(13)
-                i = Int32(0)
-                while i < Int32(42)
-                    if i < dow
-                        # Previous month day
-                        compiled_hide_element(cell_base + i)
-                    end
-                    if i >= dow
-                        if i < dow + dim
-                            # Current month day
-                            day = i - dow + Int32(1)
-                            compiled_update_text(cell_base + i, Float64(day))
-                            compiled_show_element(cell_base + i)
-                        end
-                    end
-                    if i >= dow + dim
-                        # Next month day
-                        compiled_hide_element(cell_base + i)
-                    end
-                    i = i + Int32(1)
-                end
-                # ── Update month name spans ──
-                # Hide old month, show new month
-                old_m = m  # m was the OLD month before set_month
-                month_base = base
-                compiled_hide_element(month_base + old_m - Int32(1))
-                compiled_show_element(month_base + m2 - Int32(1))
-                # ── Update year ──
-                year_el = base + Int32(12)
-                compiled_update_text(year_el, Float64(y2))
-                # Reset selection
-                set_selected(Int32(-1))
-            end
-            # ─── Nav: next month (role=2) ───
-            if role == Int32(2)
-                m = current_month()
-                y = current_year()
-                if m == Int32(12)
-                    set_month(Int32(1))
-                    set_year(y + Int32(1))
-                end
-                if m != Int32(12)
-                    set_month(m + Int32(1))
-                end
-                # Update grid (same logic as prev, duplicated to avoid function calls)
-                m2 = current_month()
-                y2 = current_year()
-                base = base_el_id()
-                dim = Int32(31)
-                if m2 == Int32(2)
-                    r4 = y2 - (y2 ÷ Int32(4)) * Int32(4)
-                    r100 = y2 - (y2 ÷ Int32(100)) * Int32(100)
-                    r400 = y2 - (y2 ÷ Int32(400)) * Int32(400)
-                    dim = Int32(28)
-                    if r4 == Int32(0)
-                        if r100 != Int32(0)
-                            dim = Int32(29)
-                        end
-                        if r100 == Int32(0)
-                            if r400 == Int32(0)
-                                dim = Int32(29)
-                            end
-                        end
-                    end
-                end
-                if m2 == Int32(4)
-                    dim = Int32(30)
-                end
-                if m2 == Int32(6)
-                    dim = Int32(30)
-                end
-                if m2 == Int32(9)
-                    dim = Int32(30)
-                end
-                if m2 == Int32(11)
-                    dim = Int32(30)
-                end
-                yy = y2
-                if m2 < Int32(3)
-                    yy = y2 - Int32(1)
-                end
-                t_val = Int32(0)
-                if m2 == Int32(2)
-                    t_val = Int32(3)
-                end
-                if m2 == Int32(3)
-                    t_val = Int32(2)
-                end
-                if m2 == Int32(4)
-                    t_val = Int32(5)
-                end
-                if m2 == Int32(5)
-                    t_val = Int32(0)
-                end
-                if m2 == Int32(6)
-                    t_val = Int32(3)
-                end
-                if m2 == Int32(7)
-                    t_val = Int32(5)
-                end
-                if m2 == Int32(8)
-                    t_val = Int32(1)
-                end
-                if m2 == Int32(9)
-                    t_val = Int32(4)
-                end
-                if m2 == Int32(10)
-                    t_val = Int32(6)
-                end
-                if m2 == Int32(11)
-                    t_val = Int32(2)
-                end
-                if m2 == Int32(12)
-                    t_val = Int32(4)
-                end
-                raw_dow = (yy + yy ÷ Int32(4) - yy ÷ Int32(100) + yy ÷ Int32(400) + t_val + Int32(1))
-                dow_sun = raw_dow - (raw_dow ÷ Int32(7)) * Int32(7)
-                dow = (dow_sun + Int32(6)) - ((dow_sun + Int32(6)) ÷ Int32(7)) * Int32(7)
-                pm = m2 - Int32(1)
-                py = y2
-                if m2 == Int32(1)
-                    pm = Int32(12)
-                    py = y2 - Int32(1)
-                end
-                prev_dim = Int32(31)
-                if pm == Int32(2)
-                    r4p = py - (py ÷ Int32(4)) * Int32(4)
-                    r100p = py - (py ÷ Int32(100)) * Int32(100)
-                    r400p = py - (py ÷ Int32(400)) * Int32(400)
-                    prev_dim = Int32(28)
-                    if r4p == Int32(0)
-                        if r100p != Int32(0)
-                            prev_dim = Int32(29)
-                        end
-                        if r100p == Int32(0)
-                            if r400p == Int32(0)
-                                prev_dim = Int32(29)
-                            end
-                        end
-                    end
-                end
-                if pm == Int32(4)
-                    prev_dim = Int32(30)
-                end
-                if pm == Int32(6)
-                    prev_dim = Int32(30)
-                end
-                if pm == Int32(9)
-                    prev_dim = Int32(30)
-                end
-                if pm == Int32(11)
-                    prev_dim = Int32(30)
-                end
-                cell_base = base + Int32(13)
-                i = Int32(0)
-                while i < Int32(42)
-                    if i < dow
-                        compiled_hide_element(cell_base + i)
-                    end
-                    if i >= dow
-                        if i < dow + dim
-                            day = i - dow + Int32(1)
-                            compiled_update_text(cell_base + i, Float64(day))
-                            compiled_show_element(cell_base + i)
-                        end
-                    end
-                    if i >= dow + dim
-                        compiled_hide_element(cell_base + i)
-                    end
-                    i = i + Int32(1)
-                end
-                month_base = base
-                compiled_hide_element(month_base + m - Int32(1))
-                compiled_show_element(month_base + m2 - Int32(1))
-                year_el = base + Int32(12)
-                compiled_update_text(year_el, Float64(y2))
-                set_selected(Int32(-1))
-            end
-            # ─── Day cell click (role=0, has data-index) ───
-            if role == Int32(0)
-                idx = compiled_get_event_data_index()
-                # Only handle day cell clicks (data-index 0-41), not month/year spans
-                if idx >= Int32(0)
-                    if idx < Int32(42)
-                        set_selected(idx)
-                    end
+            idx = compiled_get_event_data_index()
+            if idx >= Int32(0)
+                if idx < Int32(42)
+                    set_selected(idx)
                 end
             end
         end,
@@ -553,12 +240,12 @@ function _calendar_month_panel(cal_id, year, month, show_outside_days, fixed_wee
     end
 
     # Caption with 12 month name spans + year span
-    month_spans = [Span(:class => "text-sm font-medium select-none",
+    month_spans = [Span(:class => "text-sm font-medium select-none text-warm-800 dark:text-warm-300",
                         Symbol("data-index") => string(100 + i - 1),
                         :style => i == month ? "" : "display:none",
                         _MONTH_NAMES[i])
                    for i in 1:12]
-    year_span = Span(:class => "text-sm font-medium select-none ml-1",
+    year_span = Span(:class => "text-sm font-medium select-none ml-1 text-warm-800 dark:text-warm-300",
                      Symbol("data-index") => "200",
                      string(year))
 
@@ -792,15 +479,6 @@ function _format_display_date(selected::String, mode::String)
             return dates[1]
         end
     end
-end
-
-# --- Props Transform ---
-const _CALENDAR_PROPS_TRANSFORM = (props, args) -> begin
-    m = get(props, :month, Dates.month(Dates.today()))
-    y = get(props, :year, Dates.year(Dates.today()))
-    # Alphabetical order: _m=0, _y=1
-    props[:_m] = m
-    props[:_y] = y
 end
 
 # --- Registry ---
