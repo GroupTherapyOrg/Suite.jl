@@ -130,6 +130,7 @@ function __init__()
     Therapy.register_island_props_transform!(:NavigationMenu, _NAVIGATIONMENU_PROPS_TRANSFORM)
     Therapy.register_island_props_transform!(:Menubar, _MENUBAR_PROPS_TRANSFORM)
     Therapy.register_island_props_transform!(:Calendar, _CALENDAR_PROPS_TRANSFORM)
+    Therapy.register_island_props_transform!(:Carousel, _CAROUSEL_PROPS_TRANSFORM)
 end
 
 end # module Suite

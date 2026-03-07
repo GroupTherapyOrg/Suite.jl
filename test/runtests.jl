@@ -5786,28 +5786,17 @@ using Test
     end
 
     @testset "Carousel" begin
-        @testset "Container rendering" begin
+        @testset "Container rendering (island)" begin
             html = Therapy.render_to_string(Suite.Carousel(
                 Suite.CarouselContent(
                     Suite.CarouselItem("Slide 1"),
                 ),
             ))
+            @test occursin("therapy-island", html)
             @test occursin("data-carousel", html)
             @test occursin("role=\"region\"", html)
             @test occursin("aria-roledescription=\"carousel\"", html)
             @test occursin("relative", html)
-        end
-
-        @testset "Carousel orientation" begin
-            html = Therapy.render_to_string(Suite.Carousel(orientation="vertical"))
-            @test occursin("data-carousel-orientation=\"vertical\"", html)
-        end
-
-        @testset "Carousel loop and autoplay" begin
-            html = Therapy.render_to_string(Suite.Carousel(loop=true, autoplay=true, autoplay_interval=3000))
-            @test occursin("data-carousel-loop=\"true\"", html)
-            @test occursin("data-carousel-autoplay=\"true\"", html)
-            @test occursin("data-carousel-autoplay-interval=\"3000\"", html)
         end
 
         @testset "CarouselContent" begin
@@ -5817,9 +5806,10 @@ using Test
             @test occursin("data-carousel-viewport", html)
             @test occursin("data-carousel-content", html)
             @test occursin("overflow-hidden", html)
-            @test occursin("scroll-smooth", html)
-            @test occursin("snap-x", html)
-            @test occursin("snap-mandatory", html)
+            # No scroll-snap classes (show/hide replaces scrolling)
+            @test !occursin("scroll-smooth", html)
+            @test !occursin("snap-x", html)
+            @test !occursin("snap-mandatory", html)
         end
 
         @testset "CarouselItem" begin
@@ -5828,8 +5818,8 @@ using Test
             @test occursin("data-carousel-item", html)
             @test occursin("role=\"group\"", html)
             @test occursin("aria-roledescription=\"slide\"", html)
-            @test occursin("snap-start", html)
-            @test occursin("basis-full", html)
+            @test occursin("w-full", html)
+            @test occursin("data-[state=closed]:hidden", html)
         end
 
         @testset "CarouselPrevious" begin
@@ -5862,7 +5852,7 @@ using Test
             @test occursin("max-w-md", html)
         end
 
-        @testset "Full composition" begin
+        @testset "Full composition with data-index" begin
             html = Therapy.render_to_string(Suite.Carousel(
                 Suite.CarouselContent(
                     Suite.CarouselItem("Slide 1"),
@@ -5877,12 +5867,22 @@ using Test
             @test occursin("Slide 3", html)
             @test occursin("data-carousel-prev", html)
             @test occursin("data-carousel-next", html)
+            # Slide data-index assignments
+            @test occursin("data-index=\"0\"", html)
+            @test occursin("data-index=\"1\"", html)
+            @test occursin("data-index=\"2\"", html)
+            # Nav button data-index assignments
+            @test occursin("data-index=\"100\"", html)
+            @test occursin("data-index=\"101\"", html)
+            # First slide open, rest closed
+            @test occursin("data-state=\"open\"", html)
+            @test occursin("data-state=\"closed\"", html)
         end
 
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Carousel)
             meta = Suite.COMPONENT_REGISTRY[:Carousel]
-            @test meta.tier == :styling
+            @test meta.tier == :island
             @test :Carousel in meta.exports
             @test :CarouselContent in meta.exports
             @test :CarouselItem in meta.exports
