@@ -23,6 +23,7 @@ using Therapy: create_signal, BindBool, ShowDescendants
 using Therapy: provide_context, use_context, use_context_signal
 using Therapy: compiled_get_prop_i32, compiled_get_event_data_index
 using Therapy: compiled_register_match_descendants, compiled_register_bit_descendants
+using Therapy: compiled_get_elements_count
 
 using Dates
 
@@ -129,6 +130,7 @@ function __init__()
     Therapy.register_island_props_transform!(:ToggleGroup, _TOGGLEGROUP_PROPS_TRANSFORM)
     Therapy.register_island_props_transform!(:NavigationMenu, _NAVIGATIONMENU_PROPS_TRANSFORM)
     Therapy.register_island_props_transform!(:Menubar, _MENUBAR_PROPS_TRANSFORM)
+    Therapy.register_island_props_transform!(:Calendar, _CALENDAR_PROPS_TRANSFORM)
 end
 
 end # module Suite

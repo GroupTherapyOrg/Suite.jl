@@ -1,26 +1,26 @@
 # Calendar.jl — Suite.jl Calendar Component
 #
 # Tier: island (Wasm — no JavaScript required)
-# Suite Dependencies: Button (for nav buttons)
+# Suite Dependencies: none
 # JS Modules: none
 #
 # Usage via package: using Suite; Calendar()
 # Usage via extract: include("components/Calendar.jl"); Calendar()
 #
-# Behavior (Thaw-style inline Wasm):
-#   - Month grid with day selection
-#   - Signal-driven: ShowDescendants handles nav button visibility
-#   - Single, multiple, and range selection modes
-#   - Month/year navigation via prev/next buttons
-#   - Today highlighting, outside days display
-#   - Disabled/hidden day support
-#   - ARIA: role=grid, aria-label, roving tabindex
+# Behavior (Full Wasm):
+#   - Month grid with day selection via compiled match_descendants
+#   - Month/year navigation via prev/next buttons (event delegation + data-role)
+#   - Grid update via compiled_update_text / compiled_show_element / compiled_hide_element
+#   - Today highlighting on initial render
 #   - DatePicker: split island (parent + trigger) with ShowDescendants
 #
-# Architecture: Monolithic @island for Calendar, Split island for DatePicker
-#   - Calendar: @island creates signal for day selection tracking
-#   - DatePicker: @island parent creates open signal, provides context
-#   - DatePickerTrigger: @island child with inline Wasm open/close behavior
+# Architecture:
+#   - Single @island with 4 signals + 1 click handler (event delegation)
+#   - 42 day cells with data-index (0-41) → match_descendants for selected state
+#   - 12 month name spans with data-index (100-111) → show/hide for month display
+#   - 1 year span with data-index (200) → update_text for year display
+#   - Nav buttons with data-role (1=prev, 2=next) → event delegation
+#   - Date math (days_in_month, day_of_week) inlined as pure Int32 arithmetic
 #
 # Reference: Thaw Calendar — github.com/thaw-ui/thaw
 # Reference: WAI-ARIA Grid — https://www.w3.org/WAI/ARIA/apg/patterns/grid/
@@ -95,28 +95,6 @@ function _calendar_weeks(year::Int, month::Int; show_outside_days::Bool=true)
     weeks
 end
 
-#   Calendar(; mode, month, year, selected, disabled_dates,
-#                  show_outside_days, fixed_weeks, class, theme, kwargs...) -> IslandVNode
-#
-# A date calendar grid with selection, navigation, and keyboard interaction.
-# Interactive behavior is compiled to WebAssembly — no JavaScript required.
-#
-# Arguments:
-# - `mode::String="single"`: Selection mode ("single", "multiple", "range")
-# - `month::Int=current_month`: Displayed month (1-12)
-# - `year::Int=current_year`: Displayed year
-# - `selected::String=""`: Pre-selected date(s) as ISO string(s), comma-separated for multiple
-# - `disabled_dates::String=""`: Disabled dates as comma-separated ISO strings
-# - `show_outside_days::Bool=true`: Show days from adjacent months
-# - `fixed_weeks::Bool=false`: Always show 6 weeks
-# - `number_of_months::Int=1`: Number of months to display side by side
-# - `class::String=""`: Additional CSS classes
-# - `theme::Symbol=:default`: Theme preset
-#
-# Examples:
-#   Calendar()
-#   Calendar(mode="range", number_of_months=2)
-#   Calendar(selected="2026-02-14")
 # SSR helper: builds the complete Calendar VNode tree.
 # Extracted from the island body so the AST transform doesn't try to compile
 # for-loops, string operations, or Dates calls.
@@ -152,17 +130,17 @@ function _calendar_render(; mode::String="single",
               show_outside_days, fixed_weeks, mode, i, number_of_months, theme))
     end
 
-    # Navigation buttons
+    # Navigation buttons with data-role for event delegation
     nav = Nav(:class => "flex items-center justify-between absolute top-3 inset-x-3 z-10",
               :aria_label => "Calendar navigation",
               Therapy.Button(:type => "button",
                      :class => cn(_nav_button_classes(theme)),
-                     Symbol("data-calendar-prev") => id,
+                     Symbol("data-role") => "1",
                      :aria_label => "Go to previous month",
                      Therapy.RawHtml(_CALENDAR_CHEVRON_LEFT)),
               Therapy.Button(:type => "button",
                      :class => cn(_nav_button_classes(theme)),
-                     Symbol("data-calendar-next") => id,
+                     Symbol("data-role") => "2",
                      :aria_label => "Go to next month",
                      Therapy.RawHtml(_CALENDAR_CHEVRON_RIGHT)),
     )
@@ -196,13 +174,349 @@ end
                         class::String="",
                         theme::Symbol=:default,
                         kwargs...)
-    # No signals — Calendar interactivity (day selection, month navigation)
-    # is handled by JS data attributes, not compiled Wasm handlers.
-    # SSR-only: all complex rendering delegated to external helper.
-    _calendar_render(; mode=mode, month=month, year=year, selected=selected,
+    # ─── Signals ───
+    # Props: _m=month (index 0), _y=year (index 1) — alphabetical order
+    current_month, set_month = create_signal(compiled_get_prop_i32(Int32(0)))
+    current_year, set_year = create_signal(compiled_get_prop_i32(Int32(1)))
+    selected_idx, set_selected = create_signal(Int32(-1))
+    base_el_id, set_base = create_signal(compiled_get_elements_count())
+
+    # Register match descendants for day selection (signal 2 = global 3, mode 0 = closed/open)
+    compiled_register_match_descendants(Int32(3), Int32(0))
+
+    # SSR content — complex rendering delegated to external helper
+    content = _calendar_render(; mode=mode, month=month, year=year, selected=selected,
                       disabled_dates=disabled_dates, show_outside_days=show_outside_days,
                       fixed_weeks=fixed_weeks, number_of_months=number_of_months,
                       class=class, theme=theme, kwargs...)
+
+    # Root Div with event delegation click handler
+    # The AST transform sees this Div and generates cursor walk for it.
+    # `content` is treated as an opaque child (Symbol), not recursed into.
+    Div(:style => "display:contents",
+        :on_click => () -> begin
+            role = compiled_get_event_closest_role()
+            # ─── Nav: prev month (role=1) ───
+            if role == Int32(1)
+                m = current_month()
+                y = current_year()
+                if m == Int32(1)
+                    set_month(Int32(12))
+                    set_year(y - Int32(1))
+                end
+                if m != Int32(1)
+                    set_month(m - Int32(1))
+                end
+                # Update grid after month change
+                m2 = current_month()
+                y2 = current_year()
+                base = base_el_id()
+                # ── days_in_month(m2, y2) ──
+                dim = Int32(31)
+                if m2 == Int32(2)
+                    # Leap year check: (y%4==0 && y%100!=0) || y%400==0
+                    r4 = y2 - (y2 ÷ Int32(4)) * Int32(4)
+                    r100 = y2 - (y2 ÷ Int32(100)) * Int32(100)
+                    r400 = y2 - (y2 ÷ Int32(400)) * Int32(400)
+                    dim = Int32(28)
+                    if r4 == Int32(0)
+                        if r100 != Int32(0)
+                            dim = Int32(29)
+                        end
+                        if r100 == Int32(0)
+                            if r400 == Int32(0)
+                                dim = Int32(29)
+                            end
+                        end
+                    end
+                end
+                if m2 == Int32(4)
+                    dim = Int32(30)
+                end
+                if m2 == Int32(6)
+                    dim = Int32(30)
+                end
+                if m2 == Int32(9)
+                    dim = Int32(30)
+                end
+                if m2 == Int32(11)
+                    dim = Int32(30)
+                end
+                # ── day_of_week(y2, m2, 1): Tomohiko Sakamoto ──
+                # t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4}
+                # For m < 3, use y-1
+                yy = y2
+                if m2 < Int32(3)
+                    yy = y2 - Int32(1)
+                end
+                # t[m2] via if-chain
+                t_val = Int32(0)
+                if m2 == Int32(2)
+                    t_val = Int32(3)
+                end
+                if m2 == Int32(3)
+                    t_val = Int32(2)
+                end
+                if m2 == Int32(4)
+                    t_val = Int32(5)
+                end
+                if m2 == Int32(5)
+                    t_val = Int32(0)
+                end
+                if m2 == Int32(6)
+                    t_val = Int32(3)
+                end
+                if m2 == Int32(7)
+                    t_val = Int32(5)
+                end
+                if m2 == Int32(8)
+                    t_val = Int32(1)
+                end
+                if m2 == Int32(9)
+                    t_val = Int32(4)
+                end
+                if m2 == Int32(10)
+                    t_val = Int32(6)
+                end
+                if m2 == Int32(11)
+                    t_val = Int32(2)
+                end
+                if m2 == Int32(12)
+                    t_val = Int32(4)
+                end
+                # dow = (y + y/4 - y/100 + y/400 + t[m] + 1) % 7
+                # Result: 0=Sun, 1=Mon, ..., 6=Sat
+                # Convert to 0=Mon, ..., 6=Sun: dow_mon = (dow + 6) % 7
+                raw_dow = (yy + yy ÷ Int32(4) - yy ÷ Int32(100) + yy ÷ Int32(400) + t_val + Int32(1))
+                dow_sun = raw_dow - (raw_dow ÷ Int32(7)) * Int32(7)
+                dow = (dow_sun + Int32(6)) - ((dow_sun + Int32(6)) ÷ Int32(7)) * Int32(7)
+                # ── prev month's days_in_month ──
+                pm = m2 - Int32(1)
+                py = y2
+                if m2 == Int32(1)
+                    pm = Int32(12)
+                    py = y2 - Int32(1)
+                end
+                prev_dim = Int32(31)
+                if pm == Int32(2)
+                    r4p = py - (py ÷ Int32(4)) * Int32(4)
+                    r100p = py - (py ÷ Int32(100)) * Int32(100)
+                    r400p = py - (py ÷ Int32(400)) * Int32(400)
+                    prev_dim = Int32(28)
+                    if r4p == Int32(0)
+                        if r100p != Int32(0)
+                            prev_dim = Int32(29)
+                        end
+                        if r100p == Int32(0)
+                            if r400p == Int32(0)
+                                prev_dim = Int32(29)
+                            end
+                        end
+                    end
+                end
+                if pm == Int32(4)
+                    prev_dim = Int32(30)
+                end
+                if pm == Int32(6)
+                    prev_dim = Int32(30)
+                end
+                if pm == Int32(9)
+                    prev_dim = Int32(30)
+                end
+                if pm == Int32(11)
+                    prev_dim = Int32(30)
+                end
+                # ── Update 42 cells ──
+                cell_base = base + Int32(13)
+                i = Int32(0)
+                while i < Int32(42)
+                    if i < dow
+                        # Previous month day
+                        compiled_hide_element(cell_base + i)
+                    end
+                    if i >= dow
+                        if i < dow + dim
+                            # Current month day
+                            day = i - dow + Int32(1)
+                            compiled_update_text(cell_base + i, Float64(day))
+                            compiled_show_element(cell_base + i)
+                        end
+                    end
+                    if i >= dow + dim
+                        # Next month day
+                        compiled_hide_element(cell_base + i)
+                    end
+                    i = i + Int32(1)
+                end
+                # ── Update month name spans ──
+                # Hide old month, show new month
+                old_m = m  # m was the OLD month before set_month
+                month_base = base
+                compiled_hide_element(month_base + old_m - Int32(1))
+                compiled_show_element(month_base + m2 - Int32(1))
+                # ── Update year ──
+                year_el = base + Int32(12)
+                compiled_update_text(year_el, Float64(y2))
+                # Reset selection
+                set_selected(Int32(-1))
+            end
+            # ─── Nav: next month (role=2) ───
+            if role == Int32(2)
+                m = current_month()
+                y = current_year()
+                if m == Int32(12)
+                    set_month(Int32(1))
+                    set_year(y + Int32(1))
+                end
+                if m != Int32(12)
+                    set_month(m + Int32(1))
+                end
+                # Update grid (same logic as prev, duplicated to avoid function calls)
+                m2 = current_month()
+                y2 = current_year()
+                base = base_el_id()
+                dim = Int32(31)
+                if m2 == Int32(2)
+                    r4 = y2 - (y2 ÷ Int32(4)) * Int32(4)
+                    r100 = y2 - (y2 ÷ Int32(100)) * Int32(100)
+                    r400 = y2 - (y2 ÷ Int32(400)) * Int32(400)
+                    dim = Int32(28)
+                    if r4 == Int32(0)
+                        if r100 != Int32(0)
+                            dim = Int32(29)
+                        end
+                        if r100 == Int32(0)
+                            if r400 == Int32(0)
+                                dim = Int32(29)
+                            end
+                        end
+                    end
+                end
+                if m2 == Int32(4)
+                    dim = Int32(30)
+                end
+                if m2 == Int32(6)
+                    dim = Int32(30)
+                end
+                if m2 == Int32(9)
+                    dim = Int32(30)
+                end
+                if m2 == Int32(11)
+                    dim = Int32(30)
+                end
+                yy = y2
+                if m2 < Int32(3)
+                    yy = y2 - Int32(1)
+                end
+                t_val = Int32(0)
+                if m2 == Int32(2)
+                    t_val = Int32(3)
+                end
+                if m2 == Int32(3)
+                    t_val = Int32(2)
+                end
+                if m2 == Int32(4)
+                    t_val = Int32(5)
+                end
+                if m2 == Int32(5)
+                    t_val = Int32(0)
+                end
+                if m2 == Int32(6)
+                    t_val = Int32(3)
+                end
+                if m2 == Int32(7)
+                    t_val = Int32(5)
+                end
+                if m2 == Int32(8)
+                    t_val = Int32(1)
+                end
+                if m2 == Int32(9)
+                    t_val = Int32(4)
+                end
+                if m2 == Int32(10)
+                    t_val = Int32(6)
+                end
+                if m2 == Int32(11)
+                    t_val = Int32(2)
+                end
+                if m2 == Int32(12)
+                    t_val = Int32(4)
+                end
+                raw_dow = (yy + yy ÷ Int32(4) - yy ÷ Int32(100) + yy ÷ Int32(400) + t_val + Int32(1))
+                dow_sun = raw_dow - (raw_dow ÷ Int32(7)) * Int32(7)
+                dow = (dow_sun + Int32(6)) - ((dow_sun + Int32(6)) ÷ Int32(7)) * Int32(7)
+                pm = m2 - Int32(1)
+                py = y2
+                if m2 == Int32(1)
+                    pm = Int32(12)
+                    py = y2 - Int32(1)
+                end
+                prev_dim = Int32(31)
+                if pm == Int32(2)
+                    r4p = py - (py ÷ Int32(4)) * Int32(4)
+                    r100p = py - (py ÷ Int32(100)) * Int32(100)
+                    r400p = py - (py ÷ Int32(400)) * Int32(400)
+                    prev_dim = Int32(28)
+                    if r4p == Int32(0)
+                        if r100p != Int32(0)
+                            prev_dim = Int32(29)
+                        end
+                        if r100p == Int32(0)
+                            if r400p == Int32(0)
+                                prev_dim = Int32(29)
+                            end
+                        end
+                    end
+                end
+                if pm == Int32(4)
+                    prev_dim = Int32(30)
+                end
+                if pm == Int32(6)
+                    prev_dim = Int32(30)
+                end
+                if pm == Int32(9)
+                    prev_dim = Int32(30)
+                end
+                if pm == Int32(11)
+                    prev_dim = Int32(30)
+                end
+                cell_base = base + Int32(13)
+                i = Int32(0)
+                while i < Int32(42)
+                    if i < dow
+                        compiled_hide_element(cell_base + i)
+                    end
+                    if i >= dow
+                        if i < dow + dim
+                            day = i - dow + Int32(1)
+                            compiled_update_text(cell_base + i, Float64(day))
+                            compiled_show_element(cell_base + i)
+                        end
+                    end
+                    if i >= dow + dim
+                        compiled_hide_element(cell_base + i)
+                    end
+                    i = i + Int32(1)
+                end
+                month_base = base
+                compiled_hide_element(month_base + m - Int32(1))
+                compiled_show_element(month_base + m2 - Int32(1))
+                year_el = base + Int32(12)
+                compiled_update_text(year_el, Float64(y2))
+                set_selected(Int32(-1))
+            end
+            # ─── Day cell click (role=0, has data-index) ───
+            if role == Int32(0)
+                idx = compiled_get_event_data_index()
+                # Only handle day cell clicks (data-index 0-41), not month/year spans
+                if idx >= Int32(0)
+                    if idx < Int32(42)
+                        set_selected(idx)
+                    end
+                end
+            end
+        end,
+        content)
 end
 
 function _nav_button_classes(theme::Symbol=:default)
@@ -213,17 +527,18 @@ end
 
 """
 Build a single month panel with caption + grid.
+Always renders exactly 6 weeks (42 cells) for Wasm grid update compatibility.
 """
 function _calendar_month_panel(cal_id, year, month, show_outside_days, fixed_weeks, mode, month_index, total_months, theme)
-    weeks = _calendar_weeks(year, month; show_outside_days=show_outside_days)
+    weeks = _calendar_weeks(year, month; show_outside_days=true)  # Always generate all outside days
 
-    # Pad to 6 weeks if fixed_weeks
-    if fixed_weeks && length(weeks) < 6
+    # Pad to exactly 6 weeks for consistent 42-cell grid
+    if length(weeks) < 6
         last_date = weeks[end][end].date
         while length(weeks) < 6
             week = []
             for d in 1:7
-                current = last_date + Dates.Day(d + (length(weeks) - length(_calendar_weeks(year, month; show_outside_days=show_outside_days))) * 7)
+                current = last_date + Dates.Day(1)
                 push!(week, (
                     date = current,
                     day_num = Dates.day(current),
@@ -231,21 +546,27 @@ function _calendar_month_panel(cal_id, year, month, show_outside_days, fixed_wee
                     is_today = current == Dates.today(),
                     iso_date = string(current),
                 ))
+                last_date = current
             end
             push!(weeks, week)
-            last_date = weeks[end][end].date
         end
     end
 
-    month_label = _MONTH_NAMES[month] * " " * string(year)
+    # Caption with 12 month name spans + year span
+    month_spans = [Span(:class => "text-sm font-medium select-none",
+                        Symbol("data-index") => string(100 + i - 1),
+                        :style => i == month ? "" : "display:none",
+                        _MONTH_NAMES[i])
+                   for i in 1:12]
+    year_span = Span(:class => "text-sm font-medium select-none ml-1",
+                     Symbol("data-index") => "200",
+                     string(year))
 
-    # Caption
     caption = Div(:class => "flex items-center justify-center h-7 relative",
-                  Span(:class => "text-sm font-medium select-none",
-                       :role => "status",
-                       :aria_live => "polite",
-                       Symbol("data-calendar-caption") => cal_id,
-                       month_label))
+                  :role => "status",
+                  :aria_live => "polite",
+                  month_spans...,
+                  year_span)
 
     # Weekday header
     weekday_cells = [Th(:scope => "col",
@@ -258,13 +579,23 @@ function _calendar_month_panel(cal_id, year, month, show_outside_days, fixed_wee
                   Tr(:class => "flex",
                      weekday_cells...))
 
-    # Day rows
-    week_rows = [_calendar_week_row(cal_id, week, show_outside_days, mode, theme) for week in weeks]
+    # Day rows — flatten weeks into a linear cell index (0-41)
+    cell_idx = 0
+    week_rows = []
+    for week in weeks
+        day_cells = []
+        for day in week
+            push!(day_cells, _calendar_day_cell(cal_id, day, show_outside_days, mode, theme, cell_idx))
+            cell_idx += 1
+        end
+        push!(week_rows, Tr(:class => "flex w-full mt-2", day_cells...))
+    end
 
     tbody = Tbody(:class => "suite-calendar-weeks",
                   week_rows...)
 
     # Table
+    month_label = _MONTH_NAMES[month] * " " * string(year)
     grid_attrs = [
         :role => "grid",
         :aria_label => month_label,
@@ -289,63 +620,49 @@ function _weekday_classes(theme::Symbol=:default)
     classes
 end
 
-function _calendar_week_row(cal_id, week, show_outside_days, mode, theme)
-    day_cells = [_calendar_day_cell(cal_id, day, show_outside_days, mode, theme) for day in week]
-    Tr(:class => "flex w-full mt-2",
-       day_cells...)
-end
-
-function _calendar_day_cell(cal_id, day, show_outside_days, mode, theme)
-    # Outside days: hidden or shown but muted
-    if day.outside && !show_outside_days
-        return Td(:class => "relative w-9 h-9 p-0 text-center",
-                  :role => "gridcell")
-    end
-
-    # Build cell classes
-    cell_classes_parts = [
-        "relative w-9 h-9 p-0 text-center select-none group/day"
-    ]
-
-    # Day button classes
-    btn_parts = [
+"""
+Build a single day cell as a flat <td> with data-index for Wasm interactivity.
+"""
+function _calendar_day_cell(cal_id, day, show_outside_days, mode, theme, index::Int)
+    # Cell classes — flat td (no inner button for Wasm compatibility)
+    cell_parts = [
         "relative flex items-center justify-center cursor-pointer w-9 h-9 rounded-md",
-        "text-sm font-normal p-0 border-0",
+        "text-sm font-normal p-0 select-none",
         "hover:bg-warm-100 dark:hover:bg-warm-900",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-600",
-        "transition-colors"
+        "transition-colors",
+        "data-[state=open]:bg-accent-100 data-[state=open]:text-accent-900",
+        "dark:data-[state=open]:bg-accent-900 dark:data-[state=open]:text-accent-100",
     ]
 
-    # Modifiers as data attributes
     data_attrs = Pair{Symbol,String}[]
-    push!(data_attrs, Symbol("data-calendar-day") => day.iso_date)
+    push!(data_attrs, Symbol("data-index") => string(index))
 
     if day.outside
-        push!(btn_parts, "text-warm-400 dark:text-warm-600 opacity-50")
+        push!(cell_parts, "text-warm-400 dark:text-warm-600 opacity-50")
         push!(data_attrs, Symbol("data-outside") => "true")
-    else
-        push!(btn_parts, "text-warm-800 dark:text-warm-300")
+    end
+    if !day.outside
+        push!(cell_parts, "text-warm-800 dark:text-warm-300")
     end
 
     if day.is_today
-        push!(btn_parts, "bg-warm-100 dark:bg-warm-900")
+        push!(cell_parts, "bg-warm-100 dark:bg-warm-900")
         push!(data_attrs, Symbol("data-today") => "true")
     end
 
-    btn_classes = cn(btn_parts...)
-    theme !== :default && (btn_classes = apply_theme(btn_classes, get_theme(theme)))
+    cell_classes = cn(cell_parts...)
+    theme !== :default && (cell_classes = apply_theme(cell_classes, get_theme(theme)))
 
-    cell_classes = cn(cell_classes_parts...)
+    # Outside days hidden initially (Wasm will show/hide on month nav)
+    style = day.outside ? "display:none" : ""
 
     Td(:class => cell_classes,
        :role => "gridcell",
+       :tabindex => "-1",
+       :style => style,
        data_attrs...,
-       Therapy.Button(:type => "button",
-              :class => btn_classes,
-              :tabindex => "-1",
-              Symbol("data-calendar-day-btn") => day.iso_date,
-              :aria_label => Dates.format(day.date, "E, U d, yyyy"),
-              string(day.day_num)))
+       string(day.day_num))
 end
 
 #   DatePicker(; mode, month, year, selected, placeholder,
@@ -357,23 +674,6 @@ end
 # Architecture: Split islands (Thaw-style)
 #   - DatePicker (parent island): creates open signal, provides context, uses ShowDescendants
 #   - Trigger uses inline Wasm for open/close behavior (store_active_element, push_escape_handler)
-#
-# Arguments:
-# - `mode::String="single"`: Selection mode ("single", "multiple", "range")
-# - `month::Int=current_month`: Initial displayed month
-# - `year::Int=current_year`: Initial displayed year
-# - `selected::String=""`: Pre-selected date(s)
-# - `placeholder::String="Pick a date"`: Trigger button text when no date selected
-# - `disabled_dates::String=""`: Disabled dates as comma-separated ISO strings
-# - `show_outside_days::Bool=true`: Show days from adjacent months
-# - `number_of_months::Int=1`: Number of months to display
-# - `class::String=""`: Additional CSS classes for the trigger button
-# - `theme::Symbol=:default`: Theme preset
-#
-# Examples:
-#   DatePicker()
-#   DatePicker(mode="range", number_of_months=2, placeholder="Select dates")
-#   DatePicker(selected="2026-02-14")
 @island function DatePicker(; mode::String="single",
                           month::Int=Dates.month(Dates.today()),
                           year::Int=Dates.year(Dates.today()),
@@ -494,6 +794,14 @@ function _format_display_date(selected::String, mode::String)
     end
 end
 
+# --- Props Transform ---
+const _CALENDAR_PROPS_TRANSFORM = (props, args) -> begin
+    m = get(props, :month, Dates.month(Dates.today()))
+    y = get(props, :year, Dates.year(Dates.today()))
+    # Alphabetical order: _m=0, _y=1
+    props[:_m] = m
+    props[:_y] = y
+end
 
 # --- Registry ---
 if @isdefined(register_component!)

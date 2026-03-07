@@ -4552,8 +4552,8 @@ using Test
             html = Therapy.render_to_string(Calendar(month=2, year=2026))
             @test occursin("data-calendar-month=\"2\"", html)
             @test occursin("data-calendar-year=\"2026\"", html)
-            @test occursin("data-calendar-prev", html)
-            @test occursin("data-calendar-next", html)
+            @test occursin("data-role=\"1\"", html)  # prev button
+            @test occursin("data-role=\"2\"", html)  # next button
             @test occursin("Go to previous month", html)
             @test occursin("Go to next month", html)
         end
@@ -4576,18 +4576,24 @@ using Test
             @test occursin("aria-hidden=\"true\"", html)
         end
 
-        @testset "Day buttons rendered" begin
+        @testset "Day cells rendered with data-index" begin
             html = Therapy.render_to_string(Calendar(month=2, year=2026))
-            # February 2026 has 28 days
-            @test occursin("data-calendar-day-btn=\"2026-02-01\"", html)
-            @test occursin("data-calendar-day-btn=\"2026-02-28\"", html)
-            @test occursin("data-calendar-day=\"2026-02-01\"", html)
+            # 42 day cells with data-index 0-41
+            @test occursin("data-index=\"0\"", html)
+            @test occursin("data-index=\"41\"", html)
+            # Day cells are <td> with role="gridcell"
+            @test occursin("role=\"gridcell\"", html)
         end
 
-        @testset "Day button ARIA label" begin
+        @testset "Month name spans with data-index" begin
             html = Therapy.render_to_string(Calendar(month=2, year=2026))
-            # Feb 1, 2026 is a Sunday
-            @test occursin("Sun, Feb 1, 2026", html) || occursin("2026-02-01", html)
+            # 12 month name spans with data-index 100-111
+            @test occursin("data-index=\"100\"", html)
+            @test occursin("data-index=\"111\"", html)
+            # Year span with data-index 200
+            @test occursin("data-index=\"200\"", html)
+            # Current month visible, others hidden
+            @test occursin("February", html)
         end
 
         @testset "Today highlighting" begin
@@ -4598,16 +4604,12 @@ using Test
         end
 
         @testset "Outside days" begin
-            # show_outside_days=true (default)
-            html_show = Therapy.render_to_string(Calendar(month=2, year=2026, show_outside_days=true))
-            @test occursin("data-outside=\"true\"", html_show)
-            @test occursin("opacity-50", html_show)
-
-            # show_outside_days=false
-            html_hide = Therapy.render_to_string(Calendar(month=2, year=2026, show_outside_days=false))
-            # Outside days should be empty cells (no button)
-            # The non-outside cells should still have buttons
-            @test occursin("data-calendar-day-btn=\"2026-02-01\"", html_hide)
+            html = Therapy.render_to_string(Calendar(month=2, year=2026))
+            # Outside days marked and hidden for Wasm grid updates
+            @test occursin("data-outside=\"true\"", html)
+            @test occursin("opacity-50", html)
+            # Always 42 cells (6 weeks), outside days hidden with display:none
+            @test occursin("display:none", html)
         end
 
         @testset "Selection modes" begin
