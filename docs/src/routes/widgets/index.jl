@@ -99,7 +99,7 @@ function WidgetsIndex()
                         Main.TableCell(class="font-mono text-xs", "Switch"),
                         Main.TableCell(class="font-mono text-xs", "SuiteSwitch"),
                         Main.TableCell(class="font-mono text-xs", "Bool"),
-                        Main.TableCell(Main.Badge("Available"))
+                        Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "Select"),
@@ -117,13 +117,13 @@ function WidgetsIndex()
                         Main.TableCell(class="font-mono text-xs", "TextField"),
                         Main.TableCell(class="font-mono text-xs", "SuiteInput"),
                         Main.TableCell(class="font-mono text-xs", "String"),
-                        Main.TableCell(Main.Badge("Available"))
+                        Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "TextField (multi)"),
                         Main.TableCell(class="font-mono text-xs", "SuiteTextarea"),
                         Main.TableCell(class="font-mono text-xs", "String"),
-                        Main.TableCell(Main.Badge("Available"))
+                        Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "DatePicker"),
@@ -135,9 +135,9 @@ function WidgetsIndex()
             ),
 
             # Three tiers in widget context
-            SectionH2("Three Tiers, Two Modes"),
+            SectionH2("Two Tiers, Two Modes"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Suite.jl's three implementation tiers interact with the dual-mode widget system:"
+                "Suite.jl's two implementation tiers interact with the dual-mode widget system:"
             ),
             Main.Table(
                 Main.TableHeader(
@@ -154,14 +154,9 @@ function WidgetsIndex()
                         Main.TableCell("show(io, MIME\"text/html\"()) with same classes")
                     ),
                     Main.TableRow(
-                        Main.TableCell(class="font-medium", "Interactive"),
-                        Main.TableCell("@island with create_signal"),
+                        Main.TableCell(class="font-medium", "Island (Wasm)"),
+                        Main.TableCell("@island compiled to WebAssembly"),
                         Main.TableCell("Inline <script> for interactivity")
-                    ),
-                    Main.TableRow(
-                        Main.TableCell(class="font-medium", "JS Runtime"),
-                        Main.TableCell("suite.js auto-discovery"),
-                        Main.TableCell("Bundled JS in widget HTML")
                     )
                 )
             ),

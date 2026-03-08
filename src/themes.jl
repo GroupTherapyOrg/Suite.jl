@@ -1,6 +1,6 @@
 # Suite.jl Theme System
 #
-# Provides 4 pre-built themes that control the visual personality of components.
+# Provides 5 pre-built themes that control the visual personality of components.
 # Themes work via string substitution on Tailwind class strings.
 # Default theme is a no-op (zero overhead).
 

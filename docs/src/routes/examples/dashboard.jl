@@ -73,7 +73,7 @@ function DashboardExample()
 end
 
 function _StatCard(title, value, change, positive)
-    change_color = positive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+    change_color = positive ? "text-accent-600 dark:text-accent-400" : "text-accent-secondary-600 dark:text-accent-secondary-400"
     change_icon = positive ? "↑" : "↓"
 
     Main.Card(

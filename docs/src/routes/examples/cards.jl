@@ -55,7 +55,7 @@ function CardsExample()
                     Div(:class => "space-y-4",
                         _NotificationItem("Your package was published", "Suite.jl v0.2.0 is now on the General registry.", "1 hour ago", true),
                         _NotificationItem("New star on your repo", "GroupTherapyOrg/Suite.jl received a star.", "2 hours ago", true),
-                        _NotificationItem("CI passed", "All 2172 tests passed on main.", "3 hours ago", false),
+                        _NotificationItem("CI passed", "All 2335 tests passed on main.", "3 hours ago", false),
                         _NotificationItem("New issue opened", "#42: Add Checkbox component", "5 hours ago", true)
                     )
                 ),

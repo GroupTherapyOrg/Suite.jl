@@ -134,7 +134,7 @@ function FormsExample()
 
                             # Danger zone
                             Div(:class => "grid gap-4",
-                                H3(:class => "text-lg font-medium text-red-600 dark:text-red-400", "Danger Zone"),
+                                H3(:class => "text-lg font-medium text-accent-secondary-600 dark:text-accent-secondary-400", "Danger Zone"),
                                 P(:class => "text-sm text-warm-600 dark:text-warm-400",
                                     "Once you delete your account, there is no going back. Please be certain."
                                 ),

@@ -67,9 +67,9 @@ function ThemingPage()
                     Main.TableRow(
                         Main.TableCell(class="font-medium", Main.Badge(variant="secondary", ":islands")),
                         Main.TableCell("Blue"),
-                        Main.TableCell("Blue-gray"),
+                        Main.TableCell("Warm"),
                         Main.TableCell("rounded-xl"),
-                        Main.TableCell("Glass panels — floating, modern")
+                        Main.TableCell("Floating glass panels, generous curves")
                     )
                 )
             ),
@@ -122,7 +122,8 @@ Suite.extract(:Button, "src/components/", theme=:ocean)
 
 # Extract with nature theme
 Suite.extract(:Card, "src/components/", theme=:nature)
-# → Card.jl uses rounded-xl, stone-* neutrals, emerald-* accents""")
+# → Card.jl uses rounded-xl, stone-* neutrals, emerald-* accents
+# (each theme substitutes its own color tokens)""")
             ),
 
             # Design tokens
@@ -220,7 +221,7 @@ Suite.extract(:Card, "src/components/", theme=:nature)
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "--destructive"),
-                        Main.TableCell(class="font-mono text-xs", "bg-red-600 / text-red-600")
+                        Main.TableCell(class="font-mono text-xs", "bg-accent-secondary-600 / text-accent-secondary-600")
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "--ring"),

@@ -46,8 +46,8 @@ function WidgetsExample()
                                 Main.CodeBlock(language="julia", """# Therapy.jl mode
 Switch(checked=true)
 
-# Pluto @bind mode
-@bind dark SuiteSwitch(; default=false)""")
+# Pluto @bind mode (planned)
+# @bind dark SuiteSwitch(; default=false)""")
                             )
                         )
                     )
@@ -159,9 +159,9 @@ ToggleGroup(type="single",
 Input(type="email", placeholder="...")
 Textarea(placeholder="...")
 
-# Pluto @bind mode
-@bind name SuiteInput(; default="")
-@bind bio SuiteTextarea(; default="")""")
+# Pluto @bind mode (planned)
+# @bind name SuiteInput(; default="")
+# @bind bio SuiteTextarea(; default="")""")
                             )
                         )
                     )
