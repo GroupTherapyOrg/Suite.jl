@@ -60,6 +60,7 @@
 /* Design System CSS custom properties */
 @layer base {
   :root {
+    color: var(--text-primary);
     /* Shared neutrals */
     --bg-primary: #f8f7f4;
     --bg-secondary: #f0ece4;
