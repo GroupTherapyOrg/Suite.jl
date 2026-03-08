@@ -61,7 +61,11 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     # Compilable: 1 signal for active menu index (Int32: 0=none, N=menu N is open)
     active_menu, set_active = create_signal(Int32(0))
 
-    # SSR-only: walk children, inject data-index on trigger markers
+    # Match descendants: each data-index element gets data-state=open/closed
+    # when active_menu signal matches its index (1-based: 1=File, 2=Edit, etc.)
+    compiled_register_match_descendants(Int32(1), Int32(0))
+
+    # SSR-only: walk children, inject data-index on trigger markers and content
     _menubar_ssr_setup!(children)
 
     classes = cn(
@@ -73,27 +77,25 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
     Div(Symbol("data-menubar") => "",
-        Symbol("data-show") => ShowDescendants(active_menu),  # show/hide + data-state binding (inline Wasm)
         Symbol("data-loop") => string(loop),
         :role => "menubar",
         :class => classes,
         :on_click => () -> begin
-            idx = compiled_get_event_data_index()
+            idx = compiled_get_event_data_index()  # 1-based: 1=File, 2=Edit, etc.
             current = active_menu()
-            if idx >= Int32(0)
-                menu_idx = idx + Int32(1)  # 0-based data-index → 1-based signal
+            if idx > Int32(0)
                 # NOTE: Avoid if-else — WasmTarget.jl codegen places else branch
                 # outside the if block (no wasm else opcode emitted). Use two
                 # independent if blocks with opposite conditions instead.
-                if current == menu_idx
+                if current == idx
                     set_active(Int32(0))  # Close same trigger
                     pop_escape_handler()
                 end
-                if current != menu_idx
+                if current != idx
                     if current == Int32(0)
                         push_escape_handler(Int32(0))  # Register Escape on first open
                     end
-                    set_active(menu_idx)  # Open different trigger
+                    set_active(idx)  # Open different trigger
                 end
             end
             # Close on non-trigger click (menu items) or Escape (handler_0 called with no event target)
@@ -121,20 +123,26 @@ function _menubar_ssr_setup!(children)
 end
 
 function _menubar_ssr_inject!(menu_node::VNode, idx::Int)
+    # 1-based index everywhere (0=none, 1=first menu, 2=second, etc.)
+    menu_index = idx + 1
     for child in menu_node.children
         if child isa VNode
             if haskey(child.props, Symbol("data-menubar-trigger-marker"))
-                # Add data-index on trigger marker for event delegation
-                child.props[Symbol("data-index")] = string(idx)
-                # Find inner button and add trigger identification
+                # Add 1-based data-index on trigger marker for event delegation
+                child.props[Symbol("data-index")] = string(menu_index)
+                # Find inner button and add trigger identification + match binding
                 for inner in child.children
                     if inner isa VNode
                         inner.props[Symbol("data-menubar-trigger")] = ""
                         inner.props[Symbol("aria-haspopup")] = "menu"
                         inner.props[Symbol("aria-expanded")] = "false"
                         inner.props[Symbol("data-state")] = "closed"
+                        inner.props[Symbol("data-index")] = string(menu_index)
                     end
                 end
+            elseif haskey(child.props, Symbol("data-menubar-content"))
+                # Add 1-based data-index on content for match_descendants binding
+                child.props[Symbol("data-index")] = string(menu_index)
             end
         end
     end
@@ -213,8 +221,7 @@ function MenubarContent(children...; side::String="bottom", side_offset::Int=4, 
         :role => "menu",
         :aria_orientation => "vertical",
         :tabindex => "-1",
-        :style => "display:none",
-        :class => classes,
+        :class => cn("data-[state=closed]:hidden", classes),
         kwargs...,
         children...,
     )

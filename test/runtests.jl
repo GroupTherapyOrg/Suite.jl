@@ -4184,7 +4184,7 @@ using Test
             @test occursin("data-menubar-content", html)
             @test occursin("role=\"menu\"", html)
             @test occursin("data-state=\"closed\"", html)
-            @test occursin("display:none", html)
+            @test occursin("data-[state=closed]:hidden", html)
             @test occursin("min-w-[12rem]", html)
             @test occursin("rounded-md", html)
             @test occursin("shadow-md", html)
