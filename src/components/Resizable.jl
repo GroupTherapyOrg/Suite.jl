@@ -59,9 +59,8 @@ end
 
     # Signal 0: dragging state
     dragging, set_dragging = create_signal(Int32(0))
-    # Signal 1: split percentage * 100 (initial computed from first panel's default_size)
-    initial_split = _compute_initial_split(children)
-    split_pct, set_split_pct = create_signal(Int32(initial_split))
+    # Signal 1: split percentage * 100 (from prop _s, index 0)
+    split_pct, set_split_pct = create_signal(compiled_get_prop_i32(Int32(0)))
 
     # SSR: inject data-index on handles
     _resizable_ssr_setup!(children)

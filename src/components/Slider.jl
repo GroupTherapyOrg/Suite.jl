@@ -72,10 +72,12 @@ export Slider
     # Signal 0: dragging state (0=not dragging, 1=dragging)
     dragging, set_dragging = create_signal(Int32(0))
     # Signal 1: value as percentage * 100 (0-10000 for 0%-100%)
+    # Initial value from prop _v (alphabetically: _s=0, _v=1)
+    value, set_value = create_signal(compiled_get_prop_i32(Int32(1)))
+
+    # SSR-only: compute display percentage for inline styles
     clamped = clamp(default_value, min, max)
     pct = max > min ? (clamped - min) / (max - min) * 100 : 0
-    pct_scaled = Int32(round(Int, pct * 100))
-    value, set_value = create_signal(pct_scaled)
 
     is_vertical = orientation == "vertical"
 
@@ -279,17 +281,18 @@ end
 # --- Hydration Support ---
 
 const _SLIDER_PROPS_TRANSFORM = (props, args) -> begin
-    # Compute step as percentage * 100
     min_val = get(props, :min, 0)
     max_val = get(props, :max, 100)
     step_val = get(props, :step, 1)
-    range = max_val - min_val
-    if range > 0
-        step_pct_100 = round(Int, step_val / range * 10000)
-    else
-        step_pct_100 = 100
-    end
+    range_val = max_val - min_val
+    # Step as percentage * 100 (e.g., step=1 on 0-100 → 100)
+    step_pct_100 = range_val > 0 ? round(Int, step_val / range_val * 10000) : 100
     props[:_s] = step_pct_100
+    # Initial value as percentage * 100 (e.g., default_value=50 on 0-100 → 5000)
+    default_val = get(props, :default_value, 0)
+    clamped = clamp(default_val, min_val, max_val)
+    val_pct_100 = range_val > 0 ? round(Int, (clamped - min_val) / range_val * 10000) : 0
+    props[:_v] = val_pct_100
 end
 
 
