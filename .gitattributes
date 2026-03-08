@@ -1,0 +1,6 @@
+# Hide e2e test TypeScript from GitHub language stats
+test/e2e/** linguist-vendored
+playwright.config.ts linguist-vendored
+package.json linguist-vendored
+package-lock.json linguist-vendored
+tsconfig.json linguist-vendored
