@@ -32,8 +32,11 @@ function CommandPage()
         ),
 
         # Dialog variant
-        ComponentPreview(title="Dialog", description="Command palette rendered inside a dialog overlay.",
-            Div(:class => "w-full max-w-md",
+        ComponentPreview(title="Dialog", description="Command palette rendered inside a dialog overlay. Click the button to open.",
+            Div(:class => "w-full max-w-md flex flex-col items-center gap-4",
+                Main.Button(variant="outline",
+                    :onclick => "this.parentElement.querySelector('[data-command-dialog-trigger-marker]').click()",
+                    "Open Command Palette"),
                 Main.CommandDialog(
                     Main.CommandInput(placeholder="Type a command or search..."),
                     Main.CommandList(
