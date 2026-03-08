@@ -28,7 +28,7 @@ function WidgetsIndex()
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-3",
                         "In a Pluto notebook, pass a positional argument to get a bindable struct. Use with ", Main.InlineCode("@bind"), "."
                     ),
-                    Main.CodeBlock(language="julia", "@bind value SuiteSlider(1:100)\n@bind lang SuiteSelect([\"julia\" => \"Julia\"])")
+                    Main.CodeBlock(language="julia", "@bind value Suite.SliderWidget(1:100)\n@bind lang Suite.Select([\"julia\" => \"Julia\"])")
                 )
             ),
 
@@ -52,12 +52,12 @@ function WidgetsIndex()
                 ),
                 Main.TableBody(
                     Main.TableRow(
-                        Main.TableCell(class="font-mono text-xs", "SuiteSlider(1:100)"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.SliderWidget(1:100)"),
                         Main.TableCell("Struct (widget)"),
                         Main.TableCell("Pluto @bind")
                     ),
                     Main.TableRow(
-                        Main.TableCell(class="font-mono text-xs", "SuiteSlider(; min=0, max=100)"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.SliderWidget(; min=0, max=100)"),
                         Main.TableCell("VNode (HTML)"),
                         Main.TableCell("Therapy.jl rendering")
                     )
@@ -85,49 +85,50 @@ function WidgetsIndex()
                 Main.TableBody(
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "Slider"),
-                        Main.TableCell(class="font-mono text-xs", "SuiteSlider"),
+                        Main.TableCell(class="font-mono text-xs",
+                            A(:href => "./widgets/slider/", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Suite.SliderWidget")),
                         Main.TableCell(class="font-mono text-xs", "eltype(range)"),
-                        Main.TableCell(Main.Badge(variant="outline", "Planned"))
+                        Main.TableCell(Main.Badge("Available"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "CheckBox"),
-                        Main.TableCell(class="font-mono text-xs", "SuiteCheckbox"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.Checkbox"),
                         Main.TableCell(class="font-mono text-xs", "Bool"),
                         Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "Switch"),
-                        Main.TableCell(class="font-mono text-xs", "SuiteSwitch"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.Switch"),
                         Main.TableCell(class="font-mono text-xs", "Bool"),
                         Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "Select"),
-                        Main.TableCell(class="font-mono text-xs", "SuiteSelect"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.Select"),
                         Main.TableCell(class="font-mono text-xs", "Key type"),
                         Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "Radio"),
-                        Main.TableCell(class="font-mono text-xs", "SuiteRadioGroup"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.RadioGroup"),
                         Main.TableCell(class="font-mono text-xs", "Key type"),
                         Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "TextField"),
-                        Main.TableCell(class="font-mono text-xs", "SuiteInput"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.Input"),
                         Main.TableCell(class="font-mono text-xs", "String"),
                         Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "TextField (multi)"),
-                        Main.TableCell(class="font-mono text-xs", "SuiteTextarea"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.Textarea"),
                         Main.TableCell(class="font-mono text-xs", "String"),
                         Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "DatePicker"),
-                        Main.TableCell(class="font-mono text-xs", "SuiteDatePicker"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.DatePicker"),
                         Main.TableCell(class="font-mono text-xs", "Dates.Date"),
                         Main.TableCell(Main.Badge(variant="outline", "Planned"))
                     )
@@ -135,9 +136,9 @@ function WidgetsIndex()
             ),
 
             # Three tiers in widget context
-            SectionH2("Two Tiers, Two Modes"),
+            SectionH2("Three Tiers, Two Modes"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Suite.jl's two implementation tiers interact with the dual-mode widget system:"
+                "Suite.jl's three implementation tiers interact with the dual-mode widget system:"
             ),
             Main.Table(
                 Main.TableHeader(
@@ -157,6 +158,11 @@ function WidgetsIndex()
                         Main.TableCell(class="font-medium", "Island (Wasm)"),
                         Main.TableCell("@island compiled to WebAssembly"),
                         Main.TableCell("Inline <script> for interactivity")
+                    ),
+                    Main.TableRow(
+                        Main.TableCell(class="font-medium", "Widget"),
+                        Main.TableCell("Island + @bind protocol"),
+                        Main.TableCell("SliderWidget struct + bond methods + HTML rendering")
                     )
                 )
             ),
@@ -179,8 +185,8 @@ module SuitePlutoExt
 using Suite
 import AbstractPlutoDingetjes.Bonds
 
-Bonds.initial_value(s::Suite.SuiteSliderWidget) = s.default
-Bonds.transform_value(s::Suite.SuiteSliderWidget, val) = s.values[val]
+Bonds.initial_value(s::Suite.Suite.SliderWidget) = s.default
+Bonds.transform_value(s::Suite.Suite.SliderWidget, val) = s.values[val]
 end""")
             ),
             Main.Alert(

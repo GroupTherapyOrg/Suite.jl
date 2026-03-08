@@ -6176,4 +6176,158 @@ using Test
             @test isempty(meta.js_modules)
         end
     end
+
+    @testset "Widget Protocol & SliderWidget" begin
+        using Suite: SliderWidget, AbstractSuiteWidget
+        using Suite: initial_value, possible_values, transform_value, validate_value
+
+        @testset "AbstractSuiteWidget defaults" begin
+            struct _TestWidget <: AbstractSuiteWidget end
+            tw = _TestWidget()
+            @test initial_value(tw) === missing
+            @test possible_values(tw) === nothing
+            @test transform_value(tw, 42) == 42
+            @test validate_value(tw, "anything") == false
+        end
+
+        @testset "Slider(1:10) creates correct struct" begin
+            s = Suite.SliderWidget(1:10)
+            @test s isa SliderWidget{Int}
+            @test s.values == collect(1:10)
+            @test s.default == 1
+            @test s.show_value == true
+            @test length(s.values) == 10
+        end
+
+        @testset "Slider with float range and default" begin
+            s = Suite.SliderWidget(0.0:0.1:1.0; default=0.5)
+            @test s isa SliderWidget{Float64}
+            @test s.default == 0.5
+            @test 0.5 in s.values
+        end
+
+        @testset "Slider with string values" begin
+            s = Suite.SliderWidget(["a", "b", "c"])
+            @test s isa SliderWidget{String}
+            @test s.default == "a"
+            @test s.values == ["a", "b", "c"]
+        end
+
+        @testset "Slider default snaps to closest" begin
+            s = Suite.SliderWidget(1:10; default=5.7)
+            @test s.default == 6  # closest to 5.7 in 1:10
+        end
+
+        @testset "initial_value" begin
+            s = Suite.SliderWidget(1:100; default=42)
+            @test initial_value(s) == 42
+        end
+
+        @testset "possible_values" begin
+            s = Suite.SliderWidget(1:10)
+            @test possible_values(s) == 1:10
+        end
+
+        @testset "transform_value roundtrip" begin
+            s = Suite.SliderWidget(10:10:100)
+            # Index 1 → 10, index 5 → 50, index 10 → 100
+            @test transform_value(s, 1) == 10
+            @test transform_value(s, 5) == 50
+            @test transform_value(s, 10) == 100
+        end
+
+        @testset "validate_value" begin
+            s = Suite.SliderWidget(1:10)
+            @test validate_value(s, 1) == true
+            @test validate_value(s, 10) == true
+            @test validate_value(s, 0) == false   # out of range
+            @test validate_value(s, 11) == false  # out of range
+            @test validate_value(s, 1.5) == false # not integer
+            @test validate_value(s, "x") == false # wrong type
+        end
+
+        @testset "_downsample helper" begin
+            vals = collect(1:2000)
+            ds = Suite._downsample(vals, 1000)
+            @test length(ds) == 1000
+            @test ds[1] == 1
+            @test ds[end] == 2000
+
+            # No downsample needed
+            small = collect(1:5)
+            @test Suite._downsample(small, 1000) === small
+        end
+
+        @testset "_closest helper" begin
+            vals = collect(1:10)
+            @test Suite._closest(vals, 3.2) == 3
+            @test Suite._closest(vals, 3.8) == 4
+            @test Suite._closest(vals, 1) == 1
+            @test Suite._closest(vals, 10) == 10
+        end
+
+        @testset "max_steps downsample" begin
+            s = Suite.SliderWidget(1:5000; max_steps=100)
+            @test length(s.values) == 100
+            @test s.values[1] == 1
+            @test s.values[end] == 5000
+        end
+
+        @testset "HTML rendering produces valid output" begin
+            s = Suite.SliderWidget(1:10; default=5)
+            io = IOBuffer()
+            show(io, MIME"text/html"(), s)
+            html = String(take!(io))
+
+            @test occursin("<input type=\"range\"", html)
+            @test occursin("min=\"1\"", html)
+            @test occursin("max=\"10\"", html)
+            @test occursin("value=\"5\"", html)  # index of value 5
+            @test occursin("<script>", html)
+            @test occursin("</script>", html)
+            @test occursin("CustomEvent", html)
+            @test occursin("defineProperty", html)
+        end
+
+        @testset "HTML rendering with label" begin
+            s = Suite.SliderWidget(1:10; label="Temperature")
+            io = IOBuffer()
+            show(io, MIME"text/html"(), s)
+            html = String(take!(io))
+            @test occursin("Temperature", html)
+            @test occursin("<label", html)
+        end
+
+        @testset "HTML rendering with show_value=false" begin
+            s = Suite.SliderWidget(1:10; show_value=false)
+            io = IOBuffer()
+            show(io, MIME"text/html"(), s)
+            html = String(take!(io))
+            @test !occursin("data-slider-display", html)
+        end
+
+        @testset "Plain text rendering" begin
+            s = Suite.SliderWidget(1:10; default=5)
+            io = IOBuffer()
+            show(io, MIME"text/plain"(), s)
+            txt = String(take!(io))
+            @test occursin("SliderWidget", txt)
+            @test occursin("10 values", txt)
+            @test occursin("default=5", txt)
+        end
+
+        @testset "Index-mapping roundtrip" begin
+            vals = [10, 20, 30, 40, 50]
+            s = Suite.SliderWidget(vals; default=30)
+            # default is at index 3
+            idx = Suite._slider_index(s, 30)
+            @test idx == 3
+            @test transform_value(s, idx) == 30
+
+            # Full roundtrip for each value
+            for (i, v) in enumerate(vals)
+                @test transform_value(s, i) == v
+            end
+        end
+    end
 end

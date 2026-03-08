@@ -257,7 +257,7 @@ Card(
             Div(:class => "grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center",
                 _StatItem("50+", "Components"),
                 _StatItem("2300+", "Tests"),
-                _StatItem("2", "Tiers"),
+                _StatItem("3", "Tiers"),
                 _StatItem("5", "Themes")
             )
         ),
@@ -265,11 +265,12 @@ Card(
         # Component Categories
         Div(:class => "py-16",
             H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-300 mb-12",
-                "Two Implementation Tiers"
+                "Three Implementation Tiers"
             ),
-            Div(:class => "grid md:grid-cols-2 gap-6 max-w-3xl mx-auto",
+            Div(:class => "grid md:grid-cols-3 gap-6 max-w-5xl mx-auto",
                 _CategoryCard("Pure Styling", "~20 components", "Button, Badge, Card, Alert, Input, Table, Label, Typography, Avatar, Breadcrumb, Progress, Skeleton, Separator..."),
-                _CategoryCard("Island (Wasm)", "~30 components", "Dialog, Accordion, Tabs, Slider, Calendar, Select, Command, DropdownMenu, Sheet, NavigationMenu, Toggle, Switch, Popover, Tooltip...")
+                _CategoryCard("Island (Wasm)", "~30 components", "Dialog, Accordion, Tabs, Slider, Calendar, Select, Command, DropdownMenu, Sheet, NavigationMenu, Toggle, Switch, Popover, Tooltip..."),
+                _CategoryCard("Widget", "Island + @bind", "Slider widget for notebooks — same Wasm interactivity plus bond protocol for @bind integration with Sessions.jl and Pluto")
             )
         )
     )

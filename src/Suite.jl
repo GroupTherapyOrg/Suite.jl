@@ -113,6 +113,17 @@ include("components/Toolbar.jl")
 include("components/StatusBar.jl")
 include("components/TreeView.jl")
 
+# --- Widget Protocol & Implementations ---
+include("widgets.jl")
+
+# --- Widget Constructors ---
+# SliderWidget(1:100) creates a widget struct for @bind.
+# Slider(; min=0, max=100) creates an island VNode (existing behavior).
+# Usage: @bind x Suite.SliderWidget(1:100)
+
+export SliderWidget, AbstractSuiteWidget
+export initial_value, possible_values, transform_value, validate_value
+
 # --- Theme Script (FOUC prevention) ---
 include("runtime.jl")
 

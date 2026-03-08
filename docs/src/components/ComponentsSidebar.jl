@@ -16,6 +16,7 @@ const SUITE_COMPONENTS = [
     (section = "Widgets", base_path = "widgets", items = [
         (slug = "index",            title = "Overview",          implemented = true),
         (slug = "bind",             title = "The @bind Pattern", implemented = true),
+        (slug = "slider",           title = "Slider",            implemented = true),
     ]),
     # --- Components (alphabetical) ---
     (section = "Components", base_path = "components", items = [

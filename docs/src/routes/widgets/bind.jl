@@ -17,7 +17,7 @@ function BindPage()
                 " creates a two-way connection between a Julia variable and an HTML widget:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Main.CodeBlock(language="julia", """@bind temperature SuiteSlider(0:100; default=20)
+                Main.CodeBlock(language="julia", """@bind temperature Suite.SliderWidget(0:100; default=20)
 
 # `temperature` is now a reactive Julia variable.
 # Moving the slider updates it, re-executing dependent cells.""")
@@ -48,7 +48,7 @@ function BindPage()
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Returns the Julia value before the browser renders. Used for initial cell execution and running notebooks as scripts."
             ),
-            Main.CodeBlock(language="julia", "Bonds.initial_value(s::SuiteSliderWidget) = s.default  # e.g., 50"),
+            Main.CodeBlock(language="julia", "initial_value(s::SliderWidget) = s.default  # e.g., 50"),
 
             # transform_value
             SectionH3("transform_value(widget, value_from_js)"),
@@ -57,10 +57,10 @@ function BindPage()
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-4 mb-6 overflow-x-auto",
                 Main.CodeBlock(language="julia", """# Slider: JS sends integer index → map to Julia value
-Bonds.transform_value(s::SuiteSliderWidget, val) = s.values[val]
+transform_value(s::SliderWidget, idx) = s.values[idx]
 
 # Checkbox: JS sends boolean directly
-Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
+transform_value(c::CheckboxWidget, val) = val""")
             ),
 
             # possible_values
@@ -68,14 +68,14 @@ Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Returns all possible values (before transformation). Used by PlutoSliderServer.jl for precomputing notebook states."
             ),
-            Main.CodeBlock(language="julia", "Bonds.possible_values(s::SuiteSliderWidget) = 1:length(s.values)  # indices"),
+            Main.CodeBlock(language="julia", "possible_values(s::SliderWidget) = 1:length(s.values)  # indices"),
 
             # validate_value
             SectionH3("validate_value(widget, value_from_js)"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Security validation for untrusted input on public PlutoSliderServer deployments. Values are validated before transformation."
             ),
-            Main.CodeBlock(language="julia", "Bonds.validate_value(s::SuiteSliderWidget, val) = val isa Integer && 1 <= val <= length(s.values)"),
+            Main.CodeBlock(language="julia", "validate_value(s::SliderWidget, val) = val isa Integer && 1 <= val <= length(s.values)"),
 
             Main.Separator(),
 
@@ -95,7 +95,7 @@ Bonds.transform_value(c::SuiteCheckboxWidget, val) = val""")
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
                 Main.CodeBlock(language="julia", """# Bind to Julia functions!
-@bind transform SuiteSelect([
+@bind transform Suite.Select([
     sin => "Sine",
     cos => "Cosine",
     tan => "Tangent"
@@ -130,44 +130,45 @@ plot(transform, 0:0.1:2\u03c0)""")
             Main.Separator(),
 
             # Full example
-            SectionH2("Full Example: SuiteSlider"),
+            SectionH2("Full Example: Suite.SliderWidget"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Here's how a complete dual-mode widget is implemented:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Main.CodeBlock(language="julia", """# --- Widget struct (for Pluto @bind) ---
-struct SuiteSliderWidget{T}
-    values::AbstractVector{T}
+                Main.CodeBlock(language="julia", """# --- Widget struct (for @bind) ---
+struct SliderWidget{T} <: AbstractSuiteWidget
+    values::Vector{T}
     default::T
     show_value::Bool
-    class::String
 end
 
-# Positional arg \u2192 struct (Pluto mode)
-function SuiteSlider(values::AbstractVector; default=first(values), kwargs...)
-    SuiteSliderWidget(collect(values), default, false, "")
+# Positional arg → struct (widget mode, mirrors Sessions.jl)
+function Slider(values::AbstractVector{T};
+        default=missing, show_value::Bool=true,
+        max_steps::Integer=1_000) where T
+    vs = _downsample(collect(values), max_steps)
+    d = default === missing ? first(vs) : _closest(vs, default)
+    SliderWidget(vs, d, show_value)
 end
 
-# Keyword-only \u2192 VNode (Therapy.jl mode)
-function SuiteSlider(; min=0, max=100, step=1, class="", kwargs...)
-    Input(:type => "range", :min => min, :max => max, :step => step,
-          :class => cn("h-2 w-full ...", class), kwargs...)
+# Keyword-only → VNode (island mode for Therapy.jl)
+@island function Slider(; min=0, max=100, step=1, ...)
+    # ... Wasm-compiled interactive slider
 end
 
-# --- HTML for Pluto ---
-function Base.show(io::IO, ::MIME"text/html", s::SuiteSliderWidget)
-    idx = findfirst(isequal(s.default), s.values)
-    classes = "h-2 w-full rounded-full bg-warm-200 dark:bg-warm-700"
-    print(io, \"\"\"<input type="range" min="1" max="\$(length(s.values))"
-        value="\$(idx)" class="\$(classes)">\"\"\")
-end
+# --- Bond protocol ---
+initial_value(s::SliderWidget) = s.default
+possible_values(s::SliderWidget) = 1:length(s.values)
+transform_value(s::SliderWidget, idx) = s.values[idx]
+validate_value(s::SliderWidget, val) =
+    val isa Integer && 1 <= val <= length(s.values)
 
-# --- Bonds protocol (in ext/SuitePlutoExt.jl) ---
-Bonds.initial_value(s::SuiteSliderWidget) = s.default
-Bonds.possible_values(s::SuiteSliderWidget) = 1:length(s.values)
-Bonds.transform_value(s::SuiteSliderWidget, val) = s.values[val]
-Bonds.validate_value(s::SuiteSliderWidget, val) =
-    val isa Integer && 1 <= val <= length(s.values)""")
+# --- HTML rendering (for @bind in notebooks) ---
+function Base.show(io::IO, ::MIME"text/html", s::SliderWidget)
+    idx = _slider_index(s, s.default)
+    # Renders styled <input type="range"> with index mapping
+    # + inline <script> for .value property + input event
+end""")
             ),
 
             # Therapy.jl reactivity comparison

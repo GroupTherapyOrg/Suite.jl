@@ -40,9 +40,9 @@ Suite.extract(:Button, "src/components/")
             ),
 
             # Three tiers
-            SectionH3("Two implementation tiers"),
+            SectionH3("Three implementation tiers"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Components are implemented in two tiers based on their interactivity needs:"
+                "Components are implemented in three tiers based on their interactivity needs:"
             ),
             Main.Table(
                 Main.TableHeader(
@@ -62,6 +62,11 @@ Suite.extract(:Button, "src/components/")
                         Main.TableCell(class="font-medium", "Island (Wasm)"),
                         Main.TableCell("@island macro compiles Julia logic to WebAssembly"),
                         Main.TableCell("Dialog, Accordion, Tabs, Slider, Calendar, Select, Command")
+                    ),
+                    Main.TableRow(
+                        Main.TableCell(class="font-medium", "Widget"),
+                        Main.TableCell("Island + @bind protocol for notebook integration"),
+                        Main.TableCell("Slider(1:100) — same styling, plus bond methods for @bind")
                     )
                 )
             ),
