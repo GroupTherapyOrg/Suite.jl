@@ -71,21 +71,15 @@ end
 # Examples:
 #   Pagination(PaginationContent(PaginationItem(PaginationLink("1", is_active=true)), ...))
 @island function Pagination(children...; class::String="", theme::Symbol=:default, kwargs...)
-    # Signal: current active page (1-based, 0=none)
+    # Signal: current active page (1-based)
+    # Initial value comes from _p prop (set by props transform)
     current_page, set_current_page = create_signal(Int32(1))
 
     # Auto-register match_descendants binding for data-state on [data-index] elements
     compiled_register_match_descendants(Int32(1), Int32(0))
 
     # SSR: walk children, inject data-index + initial data-state
-    # Find which page is initially active by scanning PaginationLinks
-    initial_active = 1
-    for child in children
-        child isa VNode || continue
-        initial_active = _find_initial_active(child, 0)
-        initial_active > 0 && break
-    end
-    initial_active = max(initial_active, 1)
+    initial_active = _find_pagination_initial_active(children)
     _pagination_ssr_setup!(children, initial_active)
 
     classes = cn("mx-auto flex w-full justify-center", class)
@@ -95,27 +89,27 @@ end
         :class => classes,
         :on_click => () -> begin
             idx = compiled_get_event_data_index()
-            n = compiled_get_prop_i32(Int32(0))   # _n = total page link count
-            if idx >= Int32(1)
-                if idx <= n
-                    # Direct page link click
-                    set_current_page(idx)
-                end
-            end
+            # Prev button: data-index 100
             if idx == Int32(100)
-                # Prev button
                 current = current_page()
                 new_idx = current - Int32(1)
                 if new_idx >= Int32(1)
                     set_current_page(new_idx)
                 end
             end
+            # Next button: data-index 101
             if idx == Int32(101)
-                # Next button
                 current = current_page()
+                n = compiled_get_prop_i32(Int32(0))
                 new_idx = current + Int32(1)
                 if new_idx <= n
                     set_current_page(new_idx)
+                end
+            end
+            # Direct page link: data-index 1..N (below 100)
+            if idx >= Int32(1)
+                if idx < Int32(100)
+                    set_current_page(idx)
                 end
             end
         end,
@@ -123,32 +117,37 @@ end
 end
 
 # Helper: find which PaginationLink has is_active=true, return its 1-based index
-function _find_initial_active(node::VNode, count::Int)
-    if haskey(node.props, :data_pagination_link)
-        count += 1
-        if get(node.props, Symbol("data-pagination-active"), nothing) == "true"
-            return count
-        end
-    end
-    for child in node.children
+function _find_pagination_initial_active(children)
+    result = _scan_pagination_active(children, 0)
+    return result > 0 ? result : 1
+end
+
+function _scan_pagination_active(children, count::Int)
+    for child in children
         child isa VNode || continue
-        result = _find_initial_active(child, count)
+        if haskey(child.props, :data_pagination_link)
+            count += 1
+            if get(child.props, Symbol("data-pagination-active"), nothing) == "true"
+                return count
+            end
+        end
+        result = _scan_pagination_active(child.children, count)
         if result > 0
             return result
         end
         # Update count for sibling traversal
-        count = _count_pagination_links(child, count)
+        count = _count_pagination_links_in(child.children, count)
     end
-    return 0  # Not found
+    return 0
 end
 
-function _count_pagination_links(node::VNode, count::Int)
-    if haskey(node.props, :data_pagination_link)
-        count += 1
-    end
-    for child in node.children
+function _count_pagination_links_in(children, count::Int)
+    for child in children
         child isa VNode || continue
-        count = _count_pagination_links(child, count)
+        if haskey(child.props, :data_pagination_link)
+            count += 1
+        end
+        count = _count_pagination_links_in(child.children, count)
     end
     return count
 end
