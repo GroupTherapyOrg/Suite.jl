@@ -144,61 +144,41 @@ export Slider
 
     Span(root_attrs..., kwargs...,
         # Handler 0: pointerdown — capture pointer, compute value from position
+        # NOTE: All Float64 arithmetic — WasmTarget cannot compile Int32(Float64)
         :on_pointerdown => () -> begin
-            el = Int32(1)  # root Span element ID
+            el = Int32(1)
             capture_pointer(el)
             set_dragging(Int32(1))
-            # Compute percentage from pointer position
-            # Element 2 is the track
             track_el = Int32(2)
             rx = get_bounding_rect_x(track_el)
             rw = get_bounding_rect_w(track_el)
             px = get_pointer_x()
-            raw_pct = (px - rx) * Float64(10000) / rw
-            # Snap to step
-            s = compiled_get_prop_i32(Int32(0))  # _s = step as pct*100
-            if s > Int32(0)
-                raw_i32 = Int32(raw_pct)
-                half_s = s ÷ Int32(2)
-                snapped = ((raw_i32 + half_s) ÷ s) * s
-                raw_pct = Float64(snapped)
-            end
-            # Clamp 0-10000
+            raw_pct = (px - rx) * Float64(100) / rw
             if raw_pct < Float64(0)
                 raw_pct = Float64(0)
             end
-            if raw_pct > Float64(10000)
-                raw_pct = Float64(10000)
+            if raw_pct > Float64(100)
+                raw_pct = Float64(100)
             end
-            set_value(Int32(raw_pct))
-            # Update range width and thumb left via style
-            set_style_percent(Int32(3), Int32(2), raw_pct / Float64(100))  # range: width
-            set_style_percent(Int32(4), Int32(0), raw_pct / Float64(100))  # thumb: left
+            set_style_percent(Int32(3), Int32(2), raw_pct)
+            set_style_percent(Int32(4), Int32(0), raw_pct)
         end,
-        # Handler 1: pointermove — if dragging, recompute value
+        # Handler 1: pointermove — if dragging, update position
         :on_pointermove => () -> begin
             if dragging() == Int32(1)
                 track_el = Int32(2)
                 rx = get_bounding_rect_x(track_el)
                 rw = get_bounding_rect_w(track_el)
                 px = get_pointer_x()
-                raw_pct = (px - rx) * Float64(10000) / rw
-                s = compiled_get_prop_i32(Int32(0))
-                if s > Int32(0)
-                    raw_i32 = Int32(raw_pct)
-                    half_s = s ÷ Int32(2)
-                    snapped = ((raw_i32 + half_s) ÷ s) * s
-                    raw_pct = Float64(snapped)
-                end
+                raw_pct = (px - rx) * Float64(100) / rw
                 if raw_pct < Float64(0)
                     raw_pct = Float64(0)
                 end
-                if raw_pct > Float64(10000)
-                    raw_pct = Float64(10000)
+                if raw_pct > Float64(100)
+                    raw_pct = Float64(100)
                 end
-                set_value(Int32(raw_pct))
-                set_style_percent(Int32(3), Int32(2), raw_pct / Float64(100))
-                set_style_percent(Int32(4), Int32(0), raw_pct / Float64(100))
+                set_style_percent(Int32(3), Int32(2), raw_pct)
+                set_style_percent(Int32(4), Int32(0), raw_pct)
             end
         end,
         # Handler 2: pointerup — release pointer, stop dragging

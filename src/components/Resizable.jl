@@ -73,29 +73,25 @@ end
         Symbol("data-resizable-direction") => direction,
         :style => "flex-wrap:nowrap;",
         # Handler 0: pointerdown — if on handle, capture and start dragging
+        # NOTE: All Float64 arithmetic — WasmTarget cannot compile Int32(Float64)
         :on_pointerdown => () -> begin
             idx = compiled_get_event_data_index()
             if idx >= Int32(0)
-                el = Int32(1)  # group Div element ID
+                el = Int32(1)
                 capture_pointer(el)
                 set_dragging(Int32(1))
-                # Compute initial split from pointer position
                 rx = get_bounding_rect_x(el)
                 rw = get_bounding_rect_w(el)
                 px = get_pointer_x()
-                raw_pct = (px - rx) * Float64(10000) / rw
-                if raw_pct < Float64(1000)
-                    raw_pct = Float64(1000)
+                pct = (px - rx) * Float64(100) / rw
+                if pct < Float64(10)
+                    pct = Float64(10)
                 end
-                if raw_pct > Float64(9000)
-                    raw_pct = Float64(9000)
+                if pct > Float64(90)
+                    pct = Float64(90)
                 end
-                set_split_pct(Int32(raw_pct))
-                # Update panel A flex-grow and panel B flex-grow
-                pct_a = raw_pct / Float64(100)
-                pct_b = (Float64(10000) - raw_pct) / Float64(100)
-                set_style_numeric(Int32(2), Int32(0), pct_a)  # panel A: flexGrow
-                set_style_numeric(Int32(4), Int32(0), pct_b)  # panel B: flexGrow
+                set_style_numeric(Int32(2), Int32(0), pct)
+                set_style_numeric(Int32(4), Int32(0), Float64(100) - pct)
             end
         end,
         # Handler 1: pointermove — if dragging, update split
@@ -105,18 +101,15 @@ end
                 rx = get_bounding_rect_x(el)
                 rw = get_bounding_rect_w(el)
                 px = get_pointer_x()
-                raw_pct = (px - rx) * Float64(10000) / rw
-                if raw_pct < Float64(1000)
-                    raw_pct = Float64(1000)
+                pct = (px - rx) * Float64(100) / rw
+                if pct < Float64(10)
+                    pct = Float64(10)
                 end
-                if raw_pct > Float64(9000)
-                    raw_pct = Float64(9000)
+                if pct > Float64(90)
+                    pct = Float64(90)
                 end
-                set_split_pct(Int32(raw_pct))
-                pct_a = raw_pct / Float64(100)
-                pct_b = (Float64(10000) - raw_pct) / Float64(100)
-                set_style_numeric(Int32(2), Int32(0), pct_a)
-                set_style_numeric(Int32(4), Int32(0), pct_b)
+                set_style_numeric(Int32(2), Int32(0), pct)
+                set_style_numeric(Int32(4), Int32(0), Float64(100) - pct)
             end
         end,
         # Handler 2: pointerup — release, stop dragging
