@@ -59,7 +59,11 @@ const _NAV_CHEVRON_DOWN = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
     # Compilable: 1 signal for active item index (Int32: 0=none, N=item N is open)
     active_item, set_active = create_signal(Int32(0))
 
-    # SSR-only: walk children, inject data-index on trigger markers
+    # Match descendants: each data-index element gets data-state=open/closed
+    # when active_item signal matches its index (1-based: 1=first, 2=second, etc.)
+    compiled_register_match_descendants(Int32(1), Int32(0))
+
+    # SSR-only: walk children, inject data-index on trigger/content
     _nav_ssr_setup!(children)
 
     classes = cn(
@@ -68,32 +72,31 @@ const _NAV_CHEVRON_DOWN = """<svg xmlns="http://www.w3.org/2000/svg" width="16" 
     )
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
 
+    # Click-outside: close menu when clicking outside the island
+    # el_id=-1 = therapy-island root, handler_idx=0 = on_click handler
+    compiled_add_click_outside_listener(Int32(-1), Int32(0))
+
     Div(Symbol("data-nav-menu") => "",
-        Symbol("data-show") => ShowDescendants(active_item),  # show/hide + data-state binding (inline Wasm)
         Symbol("data-orientation") => orientation,
         Symbol("data-delay-duration") => string(delay_duration),
         Symbol("data-skip-delay-duration") => string(skip_delay_duration),
         :class => classes,
         :on_click => () -> begin
-            idx = compiled_get_event_data_index()
+            idx = compiled_get_event_data_index()  # 1-based: 1=first, 2=second, etc.
             current = active_item()
-            if idx >= Int32(0)
-                item_idx = idx + Int32(1)  # 0-based data-index → 1-based signal
-                # NOTE: Avoid if-else — WasmTarget.jl codegen places else branch
-                # outside the if block (no wasm else opcode emitted). Use two
-                # independent if blocks with opposite conditions instead.
-                if current == item_idx
+            if idx > Int32(0)
+                if current == idx
                     set_active(Int32(0))  # Close same trigger
                     pop_escape_handler()
                 end
-                if current != item_idx
+                if current != idx
                     if current == Int32(0)
-                        push_escape_handler(Int32(0))  # Register Escape on first open
+                        push_escape_handler(Int32(0))
                     end
-                    set_active(item_idx)  # Open different trigger
+                    set_active(idx)  # Open different trigger
                 end
             end
-            # Close on non-trigger click (links in content) or Escape (handler_0 called with no event target)
+            # Close on non-trigger click (links in content) or Escape
             if idx < Int32(0)
                 if current > Int32(0)
                     set_active(Int32(0))
@@ -141,10 +144,23 @@ function _nav_ssr_walk!(node::VNode, idx_ref::Ref{Int})
 end
 
 function _nav_ssr_inject!(item::VNode, idx::Int)
+    # 1-based index everywhere (0=none, 1=first item, 2=second, etc.)
+    item_index = idx + 1
     for child in item.children
-        if child isa VNode && haskey(child.props, Symbol("data-nav-menu-trigger-marker"))
-            # Add data-index on trigger marker for event delegation
-            child.props[Symbol("data-index")] = string(idx)
+        if child isa VNode
+            if haskey(child.props, Symbol("data-nav-menu-trigger-marker"))
+                # 1-based data-index on trigger marker for event delegation
+                child.props[Symbol("data-index")] = string(item_index)
+                # Also on inner button for match binding (data-state + aria-expanded)
+                for inner in child.children
+                    if inner isa VNode && haskey(inner.props, Symbol("data-nav-menu-trigger"))
+                        inner.props[Symbol("data-index")] = string(item_index)
+                    end
+                end
+            elseif haskey(child.props, Symbol("data-nav-menu-content"))
+                # 1-based data-index on content for match_descendants binding
+                child.props[Symbol("data-index")] = string(item_index)
+            end
         end
     end
 end
@@ -249,8 +265,7 @@ function NavigationMenuContent(children...; theme::Symbol=:default, class::Strin
 
     Div(Symbol("data-nav-menu-content") => "",
         Symbol("data-state") => "closed",
-        :style => "display:none",
-        :class => classes,
+        :class => cn("data-[state=closed]:hidden", classes),
         kwargs...,
         children...,
     )

@@ -24,6 +24,7 @@ using Therapy: provide_context, use_context, use_context_signal
 using Therapy: compiled_get_prop_i32, compiled_get_prop_string_id, compiled_get_event_data_index
 using Therapy: compiled_register_match_descendants, compiled_register_bit_descendants
 using Therapy: compiled_copy_to_clipboard
+using Therapy: compiled_add_click_outside_listener, compiled_remove_click_outside_listener
 
 using Dates
 

@@ -4376,7 +4376,7 @@ using Test
             ))
             @test occursin("data-nav-menu-content", html)
             @test occursin("data-state=\"closed\"", html)
-            @test occursin("display:none", html)
+            @test occursin("data-[state=closed]:hidden", html)
             # Inline dropdown positioning
             @test occursin("absolute", html)
             @test occursin("z-50", html)

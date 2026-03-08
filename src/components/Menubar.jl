@@ -65,6 +65,9 @@ const _MENUBAR_DOT_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="16" h
     # when active_menu signal matches its index (1-based: 1=File, 2=Edit, etc.)
     compiled_register_match_descendants(Int32(1), Int32(0))
 
+    # Click-outside: close menu when clicking outside the island
+    compiled_add_click_outside_listener(Int32(-1), Int32(0))
+
     # SSR-only: walk children, inject data-index on trigger markers and content
     _menubar_ssr_setup!(children)
 
