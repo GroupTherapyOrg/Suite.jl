@@ -21,8 +21,9 @@ using Therapy: render_to_string, render_page
 using Therapy: @island, island, IslandDef, get_islands, clear_islands!
 using Therapy: create_signal, BindBool, ShowDescendants
 using Therapy: provide_context, use_context, use_context_signal
-using Therapy: compiled_get_prop_i32, compiled_get_event_data_index
+using Therapy: compiled_get_prop_i32, compiled_get_prop_string_id, compiled_get_event_data_index
 using Therapy: compiled_register_match_descendants, compiled_register_bit_descendants
+using Therapy: compiled_copy_to_clipboard
 
 using Dates
 
@@ -133,6 +134,7 @@ function __init__()
     Therapy.register_island_props_transform!(:Collapsible, _COLLAPSIBLE_PROPS_TRANSFORM)
     Therapy.register_island_props_transform!(:CollapsibleTrigger, _COLLAPSIBLETRIGGER_PROPS_TRANSFORM)
     Therapy.register_island_props_transform!(:Carousel, _CAROUSEL_PROPS_TRANSFORM)
+    Therapy.register_island_props_transform!(:CodeBlockCopy, _CODEBLOCKCOPY_PROPS_TRANSFORM)
 end
 
 end # module Suite

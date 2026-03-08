@@ -1,6 +1,6 @@
 # CodeBlock.jl — Suite.jl CodeBlock Component
 #
-# Tier: styling (no interactive Wasm — copy button via JS runtime)
+# Tier: island (Wasm — copy button compiled to WebAssembly)
 # Suite Dependencies: none
 # JS Modules: none
 #
@@ -10,7 +10,7 @@
 # Behavior:
 #   - Styled code display container with optional copy-to-clipboard, language badge,
 #     and line numbers.
-#   - Copy button click handler via data attributes (hydration JS)
+#   - Copy button is a Wasm island: click calls navigator.clipboard.writeText
 #   - Julia/jl language: auto-highlighted with keyword/string/comment/number colors
 #   - Sessions.jl uses this for cell code display and output rendering.
 
@@ -20,15 +20,30 @@ if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
 # --- Component Implementation ---
 
-export CodeBlock
+export CodeBlock, CodeBlockCopy
 
 # Copy icon SVG
 const _CODEBLOCK_COPY_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>"""
 
-#   CodeBlock(code; language, show_line_numbers, show_copy, class, kwargs...) -> IslandVNode
+#   CodeBlockCopy(children...; code, kwargs...) -> IslandVNode
+#
+# Copy-to-clipboard button island. Receives code text as a string prop,
+# compiled to Wasm — calls navigator.clipboard.writeText on click.
+@island function CodeBlockCopy(children...; code::String="", kwargs...)
+    # _c = code string prop (index 0 alphabetically)
+    # Store string table ID in a signal so it persists for the click handler
+    str_id, _ = create_signal(compiled_get_prop_string_id(Int32(0)))
+
+    Therapy.Button(
+        :on_click => () -> compiled_copy_to_clipboard(str_id()),
+        kwargs...,
+        children...)
+end
+
+#   CodeBlock(code; language, show_line_numbers, show_copy, class, kwargs...) -> VNode
 #
 # A styled code display block with optional copy button, line numbers, and language badge.
-# Interactive behavior is compiled to WebAssembly — no JavaScript required.
+# Copy button is a Wasm island — no JavaScript required.
 #
 # Options:
 # - `language`: Language name to display as badge (e.g., "julia", "javascript")
@@ -55,9 +70,9 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
 
     if show_copy
         push!(header_items,
-            Therapy.Button(
+            CodeBlockCopy(
+                code=code,
                 :class => "cursor-pointer ml-auto inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs text-warm-400 hover:text-warm-200 hover:bg-warm-800 transition-colors",
-                Symbol("data-codeblock-copy") => "true",
                 RawHtml(_CODEBLOCK_COPY_SVG),
             ))
     end
@@ -98,16 +113,21 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
     )
 end
 
+# --- Hydration Support ---
+
+const _CODEBLOCKCOPY_PROPS_TRANSFORM = (props, args) -> begin
+    props[:_c] = get(props, :code, "")
+end
 
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :CodeBlock,
         "CodeBlock.jl",
-        :styling,
+        :island,
         "Styled code display with copy button, line numbers, and language badge",
         Symbol[],
         Symbol[],
-        [:CodeBlock],
+        [:CodeBlock, :CodeBlockCopy],
     ))
 end

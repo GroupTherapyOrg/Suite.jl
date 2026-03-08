@@ -5484,11 +5484,12 @@ using Test
 
         @testset "Copy button" begin
             html = Therapy.render_to_string(CodeBlock("test", show_copy=true))
-            @test occursin("data-codeblock-copy", html)
+            @test occursin("therapy-island", html)
+            @test occursin("codeblockcopy", html)
             @test occursin("<svg", html)
 
             html_no_copy = Therapy.render_to_string(CodeBlock("test", show_copy=false))
-            @test !occursin("data-codeblock-copy", html_no_copy)
+            @test !occursin("therapy-island", html_no_copy)
         end
 
         @testset "Line numbers" begin
@@ -5526,7 +5527,7 @@ using Test
             html = Therapy.render_to_string(CodeBlock("x", language="bash", show_copy=true))
             @test occursin("border-b", html)  # Header separator
             @test occursin("bash", html)
-            @test occursin("data-codeblock-copy", html)
+            @test occursin("codeblockcopy", html)
         end
 
         @testset "No header when no language and no copy" begin
@@ -5537,8 +5538,9 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :CodeBlock)
             meta = Suite.COMPONENT_REGISTRY[:CodeBlock]
-            @test meta.tier == :styling
+            @test meta.tier == :island
             @test :CodeBlock in meta.exports
+            @test :CodeBlockCopy in meta.exports
         end
     end
 
