@@ -26,8 +26,8 @@
 #   - Handler 2: on_pointerup — release pointer, set dragging=0
 #   - Handler 3: on_keydown — arrows ±step, Home/End min/max
 #
-# Element IDs (deterministic from DOM structure):
-#   0: therapy-island, 1: root Span, 2: track Span, 3: range Span, 4: thumb Span
+# Element IDs (v2 hydration skips therapy-island wrapper):
+#   0: root Span, 1: track Span, 2: range Span, 3: thumb Span
 #
 # Reference: Thaw Slider — github.com/thaw-ui/thaw
 # Reference: WAI-ARIA Slider — https://www.w3.org/WAI/ARIA/apg/patterns/slider/
@@ -146,10 +146,10 @@ export Slider
         # Handler 0: pointerdown — capture pointer, compute value from position
         # NOTE: All Float64 arithmetic — WasmTarget cannot compile Int32(Float64)
         :on_pointerdown => () -> begin
-            el = Int32(1)
+            el = Int32(0)
             capture_pointer(el)
             set_dragging(Int32(1))
-            track_el = Int32(2)
+            track_el = Int32(1)
             rx = get_bounding_rect_x(track_el)
             rw = get_bounding_rect_w(track_el)
             px = get_pointer_x()
@@ -160,13 +160,13 @@ export Slider
             if raw_pct > Float64(100)
                 raw_pct = Float64(100)
             end
-            set_style_percent(Int32(3), Int32(2), raw_pct)
-            set_style_percent(Int32(4), Int32(0), raw_pct)
+            set_style_percent(Int32(2), Int32(2), raw_pct)
+            set_style_percent(Int32(3), Int32(0), raw_pct)
         end,
         # Handler 1: pointermove — if dragging, update position
         :on_pointermove => () -> begin
             if dragging() == Int32(1)
-                track_el = Int32(2)
+                track_el = Int32(1)
                 rx = get_bounding_rect_x(track_el)
                 rw = get_bounding_rect_w(track_el)
                 px = get_pointer_x()
@@ -177,13 +177,13 @@ export Slider
                 if raw_pct > Float64(100)
                     raw_pct = Float64(100)
                 end
-                set_style_percent(Int32(3), Int32(2), raw_pct)
-                set_style_percent(Int32(4), Int32(0), raw_pct)
+                set_style_percent(Int32(2), Int32(2), raw_pct)
+                set_style_percent(Int32(3), Int32(0), raw_pct)
             end
         end,
         # Handler 2: pointerup — release pointer, stop dragging
         :on_pointerup => () -> begin
-            el = Int32(1)
+            el = Int32(0)
             release_pointer(el)
             set_dragging(Int32(0))
         end,
@@ -230,8 +230,8 @@ export Slider
             if new_val != current
                 set_value(new_val)
                 pct_f = Float64(new_val) / Float64(100)
-                set_style_percent(Int32(3), Int32(2), pct_f)
-                set_style_percent(Int32(4), Int32(0), pct_f)
+                set_style_percent(Int32(2), Int32(2), pct_f)
+                set_style_percent(Int32(3), Int32(0), pct_f)
             end
         end,
         # Track

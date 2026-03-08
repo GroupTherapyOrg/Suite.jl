@@ -18,8 +18,8 @@
 #   - Handler 2: on_pointerup — release, set dragging=0
 #   - Handler 3: on_keydown — arrows ±1% on focused handle
 #
-# Element IDs (2-panel layout):
-#   0: therapy-island, 1: group Div, 2: panel A, 3: handle, 4: panel B
+# Element IDs (v2 hydration skips therapy-island wrapper):
+#   0: group Div, 1: panel A, 2: handle, 3: panel B
 #
 # Reference: react-resizable-panels by bvaughn + shadcn/ui Resizable
 
@@ -77,7 +77,7 @@ end
         :on_pointerdown => () -> begin
             idx = compiled_get_event_data_index()
             if idx >= Int32(0)
-                el = Int32(1)
+                el = Int32(0)
                 capture_pointer(el)
                 set_dragging(Int32(1))
                 rx = get_bounding_rect_x(el)
@@ -90,14 +90,14 @@ end
                 if pct > Float64(90)
                     pct = Float64(90)
                 end
-                set_style_numeric(Int32(2), Int32(0), pct)
-                set_style_numeric(Int32(4), Int32(0), Float64(100) - pct)
+                set_style_numeric(Int32(1), Int32(0), pct)
+                set_style_numeric(Int32(3), Int32(0), Float64(100) - pct)
             end
         end,
         # Handler 1: pointermove — if dragging, update split
         :on_pointermove => () -> begin
             if dragging() == Int32(1)
-                el = Int32(1)
+                el = Int32(0)
                 rx = get_bounding_rect_x(el)
                 rw = get_bounding_rect_w(el)
                 px = get_pointer_x()
@@ -108,13 +108,13 @@ end
                 if pct > Float64(90)
                     pct = Float64(90)
                 end
-                set_style_numeric(Int32(2), Int32(0), pct)
-                set_style_numeric(Int32(4), Int32(0), Float64(100) - pct)
+                set_style_numeric(Int32(1), Int32(0), pct)
+                set_style_numeric(Int32(3), Int32(0), Float64(100) - pct)
             end
         end,
         # Handler 2: pointerup — release, stop dragging
         :on_pointerup => () -> begin
-            el = Int32(1)
+            el = Int32(0)
             release_pointer(el)
             set_dragging(Int32(0))
         end,
@@ -149,8 +149,8 @@ end
                 set_split_pct(new_val)
                 pct_a = Float64(new_val) / Float64(100)
                 pct_b = (Float64(10000) - Float64(new_val)) / Float64(100)
-                set_style_numeric(Int32(2), Int32(0), pct_a)
-                set_style_numeric(Int32(4), Int32(0), pct_b)
+                set_style_numeric(Int32(1), Int32(0), pct_a)
+                set_style_numeric(Int32(3), Int32(0), pct_b)
             end
         end,
         kwargs...,
