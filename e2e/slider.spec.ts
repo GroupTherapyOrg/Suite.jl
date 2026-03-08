@@ -63,33 +63,33 @@ test.describe('Slider', () => {
 
   // --- Interaction: Keyboard ---
 
-  test.skip('ArrowRight increases value', async ({ page }) => {
-    // DEFERRED: Slider island has no wasm on_keydown handler — SSR-only rendering.
-    // Requires: on_keydown handler with key code detection + value clamping + style updates.
-    const thumb = page.locator('[role="slider"]').first();
-    const initialValue = Number(await thumb.getAttribute('aria-valuenow'));
+  test('dragging slider updates range fill', async ({ page }) => {
+    const island = page.locator('therapy-island[data-component="slider"]').first();
+    const track = island.locator('[data-slider-track]').first();
+    const range = island.locator('[data-slider-range]').first();
 
-    await thumb.focus();
-    await page.keyboard.press('ArrowRight');
+    const trackBox = await track.boundingBox();
+    expect(trackBox).toBeTruthy();
 
-    const newValue = Number(await thumb.getAttribute('aria-valuenow'));
-    expect(newValue).toBeGreaterThan(initialValue);
-  });
+    const startX = trackBox!.x + trackBox!.width * 0.2;
+    const endX = trackBox!.x + trackBox!.width * 0.8;
+    const y = trackBox!.y + trackBox!.height / 2;
 
-  test.skip('ArrowLeft decreases value', async ({ page }) => {
-    // DEFERRED: Slider island has no wasm on_keydown handler — SSR-only rendering.
-    // Requires: on_keydown handler with key code detection + value clamping + style updates.
-    const thumb = page.locator('[role="slider"]').first();
+    // Click and drag from 20% to 80%
+    await page.mouse.move(startX, y);
+    await page.mouse.down();
+    await page.mouse.move(endX, y, { steps: 5 });
+    await page.mouse.up();
 
-    // First move right to have room to go left
-    await thumb.focus();
-    await page.keyboard.press('ArrowRight');
-    await page.keyboard.press('ArrowRight');
-    const midValue = Number(await thumb.getAttribute('aria-valuenow'));
-
-    await page.keyboard.press('ArrowLeft');
-    const newValue = Number(await thumb.getAttribute('aria-valuenow'));
-    expect(newValue).toBeLessThan(midValue);
+    // Range fill should have width updated by the Wasm pointermove handler
+    const rangeStyle = await range.getAttribute('style');
+    expect(rangeStyle).toContain('width:');
+    // Width should be roughly 80% (between 70% and 90%)
+    const match = rangeStyle?.match(/width:\s*([\d.]+)%/);
+    expect(match).toBeTruthy();
+    const widthPct = parseFloat(match![1]);
+    expect(widthPct).toBeGreaterThan(60);
+    expect(widthPct).toBeLessThan(95);
   });
 
   // --- Slider Range ---
