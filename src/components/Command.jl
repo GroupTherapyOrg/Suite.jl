@@ -281,10 +281,16 @@ end
             Symbol("data-state") => "closed",
             :style => "display:none",
             :class => "fixed inset-0 z-50",
-            # Overlay
+            # Overlay — click to close
             Div(:class => overlay_classes,
                 Symbol("data-command-dialog-overlay") => "",
-                Symbol("data-state") => "closed"),
+                Symbol("data-state") => "closed",
+                :on_click => () -> begin
+                    set_open(Int32(0))
+                    unlock_scroll()
+                    pop_escape_handler()
+                    restore_active_element()
+                end),
             # Content with embedded Command
             Div(:class => content_classes,
                 Symbol("data-command-dialog-content") => "",

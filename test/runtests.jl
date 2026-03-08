@@ -1142,8 +1142,9 @@ using Test
                 CollapsibleTrigger("T"),
                 CollapsibleContent(Div("Inner")),
             ))
-            # Inside Collapsible, content starts with display:none (ShowDescendants toggles visibility)
-            @test occursin("display:none", html)
+            # Content starts closed — hidden via data-[state=closed]:hidden CSS
+            @test occursin("data-state=\"closed\"", html)
+            @test occursin("data-[state=closed]:hidden", html)
         end
 
         @testset "Custom class" begin
@@ -4869,7 +4870,6 @@ using Test
 
         @testset "Default rendering" begin
             html = Therapy.render_to_string(DataTable(test_data, test_columns))
-            @test occursin("therapy-island", html)  # @island wrapper
             @test occursin("data-datatable", html)
             @test occursin("<table", html)
             @test occursin("<thead", html)
@@ -5103,7 +5103,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :DataTable)
             meta = Suite.COMPONENT_REGISTRY[:DataTable]
-            @test meta.tier == :island
+            @test meta.tier == :styling
             @test :DataTable in meta.exports
             @test :DataTableColumn in meta.exports
             @test :Table in meta.suite_deps
