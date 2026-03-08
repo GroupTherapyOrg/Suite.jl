@@ -40,9 +40,9 @@ Suite.extract(:Button, "src/components/")
             ),
 
             # Three tiers
-            SectionH3("Three implementation tiers"),
+            SectionH3("Two implementation tiers"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Components are implemented in three tiers based on their interactivity needs:"
+                "Components are implemented in two tiers based on their interactivity needs:"
             ),
             Main.Table(
                 Main.TableHeader(
@@ -56,17 +56,12 @@ Suite.extract(:Button, "src/components/")
                     Main.TableRow(
                         Main.TableCell(class="font-medium", "Pure Styling"),
                         Main.TableCell("Julia functions generating HTML + Tailwind CSS"),
-                        Main.TableCell("Button, Card, Badge, Alert, Input")
+                        Main.TableCell("Button, Card, Badge, Alert, Input, Table")
                     ),
                     Main.TableRow(
-                        Main.TableCell(class="font-medium", "Interactive"),
-                        Main.TableCell("JS runtime for keyboard nav and state toggling"),
-                        Main.TableCell("Accordion, Tabs, Toggle, Switch")
-                    ),
-                    Main.TableRow(
-                        Main.TableCell(class="font-medium", "JS Runtime"),
-                        Main.TableCell("Full behavioral JS for complex DOM interactions"),
-                        Main.TableCell("Dialog, Menu, Popover, Select, Command")
+                        Main.TableCell(class="font-medium", "Island (Wasm)"),
+                        Main.TableCell("@island macro compiles Julia logic to WebAssembly"),
+                        Main.TableCell("Dialog, Accordion, Tabs, Slider, Calendar, Select, Command")
                     )
                 )
             ),
@@ -74,7 +69,7 @@ Suite.extract(:Button, "src/components/")
             # Themes
             SectionH3("Built-in themes"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Suite.jl ships with 4 pre-built themes. Apply a theme with a single keyword argument, or extract components with a theme baked in:"
+                "Suite.jl ships with 5 pre-built themes. Apply a theme with a single keyword argument, or extract components with a theme baked in:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
                 Main.CodeBlock(language="julia", """# Apply at render time

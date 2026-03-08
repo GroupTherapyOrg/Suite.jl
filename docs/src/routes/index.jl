@@ -139,12 +139,12 @@ function Index()
                             ),
                             Main.TableRow(
                                 Main.TableCell(class="font-medium", "Dialog"),
-                                Main.TableCell("JS Runtime"),
+                                Main.TableCell("Island"),
                                 Main.TableCell(class="text-right", "103")
                             ),
                             Main.TableRow(
                                 Main.TableCell(class="font-medium", "Calendar"),
-                                Main.TableCell("JS Runtime"),
+                                Main.TableCell("Island"),
                                 Main.TableCell(class="text-right", "119")
                             )
                         )
@@ -240,8 +240,8 @@ Card(
                     "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
                 ),
                 _FeatureCard(
-                    "4 Built-in Themes",
-                    "Default, Ocean, Minimal, Nature. Apply a theme in one kwarg. Extract with a theme baked in.",
+                    "5 Built-in Themes",
+                    "Default, Ocean, Minimal, Nature, Islands. Apply a theme in one kwarg. Extract with a theme baked in.",
                     "M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
                 ),
                 _FeatureCard(
@@ -256,21 +256,20 @@ Card(
         Div(:class => "py-12 border-y border-warm-200 dark:border-warm-700",
             Div(:class => "grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center",
                 _StatItem("50+", "Components"),
-                _StatItem("2000+", "Tests"),
-                _StatItem("3", "Tiers"),
-                _StatItem("4", "Themes")
+                _StatItem("2300+", "Tests"),
+                _StatItem("2", "Tiers"),
+                _StatItem("5", "Themes")
             )
         ),
 
-        # Component Categories — kept but updated counts
+        # Component Categories
         Div(:class => "py-16",
             H2(:class => "text-3xl font-serif font-semibold text-center text-warm-800 dark:text-warm-300 mb-12",
-                "Three Implementation Tiers"
+                "Two Implementation Tiers"
             ),
-            Div(:class => "grid md:grid-cols-3 gap-6 max-w-4xl mx-auto",
-                _CategoryCard("Pure Styling", "~20 components", "Button, Badge, Card, Alert, Input, Table, Typography, Breadcrumb, Pagination..."),
-                _CategoryCard("Interactive", "~10 components", "Accordion, Tabs, Toggle, Switch, Collapsible, Toggle Group..."),
-                _CategoryCard("JS Runtime", "~20 components", "Dialog, Menu, Popover, Tooltip, Select, Command, Toast, Calendar, DataTable...")
+            Div(:class => "grid md:grid-cols-2 gap-6 max-w-3xl mx-auto",
+                _CategoryCard("Pure Styling", "~20 components", "Button, Badge, Card, Alert, Input, Table, Label, Typography, Avatar, Breadcrumb, Progress, Skeleton, Separator..."),
+                _CategoryCard("Island (Wasm)", "~30 components", "Dialog, Accordion, Tabs, Slider, Calendar, Select, Command, DropdownMenu, Sheet, NavigationMenu, Toggle, Switch, Popover, Tooltip...")
             )
         )
     )
