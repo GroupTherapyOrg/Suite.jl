@@ -54,10 +54,30 @@ test.describe('Collapsible', () => {
     await expect(triggerEl).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test.skip('initially open collapsible shows content', async () => {
-    // DEFERRED: IslandTransform cannot compile prop-dependent signal initialization
-    // (create_signal(Int32(open ? 1 : 0))). Wasm always starts at Int32(0).
-    // Requires: WasmTarget.jl prop-dependent ternary in create_signal (not in scope)
+  test('initially open collapsible shows content', async ({ page }) => {
+    // Second collapsible on page has open=true
+    const collapsible = page.locator('therapy-island[data-component="collapsible"]').nth(1);
+    const content = collapsible.locator('[data-collapsible-content]');
+    await expect(content).toHaveAttribute('data-state', 'open');
+    await expect(content).toBeVisible();
+  });
+
+  test('initially open collapsible can be closed by clicking', async ({ page }) => {
+    const trigger = page.locator('therapy-island[data-component="collapsibletrigger"]').nth(1);
+    const triggerEl = trigger.locator('[data-collapsible-trigger]');
+    const collapsible = page.locator('therapy-island[data-component="collapsible"]').nth(1);
+    const content = collapsible.locator('[data-collapsible-content]');
+
+    // Starts open
+    await expect(content).toBeVisible();
+
+    // Click to close
+    await triggerEl.click();
+    await expect(content).not.toBeVisible({ timeout: 5000 });
+
+    // Click to reopen
+    await triggerEl.click();
+    await expect(content).toBeVisible({ timeout: 5000 });
   });
 
   test('disabled collapsible cannot be toggled', async ({ page }) => {
