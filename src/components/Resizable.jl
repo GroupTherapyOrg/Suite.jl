@@ -1,6 +1,6 @@
 # Resizable.jl — Suite.jl Resizable Panel Component
 #
-# Tier: styling (no interactive Wasm — resize behavior via JS runtime)
+# Tier: island (Wasm — drag handle for panel resizing)
 # Suite Dependencies: none
 # JS Modules: none
 #
@@ -9,7 +9,17 @@
 #
 # Draggable panel resizing with flex-grow layout, min/max constraints,
 # keyboard arrow key support, and ARIA separator semantics.
-# Data-attribute driven: resize behavior via data-resizable-* attributes
+#
+# Architecture: Monolithic @island
+#   - Signal 0: dragging (Int32, 0 or 1)
+#   - Signal 1: split_pct (Int32, percentage * 100 of first panel, 0-10000)
+#   - Handler 0: on_pointerdown — if on handle, capture, set dragging=1
+#   - Handler 1: on_pointermove — if dragging, compute split, update panels
+#   - Handler 2: on_pointerup — release, set dragging=0
+#   - Handler 3: on_keydown — arrows ±1% on focused handle
+#
+# Element IDs (2-panel layout):
+#   0: therapy-island, 1: group Div, 2: panel A, 3: handle, 4: panel B
 #
 # Reference: react-resizable-panels by bvaughn + shadcn/ui Resizable
 
@@ -25,14 +35,36 @@ const _RESIZABLE_GRIP_H_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="
 
 export ResizablePanelGroup, ResizablePanel, ResizableHandle
 
+# SSR helper: walk children, inject data-index on handles.
+# Panel flex-grow is already set by ResizablePanel() — no override needed.
+function _resizable_ssr_setup!(children)
+    handle_idx = 0
+    for child in children
+        child isa VNode || continue
+        if haskey(child.props, :data_resizable_handle)
+            child.props[Symbol("data-index")] = string(handle_idx)
+            handle_idx += 1
+        end
+    end
+end
+
 #   ResizablePanelGroup(children...; direction, class, kwargs...) -> VNode
 #
 # A container for resizable panels arranged horizontally or vertically.
 # Options: direction ("horizontal"/"vertical")
 # Examples: ResizablePanelGroup(direction="horizontal", ResizablePanel(default_size=30, ...), ResizableHandle(), ...)
-function ResizablePanelGroup(children...; direction::String="horizontal",
+@island function ResizablePanelGroup(children...; direction::String="horizontal",
                              class::String="", theme::Symbol=:default, kwargs...)
     flex_dir = direction == "vertical" ? "flex-col" : "flex-row"
+
+    # Signal 0: dragging state
+    dragging, set_dragging = create_signal(Int32(0))
+    # Signal 1: split percentage * 100 (initial computed from first panel's default_size)
+    initial_split = _compute_initial_split(children)
+    split_pct, set_split_pct = create_signal(Int32(initial_split))
+
+    # SSR: inject data-index on handles
+    _resizable_ssr_setup!(children)
 
     classes = cn("flex w-full h-full overflow-hidden", flex_dir, class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
@@ -41,9 +73,113 @@ function ResizablePanelGroup(children...; direction::String="horizontal",
         Symbol("data-resizable") => "",
         Symbol("data-resizable-direction") => direction,
         :style => "flex-wrap:nowrap;",
+        # Handler 0: pointerdown — if on handle, capture and start dragging
+        :on_pointerdown => () -> begin
+            idx = compiled_get_event_data_index()
+            if idx >= Int32(0)
+                el = Int32(1)  # group Div element ID
+                capture_pointer(el)
+                set_dragging(Int32(1))
+                # Compute initial split from pointer position
+                rx = get_bounding_rect_x(el)
+                rw = get_bounding_rect_w(el)
+                px = get_pointer_x()
+                raw_pct = (px - rx) * Float64(10000) / rw
+                if raw_pct < Float64(1000)
+                    raw_pct = Float64(1000)
+                end
+                if raw_pct > Float64(9000)
+                    raw_pct = Float64(9000)
+                end
+                set_split_pct(Int32(raw_pct))
+                # Update panel A flex-grow and panel B flex-grow
+                pct_a = raw_pct / Float64(100)
+                pct_b = (Float64(10000) - raw_pct) / Float64(100)
+                set_style_numeric(Int32(2), Int32(0), pct_a)  # panel A: flexGrow
+                set_style_numeric(Int32(4), Int32(0), pct_b)  # panel B: flexGrow
+            end
+        end,
+        # Handler 1: pointermove — if dragging, update split
+        :on_pointermove => () -> begin
+            if dragging() == Int32(1)
+                el = Int32(1)
+                rx = get_bounding_rect_x(el)
+                rw = get_bounding_rect_w(el)
+                px = get_pointer_x()
+                raw_pct = (px - rx) * Float64(10000) / rw
+                if raw_pct < Float64(1000)
+                    raw_pct = Float64(1000)
+                end
+                if raw_pct > Float64(9000)
+                    raw_pct = Float64(9000)
+                end
+                set_split_pct(Int32(raw_pct))
+                pct_a = raw_pct / Float64(100)
+                pct_b = (Float64(10000) - raw_pct) / Float64(100)
+                set_style_numeric(Int32(2), Int32(0), pct_a)
+                set_style_numeric(Int32(4), Int32(0), pct_b)
+            end
+        end,
+        # Handler 2: pointerup — release, stop dragging
+        :on_pointerup => () -> begin
+            el = Int32(1)
+            release_pointer(el)
+            set_dragging(Int32(0))
+        end,
+        # Handler 3: keydown — arrows ±1% on focused handle
+        :on_keydown => () -> begin
+            key = get_key_code()
+            current = split_pct()
+            step = Int32(100)  # 1% = 100 in our 0-10000 scale
+            new_val = current
+            # ArrowRight (39) or ArrowDown (40) = increase first panel
+            if key == Int32(39)
+                new_val = current + step
+            end
+            if key == Int32(40)
+                new_val = current + step
+            end
+            # ArrowLeft (37) or ArrowUp (38) = decrease first panel
+            if key == Int32(37)
+                new_val = current - step
+            end
+            if key == Int32(38)
+                new_val = current - step
+            end
+            # Clamp 10%-90%
+            if new_val < Int32(1000)
+                new_val = Int32(1000)
+            end
+            if new_val > Int32(9000)
+                new_val = Int32(9000)
+            end
+            if new_val != current
+                set_split_pct(new_val)
+                pct_a = Float64(new_val) / Float64(100)
+                pct_b = (Float64(10000) - Float64(new_val)) / Float64(100)
+                set_style_numeric(Int32(2), Int32(0), pct_a)
+                set_style_numeric(Int32(4), Int32(0), pct_b)
+            end
+        end,
         kwargs...,
         children...,
     )
+end
+
+# Compute initial split from first panel's default_size
+function _compute_initial_split(children)
+    for child in children
+        child isa VNode || continue
+        if haskey(child.props, :data_resizable_panel)
+            ds = get(child.props, :data_resizable_default_size, "0")
+            size = tryparse(Int, string(ds))
+            if size !== nothing && size > 0
+                return size * 100  # Convert percentage to our 0-10000 scale
+            end
+            return 5000  # Default 50%
+        end
+    end
+    return 5000
 end
 
 """
@@ -87,9 +223,6 @@ A drag handle between resizable panels.
 """
 function ResizableHandle(; with_handle::Bool=false, class::String="",
                           theme::Symbol=:default, kwargs...)
-    # Determine grip icon orientation from parent context — not available at render,
-    # so we render both and JS hides the wrong one via data attribute.
-    # Default to vertical (horizontal group = vertical separator).
     handle_content = if with_handle
         Div(:class => "z-10 flex h-4 w-3 items-center justify-center rounded-sm border border-warm-200 dark:border-warm-700 bg-warm-50 dark:bg-warm-900",
             RawHtml(_RESIZABLE_GRIP_SVG),
@@ -122,16 +255,35 @@ function ResizableHandle(; with_handle::Bool=false, class::String="",
     )
 end
 
+# --- Hydration Support ---
+
+const _RESIZABLE_PROPS_TRANSFORM = (props, args) -> begin
+    # Compute initial split percentage * 100 from first panel
+    split = 5000  # default 50%
+    for arg in args
+        arg isa Therapy.VNode || continue
+        if haskey(arg.props, :data_resizable_panel)
+            ds = get(arg.props, :data_resizable_default_size, "0")
+            size = tryparse(Int, string(ds))
+            if size !== nothing && size > 0
+                split = size * 100
+            end
+            break
+        end
+    end
+    props[:_s] = split
+end
+
 
 # --- Registry ---
 if @isdefined(register_component!)
     register_component!(ComponentMeta(
         :Resizable,
         "Resizable.jl",
-        :styling,
+        :island,
         "Draggable panel resizing with min/max constraints",
         Symbol[],
-        [:Resizable],
+        Symbol[],
         [:ResizablePanelGroup, :ResizablePanel, :ResizableHandle],
     ))
 end

@@ -827,35 +827,43 @@ using Test
                     PaginationItem(PaginationNext()),
                 ),
             ))
+            @test occursin("therapy-island", html)
             @test occursin("<nav", html)
             @test occursin("role=\"navigation\"", html)
             @test occursin("aria-label=\"pagination\"", html)
             @test occursin("Previous", html)
             @test occursin("Next", html)
+            @test occursin("data-pagination-link", html)
+            @test occursin("data-pagination-prev", html)
+            @test occursin("data-pagination-next", html)
         end
 
         @testset "Active link" begin
             html = Therapy.render_to_string(PaginationLink("1", is_active=true))
             @test occursin("aria-current=\"page\"", html)
-            @test occursin("border", html)
+            @test occursin("data-pagination-link", html)
+            @test occursin("data-pagination-active=\"true\"", html)
         end
 
         @testset "Inactive link" begin
             html = Therapy.render_to_string(PaginationLink("2"))
             @test occursin("<a", html)
             @test occursin("hover:bg-warm-100", html)
+            @test occursin("data-pagination-active=\"false\"", html)
         end
 
         @testset "Previous" begin
             html = Therapy.render_to_string(PaginationPrevious(href="/page/1"))
             @test occursin("aria-label=\"Go to previous page\"", html)
             @test occursin("href=\"/page/1\"", html)
+            @test occursin("data-pagination-prev", html)
         end
 
         @testset "Next" begin
             html = Therapy.render_to_string(PaginationNext(href="/page/3"))
             @test occursin("aria-label=\"Go to next page\"", html)
             @test occursin("href=\"/page/3\"", html)
+            @test occursin("data-pagination-next", html)
         end
 
         @testset "Ellipsis" begin
@@ -5900,8 +5908,10 @@ using Test
                 Suite.ResizableHandle(),
                 Suite.ResizablePanel(Div("Right")),
             ))
+            @test occursin("therapy-island", html)
             @test occursin("data-resizable-direction=\"horizontal\"", html)
             @test occursin("flex", html)
+            @test occursin("data-index", html)
         end
 
         @testset "Vertical direction" begin
@@ -5983,7 +5993,7 @@ using Test
         @testset "Registry" begin
             @test haskey(Suite.COMPONENT_REGISTRY, :Resizable)
             meta = Suite.COMPONENT_REGISTRY[:Resizable]
-            @test meta.tier == :styling
+            @test meta.tier == :island
             @test :ResizablePanelGroup in meta.exports
             @test :ResizablePanel in meta.exports
             @test :ResizableHandle in meta.exports

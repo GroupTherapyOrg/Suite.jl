@@ -25,6 +25,10 @@ using Therapy: compiled_get_prop_i32, compiled_get_prop_string_id, compiled_get_
 using Therapy: compiled_register_match_descendants, compiled_register_bit_descendants
 using Therapy: compiled_copy_to_clipboard
 using Therapy: compiled_add_click_outside_listener, compiled_remove_click_outside_listener
+using Therapy: compiled_capture_pointer, compiled_release_pointer
+using Therapy: compiled_get_bounding_rect_x, compiled_get_bounding_rect_w
+using Therapy: compiled_set_style_percent, compiled_set_style_numeric
+using Therapy: compiled_get_prop_f64
 
 using Dates
 
@@ -136,6 +140,9 @@ function __init__()
     Therapy.register_island_props_transform!(:CollapsibleTrigger, _COLLAPSIBLETRIGGER_PROPS_TRANSFORM)
     Therapy.register_island_props_transform!(:Carousel, _CAROUSEL_PROPS_TRANSFORM)
     Therapy.register_island_props_transform!(:CodeBlockCopy, _CODEBLOCKCOPY_PROPS_TRANSFORM)
+    Therapy.register_island_props_transform!(:Pagination, _PAGINATION_PROPS_TRANSFORM)
+    Therapy.register_island_props_transform!(:Slider, _SLIDER_PROPS_TRANSFORM)
+    Therapy.register_island_props_transform!(:ResizablePanelGroup, _RESIZABLE_PROPS_TRANSFORM)
 end
 
 end # module Suite

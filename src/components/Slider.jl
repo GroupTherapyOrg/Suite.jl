@@ -18,10 +18,16 @@
 #   - Supports horizontal and vertical orientation
 #
 # Architecture: Monolithic @island
-#   - Single island handles signal, pointer, and keyboard behavior
-#   - Uses existing Wasm imports: capture_pointer (44), release_pointer (45),
-#     get_pointer_x (36), get_bounding_rect_x (28), get_bounding_rect_w (30),
-#     get_key_code (34), prevent_default (52)
+#   - Single island handles 2 signals + 4 event handlers
+#   - Signal 0: dragging (Int32, 0 or 1)
+#   - Signal 1: value (Int32, percentage * 100, range 0-10000)
+#   - Handler 0: on_pointerdown — capture pointer, compute value, set dragging=1
+#   - Handler 1: on_pointermove — if dragging, recompute value
+#   - Handler 2: on_pointerup — release pointer, set dragging=0
+#   - Handler 3: on_keydown — arrows ±step, Home/End min/max
+#
+# Element IDs (deterministic from DOM structure):
+#   0: therapy-island, 1: root Span, 2: track Span, 3: range Span, 4: thumb Span
 #
 # Reference: Thaw Slider — github.com/thaw-ui/thaw
 # Reference: WAI-ARIA Slider — https://www.w3.org/WAI/ARIA/apg/patterns/slider/
@@ -63,10 +69,13 @@ export Slider
                   default_value::Real=0, orientation::String="horizontal",
                   disabled::Bool=false, theme::Symbol=:default,
                   class::String="", kwargs...)
-    is_active, set_active = create_signal(Int32(1))
-
+    # Signal 0: dragging state (0=not dragging, 1=dragging)
+    dragging, set_dragging = create_signal(Int32(0))
+    # Signal 1: value as percentage * 100 (0-10000 for 0%-100%)
     clamped = clamp(default_value, min, max)
     pct = max > min ? (clamped - min) / (max - min) * 100 : 0
+    pct_scaled = Int32(round(Int, pct * 100))
+    value, set_value = create_signal(pct_scaled)
 
     is_vertical = orientation == "vertical"
 
@@ -132,6 +141,117 @@ export Slider
     end
 
     Span(root_attrs..., kwargs...,
+        # Handler 0: pointerdown — capture pointer, compute value from position
+        :on_pointerdown => () -> begin
+            el = Int32(1)  # root Span element ID
+            capture_pointer(el)
+            set_dragging(Int32(1))
+            # Compute percentage from pointer position
+            # Element 2 is the track
+            track_el = Int32(2)
+            rx = get_bounding_rect_x(track_el)
+            rw = get_bounding_rect_w(track_el)
+            px = get_pointer_x()
+            raw_pct = (px - rx) * Float64(10000) / rw
+            # Snap to step
+            s = compiled_get_prop_i32(Int32(0))  # _s = step as pct*100
+            if s > Int32(0)
+                raw_i32 = Int32(raw_pct)
+                half_s = s ÷ Int32(2)
+                snapped = ((raw_i32 + half_s) ÷ s) * s
+                raw_pct = Float64(snapped)
+            end
+            # Clamp 0-10000
+            if raw_pct < Float64(0)
+                raw_pct = Float64(0)
+            end
+            if raw_pct > Float64(10000)
+                raw_pct = Float64(10000)
+            end
+            set_value(Int32(raw_pct))
+            # Update range width and thumb left via style
+            set_style_percent(Int32(3), Int32(2), raw_pct / Float64(100))  # range: width
+            set_style_percent(Int32(4), Int32(0), raw_pct / Float64(100))  # thumb: left
+        end,
+        # Handler 1: pointermove — if dragging, recompute value
+        :on_pointermove => () -> begin
+            if dragging() == Int32(1)
+                track_el = Int32(2)
+                rx = get_bounding_rect_x(track_el)
+                rw = get_bounding_rect_w(track_el)
+                px = get_pointer_x()
+                raw_pct = (px - rx) * Float64(10000) / rw
+                s = compiled_get_prop_i32(Int32(0))
+                if s > Int32(0)
+                    raw_i32 = Int32(raw_pct)
+                    half_s = s ÷ Int32(2)
+                    snapped = ((raw_i32 + half_s) ÷ s) * s
+                    raw_pct = Float64(snapped)
+                end
+                if raw_pct < Float64(0)
+                    raw_pct = Float64(0)
+                end
+                if raw_pct > Float64(10000)
+                    raw_pct = Float64(10000)
+                end
+                set_value(Int32(raw_pct))
+                set_style_percent(Int32(3), Int32(2), raw_pct / Float64(100))
+                set_style_percent(Int32(4), Int32(0), raw_pct / Float64(100))
+            end
+        end,
+        # Handler 2: pointerup — release pointer, stop dragging
+        :on_pointerup => () -> begin
+            el = Int32(1)
+            release_pointer(el)
+            set_dragging(Int32(0))
+        end,
+        # Handler 3: keydown — arrows ±step, Home/End
+        :on_keydown => () -> begin
+            key = get_key_code()
+            s = compiled_get_prop_i32(Int32(0))  # _s = step as pct*100
+            if s < Int32(1)
+                s = Int32(100)  # default 1% step
+            end
+            current = value()
+            new_val = current
+            # ArrowRight (39) or ArrowUp (38) = increase
+            if key == Int32(39)
+                new_val = current + s
+            end
+            if key == Int32(38)
+                new_val = current + s
+            end
+            # ArrowLeft (37) or ArrowDown (40) = decrease
+            if key == Int32(37)
+                new_val = current - s
+            end
+            if key == Int32(40)
+                new_val = current - s
+            end
+            # Home (36) = min
+            if key == Int32(36)
+                new_val = Int32(0)
+                prevent_default()
+            end
+            # End (35) = max
+            if key == Int32(35)
+                new_val = Int32(10000)
+                prevent_default()
+            end
+            # Clamp
+            if new_val < Int32(0)
+                new_val = Int32(0)
+            end
+            if new_val > Int32(10000)
+                new_val = Int32(10000)
+            end
+            if new_val != current
+                set_value(new_val)
+                pct_f = Float64(new_val) / Float64(100)
+                set_style_percent(Int32(3), Int32(2), pct_f)
+                set_style_percent(Int32(4), Int32(0), pct_f)
+            end
+        end,
         # Track
         Span(Symbol("data-slider-track") => "",
              Symbol("data-orientation") => orientation,
@@ -154,6 +274,22 @@ export Slider
              :class => thumb_classes,
              :style => thumb_style),
     )
+end
+
+# --- Hydration Support ---
+
+const _SLIDER_PROPS_TRANSFORM = (props, args) -> begin
+    # Compute step as percentage * 100
+    min_val = get(props, :min, 0)
+    max_val = get(props, :max, 100)
+    step_val = get(props, :step, 1)
+    range = max_val - min_val
+    if range > 0
+        step_pct_100 = round(Int, step_val / range * 10000)
+    else
+        step_pct_100 = 100
+    end
+    props[:_s] = step_pct_100
 end
 
 
