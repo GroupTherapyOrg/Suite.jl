@@ -41,18 +41,26 @@ test.describe('CodeBlock', () => {
     expect(parsed._c.length).toBeGreaterThan(0);
   });
 
-  test('clicking copy button triggers clipboard write', async ({ page }) => {
-    // We can't reliably test clipboard in headless Chromium, so verify
-    // the click handler exists by checking the island hydrates and button is clickable
+  test('clicking copy button copies code text to clipboard', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+
+    // Wait for wasm hydration
     const island = page.locator('therapy-island[data-component="codeblockcopy"]').first();
+    await expect(island).toHaveAttribute('data-hydrated', 'true', { timeout: 10000 });
+
+    // Clear clipboard
+    await page.evaluate(() => navigator.clipboard.writeText(''));
+
+    // Click copy button
     const button = island.locator('button');
-    await expect(button).toBeVisible();
-
-    // Click should not throw — verifies handler is wired up
     await button.click();
+    await page.waitForTimeout(500);
 
-    // Verify the button still works after click (no crash)
-    await expect(button).toBeVisible();
+    // Verify clipboard has actual code text (not empty, not an image)
+    const clipText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipText.length).toBeGreaterThan(0);
+    // The first code block has "using Suite" in it
+    expect(clipText).toContain('using Suite');
   });
 
   test('multiple CodeBlocks each have their own copy island', async ({ page }) => {
