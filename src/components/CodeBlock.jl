@@ -70,11 +70,12 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
 
     if show_copy
         push!(header_items,
-            CodeBlockCopy(
-                code=code,
-                :class => "cursor-pointer ml-auto inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs text-warm-400 hover:text-warm-200 hover:bg-warm-800 transition-colors",
-                RawHtml(_CODEBLOCK_COPY_SVG),
-            ))
+            Div(:class => "ml-auto",
+                CodeBlockCopy(
+                    code=code,
+                    :class => "cursor-pointer inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs text-warm-400 hover:text-warm-200 hover:bg-warm-800 transition-colors",
+                    RawHtml(_CODEBLOCK_COPY_SVG),
+                )))
     end
 
     has_header = !isempty(language) || show_copy

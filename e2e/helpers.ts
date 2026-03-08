@@ -64,6 +64,7 @@ export const componentPages: Record<string, string> = {
   'drawer': './components/drawer',
   'form': './components/form',
   'carousel': './components/carousel',
+  'code-block': './components/code-block',
 };
 
 /**
