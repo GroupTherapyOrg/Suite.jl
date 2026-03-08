@@ -60,16 +60,21 @@ test.describe('Collapsible', () => {
     // Requires: WasmTarget.jl prop-dependent ternary in create_signal (not in scope)
   });
 
-  test('disabled collapsible renders correctly', async ({ page }) => {
-    const disabledCollapsible = page.locator('therapy-island[data-component="collapsible"][data-props*="disabled"]');
-    const count = await disabledCollapsible.count();
-    if (count === 0) {
-      test.skip(true, 'No disabled collapsible on page');
-      return;
-    }
-    // Disabled attribute is passed via kwargs at SSR time
-    const root = disabledCollapsible.first().locator('[data-collapsible]');
-    await expect(root).toBeVisible();
+  test('disabled collapsible cannot be toggled', async ({ page }) => {
+    // The third collapsible on the page is disabled
+    const collapsible = page.locator('therapy-island[data-component="collapsible"]').nth(2);
+    const content = collapsible.locator('[data-collapsible-content]');
+    const trigger = page.locator('therapy-island[data-component="collapsibletrigger"]').nth(2);
+    const triggerEl = trigger.locator('[data-collapsible-trigger]');
+
+    // Content should start hidden
+    await expect(content).not.toBeVisible();
+
+    // Click the trigger — content should STAY hidden (disabled)
+    await triggerEl.click({ force: true });
+    await page.waitForTimeout(500);
+    await expect(content).not.toBeVisible();
+    await expect(content).toHaveAttribute('data-state', 'closed');
   });
 
   test('multiple open/close cycles work correctly', async ({ page }) => {

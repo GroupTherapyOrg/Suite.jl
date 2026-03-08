@@ -49,7 +49,7 @@ export Collapsible, CollapsibleTrigger, CollapsibleContent
         Symbol("data-collapsible") => "",
         Symbol("data-state") => open ? "open" : "closed",
         (disabled ? (Symbol("data-disabled") => "",) : ())...,
-        :class => cn("", class),
+        :class => cn(disabled ? "pointer-events-none" : "", class),
         kwargs...,
         children...)
 end
