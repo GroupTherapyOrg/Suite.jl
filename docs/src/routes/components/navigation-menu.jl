@@ -47,7 +47,7 @@ function NavigationMenuPage()
 
                         # Direct link (no content panel — inline link)
                         Main.NavigationMenuItem(
-                            Main.NavigationMenuLink(href="/docs", "Documentation"),
+                            Main.NavigationMenuLink(href="./", "Documentation"),
                         ),
                     ),
                 )

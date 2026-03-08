@@ -278,7 +278,8 @@ A link item within the navigation menu content. Can include a description.
 """
 function NavigationMenuLink(children...; href::String="#", active::Bool=false, description::String="", theme::Symbol=:default, class::String="", kwargs...)
     classes = cn(
-        "flex flex-col gap-1 rounded-sm p-2 text-sm cursor-pointer transition-all outline-none",
+        "flex flex-col gap-1 rounded-sm p-2 text-sm cursor-pointer transition-all outline-none no-underline",
+        "text-warm-800 dark:text-warm-300",
         "hover:bg-warm-100 hover:dark:bg-warm-800",
         "focus:bg-warm-100 focus:dark:bg-warm-800",
         "focus-visible:ring-[3px] focus-visible:ring-accent-600/50 focus-visible:outline-1",
