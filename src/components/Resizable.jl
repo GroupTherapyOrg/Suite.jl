@@ -74,6 +74,8 @@ end
         :style => "flex-wrap:nowrap;",
         # Handler 0: pointerdown — if on handle, capture and start dragging
         # NOTE: All Float64 arithmetic — WasmTarget cannot compile Int32(Float64)
+        # Handler 0: pointerdown — if on handle, capture and start dragging
+        # NOTE: No conditional reassignment — WasmTarget phi nodes are broken.
         :on_pointerdown => () -> begin
             idx = compiled_get_event_data_index()
             if idx >= Int32(0)
@@ -84,12 +86,6 @@ end
                 rw = get_bounding_rect_w(el)
                 px = get_pointer_x()
                 pct = (px - rx) * Float64(100) / rw
-                if pct < Float64(10)
-                    pct = Float64(10)
-                end
-                if pct > Float64(90)
-                    pct = Float64(90)
-                end
                 set_style_numeric(Int32(1), Int32(0), pct)
                 set_style_numeric(Int32(3), Int32(0), Float64(100) - pct)
             end
@@ -102,12 +98,6 @@ end
                 rw = get_bounding_rect_w(el)
                 px = get_pointer_x()
                 pct = (px - rx) * Float64(100) / rw
-                if pct < Float64(10)
-                    pct = Float64(10)
-                end
-                if pct > Float64(90)
-                    pct = Float64(90)
-                end
                 set_style_numeric(Int32(1), Int32(0), pct)
                 set_style_numeric(Int32(3), Int32(0), Float64(100) - pct)
             end
@@ -119,38 +109,45 @@ end
             set_dragging(Int32(0))
         end,
         # Handler 3: keydown — arrows ±1% on focused handle
+        # NOTE: Each key case is self-contained (no conditional reassignment).
         :on_keydown => () -> begin
             key = get_key_code()
-            current = split_pct()
-            step = Int32(100)  # 1% = 100 in our 0-10000 scale
-            new_val = current
-            # ArrowRight (39) or ArrowDown (40) = increase first panel
+            cur = split_pct()
+            # ArrowRight (39) = increase first panel by 1%
             if key == Int32(39)
-                new_val = current + step
+                nv1 = cur + Int32(100)
+                set_split_pct(nv1)
+                pa1 = Float64(nv1) / Float64(100)
+                pb1 = (Float64(10000) - Float64(nv1)) / Float64(100)
+                set_style_numeric(Int32(1), Int32(0), pa1)
+                set_style_numeric(Int32(3), Int32(0), pb1)
             end
+            # ArrowDown (40) = increase first panel by 1%
             if key == Int32(40)
-                new_val = current + step
+                nv2 = cur + Int32(100)
+                set_split_pct(nv2)
+                pa2 = Float64(nv2) / Float64(100)
+                pb2 = (Float64(10000) - Float64(nv2)) / Float64(100)
+                set_style_numeric(Int32(1), Int32(0), pa2)
+                set_style_numeric(Int32(3), Int32(0), pb2)
             end
-            # ArrowLeft (37) or ArrowUp (38) = decrease first panel
+            # ArrowLeft (37) = decrease first panel by 1%
             if key == Int32(37)
-                new_val = current - step
+                nv3 = cur - Int32(100)
+                set_split_pct(nv3)
+                pa3 = Float64(nv3) / Float64(100)
+                pb3 = (Float64(10000) - Float64(nv3)) / Float64(100)
+                set_style_numeric(Int32(1), Int32(0), pa3)
+                set_style_numeric(Int32(3), Int32(0), pb3)
             end
+            # ArrowUp (38) = decrease first panel by 1%
             if key == Int32(38)
-                new_val = current - step
-            end
-            # Clamp 10%-90%
-            if new_val < Int32(1000)
-                new_val = Int32(1000)
-            end
-            if new_val > Int32(9000)
-                new_val = Int32(9000)
-            end
-            if new_val != current
-                set_split_pct(new_val)
-                pct_a = Float64(new_val) / Float64(100)
-                pct_b = (Float64(10000) - Float64(new_val)) / Float64(100)
-                set_style_numeric(Int32(1), Int32(0), pct_a)
-                set_style_numeric(Int32(3), Int32(0), pct_b)
+                nv4 = cur - Int32(100)
+                set_split_pct(nv4)
+                pa4 = Float64(nv4) / Float64(100)
+                pb4 = (Float64(10000) - Float64(nv4)) / Float64(100)
+                set_style_numeric(Int32(1), Int32(0), pa4)
+                set_style_numeric(Int32(3), Int32(0), pb4)
             end
         end,
         kwargs...,

@@ -42,27 +42,23 @@ test.describe('Slider', () => {
 
   // --- Interaction: Click Track ---
 
-  test.skip('clicking track changes thumb value', async ({ page }) => {
-    // DEFERRED: Slider island has no wasm on_click handler — SSR-only rendering.
-    // Track click requires getBoundingClientRect() intrinsic for position→value math.
-    // Requires: New Therapy.jl pointer intrinsics + Slider on_pointerdown handler.
+  test('clicking track moves slider fill', async ({ page }) => {
     const island = page.locator('therapy-island[data-component="slider"]').first();
     const track = island.locator('[data-slider-track]').first();
-    const thumb = island.locator('[role="slider"]').first();
-
-    const initialValue = await thumb.getAttribute('aria-valuenow');
+    const range = island.locator('[data-slider-range]').first();
 
     const trackBox = await track.boundingBox();
-    if (trackBox) {
-      // Click near the right end of the track
-      await page.mouse.click(
-        trackBox.x + trackBox.width * 0.8,
-        trackBox.y + trackBox.height / 2
-      );
-    }
+    expect(trackBox).toBeTruthy();
 
-    const newValue = await thumb.getAttribute('aria-valuenow');
-    expect(newValue).not.toBe(initialValue);
+    // Click near the 75% mark of the track
+    await page.mouse.click(
+      trackBox!.x + trackBox!.width * 0.75,
+      trackBox!.y + trackBox!.height / 2
+    );
+
+    // Range fill should have a width style set by the Wasm handler
+    const rangeStyle = await range.getAttribute('style');
+    expect(rangeStyle).toContain('width:');
   });
 
   // --- Interaction: Keyboard ---

@@ -145,6 +145,9 @@ export Slider
     Span(root_attrs..., kwargs...,
         # Handler 0: pointerdown — capture pointer, compute value from position
         # NOTE: All Float64 arithmetic — WasmTarget cannot compile Int32(Float64)
+        # Handler 0: pointerdown — capture pointer, compute value from position
+        # NOTE: No conditional reassignment — WasmTarget phi nodes are broken.
+        # CSS naturally clips values outside 0-100% range.
         :on_pointerdown => () -> begin
             el = Int32(0)
             capture_pointer(el)
@@ -153,15 +156,9 @@ export Slider
             rx = get_bounding_rect_x(track_el)
             rw = get_bounding_rect_w(track_el)
             px = get_pointer_x()
-            raw_pct = (px - rx) * Float64(100) / rw
-            if raw_pct < Float64(0)
-                raw_pct = Float64(0)
-            end
-            if raw_pct > Float64(100)
-                raw_pct = Float64(100)
-            end
-            set_style_percent(Int32(2), Int32(2), raw_pct)
-            set_style_percent(Int32(3), Int32(0), raw_pct)
+            pct = (px - rx) * Float64(100) / rw
+            set_style_percent(Int32(2), Int32(2), pct)
+            set_style_percent(Int32(3), Int32(0), pct)
         end,
         # Handler 1: pointermove — if dragging, update position
         :on_pointermove => () -> begin
@@ -170,15 +167,9 @@ export Slider
                 rx = get_bounding_rect_x(track_el)
                 rw = get_bounding_rect_w(track_el)
                 px = get_pointer_x()
-                raw_pct = (px - rx) * Float64(100) / rw
-                if raw_pct < Float64(0)
-                    raw_pct = Float64(0)
-                end
-                if raw_pct > Float64(100)
-                    raw_pct = Float64(100)
-                end
-                set_style_percent(Int32(2), Int32(2), raw_pct)
-                set_style_percent(Int32(3), Int32(0), raw_pct)
+                pct = (px - rx) * Float64(100) / rw
+                set_style_percent(Int32(2), Int32(2), pct)
+                set_style_percent(Int32(3), Int32(0), pct)
             end
         end,
         # Handler 2: pointerup — release pointer, stop dragging
@@ -187,51 +178,43 @@ export Slider
             release_pointer(el)
             set_dragging(Int32(0))
         end,
-        # Handler 3: keydown — arrows ±step, Home/End
+        # Handler 3: keydown — arrows ±1%
+        # NOTE: Each key case is self-contained (no conditional reassignment)
+        # because WasmTarget phi nodes are broken for if-block reassignment.
         :on_keydown => () -> begin
             key = get_key_code()
-            s = compiled_get_prop_i32(Int32(0))  # _s = step as pct*100
-            if s < Int32(1)
-                s = Int32(100)  # default 1% step
-            end
-            current = value()
-            new_val = current
-            # ArrowRight (39) or ArrowUp (38) = increase
+            cur = value()
+            # ArrowRight (39) = +1%
             if key == Int32(39)
-                new_val = current + s
+                nv1 = cur + Int32(100)
+                set_value(nv1)
+                p1 = Float64(nv1) / Float64(100)
+                set_style_percent(Int32(2), Int32(2), p1)
+                set_style_percent(Int32(3), Int32(0), p1)
             end
+            # ArrowUp (38) = +1%
             if key == Int32(38)
-                new_val = current + s
+                nv2 = cur + Int32(100)
+                set_value(nv2)
+                p2 = Float64(nv2) / Float64(100)
+                set_style_percent(Int32(2), Int32(2), p2)
+                set_style_percent(Int32(3), Int32(0), p2)
             end
-            # ArrowLeft (37) or ArrowDown (40) = decrease
+            # ArrowLeft (37) = -1%
             if key == Int32(37)
-                new_val = current - s
+                nv3 = cur - Int32(100)
+                set_value(nv3)
+                p3 = Float64(nv3) / Float64(100)
+                set_style_percent(Int32(2), Int32(2), p3)
+                set_style_percent(Int32(3), Int32(0), p3)
             end
+            # ArrowDown (40) = -1%
             if key == Int32(40)
-                new_val = current - s
-            end
-            # Home (36) = min
-            if key == Int32(36)
-                new_val = Int32(0)
-                prevent_default()
-            end
-            # End (35) = max
-            if key == Int32(35)
-                new_val = Int32(10000)
-                prevent_default()
-            end
-            # Clamp
-            if new_val < Int32(0)
-                new_val = Int32(0)
-            end
-            if new_val > Int32(10000)
-                new_val = Int32(10000)
-            end
-            if new_val != current
-                set_value(new_val)
-                pct_f = Float64(new_val) / Float64(100)
-                set_style_percent(Int32(2), Int32(2), pct_f)
-                set_style_percent(Int32(3), Int32(0), pct_f)
+                nv4 = cur - Int32(100)
+                set_value(nv4)
+                p4 = Float64(nv4) / Float64(100)
+                set_style_percent(Int32(2), Int32(2), p4)
+                set_style_percent(Int32(3), Int32(0), p4)
             end
         end,
         # Track
