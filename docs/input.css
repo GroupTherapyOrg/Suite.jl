@@ -423,6 +423,13 @@
   }
 }
 
+/* Override Prism.js styles on CodeBlock pre/code elements */
+[data-codeblock] pre,
+[data-codeblock] code {
+  margin: 0 !important;
+  background: transparent !important;
+}
+
 /* Julia syntax highlighting for CodeBlock */
 @layer components {
   .suite-hl-keyword { color: #c792ea; }
