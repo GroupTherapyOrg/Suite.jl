@@ -4,7 +4,7 @@
 # color tokens, and fine-grained overrides.
 
 function ThemingPage()
-    ComponentsLayout(
+    GettingStartedLayout(
         # Header
         PageHeader("Theming", "Customize Suite.jl's visual appearance with built-in themes and fine-grained overrides."),
 

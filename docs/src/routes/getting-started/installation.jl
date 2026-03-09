@@ -4,7 +4,7 @@
 # Shows both package mode and extraction mode.
 
 function InstallationPage()
-    ComponentsLayout(
+    GettingStartedLayout(
         # Header
         PageHeader("Installation", "How to add Suite.jl to your Therapy.jl project."),
 

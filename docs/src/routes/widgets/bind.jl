@@ -1,19 +1,19 @@
 # Widgets — The @bind Pattern
 #
-# Deep dive into how PlutoUI's @bind protocol works and how
+# Deep dive into how the @bind protocol works and how
 # Suite.jl implements it for styled, accessible widgets.
 
 function BindPage()
-    ComponentsLayout(
+    WidgetsLayout(
         # Header
-        PageHeader("The @bind Pattern", "How PlutoUI's reactive binding protocol works, and how Suite.jl implements it."),
+        PageHeader("The @bind Pattern", "How the reactive binding protocol works, and how Suite.jl implements it."),
 
         Div(:class => "prose max-w-none",
 
             # Overview
             SectionH2("How @bind Works"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "In Pluto notebooks, ", Main.InlineCode("@bind"),
+                "In Sessions.jl notebooks, ", Main.InlineCode("@bind"),
                 " creates a two-way connection between a Julia variable and an HTML widget:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
@@ -29,9 +29,9 @@ function BindPage()
             ),
             Ol(:class => "list-decimal list-inside space-y-2 text-warm-600 dark:text-warm-400 mb-6",
                 Li("Julia calls ", Main.InlineCode("show(io, MIME\"text/html\"(), widget)"), " to render styled HTML"),
-                Li("Pluto attaches an event listener to the outermost element"),
+                Li("The notebook runtime attaches an event listener to the outermost element"),
                 Li("User interacts — the element dispatches an ", Main.InlineCode("input"), " event"),
-                Li("Pluto reads ", Main.InlineCode("element.value"), " from JavaScript"),
+                Li("The runtime reads ", Main.InlineCode("element.value"), " from JavaScript"),
                 Li("Julia calls ", Main.InlineCode("transform_value(widget, js_value)"), " to convert back"),
                 Li("The bound variable updates and dependent cells re-execute")
             ),
@@ -39,8 +39,7 @@ function BindPage()
             # Four protocol methods
             SectionH2("The Four Protocol Methods"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Suite.jl implements these methods from ", Main.InlineCode("AbstractPlutoDingetjes.Bonds"),
-                " for each widget type:"
+                "Suite.jl implements these bond protocol methods for each widget type:"
             ),
 
             # initial_value
@@ -66,14 +65,14 @@ transform_value(c::CheckboxWidget, val) = val""")
             # possible_values
             SectionH3("possible_values(widget)"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Returns all possible values (before transformation). Used by PlutoSliderServer.jl for precomputing notebook states."
+                "Returns all possible values (before transformation). Used for precomputing notebook states."
             ),
             Main.CodeBlock(language="julia", "possible_values(s::SliderWidget) = 1:length(s.values)  # indices"),
 
             # validate_value
             SectionH3("validate_value(widget, value_from_js)"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Security validation for untrusted input on public PlutoSliderServer deployments. Values are validated before transformation."
+                "Security validation for untrusted input on public deployments. Values are validated before transformation."
             ),
             Main.CodeBlock(language="julia", "validate_value(s::SliderWidget, val) = val isa Integer && 1 <= val <= length(s.values)"),
 
@@ -114,10 +113,10 @@ plot(transform, 0:0.1:2\u03c0)""")
             # The HTML contract
             SectionH2("The HTML Contract"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "For Pluto to connect a widget, its rendered HTML must follow these rules:"
+                "For the notebook runtime to connect a widget, its rendered HTML must follow these rules:"
             ),
             Ul(:class => "list-disc list-inside space-y-2 text-warm-600 dark:text-warm-400 mb-6",
-                Li("The outermost element is what Pluto attaches the event listener to"),
+                Li("The outermost element is what the runtime attaches the event listener to"),
                 Li("The element must have a ", Main.InlineCode(".value"), " property readable from JavaScript"),
                 Li("The element must dispatch ", Main.InlineCode("CustomEvent(\"input\")"), " when the value changes"),
                 Li("Native inputs (", Main.InlineCode("<input>"), ", ", Main.InlineCode("<select>"), ") satisfy this automatically")
@@ -171,8 +170,8 @@ function Base.show(io::IO, ::MIME"text/html", s::SliderWidget)
 end""")
             ),
 
-            # Therapy.jl reactivity comparison
-            SectionH2("Pluto vs Therapy.jl Reactivity"),
+            # Reactivity comparison
+            SectionH2("Notebook vs Therapy.jl Reactivity"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "The two systems use different reactivity models, but the widget looks the same:"
             ),
@@ -180,7 +179,7 @@ end""")
                 Main.TableHeader(
                     Main.TableRow(
                         Main.TableHead(""),
-                        Main.TableHead("Pluto"),
+                        Main.TableHead("Sessions.jl"),
                         Main.TableHead("Therapy.jl")
                     )
                 ),

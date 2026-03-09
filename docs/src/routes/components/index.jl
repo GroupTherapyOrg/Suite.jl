@@ -1,8 +1,7 @@
 # Components index page — lists all available Suite.jl components
 
 function ComponentsIndex()
-    # Flatten all component items (skip Getting Started section)
-    all_items = vcat([section.items for section in SUITE_COMPONENTS if section.section != "Getting Started"]...)
+    all_items = COMPONENT_ITEMS
 
     cards = map(all_items) do item
         if item.implemented

@@ -3,7 +3,7 @@
 # Overview of what Suite.jl is, how it works, and why you'd use it.
 
 function GettingStartedIndex()
-    ComponentsLayout(
+    GettingStartedLayout(
         # Header
         PageHeader("Introduction", "Suite.jl is a component library for Therapy.jl — beautifully designed, accessible, and copy-paste friendly."),
 

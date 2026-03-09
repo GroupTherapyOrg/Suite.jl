@@ -1,12 +1,12 @@
 # Widgets — Overview of Suite.jl's dual-mode widget system
 #
 # Shows how Suite.jl components work as both UI components (Therapy.jl)
-# and reactive data widgets (Pluto @bind).
+# and reactive data widgets (Sessions.jl @bind).
 
 function WidgetsIndex()
-    ComponentsLayout(
+    WidgetsLayout(
         # Header
-        PageHeader("Widgets", "Suite.jl components as reactive data widgets — for Pluto notebooks and Therapy.jl apps."),
+        PageHeader("Widgets", "Suite.jl components as reactive data widgets — for Sessions.jl notebooks and Therapy.jl apps."),
 
         Div(:class => "prose max-w-none",
 
@@ -26,7 +26,7 @@ function WidgetsIndex()
                 Div(:class => "border border-warm-200 dark:border-warm-700 rounded-lg p-5 bg-warm-50/50 dark:bg-warm-900/50",
                     SectionH3("Data Widget"),
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-3",
-                        "In a Pluto notebook, pass a positional argument to get a bindable struct. Use with ", Main.InlineCode("@bind"), "."
+                        "In a Sessions.jl notebook, pass a positional argument to get a bindable struct. Use with ", Main.InlineCode("@bind"), "."
                     ),
                     Main.CodeBlock(language="julia", "@bind value Suite.Slider(1:100)\n@bind lang Suite.Select([\"julia\" => \"Julia\"])")
                 )
@@ -54,7 +54,7 @@ function WidgetsIndex()
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "Suite.Slider(1:100)"),
                         Main.TableCell("Struct (widget)"),
-                        Main.TableCell("Pluto @bind")
+                        Main.TableCell("Notebook @bind")
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "Suite.Slider(; min=0, max=100)"),
@@ -71,12 +71,12 @@ function WidgetsIndex()
             # Widget mapping table
             SectionH2("Widget Mapping"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "Suite.jl provides styled replacements for every PlutoUI widget:"
+                "Suite.jl provides styled widget replacements for ", Main.InlineCode("@bind"), " in notebooks:"
             ),
             Main.Table(
                 Main.TableHeader(
                     Main.TableRow(
-                        Main.TableHead("PlutoUI"),
+                        Main.TableHead("Widget"),
                         Main.TableHead("Suite.jl"),
                         Main.TableHead("Bound Type"),
                         Main.TableHead("Status")
@@ -145,7 +145,7 @@ function WidgetsIndex()
                     Main.TableRow(
                         Main.TableHead("Tier"),
                         Main.TableHead("Therapy.jl Mode"),
-                        Main.TableHead("Pluto Mode")
+                        Main.TableHead("Notebook Mode")
                     )
                 ),
                 Main.TableBody(
@@ -170,7 +170,7 @@ function WidgetsIndex()
             # Package extension
             SectionH2("Zero-Cost Dependency"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
-                "The Pluto integration uses Julia's package extension system. If you only use Therapy.jl, AbstractPlutoDingetjes is never loaded:"
+                "The notebook integration uses Julia's package extension system. If you only use Therapy.jl, the bond protocol library is never loaded:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
                 Main.CodeBlock(language="julia", """# Project.toml
@@ -180,7 +180,7 @@ AbstractPlutoDingetjes = "6e696c72-..."
 [extensions]
 SuitePlutoExt = "AbstractPlutoDingetjes"
 
-# ext/SuitePlutoExt.jl — only loaded inside Pluto
+# ext/SuitePlutoExt.jl — loaded when notebook runtime is active
 module SuitePlutoExt
 using Suite
 import AbstractPlutoDingetjes.Bonds
@@ -191,7 +191,7 @@ end""")
             ),
             Main.Alert(
                 Main.AlertTitle("No overhead"),
-                Main.AlertDescription("In a Therapy.jl-only project, AbstractPlutoDingetjes is never imported. The widget structs exist but the Bonds protocol methods are only defined when Pluto loads the extension.")
+                Main.AlertDescription("In a Therapy.jl-only project, the bond protocol library is never imported. The widget structs exist but the Bonds methods are only defined when the notebook runtime loads the extension.")
             ),
 
             # Next steps
@@ -199,7 +199,7 @@ end""")
             Ul(:class => "list-disc list-inside space-y-2 text-warm-600 dark:text-warm-400 mb-6",
                 Li(
                     A(:href => "./widgets/bind/", :class => "text-accent-600 dark:text-accent-400 hover:underline", "The @bind Pattern"),
-                    " — How the PlutoUI protocol works under the hood"
+                    " — How the bond protocol works under the hood"
                 ),
                 Li(
                     A(:href => "./examples/", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Examples"),

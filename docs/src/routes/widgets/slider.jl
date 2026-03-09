@@ -4,7 +4,7 @@
 # Shows usage with @bind, API reference, and bond protocol details.
 
 function SliderWidgetPage()
-    ComponentsLayout(
+    WidgetsLayout(
         # Header
         PageHeader("Slider Widget", "A range slider for @bind — maps discrete Julia values to an HTML range input via index mapping."),
 
@@ -114,7 +114,7 @@ Suite.Slider(; min=0, max=100, default_value=50)""")
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "possible_values(s)"),
                         Main.TableCell(class="font-mono text-xs", "1:length(s.values)"),
-                        Main.TableCell("Integer indices for PlutoSliderServer")
+                        Main.TableCell("Integer indices for precomputing states")
                     ),
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "transform_value(s, idx)"),
