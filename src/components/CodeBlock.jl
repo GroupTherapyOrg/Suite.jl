@@ -107,7 +107,7 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
     Div(:class => wrapper_classes,
         Symbol("data-codeblock") => "",
         lang_attr..., kwargs...,
-        has_header ? Div(:class => "flex items-center gap-2 border-b border-warm-800 px-4 py-2",
+        has_header ? Div(:class => "flex items-center gap-2 border-b border-warm-800 bg-warm-900/50 px-4 py-2",
             header_items...
         ) : nothing,
         code_content,
