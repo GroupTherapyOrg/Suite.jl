@@ -56,7 +56,7 @@ end
 #   CodeBlock(read("script.jl", String), language="julia", show_line_numbers=true)
 function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool=false,
                    show_copy::Bool=true, class::String="", theme::Symbol=:default, kwargs...)
-    wrapper_classes = cn("group relative overflow-hidden rounded-lg border border-warm-200 dark:border-warm-700 bg-warm-950 dark:bg-warm-950", class)
+    wrapper_classes = cn("group relative overflow-hidden rounded-lg ring-1 ring-warm-200 dark:ring-warm-700 bg-warm-950 dark:bg-warm-950", class)
     theme !== :default && (wrapper_classes = apply_theme(wrapper_classes, get_theme(theme)))
 
     # Header with language badge and copy button
@@ -107,7 +107,7 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
     Div(:class => wrapper_classes,
         Symbol("data-codeblock") => "",
         lang_attr..., kwargs...,
-        has_header ? Div(:class => "flex items-center gap-2 border-b border-warm-800 bg-warm-900/50 px-4 py-2",
+        has_header ? Div(:class => "flex items-center gap-2 border-b border-warm-800 px-4 py-2",
             header_items...
         ) : nothing,
         code_content,
