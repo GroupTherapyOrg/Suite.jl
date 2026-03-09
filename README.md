@@ -7,15 +7,15 @@
     <img alt="Suite.jl" src="logo/suite_light.svg" height="60">
   </picture>
 
-  **A UI component library for [Therapy.jl](https://github.com/GroupTherapyOrg/Therapy.jl) inspired by [shadcn/ui](https://ui.shadcn.com/).**
-
-  54 components, 5 themes, dark mode, and a design system built on warm neutrals and Julia brand colors.
+  **A [shadcn/ui](https://ui.shadcn.com/)-inspired component library for Julia web apps built with [Therapy.jl](https://github.com/GroupTherapyOrg/Therapy.jl).**
 
   [![Docs](https://img.shields.io/badge/docs-stable-blue)](https://grouptherapyorg.github.io/Suite.jl/)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 </div>
 
 ---
+
+Suite.jl gives you 54 pre-built, themed UI components that work with Therapy.jl's three-tier component model. Every component uses warm neutrals + accent colors, supports dark mode, and can be extracted into your project so you own the code.
 
 ## Quick Start
 
@@ -27,11 +27,10 @@ Pkg.add(url="https://github.com/GroupTherapyOrg/Suite.jl")
 ```julia
 import Suite
 
-# A simple card
 Suite.Card(
     Suite.CardHeader(
         Suite.CardTitle("Hello, Suite.jl"),
-        Suite.CardDescription("A beautiful component library for Julia web apps")
+        Suite.CardDescription("A component library for Julia web apps")
     ),
     Suite.CardContent(
         Suite.Button("Get Started")
@@ -39,217 +38,86 @@ Suite.Card(
 )
 ```
 
-## Components
+## Three Component Tiers
 
-### Layout
+Suite.jl components span Therapy.jl's three tiers:
 
-| Component | Exports |
-|-----------|---------|
-| **Card** | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter` |
-| **AspectRatio** | `AspectRatio` |
-| **Separator** | `Separator` |
-| **Resizable** | `ResizablePanelGroup`, `ResizablePanel`, `ResizableHandle` |
-| **ScrollArea** | `ScrollArea` |
+### Static Components — HTML + Tailwind, zero JavaScript
 
-### Data Display
+```julia
+Suite.Card(Suite.CardContent(Suite.Badge("New"), Suite.P("Hello")))
+Suite.Alert(Suite.AlertTitle("Warning"), Suite.AlertDescription("Check this"))
+```
 
-| Component | Exports |
-|-----------|---------|
-| **Table** | `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption` |
-| **DataTable** | `DataTable`, `DataTableColumn` |
-| **Badge** | `Badge` |
-| **Avatar** | `Avatar`, `AvatarImage`, `AvatarFallback` |
-| **Calendar** | `Calendar`, `DatePicker` |
-| **CodeBlock** | `CodeBlock` |
-| **TreeView** | `TreeView`, `TreeViewItem` |
-| **Carousel** | `Carousel`, `CarouselContent`, `CarouselItem`, `CarouselPrevious`, `CarouselNext` |
-| **Skeleton** | `Skeleton` |
-| **Empty** | `Empty`, `EmptyIcon`, `EmptyTitle`, `EmptyDescription`, `EmptyAction` |
-| **Typography** | `H1`, `H2`, `H3`, `H4`, `P`, `Blockquote`, `InlineCode`, `Lead`, `Large`, `Small`, `Muted` |
+Button, Badge, Card, Alert, Avatar, Input, Label, Table, Separator, Progress, Skeleton, Typography, and more.
 
-### Forms & Input
+### Island Components — compiled to WebAssembly, interactive on the client
 
-| Component | Exports |
-|-----------|---------|
-| **Button** | `Button` |
-| **Input** | `Input` |
-| **Textarea** | `Textarea` |
-| **Label** | `Label` |
-| **Select** | `Select`, `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectGroup`, `SelectLabel`, `SelectItem` |
-| **Switch** | `Switch` |
-| **Slider** | `Slider` |
-| **Toggle** | `Toggle` |
-| **ToggleGroup** | `ToggleGroup`, `ToggleGroupItem` |
-| **Form** | `Form`, `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormDescription`, `FormMessage` |
+```julia
+Suite.Tabs(value="code",
+    Suite.TabsList(
+        Suite.TabsTrigger(value="code", "Code"),
+        Suite.TabsTrigger(value="preview", "Preview"),
+    ),
+    Suite.TabsContent(value="code", "println(\"Hello\")"),
+    Suite.TabsContent(value="preview", "Hello")
+)
+```
 
-### Feedback
+Accordion, Calendar, Carousel, CodeBlock, Collapsible, Command, Dialog, Drawer, DropdownMenu, Form, HoverCard, Menubar, NavigationMenu, Popover, Resizable, Select, Sheet, Slider, Switch, Tabs, ThemeToggle, ThemeSwitcher, Toggle, ToggleGroup, Tooltip, and more.
 
-| Component | Exports |
-|-----------|---------|
-| **Alert** | `Alert`, `AlertTitle`, `AlertDescription` |
-| **AlertDialog** | `AlertDialog`, `AlertDialogTrigger`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogFooter`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogAction`, `AlertDialogCancel` |
-| **Dialog** | `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogFooter`, `DialogTitle`, `DialogDescription`, `DialogClose` |
-| **Toast** | `Toaster` |
-| **Progress** | `Progress` |
-| **Spinner** | `Spinner` |
-| **HoverCard** | `HoverCard`, `HoverCardTrigger`, `HoverCardContent` |
-| **Tooltip** | `TooltipProvider`, `Tooltip`, `TooltipTrigger`, `TooltipContent` |
-| **Popover** | `Popover`, `PopoverTrigger`, `PopoverContent` |
+All interactivity compiles to Wasm via `@island` — zero hand-written JavaScript.
 
-### Navigation
+## Themes
 
-| Component | Exports |
-|-----------|---------|
-| **NavigationMenu** | `NavigationMenu`, `NavigationMenuList`, `NavigationMenuItem`, `NavigationMenuTrigger`, `NavigationMenuContent`, `NavigationMenuLink` |
-| **Breadcrumb** | `Breadcrumb`, `BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, `BreadcrumbPage`, `BreadcrumbSeparator` |
-| **Tabs** | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` |
-| **Menubar** | `Menubar`, `MenubarMenu`, `MenubarTrigger`, `MenubarContent`, `MenubarItem`, `MenubarSeparator` |
-| **DropdownMenu** | `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `DropdownMenuSeparator` |
-| **ContextMenu** | `ContextMenu`, `ContextMenuTrigger`, `ContextMenuContent`, `ContextMenuItem` |
-| **Command** | `Command`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem` |
-| **Pagination** | `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink`, `PaginationPrevious`, `PaginationNext` |
+5 built-in themes with automatic dark mode:
 
-### Overlay & Surface
-
-| Component | Exports |
-|-----------|---------|
-| **Sheet** | `Sheet`, `SheetTrigger`, `SheetContent`, `SheetHeader`, `SheetFooter`, `SheetTitle`, `SheetDescription` |
-| **Drawer** | `Drawer`, `DrawerTrigger`, `DrawerContent`, `DrawerHeader`, `DrawerFooter`, `DrawerTitle`, `DrawerDescription` |
-| **Accordion** | `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionContent` |
-| **Collapsible** | `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent` |
-
-### Site Components
-
-| Component | Exports |
-|-----------|---------|
-| **SiteFooter** | `SiteFooter`, `FooterBrand`, `FooterLinks`, `FooterLink`, `FooterTagline` |
-| **SiteNav** | `SiteNav` |
-| **ThemeToggle** | `ThemeToggle` |
-| **ThemeSwitcher** | `ThemeSwitcher` |
-| **StatusBar** | `StatusBar`, `StatusBarSection`, `StatusBarItem` |
-| **Toolbar** | `Toolbar`, `ToolbarGroup`, `ToolbarSeparator` |
-| **Kbd** | `Kbd` |
-
-## Interactivity Status
-
-All interactive behavior is compiled to **WebAssembly** via `@island` — zero JavaScript.
-
-### Fully Interactive (Wasm)
-
-These components have complete click/keyboard/pointer handling compiled to Wasm:
-
-- [x] Accordion (single + multiple mode, collapsible)
-- [x] AlertDialog (open/close, focus trap, escape dismiss)
-- [x] Calendar (day selection — single + multiple mode; month navigation is SSR-only)
-- [x] Carousel (prev/next slide navigation, boundary clamping, loop mode)
-- [x] CodeBlock (copy-to-clipboard button via Wasm)
-- [x] Collapsible (open/close toggle)
-- [x] Command (filtering, keyboard navigation, item selection)
-- [x] ContextMenu (right-click trigger, open/close)
-- [x] Dialog (open/close, focus trap, escape dismiss)
-- [x] Drawer (open/close, focus trap, escape dismiss)
-- [x] DropdownMenu (open/close, item selection)
-- [x] Form (validation, error display)
-- [x] HoverCard (pointer enter/leave)
-- [x] Menubar (multi-menu navigation, keyboard support)
-- [x] NavigationMenu (active item tracking)
-- [x] Popover (open/close, positioning)
-- [x] Resizable (drag handles with pointer capture, keyboard arrow keys)
-- [x] Select (open/close, item selection)
-- [x] Sheet (open/close, focus trap)
-- [x] Slider (drag, keyboard increment; also serves as a `@bind` widget)
-- [x] Switch (toggle on/off)
-- [x] Tabs (tab switching, keyboard navigation)
-- [x] ThemeToggle (dark/light mode)
-- [x] ThemeSwitcher (theme palette switching via DropdownMenu)
-- [x] Toggle (pressed/unpressed)
-- [x] ToggleGroup (single + multiple mode)
-- [x] Tooltip (pointer enter/leave)
-
-### Planned Interactive (Not Yet Wasm)
-
-These components render correctly but interactive elements don't respond to clicks yet:
-
-- [ ] **DataTable** — sort headers, filter input, pagination buttons render but are non-functional
-- [ ] **Toast** — toaster container renders but no client API to trigger notifications
-- [ ] **TreeView** — expand/collapse chevrons render but tree state not tracked
-
-### Pure Styling (No Interactivity Needed)
-
-These components are complete — they're static HTML + CSS with no interactive behavior required:
-
-Alert, AspectRatio, Avatar, Badge, Breadcrumb, Button, Card, Empty, Footer, Input, Kbd, Label, Pagination, Progress, ScrollArea, Separator, Skeleton, Spinner, StatusBar, Table, Textarea, Toolbar, Typography
-
-## Theme System
-
-Suite.jl includes 5 built-in themes with automatic dark mode support:
-
-| Theme | Accent | Description |
-|-------|--------|-------------|
+| Theme | Accent | Style |
+|-------|--------|-------|
 | `default` | Purple | Warm scholarly tones |
 | `ocean` | Blue | Cool and professional |
 | `minimal` | Zinc | Sharp, monospace-friendly |
 | `nature` | Emerald | Organic earthy tones |
 | `islands` | Blue-gray | Floating glass panels |
 
-Themes use CSS custom properties and can be switched at runtime:
-
 ```julia
-# Dark/light mode toggle
-Suite.ThemeToggle()
-
-# Theme palette switcher
-Suite.ThemeSwitcher()
+Suite.ThemeToggle()     # Dark/light mode
+Suite.ThemeSwitcher()   # Switch between themes
 ```
 
-### Design System
+## Extraction (Own the Code)
 
-All components use a shared design system built on:
-
-- **Warm neutrals** (`warm-50` through `warm-950`) for backgrounds, borders, and text
-- **Accent colors** for interactive elements only (links, buttons, active states)
-- **Julia brand colors** for the `.jl` wordmark: Blue `#4063d8`, Green `#389826`, Purple `#9558b2`, Red `#cb3c33`
-
-## Usage with Therapy.jl
-
-Suite.jl is designed for [Therapy.jl](https://github.com/GroupTherapyOrg/Therapy.jl) applications. All components return standard Therapy.jl VNodes:
+Like shadcn/ui, you can extract any component into your project and customize it:
 
 ```julia
-using Therapy
-import Suite
-
-function MyPage()
-    Fragment(
-        Suite.Alert(variant="default",
-            Suite.AlertTitle("Welcome"),
-            Suite.AlertDescription("This is a Suite.jl alert component.")
-        ),
-
-        Suite.Tabs(value="code",
-            Suite.TabsList(
-                Suite.TabsTrigger(value="code", "Code"),
-                Suite.TabsTrigger(value="preview", "Preview"),
-            ),
-            Suite.TabsContent(value="code",
-                Suite.CodeBlock("println(\"Hello!\")", language="julia")
-            ),
-            Suite.TabsContent(value="preview",
-                Suite.P("Hello!")
-            )
-        )
-    )
-end
+Suite.extract(:Button)                    # Copy Button.jl to ./components/
+Suite.extract(:Dialog)                    # Includes dependencies automatically
+Suite.extract(:Button; theme=:ocean)      # Apply theme during extraction
+Suite.list()                              # See all 54 components
+Suite.info(:Dialog)                       # Show deps, tier, exports
 ```
+
+## All Components
+
+| Category | Components |
+|----------|------------|
+| **Layout** | Card, AspectRatio, Separator, Resizable, ScrollArea |
+| **Data Display** | Table, DataTable, Badge, Avatar, Calendar, CodeBlock, TreeView, Carousel, Skeleton, Empty, Typography |
+| **Forms** | Button, Input, Textarea, Label, Select, Switch, Slider, Toggle, ToggleGroup, Form |
+| **Feedback** | Alert, AlertDialog, Dialog, Toast, Progress, Spinner, HoverCard, Tooltip, Popover |
+| **Navigation** | NavigationMenu, Breadcrumb, Tabs, Menubar, DropdownMenu, ContextMenu, Command, Pagination |
+| **Overlay** | Sheet, Drawer, Accordion, Collapsible |
+| **Site** | SiteFooter, SiteNav, ThemeToggle, ThemeSwitcher, StatusBar, Toolbar, Kbd |
 
 ## Requirements
 
 - Julia 1.12+
 - [Therapy.jl](https://github.com/GroupTherapyOrg/Therapy.jl)
-- [WasmTarget.jl](https://github.com/GroupTherapyOrg/WasmTarget.jl) (for interactive island components)
+- [WasmTarget.jl](https://github.com/GroupTherapyOrg/WasmTarget.jl) (for island components)
 
 ## Documentation
 
-Full documentation with live examples: **https://grouptherapyorg.github.io/Suite.jl/**
+Full docs with live examples: **https://grouptherapyorg.github.io/Suite.jl/**
 
 ## License
 
