@@ -37,7 +37,7 @@ Card(
 ```
 """
 function Card(children...; class::String="", theme::Symbol=:default, kwargs...)
-    classes = cn("glass-panel rounded-xl border border-warm-200 dark:border-warm-700 bg-warm-100 dark:bg-warm-900 text-warm-800 dark:text-warm-300 shadow-sm flex flex-col gap-6 py-6 text-sm overflow-hidden", class)
+    classes = cn("glass-panel rounded-xl border border-warm-200 dark:border-warm-700 bg-warm-100 dark:bg-warm-900 text-warm-800 dark:text-warm-300 shadow-sm flex flex-col gap-6 py-6 text-sm", class)
     theme !== :default && (classes = apply_theme(classes, get_theme(theme)))
     Div(:class => classes, kwargs..., children...)
 end
@@ -48,7 +48,7 @@ end
 Header section of a Card containing title and description.
 """
 function CardHeader(children...; class::String="", kwargs...)
-    classes = cn("flex flex-col gap-1.5 px-6", class)
+    classes = cn("flex flex-col gap-1.5 px-8", class)
     Div(:class => classes, kwargs..., children...)
 end
 
@@ -79,7 +79,7 @@ end
 Main content area of a Card.
 """
 function CardContent(children...; class::String="", kwargs...)
-    classes = cn("px-6", class)
+    classes = cn("px-8", class)
     Div(:class => classes, kwargs..., children...)
 end
 
@@ -89,7 +89,7 @@ end
 Footer section of a Card, typically containing action buttons.
 """
 function CardFooter(children...; class::String="", kwargs...)
-    classes = cn("flex items-center px-6", class)
+    classes = cn("flex items-center px-8", class)
     Div(:class => classes, kwargs..., children...)
 end
 
