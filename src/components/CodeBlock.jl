@@ -93,12 +93,12 @@ function CodeBlock(code::String=""; language::String="", show_line_numbers::Bool
                 map(i -> Div(string(i)), 1:length(code_lines))...
             ),
             # Code area
-            Pre(:class => "flex-1 overflow-x-auto p-4 font-mono text-sm leading-6 text-warm-200",
+            Pre(:class => "flex-1 overflow-x-auto !m-0 !bg-transparent p-4 font-mono text-sm leading-6 text-warm-200",
                 Code(:class => lang_class, code)
             ),
         )
     else
-        Pre(:class => "overflow-x-auto p-4 font-mono text-sm leading-6 text-warm-200",
+        Pre(:class => "overflow-x-auto !m-0 !bg-transparent p-4 font-mono text-sm leading-6 text-warm-200",
             Code(:class => lang_class, code)
         )
     end
