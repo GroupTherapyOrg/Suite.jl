@@ -17,7 +17,7 @@ function BindPage()
                 " creates a two-way connection between a Julia variable and an HTML widget:"
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Main.CodeBlock(language="julia", """@bind temperature Suite.SliderWidget(0:100; default=20)
+                Main.CodeBlock(language="julia", """@bind temperature Suite.Slider(0:100; default=20)
 
 # `temperature` is now a reactive Julia variable.
 # Moving the slider updates it, re-executing dependent cells.""")
@@ -130,7 +130,7 @@ plot(transform, 0:0.1:2\u03c0)""")
             Main.Separator(),
 
             # Full example
-            SectionH2("Full Example: Suite.SliderWidget"),
+            SectionH2("Full Example: Suite.Slider"),
             P(:class => "text-warm-600 dark:text-warm-400 leading-relaxed mb-4",
                 "Here's how a complete dual-mode widget is implemented:"
             ),

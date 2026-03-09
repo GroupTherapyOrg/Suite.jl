@@ -1,6 +1,6 @@
 # Widgets — Slider
 #
-# Documentation for Suite.SliderWidget (positional-arg mode).
+# Documentation for Suite.Slider widget mode (positional-arg dispatch).
 # Shows usage with @bind, API reference, and bond protocol details.
 
 function SliderWidgetPage()
@@ -17,7 +17,7 @@ function SliderWidgetPage()
             ),
             Div(:class => "border border-warm-200 dark:border-warm-700 rounded-lg p-6 bg-warm-50/50 dark:bg-warm-900/50 mb-6",
                 RawHtml(let io = IOBuffer()
-                    show(io, MIME"text/html"(), Main.SliderWidget(1:100; label="Temperature"))
+                    show(io, MIME"text/html"(), Main.Slider(1:100; label="Temperature"))
                     String(take!(io))
                 end)
             ),
@@ -32,9 +32,9 @@ function SliderWidgetPage()
                 Main.CodeBlock(language="julia", """using Suite
 
 # Widget mode (positional arg → struct for @bind)
-@bind temperature Suite.SliderWidget(0:100; default=20)
-@bind opacity Suite.SliderWidget(0.0:0.01:1.0; default=0.5)
-@bind color Suite.SliderWidget(["red", "green", "blue"]; default="green")
+@bind temperature Suite.Slider(0:100; default=20)
+@bind opacity Suite.Slider(0.0:0.01:1.0; default=0.5)
+@bind color Suite.Slider(["red", "green", "blue"]; default="green")
 
 # Island mode (keyword-only → VNode for Therapy.jl)
 Suite.Slider(; min=0, max=100, default_value=50)""")
@@ -137,7 +137,7 @@ Suite.Slider(; min=0, max=100, default_value=50)""")
                 " maps it back to the actual Julia value. This enables binding to any Julia type."
             ),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Main.CodeBlock(language="julia", """s = Suite.SliderWidget(["low", "medium", "high"])
+                Main.CodeBlock(language="julia", """s = Suite.Slider(["low", "medium", "high"])
 
 # HTML: <input type="range" min="1" max="3" value="1">
 # User drags to position 2 → JS sends index 2
@@ -151,23 +151,23 @@ Suite.Slider(; min=0, max=100, default_value=50)""")
 
             SectionH3("Integer Range"),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Main.CodeBlock(language="julia", "@bind n Suite.SliderWidget(1:100)\n# n is an Int in 1:100")
+                Main.CodeBlock(language="julia", "@bind n Suite.Slider(1:100)\n# n is an Int in 1:100")
             ),
 
             SectionH3("Float Range"),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Main.CodeBlock(language="julia", "@bind alpha Suite.SliderWidget(0.0:0.01:1.0; default=0.5)\n# alpha is a Float64 in 0.0:0.01:1.0")
+                Main.CodeBlock(language="julia", "@bind alpha Suite.Slider(0.0:0.01:1.0; default=0.5)\n# alpha is a Float64 in 0.0:0.01:1.0")
             ),
 
             SectionH3("Arbitrary Values"),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Main.CodeBlock(language="julia", """@bind city Suite.SliderWidget(["NYC", "LA", "Chicago", "Houston"])
+                Main.CodeBlock(language="julia", """@bind city Suite.Slider(["NYC", "LA", "Chicago", "Houston"])
 # city is a String""")
             ),
 
             SectionH3("With Label"),
             Div(:class => "bg-warm-900 dark:bg-warm-950 rounded-lg p-5 mb-6 overflow-x-auto",
-                Main.CodeBlock(language="julia", """@bind temp Suite.SliderWidget(0:100; default=20, label="Temperature")""")
+                Main.CodeBlock(language="julia", """@bind temp Suite.Slider(0:100; default=20, label="Temperature")""")
             ),
 
             # Next steps

@@ -28,7 +28,7 @@ function WidgetsIndex()
                     P(:class => "text-sm text-warm-600 dark:text-warm-400 mb-3",
                         "In a Pluto notebook, pass a positional argument to get a bindable struct. Use with ", Main.InlineCode("@bind"), "."
                     ),
-                    Main.CodeBlock(language="julia", "@bind value Suite.SliderWidget(1:100)\n@bind lang Suite.Select([\"julia\" => \"Julia\"])")
+                    Main.CodeBlock(language="julia", "@bind value Suite.Slider(1:100)\n@bind lang Suite.Select([\"julia\" => \"Julia\"])")
                 )
             ),
 
@@ -52,12 +52,12 @@ function WidgetsIndex()
                 ),
                 Main.TableBody(
                     Main.TableRow(
-                        Main.TableCell(class="font-mono text-xs", "Suite.SliderWidget(1:100)"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.Slider(1:100)"),
                         Main.TableCell("Struct (widget)"),
                         Main.TableCell("Pluto @bind")
                     ),
                     Main.TableRow(
-                        Main.TableCell(class="font-mono text-xs", "Suite.SliderWidget(; min=0, max=100)"),
+                        Main.TableCell(class="font-mono text-xs", "Suite.Slider(; min=0, max=100)"),
                         Main.TableCell("VNode (HTML)"),
                         Main.TableCell("Therapy.jl rendering")
                     )
@@ -86,7 +86,7 @@ function WidgetsIndex()
                     Main.TableRow(
                         Main.TableCell(class="font-mono text-xs", "Slider"),
                         Main.TableCell(class="font-mono text-xs",
-                            A(:href => "./widgets/slider/", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Suite.SliderWidget")),
+                            A(:href => "./widgets/slider/", :class => "text-accent-600 dark:text-accent-400 hover:underline", "Suite.Slider")),
                         Main.TableCell(class="font-mono text-xs", "eltype(range)"),
                         Main.TableCell(Main.Badge("Available"))
                     ),
@@ -185,8 +185,8 @@ module SuitePlutoExt
 using Suite
 import AbstractPlutoDingetjes.Bonds
 
-Bonds.initial_value(s::Suite.Suite.SliderWidget) = s.default
-Bonds.transform_value(s::Suite.Suite.SliderWidget, val) = s.values[val]
+Bonds.initial_value(s::Suite.SliderWidget) = s.default
+Bonds.transform_value(s::Suite.SliderWidget, val) = s.values[val]
 end""")
             ),
             Main.Alert(

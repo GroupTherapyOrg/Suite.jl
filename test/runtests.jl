@@ -6191,7 +6191,7 @@ using Test
         end
 
         @testset "Slider(1:10) creates correct struct" begin
-            s = Suite.SliderWidget(1:10)
+            s = Suite.Slider(1:10)
             @test s isa SliderWidget{Int}
             @test s.values == collect(1:10)
             @test s.default == 1
@@ -6200,36 +6200,36 @@ using Test
         end
 
         @testset "Slider with float range and default" begin
-            s = Suite.SliderWidget(0.0:0.1:1.0; default=0.5)
+            s = Suite.Slider(0.0:0.1:1.0; default=0.5)
             @test s isa SliderWidget{Float64}
             @test s.default == 0.5
             @test 0.5 in s.values
         end
 
         @testset "Slider with string values" begin
-            s = Suite.SliderWidget(["a", "b", "c"])
+            s = Suite.Slider(["a", "b", "c"])
             @test s isa SliderWidget{String}
             @test s.default == "a"
             @test s.values == ["a", "b", "c"]
         end
 
         @testset "Slider default snaps to closest" begin
-            s = Suite.SliderWidget(1:10; default=5.7)
+            s = Suite.Slider(1:10; default=5.7)
             @test s.default == 6  # closest to 5.7 in 1:10
         end
 
         @testset "initial_value" begin
-            s = Suite.SliderWidget(1:100; default=42)
+            s = Suite.Slider(1:100; default=42)
             @test initial_value(s) == 42
         end
 
         @testset "possible_values" begin
-            s = Suite.SliderWidget(1:10)
+            s = Suite.Slider(1:10)
             @test possible_values(s) == 1:10
         end
 
         @testset "transform_value roundtrip" begin
-            s = Suite.SliderWidget(10:10:100)
+            s = Suite.Slider(10:10:100)
             # Index 1 → 10, index 5 → 50, index 10 → 100
             @test transform_value(s, 1) == 10
             @test transform_value(s, 5) == 50
@@ -6237,7 +6237,7 @@ using Test
         end
 
         @testset "validate_value" begin
-            s = Suite.SliderWidget(1:10)
+            s = Suite.Slider(1:10)
             @test validate_value(s, 1) == true
             @test validate_value(s, 10) == true
             @test validate_value(s, 0) == false   # out of range
@@ -6267,14 +6267,14 @@ using Test
         end
 
         @testset "max_steps downsample" begin
-            s = Suite.SliderWidget(1:5000; max_steps=100)
+            s = Suite.Slider(1:5000; max_steps=100)
             @test length(s.values) == 100
             @test s.values[1] == 1
             @test s.values[end] == 5000
         end
 
         @testset "HTML rendering produces valid output" begin
-            s = Suite.SliderWidget(1:10; default=5)
+            s = Suite.Slider(1:10; default=5)
             io = IOBuffer()
             show(io, MIME"text/html"(), s)
             html = String(take!(io))
@@ -6290,7 +6290,7 @@ using Test
         end
 
         @testset "HTML rendering with label" begin
-            s = Suite.SliderWidget(1:10; label="Temperature")
+            s = Suite.Slider(1:10; label="Temperature")
             io = IOBuffer()
             show(io, MIME"text/html"(), s)
             html = String(take!(io))
@@ -6299,7 +6299,7 @@ using Test
         end
 
         @testset "HTML rendering with show_value=false" begin
-            s = Suite.SliderWidget(1:10; show_value=false)
+            s = Suite.Slider(1:10; show_value=false)
             io = IOBuffer()
             show(io, MIME"text/html"(), s)
             html = String(take!(io))
@@ -6307,7 +6307,7 @@ using Test
         end
 
         @testset "Plain text rendering" begin
-            s = Suite.SliderWidget(1:10; default=5)
+            s = Suite.Slider(1:10; default=5)
             io = IOBuffer()
             show(io, MIME"text/plain"(), s)
             txt = String(take!(io))
@@ -6318,7 +6318,7 @@ using Test
 
         @testset "Index-mapping roundtrip" begin
             vals = [10, 20, 30, 40, 50]
-            s = Suite.SliderWidget(vals; default=30)
+            s = Suite.Slider(vals; default=30)
             # default is at index 3
             idx = Suite._slider_index(s, 30)
             @test idx == 3

@@ -1,23 +1,26 @@
 # Slider.jl — Suite.jl Slider Component
 #
-# Tier: island (Wasm — no JavaScript required)
+# Tier: island + widget (Wasm interactivity + @bind protocol)
 # Suite Dependencies: none (leaf component)
 # JS Modules: none
 #
-# Usage via package: using Suite; Slider(default_value=50)
-# Usage via extract: include("components/Slider.jl"); Slider(...)
+# Usage:
+#   Slider(; min=0, max=100, default_value=50)   # Island mode → VNode
+#   Slider(1:100)                                  # Widget mode → SliderWidget
+#   Slider(1:100; default=50, show_value=true)     # Widget mode with options
 #
-# Behavior (Thaw-style inline Wasm):
+# Island behavior (Thaw-style inline Wasm):
 #   - Range slider with track, fill range, and draggable thumb
 #   - Inline Wasm: pointer capture for drag, keyboard for arrow/Home/End
-#   - Pointer down: capture pointer, calculate position, update signal
-#   - Pointer move: update signal from pointer position (while dragging)
-#   - Pointer up: release pointer capture
-#   - Keyboard: Arrow keys ±step, Home/End min/max
 #   - ARIA: role=slider on thumb with aria-valuenow/min/max/orientation
 #   - Supports horizontal and vertical orientation
 #
-# Architecture: Monolithic @island
+# Widget behavior (@bind protocol):
+#   - SliderWidget struct with index-mapped HTML rendering
+#   - Bond protocol: initial_value, possible_values, transform_value, validate_value
+#   - HTML <input type="range"> with inline JS for .value + input event
+#
+# Architecture: Monolithic @island (manual registration for multiple dispatch)
 #   - Single island handles 2 signals + 4 event handlers
 #   - Signal 0: dragging (Int32, 0 or 1)
 #   - Signal 1: value (Int32, percentage * 100, range 0-10000)
@@ -36,36 +39,9 @@
 if !@isdefined(Div); using Therapy end
 if !@isdefined(cn); include(joinpath(@__DIR__, "..", "utils.jl")) end
 
-# --- Component Implementation ---
+# --- Island Render Function (replaces @island macro expansion) ---
 
-export Slider
-
-#   Slider(; min, max, step, default_value, orientation, disabled, class, kwargs...) -> IslandVNode
-#
-# An input where the user selects a value from within a given range.
-# Interactive behavior is compiled to WebAssembly — no JavaScript required.
-#
-# Inline Wasm behavior (Thaw-style):
-#   - Pointer down on track: capture pointer, calculate value, update signal
-#   - Pointer move (dragging): recalculate value from pointer position
-#   - Pointer up: release pointer capture
-#   - Keyboard: arrows ± step, Home = min, End = max
-#
-# Props:
-# - `min`: Minimum value (default `0`)
-# - `max`: Maximum value (default `100`)
-# - `step`: Step increment (default `1`)
-# - `default_value`: Initial value (default `0`)
-# - `orientation`: `"horizontal"` or `"vertical"` (default `"horizontal"`)
-# - `disabled`: Disable the slider (default `false`)
-#
-# Examples:
-#   Slider()
-#   Slider(default_value=50, min=0, max=100)
-#   Slider(step=10, default_value=30)
-#   Slider(orientation="vertical")
-#   Slider(disabled=true, default_value=40)
-@island function Slider(; min::Real=0, max::Real=100, step::Real=1,
+function _island_render_Slider(; min::Real=0, max::Real=100, step::Real=1,
                   default_value::Real=0, orientation::String="horizontal",
                   disabled::Bool=false, theme::Symbol=:default,
                   class::String="", kwargs...)
@@ -145,7 +121,6 @@ export Slider
     Span(root_attrs..., kwargs...,
         # Handler 0: pointerdown — capture pointer, compute value from position
         # NOTE: All Float64 arithmetic — WasmTarget cannot compile Int32(Float64)
-        # Handler 0: pointerdown — capture pointer, compute value from position
         # NOTE: No conditional reassignment — WasmTarget phi nodes are broken.
         # CSS naturally clips values outside 0-100% range.
         :on_pointerdown => () -> begin
@@ -239,6 +214,75 @@ export Slider
              :class => thumb_classes,
              :style => thumb_style),
     )
+end
+
+# --- Body expression for Wasm v2 compilation ---
+# Captured as Expr (same as what @island QuoteNode(body) would produce)
+const _SLIDER_BODY_EXPR = quote
+    dragging, set_dragging = create_signal(Int32(0))
+    value, set_value = create_signal(compiled_get_prop_i32(Int32(1)))
+    clamped = clamp(default_value, min, max)
+    pct = max > min ? (clamped - min) / (max - min) * 100 : 0
+    is_vertical = orientation == "vertical"
+    root_classes = cn("relative flex touch-none select-none items-center", is_vertical ? "h-full min-h-44 w-auto flex-col" : "w-full", disabled ? "opacity-50 pointer-events-none" : "", class)
+    track_classes = cn("relative grow overflow-hidden rounded-full bg-accent-600/20 dark:bg-accent-600/30", is_vertical ? "h-full w-1.5" : "h-1.5 w-full")
+    range_classes = cn("absolute bg-accent-600 rounded-full", is_vertical ? "w-full" : "h-full")
+    range_style = if is_vertical; "bottom: 0; height: $(pct)%;"; else; "left: 0; width: $(pct)%;"; end
+    thumb_classes = cn("block size-4 shrink-0 rounded-full border border-accent-600 bg-warm-50 dark:bg-warm-950", "shadow-sm cursor-pointer transition-[color,box-shadow]", "hover:ring-4 hover:ring-accent-600/20", "focus-visible:ring-4 focus-visible:ring-accent-600/50 focus-visible:outline-hidden")
+    thumb_style = if is_vertical; "position: absolute; left: 50%; bottom: $(pct)%; transform: translate(-50%, 50%);"; else; "position: absolute; top: 50%; left: $(pct)%; transform: translate(-50%, -50%);"; end
+    if theme !== :default; t = get_theme(theme); root_classes = apply_theme(root_classes, t); track_classes = apply_theme(track_classes, t); range_classes = apply_theme(range_classes, t); thumb_classes = apply_theme(thumb_classes, t); end
+    root_attrs = Pair{Symbol,Any}[Symbol("data-slider") => "", Symbol("data-orientation") => orientation, Symbol("data-min") => string(min), Symbol("data-max") => string(max), Symbol("data-step") => string(step), Symbol("data-value") => string(clamped), :class => root_classes]
+    if disabled; push!(root_attrs, Symbol("data-disabled") => ""); push!(root_attrs, :aria_disabled => "true"); end
+    Span(root_attrs..., kwargs...,
+        :on_pointerdown => () -> begin; el = Int32(0); capture_pointer(el); set_dragging(Int32(1)); track_el = Int32(1); rx = get_bounding_rect_x(track_el); rw = get_bounding_rect_w(track_el); px = get_pointer_x(); pct = (px - rx) * Float64(100) / rw; set_style_percent(Int32(2), Int32(2), pct); set_style_percent(Int32(3), Int32(0), pct); end,
+        :on_pointermove => () -> begin; if dragging() == Int32(1); track_el = Int32(1); rx = get_bounding_rect_x(track_el); rw = get_bounding_rect_w(track_el); px = get_pointer_x(); pct = (px - rx) * Float64(100) / rw; set_style_percent(Int32(2), Int32(2), pct); set_style_percent(Int32(3), Int32(0), pct); end; end,
+        :on_pointerup => () -> begin; el = Int32(0); release_pointer(el); set_dragging(Int32(0)); end,
+        :on_keydown => () -> begin; key = get_key_code(); cur = value(); if key == Int32(39); nv1 = cur + Int32(100); set_value(nv1); p1 = Float64(nv1) / Float64(100); set_style_percent(Int32(2), Int32(2), p1); set_style_percent(Int32(3), Int32(0), p1); end; if key == Int32(38); nv2 = cur + Int32(100); set_value(nv2); p2 = Float64(nv2) / Float64(100); set_style_percent(Int32(2), Int32(2), p2); set_style_percent(Int32(3), Int32(0), p2); end; if key == Int32(37); nv3 = cur - Int32(100); set_value(nv3); p3 = Float64(nv3) / Float64(100); set_style_percent(Int32(2), Int32(2), p3); set_style_percent(Int32(3), Int32(0), p3); end; if key == Int32(40); nv4 = cur - Int32(100); set_value(nv4); p4 = Float64(nv4) / Float64(100); set_style_percent(Int32(2), Int32(2), p4); set_style_percent(Int32(3), Int32(0), p4); end; end,
+        Span(Symbol("data-slider-track") => "", Symbol("data-orientation") => orientation, :class => track_classes,
+            Span(Symbol("data-slider-range") => "", Symbol("data-orientation") => orientation, :class => range_classes, :style => range_style)),
+        Span(Symbol("data-slider-thumb") => "", Symbol("data-orientation") => orientation, :role => "slider", :tabindex => disabled ? "-1" : "0", :aria_valuenow => string(clamped), :aria_valuemin => string(min), :aria_valuemax => string(max), :aria_orientation => orientation, :class => thumb_classes, :style => thumb_style))
+end
+
+# --- IslandDef registration (manual — replaces @island binding) ---
+
+const _SLIDER_ISLAND_DEF = Therapy.IslandDef(:Slider, _island_render_Slider, false, _SLIDER_BODY_EXPR)
+Therapy.ISLAND_REGISTRY[:Slider] = _SLIDER_ISLAND_DEF
+
+# --- Slider: unified function with multiple dispatch ---
+
+export Slider
+
+"""
+    Slider(; min=0, max=100, step=1, default_value=0, ...) -> IslandVNode
+
+Island mode: renders an interactive Wasm-powered range slider.
+
+    Slider(values::AbstractVector; default=missing, show_value=true, ...) -> SliderWidget
+
+Widget mode: creates a SliderWidget struct for use with `@bind` in notebooks.
+Same component, two dispatch modes via Julia's multiple dispatch.
+
+# Examples
+```julia
+# Island mode (keyword-only → interactive Wasm slider)
+Slider(; min=0, max=100, default_value=50)
+
+# Widget mode (positional vector → @bind struct)
+@bind x Slider(1:100)
+@bind y Slider(0.0:0.01:1.0; default=0.5)
+```
+"""
+function Slider(; kwargs...)
+    _SLIDER_ISLAND_DEF(; kwargs...)
+end
+
+function Slider(values::AbstractVector{T};
+        default=missing, show_value::Bool=true, label::String="",
+        class::String="", theme::Symbol=:default,
+        max_steps::Integer=1_000) where T
+    vs = _downsample(collect(values), max_steps)
+    d = default === missing ? first(vs) : _closest(vs, default)
+    SliderWidget{T}(vs, d, show_value, label, class, theme)
 end
 
 # --- Hydration Support ---

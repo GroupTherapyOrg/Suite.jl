@@ -116,11 +116,6 @@ include("components/TreeView.jl")
 # --- Widget Protocol & Implementations ---
 include("widgets.jl")
 
-# --- Widget Constructors ---
-# SliderWidget(1:100) creates a widget struct for @bind.
-# Slider(; min=0, max=100) creates an island VNode (existing behavior).
-# Usage: @bind x Suite.SliderWidget(1:100)
-
 export SliderWidget, AbstractSuiteWidget
 export initial_value, possible_values, transform_value, validate_value
 
@@ -139,6 +134,8 @@ function __init__()
             Therapy.ISLAND_REGISTRY[val.name] = val
         end
     end
+    # Slider uses manual IslandDef (not @island) for multiple dispatch support
+    Therapy.ISLAND_REGISTRY[:Slider] = _SLIDER_ISLAND_DEF
 
     # Register props transforms for Wasm compilation (used by compile_island)
     Therapy.register_island_props_transform!(:Tabs, _TABS_PROPS_TRANSFORM)
